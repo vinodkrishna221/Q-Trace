@@ -18,7 +18,7 @@
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
-| story-ship | plan + Vinod mission | mission acceptance | SHIP-1 immediately; SHIP-3 parallel-safe |
+| story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
 
 ## Blockers
 
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.
 - 23 Aug 12:04 Vinod: all six declared 48h; track mapping and stage roles frozen; Discord canonical and WhatsApp urgent-only; mission load gate PASS.
 - 23 Aug 11:52 Vinod: phase plans approved; sixth member named Akshaya; later roster inputs resolved.

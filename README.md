@@ -1,83 +1,101 @@
-# ⚔️ WarRoom
+# ⚛️ Q-Trace — Quantum Flight Recorder & Learning Platform
 
-**A hackathon operating system for AI-agent teams.** One `.agents/` brain — 12 specialist
-personas, battle-tested rules, 12 skills, 10 slash-command workflows — synced into
-**Antigravity**, **Claude Code**, and **OpenCode**, so every teammate's agent shows up
-already knowing the plan, the stack, and the standards.
+> **Q-Trace** is an AI-assisted quantum computing learning platform where learners predict, build, simulate, inspect, and repair quantum circuits. Featuring the **Quantum Flight Recorder**, Q-Trace pinpoints the exact gate where a learner's conceptual model diverged, provides evidence-grounded tutoring, and tracks progress.
 
-Built for the loop most teams do badly by hand:
+---
 
-```
-/ideate → /kickoff → /blueprint → /phase-plan → /missions
-   ↓ (build loop, per member, remote)
-pick task → build with persona → PR → fresh-eyes review → merge
-   ↓
-/standup … /pivot (if needed) … /integrate → /ship → /retro
-```
+## 🚀 Quick Start & Development
 
-## 60-Second Setup (start of every hackathon)
+### 1. Prerequisites
+- **Node.js**: v20+ (v24 recommended) & **pnpm**: v10+
+- **Python**: v3.12+
 
+### 2. Environment Setup
 ```bash
-git clone <this-template> my-hack && cd my-hack
-./scripts/new-hackathon.sh        # name the project, pick team/solo, toggle stacks
-./scripts/sync.sh                 # mirror the brain into all three tools
-git init && git add -A && git commit -m "chore: warroom init" && git push
+# Copy the environment template
+cp .env.example .env
 ```
 
-Then open your tool of choice and run `/ideate` (or `/kickoff` if the idea is fixed).
+### 3. Install & Run
 
-**Adoption note: only the LEAD needs to read the whole kit.** Teammates read
-`START-HERE.md` + their own mission file — the context capsules carry everything else.
-First event with a new team? Run `/drill` (a 2-hour rehearsal) before it counts —
-field data says it's the difference between 70% and full speed.
+#### Frontend (`apps/web` — Next.js 15 App Router):
+```bash
+# Install frontend dependencies
+pnpm install
 
-## What Makes It Different
+# Run the web development server (http://localhost:3000)
+pnpm dev:web
+```
 
-- **The Ideation Gauntlet** — predicts the ideas every other team's ChatGPT will pitch,
-  bans them, and forces divergence under constraint lenses. Then triages by
-  demo-impact × build-cost so you never pick the "impressive but unbuildable in 36h" trap.
-- **The Problem Prospector** — for self-proposed events (SIH Open Innovation): mines
-  real problems from streams where institutions admit them with numbers (CAG audits,
-  parliamentary questions, grievance stats, tenders, failed pilots) — triangulated,
-  chair-test filtered, and shipped as submission-ready PS docs. Found, not invented.
-  A software-native screen runs BEFORE mining starts (kills physical/hardware-only
-  cells) and again on every wedge (no fabrication, demos standalone) — so an all-CS
-  team never burns budget on problems it can't build.
-- **Judge simulation all the way down** — Oracle scores the idea AND the evolving build
-  against the actual rubric at every standup. You never drift from what's scored.
-- **Contract-first missions** — API/event contracts are committed files; teammates (and
-  their agents) build in parallel without integration hell.
-- **Advisor protocol** — personas are required to push back with evidence when you're
-  over-scoping or rebuilding something that already exists. (Scout runs prior-art checks
-  before any non-trivial build.)
-- **Solo mode** — one human? The cast becomes your team: missions assigned to personas,
-  parallel agent sessions via git worktrees, and a fresh-context Warden review before
-  every merge. Branches + PRs stay.
-- **Ponytail + Caveman** (bundled, MIT, upstream-credited) — YAGNI-enforced code,
-  token-compressed chatter. Discipline for what gets built and what gets said.
+#### Backend API (`apps/api` — FastAPI Modular Monolith):
+```bash
+# Install backend in a virtual environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+source .venv/bin/activate
 
-## The Cast
+pip install -e "./apps/api[quantum,dev]"
 
-Orion (architect) · Maverick (contrarian ideator) · Oracle (judge simulator) ·
-Scout (intel & prior-art) · Nova (Next.js) · Forge (FastAPI) · Volt (Node) ·
-Atlas (Mongo/Convex) · Sage (AI/RAG/voice/MCP) · Warden (review) · Patch (integrate/deploy) ·
-Herald (pitch & demo).
+# Run backend API server (http://localhost:8000)
+uvicorn apps.api.app.main:app --reload --port 8000
+```
 
-## Read Next
+### 4. Layout & Environment Check
+```bash
+bash scripts/check-layout.sh
+```
 
-- **Leads:** `docs/LEADER-MANUAL.md` — the command manual: the decisions only you make,
-  per-phase sign-offs, fleet management, the ten ways leads lose
-- **Members:** `docs/MEMBER-MANUAL.md` — the execution manual: the loop, the five laws,
-  agent craft, eval-round duties, the when-things-go-wrong table
-- `docs/WORKFLOW.md` — the full playbook: timelines (24/36/48h), team + solo modes, rituals
-- `docs/TOOL-PATHS.md` — where everything lands in each tool, manual fallbacks
-- `AGENTS.md` — the always-loaded law every agent obeys
+---
 
-## Credits
+## 📁 Repository Structure
 
-- [ponytail](https://github.com/DietrichGebert/ponytail) © Dietrich Gebert, MIT — bundled verbatim
-- [caveman](https://github.com/JuliusBrussee/caveman) © Julius Brussee, MIT — bundled verbatim
-- [bolt-slides](https://github.com/stackblitz/bolt-slides) © StackBlitz, MIT — deck engine + skill (bundled, hidden demo-trigger removed)
-- Command-vocabulary inspiration: GitHub Spec Kit · Scale-gate inspiration: BMAD-METHOD
+```
+├── apps/
+│   ├── web/                     # Next.js 15+ App Router frontend
+│   │   ├── app/                 # App Router pages and layouts
+│   │   ├── components/          # Shared UI components
+│   │   ├── features/            # Circuit workspace & learning features
+│   │   ├── tests/               # Unit, fixture, and acceptance tests
+│   │   └── e2e/                 # Playwright end-to-end tests
+│   └── api/                     # FastAPI backend modular monolith
+│       ├── app/
+│       │   ├── main.py          # Application entrypoint & health routes
+│       │   ├── routers/         # API domain routers (circuits, sim, tutor)
+│       │   ├── services/        # Quantum runtime, diagnosis, and tutor services
+│       │   ├── repositories/    # MongoDB Atlas & in-memory seed stores
+│       │   ├── prompts/         # Structured evidence prompts
+│       │   └── models/          # Domain schemas & validation
+│       └── tests/               # Unit, contract, fixture, security tests
+├── board/
+│   ├── contracts/               # Shared API, circuit, and event contracts
+│   ├── STATUS.md                # Live project heartbeat and glance-source
+│   ├── DECISIONS.md             # Architecture decisions and contract changes
+│   └── TEAM.md                  # Team member roles, tracks, and shift plan
+├── docs/                        # PRD, Architecture, and Schema documentation
+├── missions/                    # Per-member mission briefs
+├── plans/                       # Per-track phase plans and task DAGs
+└── scripts/                     # Tooling, smoke tests, and check scripts
+```
 
-MIT. Fork it, win with it, `/retro` it better.
+---
+
+## 🌿 Git Branch & PR Conventions
+
+- **Branch Naming:** `feat/<track>/<card-id>-<short-description>`
+  - Example: `feat/story-ship/ship-1-scaffold-the-monorepo-and-environment`
+  - Example: `feat/learning-ux/ux-1-create-the-learner-application-shell`
+  - Example: `feat/simulation-api/sim-1-create-the-fastapi-service-boundary`
+- **Commit Messages:** Conventional Commits (`feat(scope): ...`, `fix(scope): ...`, `chore(scope): ...`)
+- **Rules:**
+  - One card per branch.
+  - Run the card's exact TEST command before marking complete.
+  - Every PR requires a fresh-session Warden review before merge.
+  - Contracts in `board/contracts/` change only via version bump + DECISIONS entry + consumer ping.
+
+---
+
+# ⚔️ WarRoom System
+
+Operated under the **WarRoom** hackathon operating system. Persona rules and workflows are located in `.agents/`.

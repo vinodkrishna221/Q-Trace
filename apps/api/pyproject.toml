@@ -1,0 +1,29 @@
+[project]
+name = "qtrace-api"
+version = "0.1.0"
+description = "Q-Trace Backend API — Quantum simulation, Flight Recorder diagnosis, and learning services"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "pymongo>=4.10.0",
+    "httpx>=0.28.0",
+]
+
+[project.optional-dependencies]
+quantum = [
+    "qiskit>=2.3.0",
+    "qiskit-aer>=0.17.0",
+    "pennylane>=0.45.0",
+]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

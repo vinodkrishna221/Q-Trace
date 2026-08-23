@@ -1,7 +1,7 @@
 # Mission — Vinod Krishna · Integration, deployment and shared story
 
 > Context capsule: this file + the repo = everything needed in any tool, cold.
-> ACCEPTED: [ ] **Vinod Krishna ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
+> ACCEPTED: [x] **Vinod Krishna ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
 
 ## The project in 30 seconds
 
@@ -47,7 +47,7 @@ DELIVERABLE: Create root workspace files, `apps/web`, `apps/api`, scripts/test d
 TEST: `bash scripts/check-layout.sh` verifies required directories/env names and that no secret value is committed.
 DEPENDS: —          UNBLOCKS: UX-1,SIM-1,DATA-1,QA-1,SHIP-2
 DEMO: Every teammate can clone and begin a track without inventing paths.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 BRANCH: `feat/story-ship/ship-1-scaffold-the-monorepo-and-environment`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -154,6 +154,6 @@ Lead the opening problem and one-line pitch; explain architecture, feasibility a
 
 ## Acceptance
 
-- [ ] I, **Vinod Krishna**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
-- [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
-- [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+- [x] I, **Vinod Krishna**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
+- [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
+- [x] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.

@@ -62,7 +62,7 @@ DELIVERABLE: Create root workspace files, `apps/web`, `apps/api`, scripts/test d
 TEST: `bash scripts/check-layout.sh` verifies required directories/env names and that no secret value is committed.
 DEPENDS: —          UNBLOCKS: UX-1,SIM-1,DATA-1,QA-1,SHIP-2
 DEMO: Every teammate can clone and begin a track without inventing paths.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 
 ### SHIP-2 · Create the one-laptop demo launcher                        [timebox: 2h]
 CONTEXT: Web/API shells exist. Load SIH arena and deploy-runbook. The launcher must force memory seeds and Tutor fallback, not require Atlas or internet.

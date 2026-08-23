@@ -1,0 +1,15 @@
+{
+  "name": "q-trace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Q-Trace — AI-assisted quantum learning platform with Quantum Flight Recorder",
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "uvicorn apps.api.app.main:app --reload --port 8000",
+    "build:web": "pnpm --filter web build",
+    "test:web": "pnpm --filter web test",
+    "lint:web": "pnpm --filter web lint",
+    "check:layout": "bash scripts/check-layout.sh"
+  },
+  "packageManager": "pnpm@10.33.0"
+}
