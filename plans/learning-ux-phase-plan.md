@@ -62,7 +62,7 @@ DELIVERABLE: Create `apps/web` with App Router, strict TypeScript, Tailwind, sha
 TEST: `pnpm --dir apps/web test -- role-switch` renders three synthetic roles and opens `/learn/bell-state` as Aarav without network access.
 DEPENDS: SHIP-1          UNBLOCKS: UX-2,SHIP-2
 DEMO: The judge sees a credible product shell and can enter as Aarav.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-2 · Render the Bell Module and capture a prediction                        [timebox: 2h]
 CONTEXT: UX-1 provides the shell. Load `learning-content.md`, `circuit-simulation.md` and the Bell module fixture. The learner-led story requires a structured pre-run answer, not free text.
