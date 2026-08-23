@@ -1,7 +1,7 @@
 # Mission — Venu Gopal · Learner experience and live demo operation
 
 > Context capsule: this file + the repo = everything needed in any tool, cold.
-> ACCEPTED: [ ] **Venu Gopal ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
+> ACCEPTED: [x] **Venu Gopal ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
 
 ## The project in 30 seconds
 
@@ -48,7 +48,7 @@ DELIVERABLE: Create `apps/web` with App Router, strict TypeScript, Tailwind, sha
 TEST: `pnpm --dir apps/web test -- role-switch` renders three synthetic roles and opens `/learn/bell-state` as Aarav without network access.
 DEPENDS: SHIP-1          UNBLOCKS: UX-2,SHIP-2
 DEMO: The judge sees a credible product shell and can enter as Aarav.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-1-create-the-learner-application-shell`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -165,7 +165,7 @@ Operate the live demo; narrate Aarav/Meera entry, Prediction Checkpoint, Circuit
 - Contract change: edit contract → bump version/changelog → DECISIONS entry → ping consumers in Discord → then change code.
 
 ## Acceptance
-
-- [ ] I, **Venu Gopal**, accept this mission, the 20h card load, file boundary, first branch and shared pitch beat.
-- [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
-- [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+ 
+- [x] I, **Venu Gopal**, accept this mission, the 20h card load, file boundary, first branch and shared pitch beat.
+- [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
+- [x] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.

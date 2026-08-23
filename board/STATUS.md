@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission | mission acceptance | UX-1 after SHIP-1 |
+| learning-ux | plan + Venu mission + UX-1 | PR review (UX-1) | UX-2 |
 | simulation-api | plan + Uday mission | mission acceptance | SIM-1 after SHIP-1 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 23 Aug 18:42 Venu: UX-1 green — Next.js learner app shell, shadcn primitives, dark theme, route groups (learn/lab/progress/instructor), contract fixture loader, and role switch established; 3/3 tests passed, next build passed (9/9 static routes), PR ready for Warden review.
 - 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.
 - 23 Aug 12:04 Vinod: all six declared 48h; track mapping and stage roles frozen; Discord canonical and WhatsApp urgent-only; mission load gate PASS.
