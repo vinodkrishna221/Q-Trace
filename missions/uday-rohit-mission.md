@@ -78,7 +78,7 @@ DELIVERABLE: Implement POST/GET Simulation Run routes, synchronous timeout/threa
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_simulation_routes.py` posts the contract Bell request and retrieves the same persisted run with duration and request ID.
 DEPENDS: SIM-3,DATA-1          UNBLOCKS: UX-4,SIM-5,SIM-6,AI-4,QA-3
 DEMO: The frontend can run a real circuit and replay a persistent State Trace.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-4-expose-and-persist-simulation-runs`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
