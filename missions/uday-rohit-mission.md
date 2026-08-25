@@ -58,7 +58,7 @@ DELIVERABLE: Add Pydantic v2 Circuit Model/Operation types, closed gate enum, qu
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_circuit_model.py` accepts Bell and rejects RX, six qubits, duplicate op IDs and invalid control/target mappings.
 DEPENDS: SIM-1          UNBLOCKS: SIM-3
 DEMO: Ensures the visual builder cannot send unsafe or ambiguous circuits.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-2-validate-the-canonical-circuit-model`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
