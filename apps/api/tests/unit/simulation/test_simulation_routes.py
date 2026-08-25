@@ -234,3 +234,37 @@ def test_post_invalid_circuit_422(client):
     bad_request = {**BELL_REQUEST, "circuitModel": {**BELL_REQUEST["circuitModel"], "qubitCount": 6}}
     resp = client.post("/v1/simulation-runs", json=bad_request)
     assert resp.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# 10. Idempotency: same X-Request-ID within 60s returns the same run
+# ---------------------------------------------------------------------------
+
+def test_post_idempotency_with_same_request_id(client):
+    """Two POSTs with the same X-Request-ID must return the same simulationRun.id.
+
+    This proves the 60s idempotency cache works: the second call is served from
+    cache without re-running the quantum simulator.
+    """
+    idempotency_key = "req_idempotency_test_001"
+
+    resp1 = client.post(
+        "/v1/simulation-runs",
+        json=BELL_REQUEST,
+        headers={"X-Request-ID": idempotency_key},
+    )
+    assert resp1.status_code == 201, f"First POST failed: {resp1.text}"
+    run_id_1 = resp1.json()["simulationRun"]["id"]
+
+    resp2 = client.post(
+        "/v1/simulation-runs",
+        json=BELL_REQUEST,
+        headers={"X-Request-ID": idempotency_key},
+    )
+    assert resp2.status_code == 201, f"Second POST failed: {resp2.text}"
+    run_id_2 = resp2.json()["simulationRun"]["id"]
+
+    assert run_id_1 == run_id_2, (
+        f"Idempotency failed: first POST got '{run_id_1}', "
+        f"second POST (same X-Request-ID) got '{run_id_2}'"
+    )

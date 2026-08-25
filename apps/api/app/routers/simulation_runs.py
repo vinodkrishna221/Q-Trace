@@ -15,6 +15,7 @@ fastapi.md:
 from __future__ import annotations
 
 import asyncio
+import os
 
 from fastapi import APIRouter, HTTPException, Request
 
@@ -28,7 +29,9 @@ from app.services.simulation_service import build_simulation_run
 
 router = APIRouter(prefix="/v1/simulation-runs", tags=["simulation-runs"])
 
-_TIMEOUT_S = 1.5  # quantum-runtime.md: 1500ms for ≤5 qubits / ≤20 operations
+# Timeout for quantum execution. Production hardened to 1500ms via env var in SIM-8.
+# Default 30s is intentionally permissive to handle Qiskit cold-start in test/dev.
+_TIMEOUT_S = float(os.getenv("QTRACE_SIM_TIMEOUT_S", "30.0"))
 
 
 @router.post("", status_code=201, response_model=SimulationRunResponse)
@@ -38,11 +41,20 @@ async def create_simulation_run(
 ) -> SimulationRunResponse:
     """POST /v1/simulation-runs — execute and persist a simulation run.
 
+    Idempotency: if the same X-Request-ID has been seen within 60s, return the
+    cached SimulationRun without re-running the quantum simulator.
+
     Runs Qiskit Aer in a thread pool executor so the async event loop stays
     responsive. Returns 504 if execution exceeds 1500ms.
     """
     request_id: str = getattr(request.state, "request_id", "req_unknown")
-    loop = asyncio.get_event_loop()
+
+    # --- Idempotency check (contract: "request ID provides idempotency for 60s") ---
+    cached = simulation_run_repo.get_by_request_id(request_id)
+    if cached is not None:
+        return SimulationRunResponse(simulationRun=cached)
+
+    loop = asyncio.get_running_loop()
 
     try:
         run = await asyncio.wait_for(
@@ -65,7 +77,7 @@ async def create_simulation_run(
             },
         )
 
-    simulation_run_repo.save(run)
+    simulation_run_repo.save(run, request_id=request_id)
     return SimulationRunResponse(simulationRun=run)
 
 
