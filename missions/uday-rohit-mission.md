@@ -48,7 +48,7 @@ DELIVERABLE: Create `apps/api` with uv project, FastAPI app, CORS settings, requ
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_health.py` proves health=200, readiness reports primary adapter status and errors include requestId.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-2,SHIP-2
 DEMO: Plumbing for the first deployable backend and every quantum endpoint.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-1-create-the-fastapi-service-boundary`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
