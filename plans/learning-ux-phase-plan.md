@@ -78,7 +78,7 @@ DELIVERABLE: Add a read-only two-wire Circuit Workspace, generated Qiskit panel,
 TEST: `pnpm --dir apps/web test -- mocked-bell-loop` walks every state and verifies basis labels `00`/`11`, `MIXED_SUBSYSTEM`, evidence keys and repair success.
 DEPENDS: UX-2          UNBLOCKS: UX-4
 DEMO: The full 90-second learner story can be rehearsed before backend merge.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-4 · Swap the Bell journey to live contracts                        [timebox: 2h]
 CONTEXT: The mocked loop is green and P0 domain endpoints exist. Load all four contracts and keep fixtures behind `DEMO_LOCAL` fallback. Do not redesign screens or alter response shapes.
