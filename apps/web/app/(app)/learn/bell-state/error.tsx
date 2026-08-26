@@ -14,18 +14,18 @@ export default function Error({
 }) {
   return (
     <div className="flex items-center justify-center min-h-[50vh] p-4" data-testid="learn-error-shell">
-      <Card className="border-rose-900/60 bg-zinc-900/90 max-w-lg w-full">
+      <Card className="border-danger/40 bg-zinc-900/90 max-w-lg w-full">
         <CardHeader>
-          <div className="flex items-center gap-2 text-rose-400">
+          <div className="flex items-center gap-2 text-danger">
             <AlertTriangle className="w-5 h-5" />
             <CardTitle className="text-lg">Module Loading Error</CardTitle>
           </div>
-          <CardDescription className="text-xs text-zinc-400">
+          <CardDescription className="text-xs text-ink-dim">
             An error occurred while loading this quantum learning module.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-3 rounded bg-zinc-950 border border-zinc-800 text-xs font-mono text-rose-300">
+          <div className="p-3 rounded bg-abyss border border-line text-xs font-mono text-danger">
             {error.message || 'Unknown render error in module shell.'}
           </div>
         </CardContent>
