@@ -4,9 +4,31 @@ import * as React from 'react';
 import { ContentBlock } from '@/lib/contracts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BookOpen, AlertCircle, Info, Sigma } from 'lucide-react';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 
 interface ConceptBlocksProps {
   contentBlocks: ContentBlock[];
+}
+
+function FormulaBlock({ latex }: { latex: string }) {
+  const renderedHtml = React.useMemo(() => {
+    try {
+      return katex.renderToString(latex, {
+        throwOnError: false,
+        displayMode: true,
+      });
+    } catch {
+      return latex;
+    }
+  }, [latex]);
+
+  return (
+    <div
+      className="text-base md:text-lg font-medium py-1 overflow-x-auto text-cyan-200"
+      dangerouslySetInnerHTML={{ __html: renderedHtml }}
+    />
+  );
 }
 
 export function ConceptBlocks({ contentBlocks }: ConceptBlocksProps) {
@@ -66,7 +88,7 @@ export function ConceptBlocks({ contentBlocks }: ConceptBlocksProps) {
                   <Sigma className="w-3.5 h-3.5 text-cyan-400" />
                   <span>State Formula</span>
                 </div>
-                <div className="text-base md:text-lg font-semibold py-1">{block.latex}</div>
+                <FormulaBlock latex={block.latex} />
                 <div className="text-[11px] text-zinc-500 font-sans mt-1">
                   Mathematical representation (not physical trajectory)
                 </div>
