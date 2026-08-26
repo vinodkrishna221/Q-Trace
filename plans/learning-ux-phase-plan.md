@@ -70,7 +70,7 @@ DELIVERABLE: Implement the Bell Module page with concept blocks, prior-knowledge
 TEST: `pnpm --dir apps/web test -- bell-prediction` selects `INDEPENDENT_RANDOM`, reloads the route and shows the saved choice before Run is enabled.
 DEPENDS: UX-1          UNBLOCKS: UX-3
 DEMO: Aarav makes the wrong prediction judges will watch the Flight Recorder repair.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-3 · Build the mocked learner evidence loop                        [timebox: 2h]
 CONTEXT: UX-2 captures the Prediction Checkpoint. Load `quantum-ui.md` and fixture responses for Simulation Run, Flight Recorder, Tutor, Repair Challenge and Progress. This is a contract-shaped UI slice, not live integration.
