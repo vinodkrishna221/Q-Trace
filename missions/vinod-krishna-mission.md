@@ -57,7 +57,7 @@ DELIVERABLE: Implement `scripts/demo-local.sh`, reset command, readiness wait, c
 TEST: `bash scripts/demo-local.sh --check` starts both services, reaches web/API health and proves Atlas/Tutor keys are absent.
 DEPENDS: SHIP-1,UX-1,SIM-1          UNBLOCKS: QA-3
 DEMO: The entire prototype can run from one laptop at the venue.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 BRANCH: `feat/story-ship/ship-2-create-the-one-laptop-demo`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

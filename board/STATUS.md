@@ -18,7 +18,7 @@
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
-| story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
+| story-ship | plan + Vinod mission + SHIP-1 + SHIP-2 | PR review (SHIP-2) | SHIP-3 |
 
 ## Blockers
 
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 26 Aug 12:28 Vinod: SHIP-2 green — one-laptop demo launcher scripts/demo-local.sh established with full local offline contract, memory seeds, mock Tutor fallback, readiness polling, clean shutdown, and key absence checks; bash scripts/demo-local.sh --check passed; PR ready for Warden review.
 
 - 23 Aug 18:42 Venu: UX-1 green — Next.js learner app shell, shadcn primitives, dark theme, route groups (learn/lab/progress/instructor), contract fixture loader, and role switch established; 3/3 tests passed, next build passed (9/9 static routes), PR ready for Warden review.
 - 25 Aug 10:48 Uday: SIM-1 green — FastAPI service boundary: RequestIDMiddleware, contract error handler, /health=200, /ready with primaryAdapter, /v1/circuits and /v1/simulation-runs router placeholders; 7/7 tests passed; PR ready for Warden review.
