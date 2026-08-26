@@ -1,17 +1,90 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
 
+/*
+ * Q-Trace Design System — "Observatory Dark"
+ * Single source of tokens. See docs/DESIGN-SYSTEM.md.
+ * Pages consume semantic utilities (bg-panel, text-ink-dim, border-line, text-evidence…),
+ * never raw palette classes.
+ */
+
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  /* surfaces */
+  --bg-abyss: #06070d;
+  --bg-panel: #0b0d17;
+  --bg-raised: #111425;
+  --line: #1c2138;
+  --line-bright: #2b3355;
+
+  /* text */
+  --ink: #e8ecf8;
+  --ink-dim: #8b93b0;
+  --ink-faint: #565d78;
+
+  /* semantics — light is meaning */
+  --accent: #22d3ee;
+  --accent-deep: #0e7490;
+  --evidence: #34d399;
+  --caution: #fbbf24;
+  --danger: #fb7185;
+  --violet: #a78bfa;
+
   color-scheme: dark;
 }
 
+@theme inline {
+  --color-abyss: var(--bg-abyss);
+  --color-panel: var(--bg-panel);
+  --color-raised: var(--bg-raised);
+  --color-line: var(--line);
+  --color-line-bright: var(--line-bright);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-evidence: var(--evidence);
+  --color-caution: var(--caution);
+  --color-danger: var(--danger);
+  --color-violet: var(--violet);
+
+  --font-display: "Space Grotesk", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --shadow-glow: 0 0 24px -4px color-mix(in srgb, var(--accent) 45%, transparent);
+  --shadow-glow-soft: 0 0 40px -8px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-abyss);
+  color: var(--ink);
+  font-family: var(--font-sans);
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  /* faint instrument-grid texture over the abyss */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--accent) 7%, transparent), transparent),
+    linear-gradient(color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 35%, transparent) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  background-attachment: fixed;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--ink);
+}
+
+/* thin instrument scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-bright) transparent;
+}
+
+/* KaTeX inherits our ink, tinted toward accent for state formulas */
+.katex {
+  color: var(--accent);
+  font-size: 1.05em;
 }
