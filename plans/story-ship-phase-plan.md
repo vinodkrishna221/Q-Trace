@@ -70,7 +70,7 @@ DELIVERABLE: Implement `scripts/demo-local.sh`, reset command, readiness wait, c
 TEST: `bash scripts/demo-local.sh --check` starts both services, reaches web/API health and proves Atlas/Tutor keys are absent.
 DEPENDS: SHIP-1,UX-1,SIM-1          UNBLOCKS: QA-3
 DEMO: The entire prototype can run from one laptop at the venue.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 
 ### SHIP-3 · Draft the deck spine and learner demo script                        [timebox: 2h]
 CONTEXT: IDEA-BRIEF, PRD and evidence links are frozen. Load Herald, Oracle and SIH arena; do not claim production impact or sponsor authorship.
