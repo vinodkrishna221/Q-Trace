@@ -35,6 +35,9 @@ importers:
         specifier: ^5.0.2
         version: 5.0.15(@types/react@19.2.18)(react@19.2.8)
     devDependencies:
+      '@rollup/wasm-node':
+        specifier: ^4.63.0
+        version: 4.63.0
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.1
@@ -698,6 +701,11 @@ packages:
     resolution: {integrity: sha512-/gDJaRs4gl0NPIwqCz+6PkpmhhjRAD2j6P4rSNHBzUkO3naEx2mIU0pRle1vUNRQ7mE/+8OOeXLTv/J56FKiQg==}
     cpu: [x64]
     os: [win32]
+
+  '@rollup/wasm-node@4.63.0':
+    resolution: {integrity: sha512-xYOZhVB5bo0sv80toQNC5doOzaKt9bJtdPobqY1IKHm/Ro0pBq6NoRP/ZuHmoDixR4btK+JepYAtjFNrSK/mgA==}
+    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
+    hasBin: true
 
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
@@ -1826,6 +1834,13 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.62.5':
     optional: true
+
+  '@rollup/wasm-node@4.63.0':
+    dependencies:
+      '@types/estree': 1.0.9
+    optionalDependencies:
+      '@napi-rs/lzma-linux-x64-gnu': 1.5.1
+      fsevents: 2.3.3
 
   '@swc/helpers@0.5.15':
     dependencies:

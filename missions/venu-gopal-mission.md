@@ -58,7 +58,7 @@ DELIVERABLE: Implement the Bell Module page with concept blocks, prior-knowledge
 TEST: `pnpm --dir apps/web test -- bell-prediction` selects `INDEPENDENT_RANDOM`, reloads the route and shows the saved choice before Run is enabled.
 DEPENDS: UX-1          UNBLOCKS: UX-3
 DEMO: Aarav makes the wrong prediction judges will watch the Flight Recorder repair.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-2-render-the-bell-module-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
