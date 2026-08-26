@@ -62,7 +62,7 @@ DELIVERABLE: Create typed repository protocols, dependency selector and determin
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_memory_repository.py` resets twice to identical IDs and proves create/get plus atomic progress update primitives.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-4,DATA-2
 DEMO: Plumbing for every P0 endpoint and the venue-safe store.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-2 · Seed learner, content and challenge truth                        [timebox: 3h]
 CONTEXT: Repository protocol exists. Load PRD vocabulary, SCHEMA seed plan and learning/progress contracts. Seed content is vetted and idempotent.
