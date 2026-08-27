@@ -22,8 +22,8 @@ import {
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
-import { CircuitWorkspaceReadonly } from '@/features/circuit/circuit-workspace-readonly';
-import { QiskitCodePanel } from '@/features/circuit/qiskit-code-panel';
+import { InteractiveCircuitWorkspace } from '@/features/circuit/interactive-circuit-workspace';
+import { useCircuitStore } from '@/lib/circuit-store';
 import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
 import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
 import { TutorCard } from '@/features/tutor/tutor-card';
@@ -39,6 +39,7 @@ import {
   SimulationRun,
   DiagnoseResponse,
   TutorExplanation,
+  CircuitModel,
 } from '@/lib/contracts';
 
 export default function BellStateLearnPage() {
@@ -72,16 +73,19 @@ export default function BellStateLearnPage() {
   const isExecutingPipeline =
     simulationMutation.isPending || diagnoseMutation.isPending || tutorMutation.isPending;
 
-  const handleRunSimulation = async () => {
+  const { circuit: activeCircuit } = useCircuitStore();
+
+  const handleRunSimulation = async (circuitOverride?: CircuitModel) => {
     try {
       const savedDraft = getPredictionDraft(learnerProfileId, moduleData.id);
       const predictionAnswer = savedDraft?.answer || 'INDEPENDENT_RANDOM';
+      const targetCircuit = circuitOverride || activeCircuit || DEMO_STARTER_CIRCUIT;
 
       // 1. Run simulation via TanStack Query mutation
       const simResult = await simulationMutation.mutateAsync({
         learnerProfileId,
         moduleId: moduleData.id,
-        circuitModel: DEMO_STARTER_CIRCUIT,
+        circuitModel: targetCircuit,
         predictionResponse: {
           checkpointId: moduleData.predictionCheckpoint?.id || 'pc_bell_outcomes',
           answer: predictionAnswer,
@@ -328,14 +332,12 @@ export default function BellStateLearnPage() {
 
       {/* Step 2: Circuit Workspace & Synchronized Qiskit Code */}
       <div className="space-y-6 pt-4 border-t border-line">
-        <CircuitWorkspaceReadonly
-          circuit={DEMO_STARTER_CIRCUIT}
+        <InteractiveCircuitWorkspace
+          initialCircuit={DEMO_STARTER_CIRCUIT}
           isSimulating={isExecutingPipeline}
           hasExecuted={hasSimulated}
           onRunSimulation={handleRunSimulation}
         />
-
-        <QiskitCodePanel />
       </div>
 
       {/* Pipeline execution indicator */}

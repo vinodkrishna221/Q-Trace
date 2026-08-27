@@ -88,7 +88,7 @@ DELIVERABLE: Implement ordered dnd-kit qubit wires with H/X/Y/Z/CNOT/Measure pla
 TEST: `pnpm --dir apps/web test -- circuit-workspace` places H+CNOT, serializes stable columns, round-trips the supported code edit and rejects an unsupported RX without mutating the model.
 DEPENDS: UX-4          UNBLOCKS: UX-8,QA-5
 DEMO: Judges build the Bell circuit visually and see synchronized Qiskit code.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-5-implement-the-interactive-circuit-workspace`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

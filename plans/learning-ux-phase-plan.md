@@ -96,7 +96,7 @@ DELIVERABLE: Implement ordered dnd-kit qubit wires with H/X/Y/Z/CNOT/Measure pla
 TEST: `pnpm --dir apps/web test -- circuit-workspace` places H+CNOT, serializes stable columns, round-trips the supported code edit and rejects an unsupported RX without mutating the model.
 DEPENDS: UX-4          UNBLOCKS: UX-8,QA-5
 DEMO: Judges build the Bell circuit visually and see synchronized Qiskit code.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-6 · Complete learning paths and visual evidence                        [timebox: 3h]
 CONTEXT: P0 proves one Bell route. Load `learning-content.md`, `circuit-simulation.md` and visualization law. The three-Module catalogue may use concise seeded content, but Bell remains the complete path.
