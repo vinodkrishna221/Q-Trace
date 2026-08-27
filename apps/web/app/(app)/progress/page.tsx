@@ -3,15 +3,23 @@
 import * as React from 'react';
 import { useRoleStore } from '@/lib/role-store';
 import { DEMO_PROGRESS_RECORDS } from '@/lib/fixtures';
+import { useProgressRecordQuery } from '@/lib/hooks/use-quantum-api';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Award, CheckCircle, BookOpen, Sparkles } from 'lucide-react';
+import { Award, CheckCircle, BookOpen, Sparkles, Server } from 'lucide-react';
 
 export default function ProgressPage() {
   const { activeRole, activeLearnerProfile } = useRoleStore();
   const profileId = activeLearnerProfile?.id || 'lp_aarav';
-  const progress = DEMO_PROGRESS_RECORDS[profileId] || DEMO_PROGRESS_RECORDS['lp_aarav'];
+
+  const { data: progressWithMeta, isLoading } = useProgressRecordQuery(profileId);
+  const progress =
+    progressWithMeta?.data ||
+    DEMO_PROGRESS_RECORDS[profileId] ||
+    DEMO_PROGRESS_RECORDS['lp_aarav'];
+  const isFallback = progressWithMeta?.meta?.isFallback ?? true;
+  const requestId = progressWithMeta?.meta?.requestId ?? 'req_demo_progress';
 
   const masteredCount = progress.skillStates.filter((s) => s.status === 'MASTERED').length;
 
@@ -32,6 +40,19 @@ export default function ProgressPage() {
         }
         title={`Progress — ${activeRole.name}`}
         purpose="Skill mastery, completed modules, and misconception history — recorded from verified simulator runs."
+        actions={
+          <div
+            className="flex items-center gap-2 bg-panel border border-line px-3 py-1.5 rounded-lg text-xs font-mono"
+            data-testid="progress-meta-badge"
+          >
+            <Server className="w-3.5 h-3.5 text-accent" />
+            <span className="text-ink-dim">Req:</span>
+            <span className="text-accent font-semibold">{requestId}</span>
+            <Badge variant={isFallback ? 'warning' : 'outline'} className="text-[9px]">
+              {isFallback ? 'DEMO_LOCAL' : 'LIVE API'}
+            </Badge>
+          </div>
+        }
       />
 
       {/* Stat strip */}

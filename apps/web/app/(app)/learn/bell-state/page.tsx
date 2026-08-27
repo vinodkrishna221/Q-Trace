@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useRoleStore } from '@/lib/role-store';
+import { usePredictionStore } from '@/lib/prediction-store';
 import {
   DEMO_MODULES,
   DEMO_STARTER_CIRCUIT,
@@ -10,7 +11,14 @@ import {
   DEMO_TUTOR_RESPONSE,
   DEMO_CHALLENGE,
   DEMO_CHALLENGE_ATTEMPT_RESPONSE,
+  DEMO_REPAIRED_CIRCUIT,
 } from '@/lib/fixtures';
+import {
+  useSimulationRunMutation,
+  useDiagnoseMutation,
+  useTutorExplainMutation,
+  useChallengeAttemptMutation,
+} from '@/lib/hooks/use-quantum-api';
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
@@ -24,42 +32,113 @@ import { ProgressSuccessCard } from '@/features/progress/progress-success-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Cpu, ShieldCheck, Radio } from 'lucide-react';
-import { ChallengeAttempt, ProgressRecord } from '@/lib/contracts';
+import { Clock, Cpu, ShieldCheck, Radio, Server, CheckCircle2, RefreshCw } from 'lucide-react';
+import {
+  ChallengeAttempt,
+  ProgressRecord,
+  SimulationRun,
+  DiagnoseResponse,
+  TutorExplanation,
+} from '@/lib/contracts';
 
 export default function BellStateLearnPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
+  const { getPredictionDraft } = usePredictionStore();
   const moduleData = DEMO_MODULES['bell-state'];
 
   const learnerProfileId = activeLearnerProfile?.id || activeRole.profileId || 'lp_aarav';
   const learnerName = activeRole.name;
 
-  // Learner loop interactive state
-  const [hasSimulated, setHasSimulated] = React.useState(true);
-  const [isSimulating, setIsSimulating] = React.useState(false);
+  // TanStack Query mutations
+  const simulationMutation = useSimulationRunMutation();
+  const diagnoseMutation = useDiagnoseMutation();
+  const tutorMutation = useTutorExplainMutation();
+  const challengeAttemptMutation = useChallengeAttemptMutation();
+
+  // Active state for live pipeline
+  const [simulationRun, setSimulationRun] = React.useState<SimulationRun | null>(DEMO_SIMULATION_RUN);
+  const [diagnosis, setDiagnosis] = React.useState<DiagnoseResponse | null>(DEMO_FLIGHT_RECORDER_DIAGNOSIS);
+  const [tutorResponse, setTutorResponse] = React.useState<TutorExplanation | null>(DEMO_TUTOR_RESPONSE);
   const [repairAttempt, setRepairAttempt] = React.useState<ChallengeAttempt | null>(
     DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt
   );
   const [progressRecord, setProgressRecord] = React.useState<ProgressRecord | null>(
     DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord
   );
-  const [isSubmittingRepair, setIsSubmittingRepair] = React.useState(false);
+  const [hasSimulated, setHasSimulated] = React.useState(true);
+  const [latestRequestId, setLatestRequestId] = React.useState<string>('req_demo_001');
+  const [isFallbackActive, setIsFallbackActive] = React.useState<boolean>(false);
 
-  const handleRunSimulation = () => {
-    setIsSimulating(true);
-    setTimeout(() => {
-      setIsSimulating(false);
+  const isExecutingPipeline =
+    simulationMutation.isPending || diagnoseMutation.isPending || tutorMutation.isPending;
+
+  const handleRunSimulation = async () => {
+    try {
+      const savedDraft = getPredictionDraft(learnerProfileId, moduleData.id);
+      const predictionAnswer = savedDraft?.answer || 'INDEPENDENT_RANDOM';
+
+      // 1. Run simulation via TanStack Query mutation
+      const simResult = await simulationMutation.mutateAsync({
+        learnerProfileId,
+        moduleId: moduleData.id,
+        circuitModel: DEMO_STARTER_CIRCUIT,
+        predictionResponse: {
+          checkpointId: moduleData.predictionCheckpoint?.id || 'pc_bell_outcomes',
+          answer: predictionAnswer,
+        },
+        primaryAdapter: 'QISKIT_AER',
+        runConformance: true,
+        shots: 1024,
+      });
+
+      setSimulationRun(simResult.data);
+      setLatestRequestId(simResult.meta.requestId);
+      setIsFallbackActive(simResult.meta.isFallback);
       setHasSimulated(true);
-    }, 400);
+
+      // 2. Automatically trigger Flight Recorder diagnosis
+      const diagResult = await diagnoseMutation.mutateAsync({
+        learnerProfileId,
+        simulationRunId: simResult.data.id,
+      });
+      setDiagnosis(diagResult.data);
+
+      // 3. Automatically trigger Tutor explanation
+      const tutorResult = await tutorMutation.mutateAsync({
+        learnerProfileId,
+        moduleId: moduleData.id,
+        simulationRunId: simResult.data.id,
+        misconceptionSignalId: diagResult.data.misconceptionSignal.id,
+        intent: 'EXPLAIN_DIVERGENCE',
+      });
+      setTutorResponse(tutorResult.data.tutorResponse);
+    } catch {
+      // Retain fallback state on unexpected error
+      setIsFallbackActive(true);
+      setHasSimulated(true);
+    }
   };
 
-  const handleSubmitRepair = () => {
-    setIsSubmittingRepair(true);
-    setTimeout(() => {
-      setIsSubmittingRepair(false);
+  const handleSubmitRepair = async () => {
+    try {
+      const result = await challengeAttemptMutation.mutateAsync({
+        challengeId: DEMO_CHALLENGE.id,
+        learnerProfileId,
+        submittedAnswer: {
+          type: 'CIRCUIT_MODEL',
+          circuitModelId: DEMO_REPAIRED_CIRCUIT.id,
+        },
+        simulationRunId: simulationRun?.id || 'sr_demo_002',
+      });
+
+      setRepairAttempt(result.data.challengeAttempt);
+      setProgressRecord(result.data.progressRecord);
+      setLatestRequestId(result.meta.requestId);
+      setIsFallbackActive(result.meta.isFallback);
+    } catch {
       setRepairAttempt(DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt);
       setProgressRecord(DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord);
-    }, 400);
+    }
   };
 
   return (
@@ -80,7 +159,7 @@ export default function BellStateLearnPage() {
         purpose="Build, simulate, and diagnose an entangled two-qubit Bell pair — with Qiskit Aer evidence at every gate."
         actions={
           <div
-            className="flex flex-col items-start md:items-end bg-panel border border-line px-4 py-3 rounded-lg text-xs"
+            className="flex flex-col items-start md:items-end bg-panel border border-line px-4 py-3 rounded-lg text-xs space-y-1.5"
             data-testid="learner-context-banner"
           >
             <div className="flex items-center gap-1.5 font-medium text-ink-dim">
@@ -90,8 +169,30 @@ export default function BellStateLearnPage() {
               </span>
               <span className="text-ink-faint">({activeRole.roleTag})</span>
             </div>
+
+            {/* Request ID & Live Protocol Badge */}
+            <div
+              className="flex items-center gap-2 pt-1 border-t border-line/60 font-mono text-[10px]"
+              data-testid="live-request-badge"
+            >
+              <div className="flex items-center gap-1 text-ink-dim">
+                <Server className="w-3 h-3 text-accent" />
+                <span>Req:</span>
+                <span data-testid="request-id" className="text-accent font-semibold">
+                  {latestRequestId}
+                </span>
+              </div>
+              <Badge
+                variant={isFallbackActive ? 'warning' : 'outline'}
+                className="text-[9px] px-1.5 py-0"
+                data-testid="api-mode-badge"
+              >
+                {isFallbackActive ? 'DEMO_LOCAL' : 'LIVE API'}
+              </Badge>
+            </div>
+
             {activeLearningPath && (
-              <div className="text-[11px] text-ink-faint mt-1 max-w-xs text-left md:text-right">
+              <div className="text-[11px] text-ink-faint mt-0.5 max-w-xs text-left md:text-right">
                 {activeLearningPath.recommendationReason}
               </div>
             )}
@@ -135,7 +236,7 @@ export default function BellStateLearnPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {/* Mini wire diagram — visual identity, gates seated on real wires */}
+              {/* Mini wire diagram */}
               <div
                 className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
                 role="img"
@@ -163,7 +264,6 @@ export default function BellStateLearnPage() {
                     </div>
                   </div>
                 ))}
-                {/* entanglement link */}
                 <div className="text-center text-[10px] text-violet font-mono tracking-widest">
                   ┆ CNOT(0 → 1) · entanglement ┆
                 </div>
@@ -201,9 +301,9 @@ export default function BellStateLearnPage() {
             <CardContent className="text-xs space-y-2.5">
               {[
                 'Predict the measurement pattern',
-                'Simulate on Aer',
-                'Flight Recorder diagnosis',
-                'Evidence-based repair',
+                'Simulate on Aer (TanStack Mutation)',
+                'Flight Recorder diagnosis (Deterministic Rule)',
+                'Evidence-based repair & Progress record',
               ].map((step, i) => (
                 <div
                   key={step}
@@ -230,7 +330,7 @@ export default function BellStateLearnPage() {
       <div className="space-y-6 pt-4 border-t border-line">
         <CircuitWorkspaceReadonly
           circuit={DEMO_STARTER_CIRCUIT}
-          isSimulating={isSimulating}
+          isSimulating={isExecutingPipeline}
           hasExecuted={hasSimulated}
           onRunSimulation={handleRunSimulation}
         />
@@ -238,27 +338,35 @@ export default function BellStateLearnPage() {
         <QiskitCodePanel />
       </div>
 
+      {/* Pipeline execution indicator */}
+      {isExecutingPipeline && (
+        <div className="p-4 rounded-lg border border-accent/40 bg-accent/10 flex items-center gap-3 font-mono text-xs text-accent">
+          <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+          <span>Executing live contract pipeline: Simulation Run → State Trace → Diagnosis → Tutor...</span>
+        </div>
+      )}
+
       {/* Step 3: Visual Evidence (Probability & Histogram) */}
-      {hasSimulated && (
+      {hasSimulated && simulationRun && (
         <div className="space-y-6 pt-4 border-t border-line">
-          <ProbabilityHistogramView simulationRun={DEMO_SIMULATION_RUN} />
+          <ProbabilityHistogramView simulationRun={simulationRun} />
         </div>
       )}
 
       {/* Step 4: Quantum Flight Recorder */}
-      {hasSimulated && (
+      {hasSimulated && diagnosis && simulationRun && (
         <div className="space-y-6 pt-4 border-t border-line">
           <FlightRecorderView
-            diagnosis={DEMO_FLIGHT_RECORDER_DIAGNOSIS}
-            stateTrace={DEMO_SIMULATION_RUN.stateTrace}
+            diagnosis={diagnosis}
+            stateTrace={simulationRun.stateTrace}
           />
         </div>
       )}
 
       {/* Step 5: Evidence-Bound Tutor Card */}
-      {hasSimulated && (
+      {hasSimulated && tutorResponse && (
         <div className="space-y-6 pt-4 border-t border-line">
-          <TutorCard tutorResponse={DEMO_TUTOR_RESPONSE} />
+          <TutorCard tutorResponse={tutorResponse} />
         </div>
       )}
 
@@ -268,7 +376,7 @@ export default function BellStateLearnPage() {
           <RepairChallengeCard
             challenge={DEMO_CHALLENGE}
             attempt={repairAttempt}
-            isSubmitting={isSubmittingRepair}
+            isSubmitting={challengeAttemptMutation.isPending}
             onSubmitAttempt={handleSubmitRepair}
           />
         </div>

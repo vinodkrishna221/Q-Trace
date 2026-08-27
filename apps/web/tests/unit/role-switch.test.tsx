@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '../test-utils';
 import { RoleSwitcher } from '@/components/ui/role-switcher';
 import BellStateLearnPage from '@/app/(app)/learn/bell-state/page';
 import { useRoleStore } from '@/lib/role-store';

@@ -108,7 +108,7 @@ export function RepairChallengeCard({
 
         <Button
           onClick={onSubmitAttempt}
-          disabled={isSubmitting || isPassed}
+          disabled={isSubmitting}
           data-testid="submit-repair-btn"
           className="font-semibold"
           variant={isPassed ? 'outline' : 'default'}
@@ -121,7 +121,7 @@ export function RepairChallengeCard({
           ) : isPassed ? (
             <>
               <CheckCircle2 className="w-4 h-4 mr-2 text-evidence" />
-              <span>Challenge Passed (100 pts)</span>
+              <span>Challenge Passed (100 pts) · Re-verify</span>
             </>
           ) : (
             <>

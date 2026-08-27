@@ -2,13 +2,17 @@
 
 import * as React from 'react';
 import { DEMO_INSTRUCTOR_INSIGHT } from '@/lib/fixtures';
+import { useInstructorInsightQuery } from '@/lib/hooks/use-quantum-api';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, CheckCircle, AlertTriangle, BarChart2, Radio } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, BarChart2, Radio, Server } from 'lucide-react';
 
 export default function InstructorPage() {
-  const insight = DEMO_INSTRUCTOR_INSIGHT;
+  const { data: insightWithMeta } = useInstructorInsightQuery('cohort_demo_2026');
+  const insight = insightWithMeta?.data || DEMO_INSTRUCTOR_INSIGHT;
+  const isFallback = insightWithMeta?.meta?.isFallback ?? true;
+  const requestId = insightWithMeta?.meta?.requestId ?? 'req_demo_instructor';
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto" data-testid="instructor-insight-view">
@@ -22,14 +26,28 @@ export default function InstructorPage() {
         title="Cohort Analytics & Misconceptions"
         purpose="Aggregate completion, challenge pass rates, and Flight Recorder divergence signals — evidence for what to re-teach next."
         actions={
-          <div className="flex items-center gap-3 bg-panel border border-line px-4 py-2.5 rounded-lg">
-            <Users className="w-5 h-5 text-accent" />
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-ink-faint">
-                Active Learners
-              </div>
-              <div className="text-lg font-display font-bold text-ink">
-                {insight.learnerCount} students
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-2 bg-panel border border-line px-3 py-2 rounded-lg text-xs font-mono"
+              data-testid="instructor-meta-badge"
+            >
+              <Server className="w-3.5 h-3.5 text-accent" />
+              <span className="text-ink-dim">Req:</span>
+              <span className="text-accent font-semibold">{requestId}</span>
+              <Badge variant={isFallback ? 'warning' : 'outline'} className="text-[9px]">
+                {isFallback ? 'DEMO_LOCAL' : 'LIVE API'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center gap-3 bg-panel border border-line px-4 py-2.5 rounded-lg">
+              <Users className="w-5 h-5 text-accent" />
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-ink-faint">
+                  Active Learners
+                </div>
+                <div className="text-lg font-display font-bold text-ink">
+                  {insight.learnerCount} students
+                </div>
               </div>
             </div>
           </div>
