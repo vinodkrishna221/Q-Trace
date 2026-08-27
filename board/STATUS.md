@@ -14,7 +14,7 @@
 | learning-ux | plan + Venu mission + UX-1 + UX-2 | mission progression | UX-3 |
 | simulation-api | plan + Uday mission + SIM-1 + SIM-2 | PR review (SIM-2) | SIM-3 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
+| data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 + SHIP-2 | PR review (SHIP-2) | SHIP-3 |
 
@@ -40,6 +40,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 26 Aug 19:30 Rani: DATA-1 green — typed repository protocols, dependency selector, and deterministic in-memory store for profiles, paths, modules, runs, signals, challenges/attempts, and atomic progress updates established; 11/11 tests passed, PR ready for Warden review.
 - 26 Aug 13:42 Venu: UX-2 merged to main — Bell Module page with concept blocks (KaTeX LaTeX formulas/callouts), prior-knowledge path badge, Prediction Checkpoint and persisted client draft (keyed by learner/module); 6/6 tests passed (9/9 suite), Next.js build passed.
 - 26 Aug 12:28 Vinod: SHIP-2 green — one-laptop demo launcher scripts/demo-local.sh established with full local offline contract, memory seeds, mock Tutor fallback, readiness polling, clean shutdown, and key absence checks; bash scripts/demo-local.sh --check passed; PR ready for Warden review.
 - 23 Aug 18:42 Venu: UX-1 green — Next.js learner app shell, shadcn primitives, dark theme, route groups (learn/lab/progress/instructor), contract fixture loader, and role switch established; 3/3 tests passed, next build passed (9/9 static routes), PR ready for Warden review.

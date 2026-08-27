@@ -1,7 +1,7 @@
 # Mission — Rani · Learning data, progress and instructor analytics
 
 > Context capsule: this file + the repo = everything needed in any tool, cold.
-> ACCEPTED: [ ] **Rani ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
+> ACCEPTED: [x] **Rani ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
 
 ## The project in 30 seconds
 
@@ -47,7 +47,7 @@ DELIVERABLE: Create typed repository protocols, dependency selector and determin
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_memory_repository.py` resets twice to identical IDs and proves create/get plus atomic progress update primitives.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-4,DATA-2
 DEMO: Plumbing for every P0 endpoint and the venue-safe store.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-1-define-repositories-and-the-in`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -149,6 +149,6 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 
 ## Acceptance
 
-- [ ] I, **Rani**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
-- [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
-- [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+- [x] I, **Rani**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
+- [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
+- [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
