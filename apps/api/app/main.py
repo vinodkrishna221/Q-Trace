@@ -15,7 +15,7 @@ import logging
 import os
 import uuid
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -71,6 +71,27 @@ app.add_middleware(RequestIDMiddleware)
 # ---------------------------------------------------------------------------
 # Global exception handler — contract error shape
 # ---------------------------------------------------------------------------
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """Format HTTPException as contract error envelope {error:{code,message,requestId,details}}."""
+    request_id = getattr(request.state, "request_id", "req_unknown")
+    # Detail may already be a dict with code/message (raised by routes)
+    if isinstance(exc.detail, dict):
+        code = exc.detail.get("code", "HTTP_ERROR")
+        message = exc.detail.get("message", str(exc.detail))
+        details = exc.detail.get("details")
+        rid = exc.detail.get("requestId", request_id)
+    else:
+        code = "HTTP_ERROR"
+        message = str(exc.detail)
+        details = None
+        rid = request_id
+    envelope = ErrorEnvelope(
+        error=ErrorDetail(code=code, message=message, requestId=rid, details=details)
+    )
+    return JSONResponse(status_code=exc.status_code, content=envelope.model_dump())
 
 
 @app.exception_handler(Exception)
