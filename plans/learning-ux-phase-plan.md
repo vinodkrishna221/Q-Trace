@@ -86,7 +86,7 @@ DELIVERABLE: Replace P0 fixture calls with TanStack Query mutations/queries for 
 TEST: `pnpm --dir apps/web test:e2e -- bell-live` against the local API completes prediction → run → diagnosis → repair → progress and exposes the request ID.
 DEPENDS: UX-3,SIM-4,AI-3,DATA-3          UNBLOCKS: UX-5,UX-6,QA-3,SHIP-5
 DEMO: Aarav completes the real HTTP walking skeleton; this unblocks the global smoke test.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 

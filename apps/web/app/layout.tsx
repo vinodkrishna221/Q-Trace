@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: 'Q-Trace — Quantum Flight Recorder & Learning Platform',
@@ -24,8 +25,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-abyss text-ink font-sans antialiased">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
 }
+
