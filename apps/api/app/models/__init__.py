@@ -1,11 +1,15 @@
 """Domain models for Q-Trace."""
 
+from app.models.circuit import (
+    CircuitModel,
+    CircuitModelSource,
+    GateName,
+    Operation,
+)
 from app.models.entities import (
     Challenge,
     ChallengeAttempt,
     ChallengeType,
-    CircuitModel,
-    CircuitModelSource,
     CohortChallengePassRate,
     CohortLiveDemoLearner,
     CohortModuleCompletion,
@@ -13,7 +17,6 @@ from app.models.entities import (
     ContentBlock,
     ContentBlockType,
     EntryBand,
-    GateName,
     InstructorInsight,
     InstructorProfile,
     LearnerProfile,
@@ -24,7 +27,6 @@ from app.models.entities import (
     MisconceptionSummaryItem,
     Module,
     ModuleLevel,
-    Operation,
     PredictionCheckpoint,
     PriorKnowledge,
     ProgressRecord,

@@ -5,6 +5,7 @@ from app.models.entities import (
     Challenge,
     ChallengeAttempt,
     CircuitModel,
+    GateName,
     InstructorProfile,
     LearnerProfile,
     LearningPath,
@@ -205,10 +206,11 @@ async def test_circuits_and_simulation_runs(repo: InMemoryRepository) -> None:
         qubitCount=2,
         classicalBitCount=2,
         operations=[
-            Operation(opId="op_1", gate="H", targets=[0], controls=[], classicalTargets=[], column=0),
-            Operation(opId="op_2", gate="CNOT", targets=[1], controls=[0], classicalTargets=[], column=1),
+            Operation(opId="op_1", gate=GateName.H, targets=[0], controls=[], classicalTargets=[], column=0),
+            Operation(opId="op_2", gate=GateName.CNOT, targets=[1], controls=[0], classicalTargets=[], column=1),
         ],
         source="SEED",
+        modelVersion=1,
     )
     await repo.create_or_update_circuit_model(circuit)
 

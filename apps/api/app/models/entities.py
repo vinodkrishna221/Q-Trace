@@ -105,35 +105,7 @@ class Module(BaseModel):
 
 # --- Circuit Model ---
 
-GateName = Literal["H", "X", "Y", "Z", "CNOT", "MEASURE"]
-
-
-class Operation(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    opId: str
-    gate: GateName
-    targets: list[int] = Field(default_factory=list)
-    controls: list[int] = Field(default_factory=list)
-    classicalTargets: list[int] = Field(default_factory=list)
-    column: int = 0
-
-
-CircuitModelSource = Literal["BUILDER", "SUPPORTED_QISKIT", "SEED"]
-
-
-class CircuitModel(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str
-    name: str
-    qubitCount: int = 2
-    classicalBitCount: int = 2
-    operations: list[Operation] = Field(default_factory=list)
-    source: CircuitModelSource = "SEED"
-    ownerLearnerProfileId: Optional[str] = None
-    openQasm3: Optional[str] = None
-    modelVersion: int = 1
-    createdAt: Optional[str] = None
-    updatedAt: Optional[str] = None
+from app.models.circuit import CircuitModel, CircuitModelSource, GateName, Operation
 
 
 # --- Simulation Run ---
