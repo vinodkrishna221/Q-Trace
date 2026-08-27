@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | PR review (UX-5) | UX-6 |
+| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
