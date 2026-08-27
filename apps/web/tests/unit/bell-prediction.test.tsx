@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { screen, fireEvent, cleanup } from '@testing-library/react';
+import { render } from '../test-utils';
 import BellStateLearnPage from '@/app/(app)/learn/bell-state/page';
 import { useRoleStore } from '@/lib/role-store';
 import { usePredictionStore } from '@/lib/prediction-store';

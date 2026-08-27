@@ -11,7 +11,9 @@
 
 ## Tracks
 
-| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 | UX-3 merged to main | UX-4 |
+| Track | Done | In flight | Next |
+|---|---|---|---|
+| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 | PR review (UX-4) | UX-5 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
@@ -40,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 27 Aug 12:15 Venu: UX-4 green — Swapped Bell journey to live contracts via TanStack Query mutations/queries (Simulation Run, Flight Recorder diagnosis, Tutor explanation, Challenge Attempt, Progress Record, Instructor Insight) with verified request ID exposure and disclosed DEMO_LOCAL fallback; 18/18 tests passed (including bell-live acceptance e2e), Next.js build passed (9/9 static routes), PR ready for Warden review.
 - 26 Aug 21:15 Venu: UX-3 green — Mocked learner evidence loop with read-only 2-wire Circuit Workspace, generated Qiskit panel, probability/histogram evidence, two-step Flight Recorder (with MIXED_SUBSYSTEM / divergence isolation), fallback Tutor card, Repair Challenge, and Progress success state established; 5/5 tests passed (14/14 suite), Next.js build passed, PR ready for Warden review.
 - 26 Aug 19:30 Rani: DATA-1 green — typed repository protocols, dependency selector, and deterministic in-memory store for profiles, paths, modules, runs, signals, challenges/attempts, and atomic progress updates established; 11/11 tests passed, PR ready for Warden review.
 - 26 Aug 13:42 Venu: UX-2 merged to main — Bell Module page with concept blocks (KaTeX LaTeX formulas/callouts), prior-knowledge path badge, Prediction Checkpoint and persisted client draft (keyed by learner/module); 6/6 tests passed (9/9 suite), Next.js build passed.
