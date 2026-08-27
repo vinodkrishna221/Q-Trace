@@ -11,6 +11,10 @@ import {
   Challenge,
   ProgressRecord,
   InstructorInsight,
+  SimulationRun,
+  DiagnoseResponse,
+  TutorExplanation,
+  CreateChallengeAttemptResponse,
 } from './contracts';
 
 export interface SyntheticRole {
@@ -288,3 +292,160 @@ export const DEMO_INSTRUCTOR_INSIGHT: InstructorInsight = {
   },
   dataDisclosure: 'Synthetic seeded cohort plus current live demo attempt',
 };
+
+export const DEMO_SIMULATION_RUN: SimulationRun = {
+  id: 'sr_demo_001',
+  learnerProfileId: 'lp_aarav',
+  moduleId: 'mod_bell',
+  circuitModelId: 'cm_bell_seed',
+  adapter: 'QISKIT_AER',
+  shots: 1024,
+  status: 'SUCCEEDED',
+  probabilities: { '00': 0.5, '11': 0.5 },
+  counts: { '00': 512, '11': 512 },
+  stateTrace: [
+    {
+      stepIndex: 0,
+      operationId: 'op_1',
+      label: 'After H',
+      basisProbabilities: { '00': 0.5, '10': 0.5 },
+      amplitudes: {
+        '00': { re: 0.70710678, im: 0.0 },
+        '10': { re: 0.70710678, im: 0.0 },
+      },
+      reducedQubits: [
+        { qubit: 0, bloch: { x: 1.0, y: 0.0, z: 0.0 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+        { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 1.0 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+      ],
+    },
+    {
+      stepIndex: 1,
+      operationId: 'op_2',
+      label: 'After CNOT',
+      basisProbabilities: { '00': 0.5, '11': 0.5 },
+      amplitudes: {
+        '00': { re: 0.70710678, im: 0.0 },
+        '11': { re: 0.70710678, im: 0.0 },
+      },
+      reducedQubits: [
+        { qubit: 0, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' },
+        { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' },
+      ],
+    },
+  ],
+  conformance: {
+    adapter: 'PENNYLANE',
+    maxProbabilityDelta: 0.0,
+    epsilon: 0.000001,
+    passed: true,
+    skippedReason: null,
+  },
+  durationMs: 84,
+  createdAt: '2026-08-23T05:27:00Z',
+};
+
+export const DEMO_FLIGHT_RECORDER_DIAGNOSIS: DiagnoseResponse = {
+  misconceptionSignal: {
+    id: 'ms_demo_001',
+    learnerProfileId: 'lp_aarav',
+    simulationRunId: 'sr_demo_001',
+    code: 'SUPERPOSITION_VS_ENTANGLEMENT',
+    firstDivergenceStep: 1,
+    evidence: {
+      prediction: 'INDEPENDENT_RANDOM',
+      verifiedBehavior: 'CORRELATED_00_11',
+      stateTraceStepIndexes: [0, 1],
+    },
+    confidence: 1.0,
+    repairChallengeId: 'ch_bell_repair',
+    createdAt: '2026-08-23T05:27:01Z',
+  },
+  replay: [
+    {
+      stepIndex: 0,
+      headline: 'Superposition created',
+      evidenceKeys: ['stateTrace.0.basisProbabilities'],
+    },
+    {
+      stepIndex: 1,
+      headline: 'Correlation introduced',
+      evidenceKeys: ['stateTrace.1.basisProbabilities', 'stateTrace.1.reducedQubits'],
+    },
+  ],
+};
+
+export const DEMO_TUTOR_RESPONSE: TutorExplanation = {
+  responseId: 'tr_demo_001',
+  intent: 'EXPLAIN_DIVERGENCE',
+  summary:
+    'The Hadamard gate made qubit 0 uncertain; the CNOT then tied qubit 1 to that branch. Each shot is random, but the pair is correlated.',
+  steps: [
+    {
+      title: 'After H',
+      body: 'The verified probabilities are 00 = 0.5 and 10 = 0.5.',
+      evidenceKeys: ['stateTrace.0.basisProbabilities'],
+    },
+    {
+      title: 'After CNOT',
+      body: 'The verified support moves to 00 = 0.5 and 11 = 0.5.',
+      evidenceKeys: ['stateTrace.1.basisProbabilities'],
+    },
+  ],
+  numericalClaims: [
+    { claim: 'P(00)=0.5', evidenceKey: 'stateTrace.1.basisProbabilities.00' },
+    { claim: 'P(11)=0.5', evidenceKey: 'stateTrace.1.basisProbabilities.11' },
+  ],
+  repairChallengeId: 'ch_bell_repair',
+  fallbackUsed: true,
+  model: 'DEMO_FALLBACK',
+  safetyNote: 'Explanation is grounded in this Simulation Run; it is not a hardware claim.',
+};
+
+export const DEMO_REPAIRED_CIRCUIT: CircuitModel = {
+  id: 'cm_aarav_repaired',
+  name: 'Aarav Repaired Bell Circuit',
+  qubitCount: 2,
+  classicalBitCount: 2,
+  operations: [
+    { opId: 'op_1', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_2', gate: 'CNOT', targets: [1], controls: [0], classicalTargets: [], column: 1 },
+    { opId: 'op_3', gate: 'MEASURE', targets: [0], controls: [], classicalTargets: [0], column: 2 },
+    { opId: 'op_4', gate: 'MEASURE', targets: [1], controls: [], classicalTargets: [1], column: 2 },
+  ],
+  source: 'BUILDER',
+  modelVersion: 1,
+  ownerLearnerProfileId: 'lp_aarav',
+  createdAt: '2026-08-23T05:27:50Z',
+  updatedAt: '2026-08-23T05:27:50Z',
+};
+
+export const DEMO_CHALLENGE_ATTEMPT_RESPONSE: CreateChallengeAttemptResponse = {
+  challengeAttempt: {
+    id: 'ca_demo_001',
+    challengeId: 'ch_bell_repair',
+    learnerProfileId: 'lp_aarav',
+    simulationRunId: 'sr_demo_002',
+    submittedAnswer: { type: 'CIRCUIT_MODEL', circuitModelId: 'cm_aarav_repaired' },
+    passed: true,
+    score: 100,
+    feedbackCode: 'BELL_SUPPORT_CORRECT',
+    attemptNumber: 1,
+    createdAt: '2026-08-23T05:28:00Z',
+  },
+  progressRecord: {
+    id: 'progress_lp_aarav',
+    learnerProfileId: 'lp_aarav',
+    completedModuleIds: ['mod_superposition', 'mod_bell'],
+    skillStates: [
+      { skillId: 'skill_create_bell', status: 'MASTERED', score: 100 },
+      { skillId: 'skill_explain_correlation', status: 'PRACTICING', score: 70 },
+    ],
+    latestChallengeAttemptId: 'ca_demo_001',
+    misconceptionSummary: [
+      { code: 'SUPERPOSITION_VS_ENTANGLEMENT', count: 1, latestAt: '2026-08-23T05:27:01Z' },
+    ],
+    totalPoints: 150,
+    updatedAt: '2026-08-23T05:28:00Z',
+  },
+};
+

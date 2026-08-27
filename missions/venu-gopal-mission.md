@@ -68,7 +68,7 @@ DELIVERABLE: Add a read-only two-wire Circuit Workspace, generated Qiskit panel,
 TEST: `pnpm --dir apps/web test -- mocked-bell-loop` walks every state and verifies basis labels `00`/`11`, `MIXED_SUBSYSTEM`, evidence keys and repair success.
 DEPENDS: UX-2          UNBLOCKS: UX-4
 DEMO: The full 90-second learner story can be rehearsed before backend merge.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-3-build-the-mocked-learner-evidence`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

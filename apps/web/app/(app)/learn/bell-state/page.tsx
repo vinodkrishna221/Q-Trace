@@ -2,14 +2,30 @@
 
 import * as React from 'react';
 import { useRoleStore } from '@/lib/role-store';
-import { DEMO_MODULES, DEMO_STARTER_CIRCUIT } from '@/lib/fixtures';
+import {
+  DEMO_MODULES,
+  DEMO_STARTER_CIRCUIT,
+  DEMO_SIMULATION_RUN,
+  DEMO_FLIGHT_RECORDER_DIAGNOSIS,
+  DEMO_TUTOR_RESPONSE,
+  DEMO_CHALLENGE,
+  DEMO_CHALLENGE_ATTEMPT_RESPONSE,
+} from '@/lib/fixtures';
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
+import { CircuitWorkspaceReadonly } from '@/features/circuit/circuit-workspace-readonly';
+import { QiskitCodePanel } from '@/features/circuit/qiskit-code-panel';
+import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
+import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
+import { TutorCard } from '@/features/tutor/tutor-card';
+import { RepairChallengeCard } from '@/features/challenges/repair-challenge-card';
+import { ProgressSuccessCard } from '@/features/progress/progress-success-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Cpu, ShieldCheck, Radio } from 'lucide-react';
+import { ChallengeAttempt, ProgressRecord } from '@/lib/contracts';
 
 export default function BellStateLearnPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
@@ -18,18 +34,46 @@ export default function BellStateLearnPage() {
   const learnerProfileId = activeLearnerProfile?.id || activeRole.profileId || 'lp_aarav';
   const learnerName = activeRole.name;
 
+  // Learner loop interactive state
+  const [hasSimulated, setHasSimulated] = React.useState(true);
+  const [isSimulating, setIsSimulating] = React.useState(false);
+  const [repairAttempt, setRepairAttempt] = React.useState<ChallengeAttempt | null>(
+    DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt
+  );
+  const [progressRecord, setProgressRecord] = React.useState<ProgressRecord | null>(
+    DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord
+  );
+  const [isSubmittingRepair, setIsSubmittingRepair] = React.useState(false);
+
+  const handleRunSimulation = () => {
+    setIsSimulating(true);
+    setTimeout(() => {
+      setIsSimulating(false);
+      setHasSimulated(true);
+    }, 400);
+  };
+
+  const handleSubmitRepair = () => {
+    setIsSubmittingRepair(true);
+    setTimeout(() => {
+      setIsSubmittingRepair(false);
+      setRepairAttempt(DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt);
+      setProgressRecord(DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord);
+    }, 400);
+  };
+
   return (
-    <div className="space-y-8 max-w-5xl mx-auto" data-testid="learn-bell-state-view">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12" data-testid="learn-bell-state-view">
       <PageHeader
         data-testid="bell-page-header"
         eyebrow={
           <>
             <Badge variant="default">{moduleData.level} MODULE</Badge>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 font-mono text-xs text-ink-dim">
               <Clock className="w-3.5 h-3.5" />
               {moduleData.estimatedMinutes} mins
             </span>
-            <span>ID: {moduleData.id}</span>
+            <span className="font-mono text-xs text-ink-faint">ID: {moduleData.id}</span>
           </>
         }
         title={moduleData.title}
@@ -181,6 +225,64 @@ export default function BellStateLearnPage() {
           </Card>
         </div>
       </div>
+
+      {/* Step 2: Circuit Workspace & Synchronized Qiskit Code */}
+      <div className="space-y-6 pt-4 border-t border-line">
+        <CircuitWorkspaceReadonly
+          circuit={DEMO_STARTER_CIRCUIT}
+          isSimulating={isSimulating}
+          hasExecuted={hasSimulated}
+          onRunSimulation={handleRunSimulation}
+        />
+
+        <QiskitCodePanel />
+      </div>
+
+      {/* Step 3: Visual Evidence (Probability & Histogram) */}
+      {hasSimulated && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <ProbabilityHistogramView simulationRun={DEMO_SIMULATION_RUN} />
+        </div>
+      )}
+
+      {/* Step 4: Quantum Flight Recorder */}
+      {hasSimulated && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <FlightRecorderView
+            diagnosis={DEMO_FLIGHT_RECORDER_DIAGNOSIS}
+            stateTrace={DEMO_SIMULATION_RUN.stateTrace}
+          />
+        </div>
+      )}
+
+      {/* Step 5: Evidence-Bound Tutor Card */}
+      {hasSimulated && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <TutorCard tutorResponse={DEMO_TUTOR_RESPONSE} />
+        </div>
+      )}
+
+      {/* Step 6: Repair Challenge Card */}
+      {hasSimulated && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <RepairChallengeCard
+            challenge={DEMO_CHALLENGE}
+            attempt={repairAttempt}
+            isSubmitting={isSubmittingRepair}
+            onSubmitAttempt={handleSubmitRepair}
+          />
+        </div>
+      )}
+
+      {/* Step 7: Progress Success Card */}
+      {progressRecord && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <ProgressSuccessCard
+            progress={progressRecord}
+            learnerName={learnerName}
+          />
+        </div>
+      )}
     </div>
   );
 }

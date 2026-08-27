@@ -11,7 +11,7 @@
 
 ## Tracks
 
-| learning-ux | plan + Venu mission + UX-1 + UX-2 | mission progression | UX-3 |
+| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 | UX-3 merged to main | UX-4 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
@@ -40,6 +40,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 26 Aug 21:15 Venu: UX-3 green — Mocked learner evidence loop with read-only 2-wire Circuit Workspace, generated Qiskit panel, probability/histogram evidence, two-step Flight Recorder (with MIXED_SUBSYSTEM / divergence isolation), fallback Tutor card, Repair Challenge, and Progress success state established; 5/5 tests passed (14/14 suite), Next.js build passed, PR ready for Warden review.
 - 26 Aug 19:30 Rani: DATA-1 green — typed repository protocols, dependency selector, and deterministic in-memory store for profiles, paths, modules, runs, signals, challenges/attempts, and atomic progress updates established; 11/11 tests passed, PR ready for Warden review.
 - 26 Aug 13:42 Venu: UX-2 merged to main — Bell Module page with concept blocks (KaTeX LaTeX formulas/callouts), prior-knowledge path badge, Prediction Checkpoint and persisted client draft (keyed by learner/module); 6/6 tests passed (9/9 suite), Next.js build passed.
 - 26 Aug 12:28 Vinod: SHIP-2 green — one-laptop demo launcher scripts/demo-local.sh established with full local offline contract, memory seeds, mock Tutor fallback, readiness polling, clean shutdown, and key absence checks; bash scripts/demo-local.sh --check passed; PR ready for Warden review.
