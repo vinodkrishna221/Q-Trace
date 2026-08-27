@@ -98,7 +98,7 @@ DELIVERABLE: Render the three-Module catalogue, Aarav/Meera entry differences, P
 TEST: `pnpm --dir apps/web test:e2e -- learning-visuals` shows all three Modules, different entry badges, a mixed reduced-state label and functional static fallback with Plotly disabled.
 DEPENDS: UX-4,DATA-5,SIM-6          UNBLOCKS: UX-7
 DEMO: The prototype visibly covers structured learning and scientifically honest visualization.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-6-complete-learning-paths-and-visual`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
