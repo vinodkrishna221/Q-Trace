@@ -16,7 +16,7 @@
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
-| story-ship | plan + Vinod mission + SHIP-1 + SHIP-2 | PR review (SHIP-2) | SHIP-3 |
+| story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
 
