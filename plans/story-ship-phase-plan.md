@@ -78,7 +78,7 @@ DELIVERABLE: Create `docs/DEMO-SCRIPT.md` v0 and PPT outline covering pain, exis
 TEST: `python3 scripts/check_story_claims.py` finds sources for every number and confirms the 90-second script includes all eight learner beats plus fallback cue.
 DEPENDS: —          UNBLOCKS: SHIP-5
 DEMO: The team can explain the product while builders work.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 

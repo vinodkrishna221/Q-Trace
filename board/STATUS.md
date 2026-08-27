@@ -56,3 +56,4 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 23 Aug 11:31 Orion: six FULL track plans generated and audited — 50 cards/108h, acyclic DAG, P0 complete; plans later approved.
 - 23 Aug 11:25 Orion: FULL blueprint drafted; quantum-ui/runtime diff approved, applied and synced; artifacts later approved.
 - 23 Aug 10:57 Orion: FULL kickoff drafted after approved broad platform + Quantum Flight Recorder direction; PRD later approved.
+- 27 Aug 12:30 Vinod: SHIP-3 green — docs/DEMO-SCRIPT.md v0 created with 90-second learner-led script, 8 timed beats (B1–B8), PPT outline (8 sections sourced), fallback cue, judge Q&A pre-arms, sourced evidence ledger (7 URLs), submission checklist; scripts/check_story_claims.py written; python scripts/check_story_claims.py passed 4/4 checks; PR ready for Warden review. SHIP-5 now unblocked.
