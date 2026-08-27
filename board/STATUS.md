@@ -11,12 +11,10 @@
 
 ## Tracks
 
-| Track | Done | In flight | Next |
-|---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 | PR review (UX-3) | UX-4 |
-| simulation-api | plan + Uday mission + SIM-1 + SIM-2 | PR review (SIM-2) | SIM-3 |
+| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 | UX-3 merged to main | UX-4 |
+| simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
+| data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 + SHIP-2 | PR review (SHIP-2) | SHIP-3 |
 
@@ -43,11 +41,14 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 ## Log
 
 - 26 Aug 21:15 Venu: UX-3 green — Mocked learner evidence loop with read-only 2-wire Circuit Workspace, generated Qiskit panel, probability/histogram evidence, two-step Flight Recorder (with MIXED_SUBSYSTEM / divergence isolation), fallback Tutor card, Repair Challenge, and Progress success state established; 5/5 tests passed (14/14 suite), Next.js build passed, PR ready for Warden review.
+- 26 Aug 19:30 Rani: DATA-1 green — typed repository protocols, dependency selector, and deterministic in-memory store for profiles, paths, modules, runs, signals, challenges/attempts, and atomic progress updates established; 11/11 tests passed, PR ready for Warden review.
 - 26 Aug 13:42 Venu: UX-2 merged to main — Bell Module page with concept blocks (KaTeX LaTeX formulas/callouts), prior-knowledge path badge, Prediction Checkpoint and persisted client draft (keyed by learner/module); 6/6 tests passed (9/9 suite), Next.js build passed.
 - 26 Aug 12:28 Vinod: SHIP-2 green — one-laptop demo launcher scripts/demo-local.sh established with full local offline contract, memory seeds, mock Tutor fallback, readiness polling, clean shutdown, and key absence checks; bash scripts/demo-local.sh --check passed; PR ready for Warden review.
 - 23 Aug 18:42 Venu: UX-1 green — Next.js learner app shell, shadcn primitives, dark theme, route groups (learn/lab/progress/instructor), contract fixture loader, and role switch established; 3/3 tests passed, next build passed (9/9 static routes), PR ready for Warden review.
 - 25 Aug 10:48 Uday: SIM-1 green — FastAPI service boundary: RequestIDMiddleware, contract error handler, /health=200, /ready with primaryAdapter, /v1/circuits and /v1/simulation-runs router placeholders; 7/7 tests passed; PR ready for Warden review.
 - 25 Aug 15:24 Uday: SIM-2 green — Pydantic v2 Circuit Model/Operation types with closed GateName enum, qubit/operation/column/control/MEASURE validators; zero SDK imports; 17/17 tests passed; PR ready for Warden review.
+- 25 Aug 16:27 Uday: SIM-3 green — Qiskit Aer adapter + basis normalizer: Bell P(00/11)=0.5, trace length 2 (MEASURE excluded), post-CNOT purity 0.5/MIXED, asymmetric label correct; 23/23 tests passed; PR ready for Warden review.
+- 25 Aug 16:54 Uday: SIM-4 green — POST/GET /v1/simulation-runs routes, threadpool executor, 1500ms timeout, in-memory repo (DATA-1 mock), contract error handler for HTTPException; 22/22 tests passed; PR ready for Warden review.
 - 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.
 - 23 Aug 12:04 Vinod: all six declared 48h; track mapping and stage roles frozen; Discord canonical and WhatsApp urgent-only; mission load gate PASS.
