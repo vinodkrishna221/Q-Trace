@@ -3,6 +3,18 @@
 from typing import Optional
 from app.repositories.base import DataRepositoryProtocol
 from app.repositories.memory import InMemoryRepository
+from app.repositories.seeds import (
+    CORE_CHALLENGES,
+    CORE_CIRCUIT_MODELS,
+    CORE_INSTRUCTOR_PROFILE,
+    CORE_LEARNER_PROFILES,
+    CORE_LEARNING_PATHS,
+    CORE_MODULES,
+    CORE_PREDICTION_CHECKPOINTS,
+    CORE_PROGRESS_RECORDS,
+    get_core_seed_dataset,
+    seed_core_truth,
+)
 
 _default_repository: Optional[DataRepositoryProtocol] = None
 
@@ -26,4 +38,14 @@ __all__ = [
     "InMemoryRepository",
     "get_repository",
     "set_repository",
+    "seed_core_truth",
+    "get_core_seed_dataset",
+    "CORE_LEARNER_PROFILES",
+    "CORE_INSTRUCTOR_PROFILE",
+    "CORE_LEARNING_PATHS",
+    "CORE_MODULES",
+    "CORE_PREDICTION_CHECKPOINTS",
+    "CORE_CIRCUIT_MODELS",
+    "CORE_CHALLENGES",
+    "CORE_PROGRESS_RECORDS",
 ]
