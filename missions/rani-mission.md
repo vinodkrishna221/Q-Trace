@@ -106,8 +106,8 @@ CONTEXT: DATA-6 and AI-4 provide deployed cohort seeds and Misconception Signals
 DELIVERABLE: Implement indexed aggregation, 10-second cache, empty cohort response, live-demo learner marker and concurrent idempotency test for Challenge Attempts.
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_instructor_analytics.py` verifies rates, top misconception counts, empty cohort and no double score under concurrent duplicate requests.
 DEPENDS: DATA-6,AI-4          UNBLOCKS: UX-7,DATA-8,QA-6
-DEMO: Dr. Rao sees fast, consistent analytics after Aarav’s live repair.
-PERSONA: Atlas           STATUS: [ ] todo
+DEMO: Dr. Rao sees fast, consistent analytics after Aarav's live repair.
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-7-harden-analytics-aggregation-and-idempotency`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

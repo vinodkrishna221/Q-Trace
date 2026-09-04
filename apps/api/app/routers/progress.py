@@ -6,6 +6,7 @@ Endpoints:
 - GET /v1/progress-records/{learnerProfileId}
 """
 
+import asyncio
 from typing import Any, Optional
 import uuid
 from fastapi import APIRouter, Depends, Header, HTTPException, status
@@ -15,8 +16,9 @@ from app.repositories import DataRepositoryProtocol, get_repository
 
 router = APIRouter(tags=["progress"])
 
-# In-memory idempotency cache for deduplication
+# In-memory idempotency cache for deduplication with async lock
 _idempotency_cache: dict[str, dict[str, Any]] = {}
+_idempotency_lock = asyncio.Lock()
 
 
 class ChallengeAttemptRequest(BaseModel):
@@ -57,10 +59,20 @@ async def post_challenge_attempt(
     repo: DataRepositoryProtocol = Depends(get_repository),
 ) -> dict:
     """Submit a challenge attempt and atomically update learner progress."""
-    # 1. Idempotency check
-    if idempotency_key and idempotency_key in _idempotency_cache:
-        return _idempotency_cache[idempotency_key]
+    if idempotency_key:
+        async with _idempotency_lock:
+            if idempotency_key in _idempotency_cache:
+                return _idempotency_cache[idempotency_key]
+            res = await _execute_challenge_attempt(request, idempotency_key, repo)
+            return res
+    return await _execute_challenge_attempt(request, None, repo)
 
+
+async def _execute_challenge_attempt(
+    request: ChallengeAttemptRequest,
+    idempotency_key: Optional[str],
+    repo: DataRepositoryProtocol,
+) -> dict:
     # 2. Challenge & Learner existence checks
     challenge = await repo.get_challenge(request.challengeId)
     if not challenge:

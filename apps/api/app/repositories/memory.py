@@ -1,6 +1,7 @@
 """In-memory deterministic repository implementation for Q-Trace."""
 
 import asyncio
+import time
 from typing import Optional
 from app.models.entities import (
     Challenge,
@@ -43,6 +44,7 @@ class InMemoryRepository(DataRepositoryProtocol):
         self._challenges: dict[str, Challenge] = {}
         self._challenge_attempts: dict[str, ChallengeAttempt] = {}
         self._progress_records: dict[str, ProgressRecord] = {}
+        self._insight_cache: dict[str, tuple[float, InstructorInsight]] = {}
 
     # --- Lifecycle ---
 
@@ -60,6 +62,7 @@ class InMemoryRepository(DataRepositoryProtocol):
             self._challenges.clear()
             self._challenge_attempts.clear()
             self._progress_records.clear()
+            self._insight_cache.clear()
 
     # --- Learner & Instructor Profiles ---
 
@@ -406,6 +409,7 @@ class InMemoryRepository(DataRepositoryProtocol):
 
             # 6. Save updated progress record
             self._progress_records[progress.id] = progress
+            self._insight_cache.clear()
 
             return attempt, progress
 
@@ -415,6 +419,12 @@ class InMemoryRepository(DataRepositoryProtocol):
         self, cohort_id: str
     ) -> Optional[InstructorInsight]:
         async with self._lock:
+            now_ts = time.time()
+            if cohort_id in self._insight_cache:
+                cached_ts, cached_insight = self._insight_cache[cohort_id]
+                if now_ts - cached_ts < 10.0:
+                    return cached_insight
+
             cohort_learners = [
                 p for p in self._learner_profiles.values() if p.cohortId == cohort_id
             ]
@@ -501,7 +511,7 @@ class InMemoryRepository(DataRepositoryProtocol):
                     latestAttemptPassed=latest_passed,
                 )
 
-            return InstructorInsight(
+            insight = InstructorInsight(
                 cohortId=cohort_id,
                 generatedAt=utc_now_iso(),
                 learnerCount=learner_count,
@@ -511,3 +521,5 @@ class InMemoryRepository(DataRepositoryProtocol):
                 liveDemoLearner=live_demo_learner,
                 dataDisclosure="Synthetic seeded cohort plus current live demo attempt",
             )
+            self._insight_cache[cohort_id] = (now_ts, insight)
+            return insight

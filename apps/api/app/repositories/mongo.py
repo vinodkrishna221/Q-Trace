@@ -1,5 +1,6 @@
 """Async MongoDB repository implementation for Q-Trace."""
 
+import time
 from typing import Any, Optional
 from pydantic import BaseModel
 from app.models.entities import (
@@ -41,6 +42,7 @@ class MongoRepository(DataRepositoryProtocol):
 
     def __init__(self, db: Any) -> None:
         self.db = db
+        self._insight_cache: dict[str, tuple[float, InstructorInsight]] = {}
 
     # --- Collection Getters ---
 
@@ -586,6 +588,7 @@ class MongoRepository(DataRepositoryProtocol):
                 )
 
         await self.create_or_update_progress_record(progress)
+        self._insight_cache.clear()
         return attempt, progress
 
     # --- Instructor Insights ---
@@ -593,6 +596,12 @@ class MongoRepository(DataRepositoryProtocol):
     async def get_instructor_insight(
         self, cohort_id: str
     ) -> Optional[InstructorInsight]:
+        now_ts = time.time()
+        if cohort_id in self._insight_cache:
+            cached_ts, cached_insight = self._insight_cache[cohort_id]
+            if now_ts - cached_ts < 10.0:
+                return cached_insight
+
         learners = await self.list_learner_profiles(cohort_id=cohort_id)
         if not learners:
             return None
@@ -692,7 +701,7 @@ class MongoRepository(DataRepositoryProtocol):
                 latestAttemptPassed=latest_passed,
             )
 
-        return InstructorInsight(
+        insight = InstructorInsight(
             cohortId=cohort_id,
             generatedAt=utc_now_iso(),
             learnerCount=learner_count,
@@ -702,3 +711,5 @@ class MongoRepository(DataRepositoryProtocol):
             liveDemoLearner=live_demo_learner,
             dataDisclosure="Synthetic seeded cohort plus current live demo attempt",
         )
+        self._insight_cache[cohort_id] = (now_ts, insight)
+        return insight
