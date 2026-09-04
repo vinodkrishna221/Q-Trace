@@ -88,7 +88,7 @@ DELIVERABLE: Add async Mongo repository, collection getters, schemaVersion guard
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_mongo_repository.py` runs repository parity against isolated Mongo and verifies required index names.
 DEPENDS: DATA-3          UNBLOCKS: DATA-5
 DEMO: The live platform persists learner and simulation history credibly.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-5 · Seed the synthetic cohort and complete Learning Paths                        [timebox: 3h]
 CONTEXT: DATA-4 makes Mongo and memory share a repository protocol. Load the SCHEMA seed plan, `learning-content.md`, `progress-analytics.md` and synthetic-data disclosure; preserve stable hero IDs.

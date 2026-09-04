@@ -3,6 +3,7 @@
 from typing import Optional
 from app.repositories.base import DataRepositoryProtocol
 from app.repositories.memory import InMemoryRepository
+from app.repositories.mongo import MongoRepository
 from app.repositories.seeds import (
     CORE_CHALLENGES,
     CORE_CIRCUIT_MODELS,
@@ -36,6 +37,7 @@ def set_repository(repo: Optional[DataRepositoryProtocol]) -> None:
 __all__ = [
     "DataRepositoryProtocol",
     "InMemoryRepository",
+    "MongoRepository",
     "get_repository",
     "set_repository",
     "seed_core_truth",
@@ -49,3 +51,4 @@ __all__ = [
     "CORE_CHALLENGES",
     "CORE_PROGRESS_RECORDS",
 ]
+

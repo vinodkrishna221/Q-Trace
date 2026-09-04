@@ -77,7 +77,7 @@ DELIVERABLE: Add async Mongo repository, collection getters, schemaVersion guard
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_mongo_repository.py` runs repository parity against isolated Mongo and verifies required index names.
 DEPENDS: DATA-3          UNBLOCKS: DATA-5
 DEMO: The live platform persists learner and simulation history credibly.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-4-implement-mongo-collections-and-indexes`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
