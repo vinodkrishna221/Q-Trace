@@ -98,7 +98,7 @@ DELIVERABLE: Compile supported Circuit Models to `default.qubit`, normalize prob
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_pennylane_conformance.py` passes Bell and asymmetric fixtures and fails a deliberately reversed basis mapping.
 DEPENDS: SIM-4,QA-1          UNBLOCKS: UX-6,SIM-7,QA-4
 DEMO: The prototype demonstrates two genuine simulators without making the second one demo-critical.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-6-add-pennylane-conformance-and-circuit`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
