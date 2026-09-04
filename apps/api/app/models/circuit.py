@@ -93,7 +93,9 @@ class CircuitModel(BaseModel):
     classicalBitCount: Annotated[int, Field(ge=0)]
     operations: list[Operation] = Field(..., max_length=20)
     source: _SOURCE_LITERAL
-    modelVersion: Literal[1]
+    modelVersion: Literal[1] = 1
+    ownerLearnerProfileId: str | None = None
+    openQasm3: str | None = None
 
     # ------------------------------------------------------------------
     # Cross-field validation
