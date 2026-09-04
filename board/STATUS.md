@@ -16,7 +16,7 @@
 | learning-ux | plan + Venu mission + UX-1 | PR review (UX-1) | UX-2 |
 | simulation-api | plan + Uday mission | mission acceptance | SIM-1 after SHIP-1 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 | PR review (DATA-4) | DATA-5 |
+| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 + DATA-5 | PR review (DATA-5) | DATA-6 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
 
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 04 Sep 06:54 Rani: DATA-5 green — Deterministic 30-profile cohort, 75 challenge attempts, 40 misconception signals, synthetic disclosure text, and Aarav live-attempt override implemented; 4/4 unit tests passed (38/38 data suite passed), PR ready for Warden review.
 - 04 Sep 06:42 Rani: DATA-4 green — Async MongoRepository, 11 collection getters, schemaVersion guards, ObjectId sanitization, and 11 collection indexes implemented; 7/7 unit tests passed (34/34 data suite passed), PR ready for Warden review.
 
 

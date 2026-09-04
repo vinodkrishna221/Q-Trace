@@ -87,7 +87,7 @@ DELIVERABLE: Create deterministic 30-profile cohort, 60–90 attempts, 35–50 m
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_demo_seed_story.py` proves exact counts/ranges, idempotency, disclosure text and Aarav live-attempt override.
 DEPENDS: DATA-4          UNBLOCKS: UX-6,AI-7,DATA-6
 DEMO: Instructor charts look populated while clearly disclosing synthetic data.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-5-seed-the-synthetic-cohort-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

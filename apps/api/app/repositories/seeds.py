@@ -3,15 +3,19 @@
 from typing import Any
 from app.models.entities import (
     Challenge,
+    ChallengeAttempt,
     CircuitModel,
     InstructorProfile,
     LearnerProfile,
     LearningPath,
+    MisconceptionSignal,
+    MisconceptionSummaryItem,
     Module,
     Operation,
     PredictionCheckpoint,
     PriorKnowledge,
     ProgressRecord,
+    SimulationRun,
     SkillState,
 )
 from app.repositories.base import DataRepositoryProtocol
@@ -333,6 +337,113 @@ CORE_PROGRESS_RECORDS: list[ProgressRecord] = [
 ]
 
 
+
+# ==============================================================================
+# Synthetic Cohort Definitions (30 profiles, 40 signals, 75 attempts)
+# ==============================================================================
+
+SYNTHETIC_LEARNER_PROFILES: list[LearnerProfile] = [
+    LearnerProfile(
+        id=f"lp_synth_{i:03d}",
+        displayName=f"Learner {i:02d}",
+        role="BEGINNER_CSE" if i % 2 == 1 else "PHYSICS_TO_CODE",
+        cohortId="cohort_demo_2026",
+        priorKnowledge=PriorKnowledge(
+            python=True,
+            linearAlgebra=(i % 3 == 0),
+            quantumTheory=(i % 4 == 0),
+            circuitProgramming=False,
+        ),
+        completedSkillIds=[],
+        activeLearningPathId=f"path_synth_{i:03d}",
+        schemaVersion=1,
+    )
+    for i in range(1, 29)
+]
+
+SYNTHETIC_LEARNING_PATHS: list[LearningPath] = [
+    LearningPath(
+        id=f"path_synth_{i:03d}",
+        learnerProfileId=f"lp_synth_{i:03d}",
+        entryBand="FOUNDATIONS" if i % 2 == 1 else "THEORY_TO_CODE",
+        moduleIds=["mod_superposition", "mod_measurement", "mod_bell"],
+        currentModuleId="mod_bell" if i > 10 else ("mod_measurement" if i > 5 else "mod_superposition"),
+        recommendationReason="Progressing through foundation modules.",
+        schemaVersion=1,
+    )
+    for i in range(1, 29)
+]
+
+SYNTHETIC_PROGRESS_RECORDS: list[ProgressRecord] = [
+    ProgressRecord(
+        id=f"progress_lp_synth_{i:03d}",
+        learnerProfileId=f"lp_synth_{i:03d}",
+        completedModuleIds=(
+            ["mod_superposition", "mod_measurement"] if i > 15
+            else (["mod_superposition"] if i > 5 else [])
+        ),
+        skillStates=[
+            SkillState(skillId="skill_create_superposition", status="MASTERED" if i > 5 else "NOT_STARTED", score=100 if i > 5 else 0),
+            SkillState(skillId="skill_predict_measurement", status="MASTERED" if i > 15 else "PRACTICING", score=100 if i > 15 else 50),
+        ],
+        latestChallengeAttemptId=f"att_synth_{((i - 1) * 2) + 1:03d}" if i <= 35 else None,
+        misconceptionSummary=(
+            [MisconceptionSummaryItem(code="SUPERPOSITION_VS_ENTANGLEMENT" if i % 2 == 0 else "MEASUREMENT_DETERMINISM", count=1, latestAt="2026-08-20T10:00:00Z")]
+            if i % 3 == 0 else []
+        ),
+        totalPoints=50 * (i % 5),
+        schemaVersion=1,
+    )
+    for i in range(1, 29)
+]
+
+SYNTHETIC_SIMULATION_RUNS: list[SimulationRun] = [
+    SimulationRun(
+        id=f"sim_synth_{i:03d}",
+        learnerProfileId=f"lp_synth_{((i - 1) % 28) + 1:03d}",
+        moduleId="mod_bell" if i % 2 == 1 else "mod_measurement",
+        circuitModelId="cm_bell_broken" if i % 2 == 1 else "cm_bell_seed",
+        shots=1024,
+        status="SUCCEEDED",
+        probabilities={"00": 0.5, "11": 0.5} if i % 2 == 0 else {"00": 0.25, "01": 0.25, "10": 0.25, "11": 0.25},
+        durationMs=12,
+        schemaVersion=1,
+    )
+    for i in range(1, 41)
+]
+
+SYNTHETIC_MISCONCEPTION_SIGNALS: list[MisconceptionSignal] = [
+    MisconceptionSignal(
+        id=f"sig_synth_{i:03d}",
+        learnerProfileId=f"lp_synth_{((i - 1) % 28) + 1:03d}",
+        simulationRunId=f"sim_synth_{i:03d}",
+        code=["SUPERPOSITION_VS_ENTANGLEMENT", "MEASUREMENT_DETERMINISM", "GATE_ORDER"][i % 3],
+        firstDivergenceStep=i % 2,
+        evidence={"expected": "H gate at col 0", "observed": "CNOT at col 0"},
+        confidence=0.95,
+        repairChallengeId="ch_bell_repair",
+        schemaVersion=1,
+    )
+    for i in range(1, 41)
+]
+
+SYNTHETIC_CHALLENGE_ATTEMPTS: list[ChallengeAttempt] = [
+    ChallengeAttempt(
+        id=f"att_synth_{i:03d}",
+        challengeId=["ch_superposition_quiz", "ch_measurement_quiz", "ch_bell_quiz", "ch_bell_repair"][i % 4],
+        learnerProfileId=f"lp_synth_{((i - 1) % 28) + 1:03d}",
+        simulationRunId=f"sim_synth_{((i - 1) % 40) + 1:03d}",
+        submittedAnswer={"choice": "CORRELATED_00_11"} if (i % 4) != 3 else {"operations": []},
+        passed=(i % 3 != 0),
+        score=50 if (i % 3 != 0) else 0,
+        feedbackCode="CORRECT" if (i % 3 != 0) else "MISCONCEPTION_DETECTED",
+        attemptNumber=1,
+        schemaVersion=1,
+    )
+    for i in range(1, 76)
+]
+
+
 # ==============================================================================
 # Dataset Access & Idempotent Seeding Logic
 # ==============================================================================
@@ -348,6 +459,20 @@ def get_core_seed_dataset() -> dict[str, Any]:
         "challenges": CORE_CHALLENGES,
         "modules": CORE_MODULES,
         "progress_records": CORE_PROGRESS_RECORDS,
+    }
+
+
+def get_demo_cohort_dataset() -> dict[str, Any]:
+    """Return dictionary of all core and synthetic cohort seed collections."""
+    core = get_core_seed_dataset()
+    return {
+        **core,
+        "learner_profiles": CORE_LEARNER_PROFILES + SYNTHETIC_LEARNER_PROFILES,
+        "learning_paths": CORE_LEARNING_PATHS + SYNTHETIC_LEARNING_PATHS,
+        "progress_records": CORE_PROGRESS_RECORDS + SYNTHETIC_PROGRESS_RECORDS,
+        "simulation_runs": SYNTHETIC_SIMULATION_RUNS,
+        "misconception_signals": SYNTHETIC_MISCONCEPTION_SIGNALS,
+        "challenge_attempts": SYNTHETIC_CHALLENGE_ATTEMPTS,
     }
 
 
@@ -407,4 +532,51 @@ async def seed_core_truth(repo: DataRepositoryProtocol) -> dict[str, int]:
         counts["progress_records"] += 1
 
     return counts
+
+
+async def seed_synthetic_cohort(repo: DataRepositoryProtocol) -> dict[str, int]:
+    """Idempotently seed the synthetic cohort dataset into any DataRepositoryProtocol."""
+    counts = {
+        "synthetic_learner_profiles": 0,
+        "synthetic_learning_paths": 0,
+        "synthetic_progress_records": 0,
+        "synthetic_simulation_runs": 0,
+        "synthetic_misconception_signals": 0,
+        "synthetic_challenge_attempts": 0,
+    }
+
+    for p in SYNTHETIC_LEARNER_PROFILES:
+        await repo.create_or_update_learner_profile(p.model_copy(deep=True))
+        counts["synthetic_learner_profiles"] += 1
+
+    for lp in SYNTHETIC_LEARNING_PATHS:
+        await repo.create_or_update_learning_path(lp.model_copy(deep=True))
+        counts["synthetic_learning_paths"] += 1
+
+    for pr in SYNTHETIC_PROGRESS_RECORDS:
+        await repo.create_or_update_progress_record(pr.model_copy(deep=True))
+        counts["synthetic_progress_records"] += 1
+
+    for sr in SYNTHETIC_SIMULATION_RUNS:
+        await repo.create_simulation_run(sr.model_copy(deep=True))
+        counts["synthetic_simulation_runs"] += 1
+
+    for ms in SYNTHETIC_MISCONCEPTION_SIGNALS:
+        await repo.create_misconception_signal(ms.model_copy(deep=True))
+        counts["synthetic_misconception_signals"] += 1
+
+    for ca in SYNTHETIC_CHALLENGE_ATTEMPTS:
+        await repo.create_challenge_attempt(ca.model_copy(deep=True))
+        counts["synthetic_challenge_attempts"] += 1
+
+    return counts
+
+
+async def seed_demo_cohort(repo: DataRepositoryProtocol) -> dict[str, int]:
+    """Seed both core truth and synthetic cohort datasets into the repository."""
+    core = await seed_core_truth(repo)
+    synth = await seed_synthetic_cohort(repo)
+    merged = {**core, **synth}
+    return merged
+
 
