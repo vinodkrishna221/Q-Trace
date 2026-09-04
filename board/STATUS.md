@@ -16,7 +16,7 @@
 | learning-ux | plan + Venu mission + UX-1 | PR review (UX-1) | UX-2 |
 | simulation-api | plan + Uday mission | mission acceptance | SIM-1 after SHIP-1 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission | mission acceptance | DATA-1 after SHIP-1 |
+| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 | PR review (DATA-3) | DATA-4 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
 
@@ -42,6 +42,11 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 03 Sep 22:22 Rani: DATA-3 green — Challenge, Attempt, Progress and Instructor routers/services implemented; idempotency key caching, deterministic grading, atomic Progress Record updates and aggregate Instructor Insights verified; 7/7 tests passed (27/27 data suite passed), PR ready for Warden review.
+
+- 31 Aug 19:15 Rani: DATA-2 green — seeded hero learner profiles (Aarav, Meera), instructor (Dr. Rao), 3 modules, 2 learning paths, Bell prediction checkpoint, starter/broken circuits, quizzes/repair challenge, and initial progress records with full referential integrity and idempotency; 8/8 tests passed, PR ready for Warden review.
+
+- 26 Aug 19:30 Rani: DATA-1 green — typed repository protocols, dependency selector, and deterministic in-memory store for profiles, paths, modules, runs, signals, challenges/attempts, and atomic progress updates established; 10/10 tests passed, PR ready for Warden review.
 - 23 Aug 18:42 Venu: UX-1 green — Next.js learner app shell, shadcn primitives, dark theme, route groups (learn/lab/progress/instructor), contract fixture loader, and role switch established; 3/3 tests passed, next build passed (9/9 static routes), PR ready for Warden review.
 - 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.

@@ -1,11 +1,11 @@
 # Mission — Rani · Learning data, progress and instructor analytics
 
 > Context capsule: this file + the repo = everything needed in any tool, cold.
-> ACCEPTED: [ ] **Rani ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
+> ACCEPTED: [x] **Rani ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
 
 ## The project in 30 seconds
 
-**Q-Trace** is an AI-assisted quantum learning platform where Aarav or Meera learns, predicts, builds, simulates, sees and repairs a circuit. The live Bell-state path runs through real Qiskit evidence. **Quantum Flight Recorder** finds the first gate where the learner’s mental model diverged, the evidence-bound Tutor explains it, and a Repair Challenge updates Progress and Instructor Insight. The internal prototype must work from one laptop without cloud AI, Atlas or venue internet.
+**Q-Trace** is an AI-assisted quantum learning platform where Aarav or Meera learns, predicts, builds, simulates, sees and repairs a circuit. The live Bell-state path runs through real Qiskit evidence. **Quantum Flight Recorder** finds the first gate where the learner's mental model diverged, the evidence-bound Tutor explains it, and a Repair Challenge updates Progress and Instructor Insight. The internal prototype must work from one laptop without cloud AI, Atlas or venue internet.
 
 ## Your mission
 
@@ -18,7 +18,7 @@
 ## File boundary
 
 **Owns:** `apps/api/app/repositories/**`, `routers/learning.py`, `progress.py`, `instructor.py`, `scripts/seed.py`, and `apps/api/tests/unit/data/**`.
-**Never touch silently:** another mission’s implementation or unit-test surface; contracts change only through version bump + DECISIONS + Discord ping.
+**Never touch silently:** another mission's implementation or unit-test surface; contracts change only through version bump + DECISIONS + Discord ping.
 
 ## Rules and frozen inputs
 
@@ -47,7 +47,7 @@ DELIVERABLE: Create typed repository protocols, dependency selector and determin
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_memory_repository.py` resets twice to identical IDs and proves create/get plus atomic progress update primitives.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-4,DATA-2
 DEMO: Plumbing for every P0 endpoint and the venue-safe store.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-1-define-repositories-and-the-in`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -57,7 +57,7 @@ DELIVERABLE: Add Aarav, Meera, Dr. Rao session metadata, three Modules, two Lear
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_core_seed.py` seeds twice with no duplicates and retrieves every ID referenced by the contracts.
 DEPENDS: DATA-1          UNBLOCKS: AI-3,DATA-3
 DEMO: The prototype opens with all three users and a coherent Bell learning journey.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-2-seed-learner-content-and-challenge`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -66,8 +66,8 @@ CONTEXT: Core seeds exist; diagnosis may still use fixtures. Load progress contr
 DELIVERABLE: Implement Challenge, Attempt, Progress and Instructor routers/services using the repository protocol, idempotency key and atomic attempt + Progress Record update.
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_progress_flow.py` posts a passing Bell attempt twice and proves one attempt, one 100-point increment and updated Instructor Insight.
 DEPENDS: DATA-2          UNBLOCKS: UX-4,DATA-4,QA-3,QA-5
-DEMO: Aarav’s repair visibly changes progress and Dr. Rao’s aggregate proof.
-PERSONA: Atlas           STATUS: [ ] todo
+DEMO: Aarav's repair visibly changes progress and Dr. Rao's aggregate proof.
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-3-persist-challenge-attempts-and-progress`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -106,7 +106,7 @@ CONTEXT: DATA-6 and AI-4 provide deployed cohort seeds and Misconception Signals
 DELIVERABLE: Implement indexed aggregation, 10-second cache, empty cohort response, live-demo learner marker and concurrent idempotency test for Challenge Attempts.
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_instructor_analytics.py` verifies rates, top misconception counts, empty cohort and no double score under concurrent duplicate requests.
 DEPENDS: DATA-6,AI-4          UNBLOCKS: UX-7,DATA-8,QA-6
-DEMO: Dr. Rao sees fast, consistent analytics after Aarav’s live repair.
+DEMO: Dr. Rao sees fast, consistent analytics after Aarav's live repair.
 PERSONA: Atlas           STATUS: [ ] todo
 BRANCH: `feat/data-analytics/data-7-harden-analytics-aggregation-and-idempotency`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
@@ -149,6 +149,6 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 
 ## Acceptance
 
-- [ ] I, **Rani**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
-- [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
-- [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+- [x] I, **Rani**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
+- [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
+- [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
