@@ -114,7 +114,7 @@ DELIVERABLE: Implement indexed aggregation, 10-second cache, empty cohort respon
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_instructor_analytics.py` verifies rates, top misconception counts, empty cohort and no double score under concurrent duplicate requests.
 DEPENDS: DATA-6,AI-4          UNBLOCKS: UX-7,DATA-8,QA-6
 DEMO: Dr. Rao sees fast, consistent analytics after Aarav’s live repair.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ## P3 · Polish — due 28 Aug 2026 09:00 IST (pre-cut-listed)
 
