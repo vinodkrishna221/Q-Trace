@@ -97,7 +97,7 @@ DELIVERABLE: Run one behavioral contract suite against memory and Atlas, add see
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_repository_contract.py` passes both backends; `uv run --project apps/api python apps/api/scripts/seed.py --check` reports the same hero IDs.
 DEPENDS: DATA-5,QA-3          UNBLOCKS: SIM-7,DATA-7,SHIP-6
 DEMO: The cloud demo and laptop demo tell the same story.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-6-prove-repository-parity-and-deploy`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 04 Sep 07:08 Rani: DATA-6 green — behavioral contract suite for both repositories added and passed, deploy runbook created, safe environment configuration documented; 1/1 unit tests passed, seed check passed, PR ready for Warden review.
 - 04 Sep 06:54 Rani: DATA-5 green — Deterministic 30-profile cohort, 75 challenge attempts, 40 misconception signals, synthetic disclosure text, and Aarav live-attempt override implemented; 4/4 unit tests passed (38/38 data suite passed), PR ready for Warden review.
 - 04 Sep 06:42 Rani: DATA-4 green — Async MongoRepository, 11 collection getters, schemaVersion guards, ObjectId sanitization, and 11 collection indexes implemented; 7/7 unit tests passed (34/34 data suite passed), PR ready for Warden review.
 
