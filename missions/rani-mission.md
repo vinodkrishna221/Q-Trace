@@ -117,7 +117,7 @@ DELIVERABLE: Lock schemaVersion/index list, verify long/empty/failed rows, add d
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` snapshots field/index names and verifies all edge responses match contracts.
 DEPENDS: DATA-7,QA-7          UNBLOCKS: —
 DEMO: The demo never reveals empty mystery cards or undisclosed synthetic analytics.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-8-freeze-schema-and-polish-edge`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -152,3 +152,4 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 - [x] I, **Rani**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
 - [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
+- [x] DATA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` → 16 passed in 1.50s.

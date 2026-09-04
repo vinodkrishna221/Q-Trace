@@ -16,7 +16,7 @@
 | learning-ux | plan + Venu mission + UX-1 | PR review (UX-1) | UX-2 |
 | simulation-api | plan + Uday mission | mission acceptance | SIM-1 after SHIP-1 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 + DATA-5 + DATA-6 + DATA-7 | PR review (DATA-7) | DATA-8 |
+| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 + DATA-5 + DATA-6 + DATA-7 + DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
 
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 04 Sep 17:20 Rani: DATA-8 green — schema_freeze.py manifest (SCHEMA_VERSION=1, 11 collections, 26 indexes, 12 entity field snapshots) and test_schema_freeze.py created; edge states (long name, empty cohort 404, failed attempt shape, learner 404) verified; synthetic dataDisclosure enforced; reset/pre-warm runbook added to DEPLOY-RUNBOOK.md; 16/16 unit tests passed (60/60 data suite passed), PR ready for Warden review.
 - 04 Sep 07:18 Rani: DATA-7 green — 10-second TTL cache for Instructor Insights, empty cohort 404 response, live-demo learner marker, and thread-safe concurrent idempotency for Challenge Attempts implemented; 4/4 unit tests passed (44/44 data suite passed), PR ready for Warden review.
 - 04 Sep 07:08 Rani: DATA-6 green — behavioral contract suite for both repositories added and passed, deploy runbook created, safe environment configuration documented; 1/1 unit tests passed, seed check passed, PR ready for Warden review.
 - 04 Sep 06:54 Rani: DATA-5 green — Deterministic 30-profile cohort, 75 challenge attempts, 40 misconception signals, synthetic disclosure text, and Aarav live-attempt override implemented; 4/4 unit tests passed (38/38 data suite passed), PR ready for Warden review.

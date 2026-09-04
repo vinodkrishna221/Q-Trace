@@ -124,4 +124,4 @@ DELIVERABLE: Lock schemaVersion/index list, verify long/empty/failed rows, add d
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` snapshots field/index names and verifies all edge responses match contracts.
 DEPENDS: DATA-7,QA-7          UNBLOCKS: —
 DEMO: The demo never reveals empty mystery cards or undisclosed synthetic analytics.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done

@@ -48,3 +48,38 @@ To wipe the database before seeding again (useful during development):
 ```bash
 uv run --project apps/api python apps/api/scripts/seed.py --reset
 ```
+
+## Schema Freeze Gate (DATA-8)
+
+**SCHEMA_VERSION = 1** is now locked. No new collection or entity field may be
+added without:
+1. Bumping `SCHEMA_VERSION` in `apps/api/app/repositories/schema_freeze.py`.
+2. Adding the new collection/index/field entries to the freeze manifest.
+3. Filing a DECISIONS entry and pinging all contract consumers in Discord.
+
+### Pre-warm Sequence (full venue cycle)
+
+Run these steps in order before any live demo:
+
+```bash
+# 1. Prove schema freeze is intact (exit 0 = no drift)
+uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py -q
+
+# 2. Verify parity between memory and Atlas backends
+uv run --project apps/api pytest apps/api/tests/unit/data/test_repository_contract.py -q
+
+# 3. Optional reset (development only — skips on venue)
+uv run --project apps/api python apps/api/scripts/seed.py --reset
+
+# 4. Seed the demo cohort + hero profiles
+uv run --project apps/api python apps/api/scripts/seed.py
+
+# 5. Verify hero IDs are present
+uv run --project apps/api python apps/api/scripts/seed.py --check
+```
+
+> [!NOTE]
+> All `InstructorInsight` responses include a `dataDisclosure` field that
+> contains "Synthetic" to clearly mark synthetic seeded cohort data.
+> The freeze test `test_instructor_insight_synthetic_disclosure_present`
+> enforces this on every deployment.
