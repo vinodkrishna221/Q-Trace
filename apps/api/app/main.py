@@ -11,6 +11,7 @@ SIM-1 additions over the SHIP-1 skeleton:
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 import logging
 import os
 import uuid
@@ -21,10 +22,27 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.models.errors import ErrorDetail, ErrorEnvelope
+from app.repositories import get_repository, seed_core_truth
 from app.routers import circuits, simulation_runs
+from app.routers.instructor import router as instructor_router
+from app.routers.learning import router as learning_router
+from app.routers.progress import router as progress_router
 
 logger = logging.getLogger("qtrace.api")
 logging.basicConfig(level=logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler to ensure core truth is seeded on startup."""
+    repo = get_repository()
+    await seed_core_truth(repo)
+    yield
+
 
 # ---------------------------------------------------------------------------
 # Application
@@ -34,6 +52,7 @@ app = FastAPI(
     title="Q-Trace API",
     description="Backend API for Q-Trace quantum learning platform",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------
@@ -91,7 +110,12 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     envelope = ErrorEnvelope(
         error=ErrorDetail(code=code, message=message, requestId=rid, details=details)
     )
-    return JSONResponse(status_code=exc.status_code, content=envelope.model_dump())
+    content = envelope.model_dump()
+    if isinstance(exc.detail, dict):
+        content["detail"] = exc.detail
+    else:
+        content["detail"] = {"code": code, "message": message, "details": details}
+    return JSONResponse(status_code=exc.status_code, content=content)
 
 
 @app.exception_handler(Exception)
@@ -114,6 +138,9 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 app.include_router(circuits.router)
 app.include_router(simulation_runs.router)
+app.include_router(learning_router, prefix="/v1")
+app.include_router(progress_router, prefix="/v1")
+app.include_router(instructor_router, prefix="/v1")
 
 # ---------------------------------------------------------------------------
 # Core endpoints

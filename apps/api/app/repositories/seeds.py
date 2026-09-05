@@ -369,41 +369,41 @@ async def seed_core_truth(repo: DataRepositoryProtocol) -> dict[str, int]:
 
     # 1. Learner profiles
     for profile in CORE_LEARNER_PROFILES:
-        await repo.create_or_update_learner_profile(profile)
+        await repo.create_or_update_learner_profile(profile.model_copy(deep=True))
         counts["learner_profiles"] += 1
 
     # 2. Instructor profile
-    await repo.create_or_update_instructor_profile(CORE_INSTRUCTOR_PROFILE)
+    await repo.create_or_update_instructor_profile(CORE_INSTRUCTOR_PROFILE.model_copy(deep=True))
     counts["instructor_profiles"] += 1
 
     # 3. Learning paths
     for path in CORE_LEARNING_PATHS:
-        await repo.create_or_update_learning_path(path)
+        await repo.create_or_update_learning_path(path.model_copy(deep=True))
         counts["learning_paths"] += 1
 
     # 4. Prediction checkpoints
     for cp in CORE_PREDICTION_CHECKPOINTS:
-        await repo.create_or_update_prediction_checkpoint(cp)
+        await repo.create_or_update_prediction_checkpoint(cp.model_copy(deep=True))
         counts["prediction_checkpoints"] += 1
 
     # 5. Circuit models
     for circuit in CORE_CIRCUIT_MODELS:
-        await repo.create_or_update_circuit_model(circuit)
+        await repo.create_or_update_circuit_model(circuit.model_copy(deep=True))
         counts["circuit_models"] += 1
 
     # 6. Challenges
     for ch in CORE_CHALLENGES:
-        await repo.create_or_update_challenge(ch)
+        await repo.create_or_update_challenge(ch.model_copy(deep=True))
         counts["challenges"] += 1
 
     # 7. Modules
     for module in CORE_MODULES:
-        await repo.create_or_update_module(module)
+        await repo.create_or_update_module(module.model_copy(deep=True))
         counts["modules"] += 1
 
     # 8. Progress records
     for progress in CORE_PROGRESS_RECORDS:
-        await repo.create_or_update_progress_record(progress)
+        await repo.create_or_update_progress_record(progress.model_copy(deep=True))
         counts["progress_records"] += 1
 
     return counts

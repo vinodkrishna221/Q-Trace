@@ -78,7 +78,7 @@ DELIVERABLE: Implement Challenge, Attempt, Progress and Instructor routers/servi
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_progress_flow.py` posts a passing Bell attempt twice and proves one attempt, one 100-point increment and updated Instructor Insight.
 DEPENDS: DATA-2          UNBLOCKS: UX-4,DATA-4,QA-3,QA-5
 DEMO: Aarav’s repair visibly changes progress and Dr. Rao’s aggregate proof.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 
