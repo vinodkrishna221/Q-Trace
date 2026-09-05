@@ -15,7 +15,7 @@
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1 | PR review (UX-1) | UX-2 |
 | simulation-api | plan + Uday mission | mission acceptance | SIM-1 after SHIP-1 |
-| ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
+| ai-pedagogy | plan + Rajeswari mission + AI-1 | PR review (AI-1) | AI-2 |
 | data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 + DATA-5 + DATA-6 + DATA-7 + DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1 | PR review (SHIP-1) | SHIP-2 / SHIP-3 |
