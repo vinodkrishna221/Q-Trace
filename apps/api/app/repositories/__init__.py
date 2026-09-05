@@ -14,7 +14,10 @@ from app.repositories.seeds import (
     CORE_PREDICTION_CHECKPOINTS,
     CORE_PROGRESS_RECORDS,
     get_core_seed_dataset,
+    get_demo_cohort_dataset,
     seed_core_truth,
+    seed_demo_cohort,
+    seed_synthetic_cohort,
 )
 
 _default_repository: Optional[DataRepositoryProtocol] = None
@@ -41,7 +44,10 @@ __all__ = [
     "get_repository",
     "set_repository",
     "seed_core_truth",
+    "seed_synthetic_cohort",
+    "seed_demo_cohort",
     "get_core_seed_dataset",
+    "get_demo_cohort_dataset",
     "CORE_LEARNER_PROFILES",
     "CORE_INSTRUCTOR_PROFILE",
     "CORE_LEARNING_PATHS",
@@ -51,4 +57,5 @@ __all__ = [
     "CORE_CHALLENGES",
     "CORE_PROGRESS_RECORDS",
 ]
+
 

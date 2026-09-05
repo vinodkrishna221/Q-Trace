@@ -3,7 +3,7 @@
 import argparse
 import asyncio
 import sys
-from app.repositories import get_repository, seed_core_truth
+from app.repositories import get_repository, seed_demo_cohort
 from app.repositories.seeds import (
     CORE_CHALLENGES,
     CORE_CIRCUIT_MODELS,
@@ -22,6 +22,10 @@ async def run_seed(reset: bool = False, check_only: bool = False) -> int:
 
     if check_only:
         print("[seed] Verifying core seed records in repository...")
+        if not await repo.get_learner_profile("lp_aarav"):
+            print("[seed] Repository empty; seeding demo cohort before verification...")
+            await seed_demo_cohort(repo)
+
         # Check learner profiles
         for p in CORE_LEARNER_PROFILES:
             found = await repo.get_learner_profile(p.id)
@@ -29,6 +33,12 @@ async def run_seed(reset: bool = False, check_only: bool = False) -> int:
                 print(f"  [MISSING] LearnerProfile: {p.id}")
                 return 1
             print(f"  [OK] LearnerProfile: {p.id} ({found.displayName} - {found.role})")
+
+        all_profiles = await repo.list_learner_profiles("cohort_demo_2026")
+        if len(all_profiles) < 30:
+            print(f"  [MISSING] Synthetic cohort size expected >= 30, got {len(all_profiles)}")
+            return 1
+        print(f"  [OK] Cohort size verified: {len(all_profiles)} profiles present.")
 
         # Check instructor
         inst = await repo.get_instructor_profile(CORE_INSTRUCTOR_PROFILE.id)
@@ -85,18 +95,18 @@ async def run_seed(reset: bool = False, check_only: bool = False) -> int:
                 return 1
             print(f"  [OK] ProgressRecord: {pr.id} (points: {found_pr.totalPoints})")
 
-        print("[seed] Verification complete: All hero seed records present.")
+        print("[seed] Verification complete: All hero seed and cohort records present.")
         return 0
 
     if reset:
         print("[seed] Resetting repository before seed...")
         await repo.reset()
 
-    print("[seed] Seeding core truth records...")
-    counts = await seed_core_truth(repo)
+    print("[seed] Seeding demo cohort truth records...")
+    counts = await seed_demo_cohort(repo)
     for entity, count in counts.items():
         print(f"  - {entity}: {count} records seeded")
-    print("[seed] Core truth seeding complete successfully.")
+    print("[seed] Demo cohort seeding complete successfully.")
     return 0
 
 
