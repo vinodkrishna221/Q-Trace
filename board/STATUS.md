@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 27 Aug 2026 13:15 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 05 Sep 2026 19:25 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -16,7 +16,7 @@
 | learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-5 | SIM-5 merged to main | SIM-6 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission + DATA-1 + DATA-2 | DATA-2 merged to main | DATA-3 |
+| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 | DATA-3 merged to main | DATA-4 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 05 Sep 19:25 Patch: DATA-3 merged to main (PR #15) — challenge attempts, idempotency locking, atomic progress grading, and instructor insights verified; 7/7 test_progress_flow passed, 9/9 test_core_seed passed, full 144/144 API suite passed, 30/30 web suite passed.
 - 27 Aug 13:15 Patch: DATA-2 merged to main (PR #14) — seed truth (Aarav, Meera, Dr. Rao, Bell modules, paths, circuit models, challenges, initial progress) verified; 9/9 test_core_seed tests passed, full 90/90 API suite passed, 30/30 web suite passed.
 - 31 Aug 19:15 Rani: DATA-2 green — seeded hero learner profiles (Aarav, Meera), instructor (Dr. Rao), 3 modules, 2 learning paths, Bell prediction checkpoint, starter/broken circuits, quizzes/repair challenge, and initial progress records with full referential integrity and idempotency; 9/9 tests passed, PR ready for Warden review.
 - 27 Aug 12:45 Venu: UX-5 green — Interactive Circuit Workspace with dnd-kit qubit wires, H/X/Y/Z/CNOT/Measure placement/removal, keyboard/click alternatives, Zustand workspace slice, generated Qiskit code editor with AST-safe parse-and-replace edit flow, and unsupported RX rejection without model mutation established; 12/12 circuit workspace tests passed (30/30 suite), Next.js build passed (9/9 static routes), PR ready for Warden review.
