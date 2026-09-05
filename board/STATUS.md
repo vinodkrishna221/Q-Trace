@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 05 Sep 2026 19:35 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 05 Sep 2026 19:40 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -16,7 +16,7 @@
 | learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-5 | SIM-5 merged to main | SIM-6 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
-| data-analytics | plan + Rani mission + DATA-1 + DATA-2 + DATA-3 + DATA-4 + DATA-5 | DATA-5 merged to main | DATA-6 |
+| data-analytics | plan + Rani mission + DATA-1..DATA-6 | DATA-6 merged to main | DATA-7 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 05 Sep 19:40 Patch: DATA-6 merged to main (PR #18) — behavioral contract parity suite for memory and Mongo repositories and docs/DEPLOY-RUNBOOK.md verified; 2/2 test_repository_contract passed, 40/40 data suite passed, full 157/157 API suite passed, seed --check verified 30 profiles.
 - 04 Sep 07:08 Rani: DATA-6 green — behavioral contract suite for both repositories added and passed, deploy runbook created, safe environment configuration documented; 1/1 unit tests passed, seed check passed, PR ready for Warden review.
 - 05 Sep 19:35 Patch: DATA-5 merged to main (PR #17) — deterministic 30-profile cohort, 75 challenge attempts, 40 misconception signals, synthetic disclosure text, and story test suite verified; 4/4 test_demo_seed_story passed, seed --check verified 30 profiles, full 155/155 API suite passed, 30/30 web suite passed.
 - 05 Sep 19:30 Patch: DATA-4 merged to main (PR #16) — async MongoRepository, 11 collection getters, schemaVersion guards, and idempotent indexes verified; 7/7 test_mongo_repository passed, 34/34 data suite passed, full 151/151 API suite passed, 30/30 web suite passed.
