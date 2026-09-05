@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 05 Sep 20:32 Rajeswari: AI-1 green — deterministic misconception rules (SUPERPOSITION_VS_ENTANGLEMENT, MEASUREMENT_DETERMINISM, GATE_ORDER, NO_SIGNAL) and pure diagnosis functions created in apps/api/app/services/diagnosis/rules.py; evidence-key registry sealed; no LLM calls; 27/27 unit tests passed, PR ready for Warden review.
 - 04 Sep 17:20 Rani: DATA-8 green — schema_freeze.py manifest (SCHEMA_VERSION=1, 11 collections, 26 indexes, 12 entity field snapshots) and test_schema_freeze.py created; edge states (long name, empty cohort 404, failed attempt shape, learner 404) verified; synthetic dataDisclosure enforced; reset/pre-warm runbook added to DEPLOY-RUNBOOK.md; 16/16 unit tests passed (60/60 data suite passed), PR ready for Warden review.
 - 05 Sep 19:42 Patch: DATA-7 merged to main (PR #19) — 10-second TTL cache for instructor insights, empty cohort 404 response, liveDemoLearner marker, and thread-safe concurrent challenge attempt locking verified; 4/4 test_instructor_analytics passed, 44/44 data suite passed, full 161/161 API suite passed, 30/30 web suite passed.
 - 04 Sep 07:18 Rani: DATA-7 green — 10-second TTL cache for Instructor Insights, empty cohort 404 response, live-demo learner marker, and thread-safe concurrent idempotency for Challenge Attempts implemented; 4/4 unit tests passed (44/44 data suite passed), PR ready for Warden review.
