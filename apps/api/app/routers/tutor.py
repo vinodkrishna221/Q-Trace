@@ -1,0 +1,223 @@
+"""
+Tutor Router — Q-Trace Evidence-Bound Tutor.
+============================================
+Owner:   Rajeswari (ai-pedagogy track)
+Card:    AI-3
+Contract: board/contracts/flight-recorder-tutor.md v1
+"""
+
+from __future__ import annotations
+
+from typing import Any, Literal, Optional
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.repositories import get_repository
+from app.services.tutor.fallback import (
+    SUPPORTED_INTENTS,
+    get_curated_bell_explanation,
+)
+from app.services.tutor.validator import (
+    EvidenceKeyValidationError,
+    FabricatedClaimError,
+)
+
+router = APIRouter(prefix="/tutor", tags=["tutor"])
+
+# QA Bell State Simulation Run contract fixture (used when live SIM-4 run is absent)
+BELL_SIMULATION_RUN_FIXTURE: dict[str, Any] = {
+    "id": "sr_demo_001",
+    "learnerProfileId": "lp_aarav",
+    "moduleId": "mod_bell",
+    "circuitModelId": "cm_bell_seed",
+    "adapter": "QISKIT_AER",
+    "shots": 1024,
+    "status": "SUCCEEDED",
+    "probabilities": {"00": 0.5, "11": 0.5},
+    "counts": {"00": 512, "11": 512},
+    "stateTrace": [
+        {
+            "stepIndex": 0,
+            "operationId": "op_1",
+            "label": "After H",
+            "basisProbabilities": {"00": 0.5, "10": 0.5},
+            "amplitudes": {
+                "00": {"re": 0.70710678, "im": 0.0},
+                "10": {"re": 0.70710678, "im": 0.0},
+            },
+            "reducedQubits": [
+                {
+                    "qubit": 0,
+                    "bloch": {"x": 1.0, "y": 0.0, "z": 0.0},
+                    "purity": 1.0,
+                    "label": "PURE_SUBSYSTEM",
+                },
+                {
+                    "qubit": 1,
+                    "bloch": {"x": 0.0, "y": 0.0, "z": 1.0},
+                    "purity": 1.0,
+                    "label": "PURE_SUBSYSTEM",
+                },
+            ],
+        },
+        {
+            "stepIndex": 1,
+            "operationId": "op_2",
+            "label": "After CNOT",
+            "basisProbabilities": {"00": 0.5, "11": 0.5},
+            "amplitudes": {
+                "00": {"re": 0.70710678, "im": 0.0},
+                "11": {"re": 0.70710678, "im": 0.0},
+            },
+            "reducedQubits": [
+                {
+                    "qubit": 0,
+                    "bloch": {"x": 0.0, "y": 0.0, "z": 0.0},
+                    "purity": 0.5,
+                    "label": "MIXED_SUBSYSTEM",
+                },
+                {
+                    "qubit": 1,
+                    "bloch": {"x": 0.0, "y": 0.0, "z": 0.0},
+                    "purity": 0.5,
+                    "label": "MIXED_SUBSYSTEM",
+                },
+            ],
+        },
+    ],
+    "conformance": {
+        "adapter": "PENNYLANE",
+        "maxProbabilityDelta": 0.0,
+        "epsilon": 0.000001,
+        "passed": True,
+        "skippedReason": None,
+    },
+    "durationMs": 84,
+    "createdAt": "2026-08-23T05:27:00Z",
+}
+
+# QA Misconception Signal contract fixture (used when live AI-2 signal is absent)
+BELL_MISCONCEPTION_SIGNAL_FIXTURE: dict[str, Any] = {
+    "id": "ms_demo_001",
+    "learnerProfileId": "lp_aarav",
+    "simulationRunId": "sr_demo_001",
+    "code": "SUPERPOSITION_VS_ENTANGLEMENT",
+    "firstDivergenceStep": 1,
+    "evidence": {
+        "prediction": "INDEPENDENT_RANDOM",
+        "verifiedBehavior": "CORRELATED_00_11",
+        "stateTraceStepIndexes": [0, 1],
+    },
+    "confidence": 1.0,
+    "repairChallengeId": "ch_bell_repair",
+    "createdAt": "2026-08-23T05:27:01Z",
+}
+
+
+class TutorExplainRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    learnerProfileId: str
+    moduleId: str
+    simulationRunId: str
+    misconceptionSignalId: str
+    intent: str
+    learnerQuestion: Optional[str] = Field(default=None, max_length=500)
+
+
+class TutorStep(BaseModel):
+    title: str
+    body: str
+    evidenceKeys: list[str]
+
+
+class NumericalClaim(BaseModel):
+    claim: str
+    evidenceKey: str
+
+
+class TutorResponsePayload(BaseModel):
+    responseId: str
+    intent: str
+    summary: str
+    steps: list[TutorStep]
+    numericalClaims: list[NumericalClaim]
+    repairChallengeId: str
+    fallbackUsed: bool = True
+    model: str = "DEMO_FALLBACK"
+    safetyNote: str
+
+
+class TutorExplainResponse(BaseModel):
+    tutorResponse: TutorResponsePayload
+
+
+@router.post("/explain", response_model=TutorExplainResponse, status_code=status.HTTP_200_OK)
+async def explain_divergence(request: TutorExplainRequest) -> TutorExplainResponse:
+    """POST /v1/tutor/explain
+    
+    Generates an evidence-grounded explanation for a learner's divergence.
+    Never persists free-form question or answer text.
+    """
+    # 1. Validate intent
+    if request.intent not in SUPPORTED_INTENTS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"INTENT_UNSUPPORTED: Intent '{request.intent}' is not supported.",
+        )
+
+    # 2. Check learner question length (guaranteed by pydantic, but explicit check)
+    if request.learnerQuestion and len(request.learnerQuestion) > 500:
+        raise HTTPException(
+            status_code=422,
+            detail="LEARNER_QUESTION_TOO_LONG: Question must not exceed 500 characters.",
+        )
+
+    repo = get_repository()
+
+    # 3. Retrieve and verify learner profile
+    learner = await repo.get_learner_profile(request.learnerProfileId)
+    if not learner:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"EVIDENCE_NOT_FOUND: Learner profile '{request.learnerProfileId}' not found.",
+        )
+
+    # 4. Retrieve simulation run evidence
+    sim_run = await repo.get_simulation_run(request.simulationRunId)
+    state_trace: list[dict[str, Any]]
+
+    if sim_run:
+        state_trace = sim_run.stateTrace
+    elif request.simulationRunId == BELL_SIMULATION_RUN_FIXTURE["id"]:
+        # Mock path fallback: use QA contract fixture
+        state_trace = BELL_SIMULATION_RUN_FIXTURE["stateTrace"]
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"EVIDENCE_NOT_FOUND: Simulation run '{request.simulationRunId}' not found.",
+        )
+
+    # 5. Retrieve misconception signal or use mock fixture
+    signal = await repo.get_misconception_signal(request.misconceptionSignalId)
+    misconception_code = "SUPERPOSITION_VS_ENTANGLEMENT"
+    if signal:
+        misconception_code = signal.code
+    elif request.misconceptionSignalId == BELL_MISCONCEPTION_SIGNAL_FIXTURE["id"]:
+        misconception_code = BELL_MISCONCEPTION_SIGNAL_FIXTURE["code"]
+
+    # 6. Generate curated fallback explanation with verified evidence validation
+    try:
+        explanation = get_curated_bell_explanation(
+            state_trace=state_trace,
+            misconception_code=misconception_code,
+            module_id=request.moduleId,
+            intent=request.intent,
+        )
+    except (EvidenceKeyValidationError, FabricatedClaimError) as err:
+        raise HTTPException(
+            status_code=422,
+            detail=f"EVIDENCE_KEY_INVALID: {err}",
+        )
+
+    # 7. Strictly DO NOT persist free-form learnerQuestion or explanation
+    return TutorExplainResponse(tutorResponse=TutorResponsePayload(**explanation))
