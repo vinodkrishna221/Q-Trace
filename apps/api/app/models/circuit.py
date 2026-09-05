@@ -65,7 +65,8 @@ class Operation(BaseModel):
 # CircuitModel
 # ---------------------------------------------------------------------------
 
-_SOURCE_LITERAL = Literal["BUILDER", "SUPPORTED_QISKIT", "SEED"]
+CircuitModelSource = Literal["BUILDER", "SUPPORTED_QISKIT", "SEED"]
+_SOURCE_LITERAL = CircuitModelSource
 
 class CircuitModel(BaseModel):
     """Canonical circuit representation.

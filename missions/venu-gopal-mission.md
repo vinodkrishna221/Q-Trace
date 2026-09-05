@@ -58,7 +58,7 @@ DELIVERABLE: Implement the Bell Module page with concept blocks, prior-knowledge
 TEST: `pnpm --dir apps/web test -- bell-prediction` selects `INDEPENDENT_RANDOM`, reloads the route and shows the saved choice before Run is enabled.
 DEPENDS: UX-1          UNBLOCKS: UX-3
 DEMO: Aarav makes the wrong prediction judges will watch the Flight Recorder repair.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-2-render-the-bell-module-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -68,7 +68,7 @@ DELIVERABLE: Add a read-only two-wire Circuit Workspace, generated Qiskit panel,
 TEST: `pnpm --dir apps/web test -- mocked-bell-loop` walks every state and verifies basis labels `00`/`11`, `MIXED_SUBSYSTEM`, evidence keys and repair success.
 DEPENDS: UX-2          UNBLOCKS: UX-4
 DEMO: The full 90-second learner story can be rehearsed before backend merge.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-3-build-the-mocked-learner-evidence`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -78,7 +78,7 @@ DELIVERABLE: Replace P0 fixture calls with TanStack Query mutations/queries for 
 TEST: `pnpm --dir apps/web test:e2e -- bell-live` against the local API completes prediction → run → diagnosis → repair → progress and exposes the request ID.
 DEPENDS: UX-3,SIM-4,AI-3,DATA-3          UNBLOCKS: UX-5,UX-6,QA-3,SHIP-5
 DEMO: Aarav completes the real HTTP walking skeleton; this unblocks the global smoke test.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-4-swap-the-bell-journey-to`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -88,7 +88,7 @@ DELIVERABLE: Implement ordered dnd-kit qubit wires with H/X/Y/Z/CNOT/Measure pla
 TEST: `pnpm --dir apps/web test -- circuit-workspace` places H+CNOT, serializes stable columns, round-trips the supported code edit and rejects an unsupported RX without mutating the model.
 DEPENDS: UX-4          UNBLOCKS: UX-8,QA-5
 DEMO: Judges build the Bell circuit visually and see synchronized Qiskit code.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-5-implement-the-interactive-circuit-workspace`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

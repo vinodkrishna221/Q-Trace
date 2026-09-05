@@ -2,45 +2,64 @@
 
 import * as React from 'react';
 import { DEMO_INSTRUCTOR_INSIGHT } from '@/lib/fixtures';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { useInstructorInsightQuery } from '@/lib/hooks/use-quantum-api';
+import { PageHeader } from '@/components/layout/page-header';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, CheckCircle, AlertTriangle, Activity, BarChart2 } from 'lucide-react';
+import { Users, CheckCircle, AlertTriangle, BarChart2, Radio, Server } from 'lucide-react';
 
 export default function InstructorPage() {
-  const insight = DEMO_INSTRUCTOR_INSIGHT;
+  const { data: insightWithMeta } = useInstructorInsightQuery('cohort_demo_2026');
+  const insight = insightWithMeta?.data || DEMO_INSTRUCTOR_INSIGHT;
+  const isFallback = insightWithMeta?.meta?.isFallback ?? true;
+  const requestId = insightWithMeta?.meta?.requestId ?? 'req_demo_instructor';
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto" data-testid="instructor-insight-view">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <Badge variant="warning" className="text-xs">INSTRUCTOR INSIGHT</Badge>
-            <Badge variant="outline" className="text-[11px] font-mono text-zinc-400">Cohort: {insight.cohortId}</Badge>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            Cohort Analytics & Misconceptions
-          </h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Aggregate performance, module completion rates and Quantum Flight Recorder divergence signals.
-          </p>
-        </div>
+    <div className="space-y-8 max-w-5xl mx-auto" data-testid="instructor-insight-view">
+      <PageHeader
+        eyebrow={
+          <>
+            <Badge variant="warning">INSTRUCTOR INSIGHT</Badge>
+            <span>Cohort: {insight.cohortId}</span>
+          </>
+        }
+        title="Cohort Analytics & Misconceptions"
+        purpose="Aggregate completion, challenge pass rates, and Flight Recorder divergence signals — evidence for what to re-teach next."
+        actions={
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-2 bg-panel border border-line px-3 py-2 rounded-lg text-xs font-mono"
+              data-testid="instructor-meta-badge"
+            >
+              <Server className="w-3.5 h-3.5 text-accent" />
+              <span className="text-ink-dim">Req:</span>
+              <span className="text-accent font-semibold">{requestId}</span>
+              <Badge variant={isFallback ? 'warning' : 'outline'} className="text-[9px]">
+                {isFallback ? 'DEMO_LOCAL' : 'LIVE API'}
+              </Badge>
+            </div>
 
-        <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-lg">
-          <Users className="w-5 h-5 text-cyan-400" />
-          <div>
-            <div className="text-[10px] text-zinc-400 uppercase font-semibold">Active Learners</div>
-            <div className="text-lg font-bold text-white">{insight.learnerCount} students</div>
+            <div className="flex items-center gap-3 bg-panel border border-line px-4 py-2.5 rounded-lg">
+              <Users className="w-5 h-5 text-accent" />
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-widest text-ink-faint">
+                  Active Learners
+                </div>
+                <div className="text-lg font-display font-bold text-ink">
+                  {insight.learnerCount} students
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        }
+      />
 
-      {/* 3 Metric Cards */}
+      {/* Metric panels */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Module Completion */}
-        <Card className="border-zinc-800">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm text-zinc-200 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CardTitle className="text-sm flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-evidence" />
               <span>Module Completion</span>
             </CardTitle>
           </CardHeader>
@@ -48,12 +67,14 @@ export default function InstructorPage() {
             {insight.moduleCompletion.map((m) => (
               <div key={m.moduleId} className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-zinc-300">{m.moduleId}</span>
-                  <span className="text-zinc-400">{m.completed}/{m.assigned} ({Math.round((m.completed / m.assigned) * 100)}%)</span>
+                  <span className="text-ink">{m.moduleId}</span>
+                  <span className="text-ink-dim">
+                    {m.completed}/{m.assigned} ({Math.round((m.completed / m.assigned) * 100)}%)
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-raised rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-emerald-500 rounded-full"
+                    className="h-full bg-evidence rounded-full"
                     style={{ width: `${(m.completed / m.assigned) * 100}%` }}
                   />
                 </div>
@@ -62,11 +83,10 @@ export default function InstructorPage() {
           </CardContent>
         </Card>
 
-        {/* Challenge Pass Rate */}
-        <Card className="border-zinc-800">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm text-zinc-200 flex items-center gap-2">
-              <BarChart2 className="w-4 h-4 text-cyan-400" />
+            <CardTitle className="text-sm flex items-center gap-2">
+              <BarChart2 className="w-4 h-4 text-accent" />
               <span>Challenge Pass Rate</span>
             </CardTitle>
           </CardHeader>
@@ -74,12 +94,14 @@ export default function InstructorPage() {
             {insight.challengePassRate.map((ch) => (
               <div key={ch.challengeId} className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-zinc-300">{ch.challengeId}</span>
-                  <span className="text-zinc-400">{ch.passed}/{ch.attempted} ({Math.round(ch.rate * 100)}%)</span>
+                  <span className="text-ink">{ch.challengeId}</span>
+                  <span className="text-ink-dim">
+                    {ch.passed}/{ch.attempted} ({Math.round(ch.rate * 100)}%)
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-raised rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-cyan-500 rounded-full"
+                    className="h-full bg-accent rounded-full"
                     style={{ width: `${ch.rate * 100}%` }}
                   />
                 </div>
@@ -88,19 +110,18 @@ export default function InstructorPage() {
           </CardContent>
         </Card>
 
-        {/* Top Misconceptions */}
-        <Card className="border-zinc-800">
+        <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm text-zinc-200 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <CardTitle className="text-sm flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-caution" />
               <span>Top Misconceptions</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {insight.topMisconceptions.map((disc) => (
-              <div key={disc.code} className="p-2 rounded bg-zinc-950 border border-zinc-850 text-xs">
-                <div className="font-mono text-amber-300 text-[11px] font-semibold">{disc.code}</div>
-                <div className="text-[10px] text-zinc-400 mt-0.5">
+              <div key={disc.code} className="p-2.5 rounded-lg bg-abyss border border-line text-xs">
+                <div className="font-mono text-caution text-[11px] font-semibold">{disc.code}</div>
+                <div className="text-[10px] text-ink-faint mt-0.5 font-mono">
                   {disc.learnerCount} learners · {disc.occurrences} detections
                 </div>
               </div>
@@ -109,11 +130,25 @@ export default function InstructorPage() {
         </Card>
       </div>
 
-      <div className="p-3 bg-zinc-900/50 rounded-lg border border-zinc-850 text-xs text-zinc-400 flex items-center justify-between">
+      {/* Live-demo callout — connects the cohort to the demo just performed */}
+      {insight.liveDemoLearner && (
+        <div className="flex items-center gap-3 p-3.5 rounded-lg border border-accent/30 bg-accent/5 text-xs">
+          <Radio className="w-4 h-4 text-accent shrink-0" />
+          <span className="text-ink-dim">
+            Live demo learner{' '}
+            <span className="font-mono text-accent">{insight.liveDemoLearner.learnerProfileId}</span>
+            {' '}—{' '}
+            {insight.liveDemoLearner.latestAttemptPassed
+              ? 'latest repair attempt: passed'
+              : 'latest repair attempt: not yet passed'}
+          </span>
+        </div>
+      )}
+
+      {/* Disclosure footer */}
+      <div className="p-3 rounded-lg border border-line bg-panel/60 text-xs text-ink-faint flex flex-wrap items-center justify-between gap-2">
         <span>{insight.dataDisclosure || 'Synthetic seeded cohort'}</span>
-        <Badge variant="outline" className="text-[10px] font-mono text-zinc-500">
-          Generated: {insight.generatedAt}
-        </Badge>
+        <span className="font-mono text-[10px]">Generated: {insight.generatedAt}</span>
       </div>
     </div>
   );

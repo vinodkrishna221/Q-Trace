@@ -2,209 +2,397 @@
 
 import * as React from 'react';
 import { useRoleStore } from '@/lib/role-store';
-import { DEMO_MODULES, DEMO_STARTER_CIRCUIT } from '@/lib/fixtures';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { usePredictionStore } from '@/lib/prediction-store';
+import {
+  DEMO_MODULES,
+  DEMO_STARTER_CIRCUIT,
+  DEMO_SIMULATION_RUN,
+  DEMO_FLIGHT_RECORDER_DIAGNOSIS,
+  DEMO_TUTOR_RESPONSE,
+  DEMO_CHALLENGE,
+  DEMO_CHALLENGE_ATTEMPT_RESPONSE,
+  DEMO_REPAIRED_CIRCUIT,
+} from '@/lib/fixtures';
+import {
+  useSimulationRunMutation,
+  useDiagnoseMutation,
+  useTutorExplainMutation,
+  useChallengeAttemptMutation,
+} from '@/lib/hooks/use-quantum-api';
+import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
+import { ConceptBlocks } from '@/features/learning/concept-blocks';
+import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
+import { InteractiveCircuitWorkspace } from '@/features/circuit/interactive-circuit-workspace';
+import { useCircuitStore } from '@/lib/circuit-store';
+import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
+import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
+import { TutorCard } from '@/features/tutor/tutor-card';
+import { RepairChallengeCard } from '@/features/challenges/repair-challenge-card';
+import { ProgressSuccessCard } from '@/features/progress/progress-success-card';
+import { PageHeader } from '@/components/layout/page-header';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { BookOpen, HelpCircle, Cpu, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Clock, Cpu, ShieldCheck, Radio, Server, CheckCircle2, RefreshCw } from 'lucide-react';
+import {
+  ChallengeAttempt,
+  ProgressRecord,
+  SimulationRun,
+  DiagnoseResponse,
+  TutorExplanation,
+  CircuitModel,
+} from '@/lib/contracts';
 
 export default function BellStateLearnPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
+  const { getPredictionDraft } = usePredictionStore();
   const moduleData = DEMO_MODULES['bell-state'];
 
-  const [selectedAnswer, setSelectedAnswer] = React.useState<string | null>(null);
+  const learnerProfileId = activeLearnerProfile?.id || activeRole.profileId || 'lp_aarav';
+  const learnerName = activeRole.name;
+
+  // TanStack Query mutations
+  const simulationMutation = useSimulationRunMutation();
+  const diagnoseMutation = useDiagnoseMutation();
+  const tutorMutation = useTutorExplainMutation();
+  const challengeAttemptMutation = useChallengeAttemptMutation();
+
+  // Active state for live pipeline
+  const [simulationRun, setSimulationRun] = React.useState<SimulationRun | null>(DEMO_SIMULATION_RUN);
+  const [diagnosis, setDiagnosis] = React.useState<DiagnoseResponse | null>(DEMO_FLIGHT_RECORDER_DIAGNOSIS);
+  const [tutorResponse, setTutorResponse] = React.useState<TutorExplanation | null>(DEMO_TUTOR_RESPONSE);
+  const [repairAttempt, setRepairAttempt] = React.useState<ChallengeAttempt | null>(
+    DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt
+  );
+  const [progressRecord, setProgressRecord] = React.useState<ProgressRecord | null>(
+    DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord
+  );
+  const [hasSimulated, setHasSimulated] = React.useState(true);
+  const [latestRequestId, setLatestRequestId] = React.useState<string>('req_demo_001');
+  const [isFallbackActive, setIsFallbackActive] = React.useState<boolean>(false);
+
+  const isExecutingPipeline =
+    simulationMutation.isPending || diagnoseMutation.isPending || tutorMutation.isPending;
+
+  const { circuit: activeCircuit } = useCircuitStore();
+
+  const handleRunSimulation = async (circuitOverride?: CircuitModel) => {
+    try {
+      const savedDraft = getPredictionDraft(learnerProfileId, moduleData.id);
+      const predictionAnswer = savedDraft?.answer || 'INDEPENDENT_RANDOM';
+      const targetCircuit = circuitOverride || activeCircuit || DEMO_STARTER_CIRCUIT;
+
+      // 1. Run simulation via TanStack Query mutation
+      const simResult = await simulationMutation.mutateAsync({
+        learnerProfileId,
+        moduleId: moduleData.id,
+        circuitModel: targetCircuit,
+        predictionResponse: {
+          checkpointId: moduleData.predictionCheckpoint?.id || 'pc_bell_outcomes',
+          answer: predictionAnswer,
+        },
+        primaryAdapter: 'QISKIT_AER',
+        runConformance: true,
+        shots: 1024,
+      });
+
+      setSimulationRun(simResult.data);
+      setLatestRequestId(simResult.meta.requestId);
+      setIsFallbackActive(simResult.meta.isFallback);
+      setHasSimulated(true);
+
+      // 2. Automatically trigger Flight Recorder diagnosis
+      const diagResult = await diagnoseMutation.mutateAsync({
+        learnerProfileId,
+        simulationRunId: simResult.data.id,
+      });
+      setDiagnosis(diagResult.data);
+
+      // 3. Automatically trigger Tutor explanation
+      const tutorResult = await tutorMutation.mutateAsync({
+        learnerProfileId,
+        moduleId: moduleData.id,
+        simulationRunId: simResult.data.id,
+        misconceptionSignalId: diagResult.data.misconceptionSignal.id,
+        intent: 'EXPLAIN_DIVERGENCE',
+      });
+      setTutorResponse(tutorResult.data.tutorResponse);
+    } catch {
+      // Retain fallback state on unexpected error
+      setIsFallbackActive(true);
+      setHasSimulated(true);
+    }
+  };
+
+  const handleSubmitRepair = async () => {
+    try {
+      const result = await challengeAttemptMutation.mutateAsync({
+        challengeId: DEMO_CHALLENGE.id,
+        learnerProfileId,
+        submittedAnswer: {
+          type: 'CIRCUIT_MODEL',
+          circuitModelId: DEMO_REPAIRED_CIRCUIT.id,
+        },
+        simulationRunId: simulationRun?.id || 'sr_demo_002',
+      });
+
+      setRepairAttempt(result.data.challengeAttempt);
+      setProgressRecord(result.data.progressRecord);
+      setLatestRequestId(result.meta.requestId);
+      setIsFallbackActive(result.meta.isFallback);
+    } catch {
+      setRepairAttempt(DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt);
+      setProgressRecord(DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord);
+    }
+  };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto" data-testid="learn-bell-state-view">
-      {/* Module Overview Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <Badge variant="default" className="text-xs">
-              {moduleData.level} MODULE
-            </Badge>
-            <span className="text-zinc-500 text-xs flex items-center gap-1 font-mono">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12" data-testid="learn-bell-state-view">
+      <PageHeader
+        data-testid="bell-page-header"
+        eyebrow={
+          <>
+            <Badge variant="default">{moduleData.level} MODULE</Badge>
+            <span className="flex items-center gap-1 font-mono text-xs text-ink-dim">
               <Clock className="w-3.5 h-3.5" />
               {moduleData.estimatedMinutes} mins
             </span>
-            <Badge variant="outline" className="text-[11px] font-mono text-zinc-400">
-              ID: {moduleData.id}
-            </Badge>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-            {moduleData.title}
-          </h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Build, simulate and diagnose an entangled two-qubit Bell pair state with Qiskit Aer evidence.
-          </p>
-        </div>
-
-        {/* Current Learner Context Banner */}
-        <div className="flex flex-col items-start md:items-end bg-zinc-900/90 border border-zinc-800 p-3 rounded-lg text-xs" data-testid="learner-context-banner">
-          <div className="flex items-center gap-1.5 font-medium text-zinc-300">
-            <span>Learner:</span>
-            <span className="text-cyan-400 font-bold" data-testid="active-learner-name">{activeRole.name}</span>
-            <span className="text-zinc-500">({activeRole.roleTag})</span>
-          </div>
-          {activeLearningPath && (
-            <div className="text-[11px] text-zinc-400 mt-1 max-w-xs text-left md:text-right">
-              {activeLearningPath.recommendationReason}
+            <span className="font-mono text-xs text-ink-faint">ID: {moduleData.id}</span>
+          </>
+        }
+        title={moduleData.title}
+        purpose="Build, simulate, and diagnose an entangled two-qubit Bell pair — with Qiskit Aer evidence at every gate."
+        actions={
+          <div
+            className="flex flex-col items-start md:items-end bg-panel border border-line px-4 py-3 rounded-lg text-xs space-y-1.5"
+            data-testid="learner-context-banner"
+          >
+            <div className="flex items-center gap-1.5 font-medium text-ink-dim">
+              <span>Learner:</span>
+              <span className="text-accent font-bold" data-testid="active-learner-name">
+                {activeRole.name}
+              </span>
+              <span className="text-ink-faint">({activeRole.roleTag})</span>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Lesson Content Section */}
+            {/* Request ID & Live Protocol Badge */}
+            <div
+              className="flex items-center gap-2 pt-1 border-t border-line/60 font-mono text-[10px]"
+              data-testid="live-request-badge"
+            >
+              <div className="flex items-center gap-1 text-ink-dim">
+                <Server className="w-3 h-3 text-accent" />
+                <span>Req:</span>
+                <span data-testid="request-id" className="text-accent font-semibold">
+                  {latestRequestId}
+                </span>
+              </div>
+              <Badge
+                variant={isFallbackActive ? 'warning' : 'outline'}
+                className="text-[9px] px-1.5 py-0"
+                data-testid="api-mode-badge"
+              >
+                {isFallbackActive ? 'DEMO_LOCAL' : 'LIVE API'}
+              </Badge>
+            </div>
+
+            {activeLearningPath && (
+              <div className="text-[11px] text-ink-faint mt-0.5 max-w-xs text-left md:text-right">
+                {activeLearningPath.recommendationReason}
+              </div>
+            )}
+          </div>
+        }
+      />
+
+      {/* Prior Knowledge & Entry Path Badge */}
+      <PriorKnowledgeBadge
+        activeRole={activeRole}
+        learnerProfile={activeLearnerProfile}
+        learningPath={activeLearningPath}
+      />
+
+      {/* Main Lesson Content & Prediction Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          {/* Concept Blocks */}
-          <Card className="border-zinc-800">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-cyan-400" />
-                <span>Concept Breakdown</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm text-zinc-300 leading-relaxed">
-              {moduleData.contentBlocks.map((block, idx) => {
-                if (block.type === 'TEXT') {
-                  return <p key={idx}>{block.body}</p>;
-                }
-                if (block.type === 'CALLOUT') {
-                  return (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-lg bg-amber-950/30 border border-amber-800/40 text-amber-200 text-xs flex gap-2.5 items-start"
-                    >
-                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                      <span>{block.body}</span>
-                    </div>
-                  );
-                }
-                if (block.type === 'FORMULA') {
-                  return (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-lg bg-zinc-950 border border-zinc-800 font-mono text-center text-cyan-300 text-sm tracking-wide"
-                    >
-                      {block.latex}
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </CardContent>
-          </Card>
+          <ConceptBlocks contentBlocks={moduleData.contentBlocks} />
 
-          {/* Prediction Checkpoint */}
           {moduleData.predictionCheckpoint && (
-            <Card className="border-cyan-900/60 bg-gradient-to-b from-zinc-900/90 to-zinc-950" data-testid="prediction-checkpoint-card">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant="warning" className="text-xs">
-                    STEP 1 · PREDICTION CHECKPOINT
-                  </Badge>
-                  <span className="text-[11px] font-mono text-zinc-500">
-                    ID: {moduleData.predictionCheckpoint.id}
-                  </span>
-                </div>
-                <CardTitle className="text-base text-white mt-1 flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-amber-400" />
-                  <span>{moduleData.predictionCheckpoint.prompt}</span>
-                </CardTitle>
-                <CardDescription className="text-xs text-zinc-400">
-                  Select your prediction before executing the circuit. Quantum Flight Recorder uses this to test for mental-model divergence.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2.5 pt-1">
-                {moduleData.predictionCheckpoint.answerSchema.options.map((opt) => {
-                  const isSelected = selectedAnswer === opt;
-                  return (
-                    <button
-                      key={opt}
-                      data-testid={`prediction-opt-${opt}`}
-                      onClick={() => setSelectedAnswer(opt)}
-                      className={`w-full text-left p-3 rounded-lg text-xs font-mono transition-all flex items-center justify-between border ${
-                        isSelected
-                          ? 'border-cyan-500 bg-cyan-950/40 text-cyan-200 ring-1 ring-cyan-400'
-                          : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
-                      }`}
-                    >
-                      <span>{opt}</span>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-cyan-400" />}
-                    </button>
-                  );
-                })}
-              </CardContent>
-              <CardFooter className="pt-2 flex justify-between items-center text-xs text-zinc-400 border-t border-zinc-800/60">
-                <span>{selectedAnswer ? `Selected: ${selectedAnswer}` : 'No prediction recorded yet'}</span>
-                <Button
-                  size="sm"
-                  disabled={!selectedAnswer}
-                  className="bg-cyan-600 hover:bg-cyan-500 text-white"
-                >
-                  Confirm & Advance to Workspace
-                </Button>
-              </CardFooter>
-            </Card>
+            <PredictionCheckpoint
+              checkpoint={moduleData.predictionCheckpoint}
+              learnerProfileId={learnerProfileId}
+              learnerName={learnerName}
+              moduleId={moduleData.id}
+            />
           )}
         </div>
 
-        {/* Sidebar / Circuit Workspace Preview Shell */}
+        {/* Context rail */}
         <div className="space-y-6">
-          <Card className="border-zinc-800">
+          <Card data-testid="starter-circuit-card">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2 text-zinc-200">
-                <Cpu className="w-4 h-4 text-cyan-400" />
-                <span>Starter Circuit ({DEMO_STARTER_CIRCUIT.name})</span>
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-accent" />
+                <span>Starter Circuit</span>
               </CardTitle>
               <CardDescription className="text-xs">
-                {DEMO_STARTER_CIRCUIT.qubitCount} qubits · {DEMO_STARTER_CIRCUIT.operations.length} gates
+                {DEMO_STARTER_CIRCUIT.name} · {DEMO_STARTER_CIRCUIT.qubitCount} qubits ·{' '}
+                {DEMO_STARTER_CIRCUIT.operations.length} operations
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="rounded bg-zinc-950 p-3 border border-zinc-850 font-mono text-xs text-zinc-400 space-y-1">
+              {/* Mini wire diagram */}
+              <div
+                className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
+                role="img"
+                aria-label="Bell circuit: Hadamard on qubit 0, CNOT from qubit 0 to qubit 1, then both qubits measured"
+              >
+                {[0, 1].map((wire) => (
+                  <div key={wire} className="flex items-center gap-2">
+                    <span className="w-8 text-accent font-semibold">q[{wire}]</span>
+                    <div className="relative flex-1 h-px bg-line-bright">
+                      <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-around">
+                        {wire === 0 ? (
+                          <>
+                            <span className="px-1.5 py-0.5 -mt-px bg-accent/15 border border-accent/60 text-accent rounded font-bold shadow-glow">H</span>
+                            <span className="h-2.5 w-2.5 rounded-full bg-accent border border-accent shadow-glow" />
+                            <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="w-6" />
+                            <span className="px-1.5 py-0.5 bg-violet/15 border border-violet/60 text-violet rounded font-bold">⊕</span>
+                            <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="text-center text-[10px] text-violet font-mono tracking-widest">
+                  ┆ CNOT(0 → 1) · entanglement ┆
+                </div>
+              </div>
+
+              {/* Operation list */}
+              <div className="rounded-lg bg-abyss p-3 border border-line font-mono text-xs text-ink-dim space-y-1.5">
                 {DEMO_STARTER_CIRCUIT.operations.map((op) => (
-                  <div key={op.opId} className="flex justify-between">
-                    <span className="text-cyan-300 font-bold">{op.gate}</span>
+                  <div key={op.opId} className="flex justify-between items-center bg-panel/60 p-1.5 rounded border border-line/60">
+                    <span className="text-accent font-bold px-1.5 py-0.5 rounded bg-accent/10 border border-accent/30">
+                      {op.gate}
+                    </span>
                     <span>targets: [{op.targets.join(', ')}]</span>
-                    {op.controls.length > 0 && <span className="text-amber-400">ctrl: [{op.controls.join(', ')}]</span>}
+                    {op.controls.length > 0 && (
+                      <span className="text-violet">ctrl: [{op.controls.join(', ')}]</span>
+                    )}
                   </div>
                 ))}
               </div>
-              <div className="text-[11px] text-zinc-500">
-                Execution target: <span className="text-zinc-400 font-mono">Qiskit Aer (1024 shots)</span>
+
+              <div className="flex items-center gap-1.5 text-[11px] text-ink-dim font-mono bg-abyss p-2 rounded border border-line">
+                <ShieldCheck className="w-3.5 h-3.5 text-evidence" />
+                <span>Target: Qiskit Aer · 1024 shots</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-zinc-800 bg-zinc-900/40">
+          <Card className="border-accent/30" data-testid="demo-path-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-semibold text-zinc-300">
-                Demonstration Path
+              <CardTitle className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                <Radio className="w-3.5 h-3.5 text-accent" />
+                <span>Flight Recorder Path</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-xs text-zinc-400 space-y-2">
-              <div className="flex items-center gap-2 text-cyan-400">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                <span>1. Predict measurement behavior</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500">
-                <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
-                <span>2. Simulate Bell Circuit on Aer</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500">
-                <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
-                <span>3. Quantum Flight Recorder Diagnosis</span>
-              </div>
-              <div className="flex items-center gap-2 text-zinc-500">
-                <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
-                <span>4. Evidence-Grounded Repair Challenge</span>
-              </div>
+            <CardContent className="text-xs space-y-2.5">
+              {[
+                'Predict the measurement pattern',
+                'Simulate on Aer (TanStack Mutation)',
+                'Flight Recorder diagnosis (Deterministic Rule)',
+                'Evidence-based repair & Progress record',
+              ].map((step, i) => (
+                <div
+                  key={step}
+                  className={`flex items-center gap-2.5 ${i === 0 ? 'text-accent font-medium' : 'text-ink-faint'}`}
+                >
+                  <div
+                    className={`flex h-5 w-5 items-center justify-center rounded-full border font-mono text-[10px] ${
+                      i === 0
+                        ? 'border-accent bg-accent/15 text-accent shadow-glow'
+                        : 'border-line-bright bg-raised'
+                    }`}
+                  >
+                    {i + 1}
+                  </div>
+                  <span>{step}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Step 2: Circuit Workspace & Synchronized Qiskit Code */}
+      <div className="space-y-6 pt-4 border-t border-line">
+        <InteractiveCircuitWorkspace
+          initialCircuit={DEMO_STARTER_CIRCUIT}
+          isSimulating={isExecutingPipeline}
+          hasExecuted={hasSimulated}
+          onRunSimulation={handleRunSimulation}
+        />
+      </div>
+
+      {/* Pipeline execution indicator */}
+      {isExecutingPipeline && (
+        <div className="p-4 rounded-lg border border-accent/40 bg-accent/10 flex items-center gap-3 font-mono text-xs text-accent">
+          <RefreshCw className="w-4 h-4 animate-spin text-accent" />
+          <span>Executing live contract pipeline: Simulation Run → State Trace → Diagnosis → Tutor...</span>
+        </div>
+      )}
+
+      {/* Step 3: Visual Evidence (Probability & Histogram) */}
+      {hasSimulated && simulationRun && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <ProbabilityHistogramView simulationRun={simulationRun} />
+        </div>
+      )}
+
+      {/* Step 4: Quantum Flight Recorder */}
+      {hasSimulated && diagnosis && simulationRun && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <FlightRecorderView
+            diagnosis={diagnosis}
+            stateTrace={simulationRun.stateTrace}
+          />
+        </div>
+      )}
+
+      {/* Step 5: Evidence-Bound Tutor Card */}
+      {hasSimulated && tutorResponse && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <TutorCard tutorResponse={tutorResponse} />
+        </div>
+      )}
+
+      {/* Step 6: Repair Challenge Card */}
+      {hasSimulated && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <RepairChallengeCard
+            challenge={DEMO_CHALLENGE}
+            attempt={repairAttempt}
+            isSubmitting={challengeAttemptMutation.isPending}
+            onSubmitAttempt={handleSubmitRepair}
+          />
+        </div>
+      )}
+
+      {/* Step 7: Progress Success Card */}
+      {progressRecord && (
+        <div className="space-y-6 pt-4 border-t border-line">
+          <ProgressSuccessCard
+            progress={progressRecord}
+            learnerName={learnerName}
+          />
+        </div>
+      )}
     </div>
   );
 }
