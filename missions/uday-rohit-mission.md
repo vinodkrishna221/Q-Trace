@@ -88,7 +88,7 @@ DELIVERABLE: Implement allowlisted Python AST parser for the frozen Qiskit gramm
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_code_and_qasm.py` round-trips Bell and rejects loops, imports, file/network calls, expressions and unsupported gates.
 DEPENDS: SIM-4          UNBLOCKS: UX-8,QA-4
 DEMO: Meera edits one supported Qiskit line and judges can export the circuit safely.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-5-parse-safe-qiskit-and-export`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

@@ -196,3 +196,48 @@ class CircuitModel(BaseModel):
             )
 
         return self
+
+
+# ---------------------------------------------------------------------------
+# SIM-5: Parse-Qiskit request / response (contract v1)
+# ---------------------------------------------------------------------------
+
+class ParseQiskitRequest(BaseModel):
+    """POST /v1/circuits/parse-qiskit request body.
+
+    Contract: { code: string (1-8000 chars), modelVersion: 1 }
+    """
+    code: str = Field(..., min_length=1, max_length=8000)
+    modelVersion: Literal[1]
+
+
+class ParseQiskitResponse(BaseModel):
+    """POST /v1/circuits/parse-qiskit 200 response.
+
+    Contract: { circuitModel: CircuitModel, warnings: list[str] }
+    """
+    circuitModel: CircuitModel
+    warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# SIM-5: Export-OpenQASM3 request / response (contract v1)
+# ---------------------------------------------------------------------------
+
+class ExportOpenQasm3Request(BaseModel):
+    """POST /v1/circuits/export-openqasm3 request body.
+
+    Contract: { circuitModel: CircuitModel }
+    """
+    circuitModel: CircuitModel
+
+
+class ExportOpenQasm3Response(BaseModel):
+    """POST /v1/circuits/export-openqasm3 200 response.
+
+    Contract: { openQasmVersion, openQasm3, lossy, warnings }
+    """
+    openQasmVersion: str
+    openQasm3: str
+    lossy: bool
+    warnings: list[str] = Field(default_factory=list)

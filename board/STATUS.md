@@ -14,7 +14,7 @@
 | Track | Done | In flight | Next |
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
-| simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
+| simulation-api | plan + Uday mission + SIM-1..SIM-5 | SIM-5 merged to main | SIM-6 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 + DATA-2 | DATA-2 merged to main | DATA-3 |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
@@ -54,6 +54,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 25 Aug 10:48 Uday: SIM-1 green — FastAPI service boundary: RequestIDMiddleware, contract error handler, /health=200, /ready with primaryAdapter, /v1/circuits and /v1/simulation-runs router placeholders; 7/7 tests passed; PR ready for Warden review.
 - 25 Aug 15:24 Uday: SIM-2 green — Pydantic v2 Circuit Model/Operation types with closed GateName enum, qubit/operation/column/control/MEASURE validators; zero SDK imports; 17/17 tests passed; PR ready for Warden review.
 - 25 Aug 16:27 Uday: SIM-3 green — Qiskit Aer adapter + basis normalizer: Bell P(00/11)=0.5, trace length 2 (MEASURE excluded), post-CNOT purity 0.5/MIXED, asymmetric label correct; 23/23 tests passed; PR ready for Warden review.
+- 04 Sep 19:10 Uday: SIM-5 green — allowlisted AST parser (no exec/eval) for frozen Qiskit grammar, OpenQASM 3 exporter with round-trip validation, POST /v1/circuits/parse-qiskit and POST /v1/circuits/export-openqasm3; 47/47 tests passed; PR ready for Warden review.
 - 25 Aug 16:54 Uday: SIM-4 green — POST/GET /v1/simulation-runs routes, threadpool executor, 1500ms timeout, in-memory repo (DATA-1 mock), contract error handler for HTTPException; 22/22 tests passed; PR ready for Warden review.
 - 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.
