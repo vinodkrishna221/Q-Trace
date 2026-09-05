@@ -70,7 +70,7 @@ DELIVERABLE: Add Aarav, Meera, Dr. Rao session metadata, three Modules, two Lear
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_core_seed.py` seeds twice with no duplicates and retrieves every ID referenced by the contracts.
 DEPENDS: DATA-1          UNBLOCKS: AI-3,DATA-3
 DEMO: The prototype opens with all three users and a coherent Bell learning journey.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-3 · Persist Challenge Attempts and progress atomically                        [timebox: 2h]
 CONTEXT: Core seeds exist; diagnosis may still use fixtures. Load progress contract and keep grading deterministic outside the repository.

@@ -57,7 +57,7 @@ DELIVERABLE: Add Aarav, Meera, Dr. Rao session metadata, three Modules, two Lear
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_core_seed.py` seeds twice with no duplicates and retrieves every ID referenced by the contracts.
 DEPENDS: DATA-1          UNBLOCKS: AI-3,DATA-3
 DEMO: The prototype opens with all three users and a coherent Bell learning journey.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 BRANCH: `feat/data-analytics/data-2-seed-learner-content-and-challenge`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
