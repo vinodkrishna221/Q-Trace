@@ -118,7 +118,7 @@ DELIVERABLE: Add adapter flags, 1500ms timeout, threadpool boundary, structured 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_runtime_guards.py` proves timeout, disabled PennyLane, no NaN/Infinity and one-worker readiness behavior.
 DEPENDS: SIM-7,SHIP-4          UNBLOCKS: SIM-9,QA-6
 DEMO: The live and local APIs fail softly instead of freezing during judging.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-8-harden-timeouts-flags-and-deployed`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
