@@ -108,7 +108,7 @@ DELIVERABLE: Inject the shared repository into simulation routes, persist immuta
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_repository_swap.py` runs the same contract suite against memory and an isolated Mongo test database.
 DEPENDS: SIM-6,DATA-6          UNBLOCKS: SIM-8
 DEMO: Simulation history works on live deploy while venue mode remains independent.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-7-swap-routes-to-the-production`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
