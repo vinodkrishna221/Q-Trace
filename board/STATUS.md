@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 05 Sep 2026 19:42 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 06 Sep 2026 16:15 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -77,3 +77,4 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 06 Sep 09:11 Uday: SIM-7 green — SimulationRunRepositoryProtocol defined, InMemorySimRunRepo encapsulated, MongoSimRunRepo wired to DATA-6 DataRepositoryProtocol (mock path: graceful fallback when entities unavailable), router injected via FastAPI Depends, DEMO_LOCAL=1 selects memory; 13/13 card tests + 155/155 regression passed; PR ready for Warden review.
 - 06 Sep 09:49 Uday: SIM-8 green — 1500ms timeout locked (QTRACE_SIM_TIMEOUT_S default=1.5), ENABLE_QISKIT=0→503 ADAPTER_UNAVAILABLE, ENABLE_PENNYLANE=0→skippedReason PENNYLANE_DISABLED, structured duration/error logs, /ready hardened (primaryAdapterEnabled, workerNote), railway.toml (SHIP-4 mock path); 10/10 card tests + 165/165 regression passed; PR ready for Warden review.
 - 27 Aug 12:30 Vinod: SHIP-3 green — docs/DEMO-SCRIPT.md v0 created with 90-second learner-led script, 8 timed beats (B1–B8), PPT outline (8 sections sourced), fallback cue, judge Q&A pre-arms, sourced evidence ledger (7 URLs), submission checklist; scripts/check_story_claims.py written; python scripts/check_story_claims.py passed 4/4 checks; PR ready for Warden review. SHIP-5 now unblocked.
+- 06 Sep 16:15 Patch: SIM-8 merged to main (PR #24) — execution timeout guards, railway.toml, flags and deployed readiness verified; 10/10 test_runtime_guards passed, 225/225 full API suite passed.
