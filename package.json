@@ -9,7 +9,9 @@
     "build:web": "pnpm --filter web build",
     "test:web": "pnpm --filter web test",
     "lint:web": "pnpm --filter web lint",
-    "check:layout": "bash scripts/check-layout.sh"
+    "check:layout": "bash scripts/check-layout.sh",
+    "demo:local": "bash scripts/demo-local.sh",
+    "demo:check": "bash scripts/demo-local.sh --check"
   },
   "packageManager": "pnpm@10.33.0"
 }
