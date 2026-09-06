@@ -1,4 +1,4 @@
-"""Simulation Run orchestration service — SIM-4.
+"""Simulation Run orchestration service — SIM-4 / SIM-6.
 
 Converts a validated SimulationRunRequest into a persisted SimulationRunOut
 by calling the Qiskit Aer adapter and serializing its output into the
@@ -11,6 +11,9 @@ quantum-runtime.md rules enforced here:
   - Adapter runs synchronously (called from executor, not inside event loop).
   - Conformance field always present; skippedReason set when PennyLane skipped.
   - Status is SUCCEEDED on clean Aer run; other statuses added in SIM-8.
+  - SIM-6: when runConformance=True, run_pennylane_conformance is called and
+    the real delta/passed/skippedReason values are returned. When False, the
+    PENNYLANE_NOT_ENABLED stub is preserved so existing tests stay green.
 """
 
 from __future__ import annotations
@@ -74,14 +77,32 @@ def build_simulation_run(
             )
         )
 
-    # --- Conformance (PennyLane added in SIM-6; skipped here) -----------------
-    conformance = ConformanceResult(
-        adapter="PENNYLANE",
-        maxProbabilityDelta=0.0,
-        epsilon=1e-6,
-        passed=False,
-        skippedReason="PENNYLANE_NOT_ENABLED",
-    )
+    # --- Conformance — SIM-6: real PennyLane call when runConformance=True ----
+    if request.runConformance:
+        # Deferred import: PennyLane only imported when conformance is requested,
+        # after CircuitModel validation has already passed.
+        from app.services.quantum.pennylane_adapter import run_pennylane_conformance  # noqa: PLC0415
+
+        pl_result = run_pennylane_conformance(
+            circuit=request.circuitModel,
+            qiskit_probabilities=aer_result.probabilities,
+        )
+        conformance = ConformanceResult(
+            adapter="PENNYLANE",
+            maxProbabilityDelta=pl_result.max_probability_delta,
+            epsilon=pl_result.epsilon,
+            passed=pl_result.passed,
+            skippedReason=pl_result.skipped_reason,
+        )
+    else:
+        # runConformance=False → skip; existing route tests use this path.
+        conformance = ConformanceResult(
+            adapter="PENNYLANE",
+            maxProbabilityDelta=0.0,
+            epsilon=1e-6,
+            passed=False,
+            skippedReason="PENNYLANE_NOT_ENABLED",
+        )
 
     return SimulationRunOut(
         id=f"sr_{uuid.uuid4().hex[:12]}",
