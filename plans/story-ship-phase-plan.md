@@ -70,7 +70,7 @@ DELIVERABLE: Implement `scripts/demo-local.sh`, reset command, readiness wait, c
 TEST: `bash scripts/demo-local.sh --check` starts both services, reaches web/API health and proves Atlas/Tutor keys are absent.
 DEPENDS: SHIP-1,UX-1,SIM-1          UNBLOCKS: QA-3
 DEMO: The entire prototype can run from one laptop at the venue.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 
 ### SHIP-3 · Draft the deck spine and learner demo script                        [timebox: 2h]
 CONTEXT: IDEA-BRIEF, PRD and evidence links are frozen. Load Herald, Oracle and SIH arena; do not claim production impact or sponsor authorship.
@@ -78,7 +78,7 @@ DELIVERABLE: Create `docs/DEMO-SCRIPT.md` v0 and PPT outline covering pain, exis
 TEST: `python3 scripts/check_story_claims.py` finds sources for every number and confirms the 90-second script includes all eight learner beats plus fallback cue.
 DEPENDS: —          UNBLOCKS: SHIP-5
 DEMO: The team can explain the product while builders work.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 

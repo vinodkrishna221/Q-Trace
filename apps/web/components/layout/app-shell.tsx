@@ -7,15 +7,17 @@ export interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-cyan-500/20 selection:text-cyan-200">
+    <div className="min-h-screen flex flex-col">
       <AppHeader />
-      <main className="flex-1 container mx-auto p-4 md:p-6 max-w-7xl">
+      <main className="flex-1 container mx-auto px-4 md:px-6 py-8 max-w-7xl w-full">
         {children}
       </main>
-      <footer className="border-t border-zinc-850 py-3 px-4 text-center text-xs text-zinc-400 bg-zinc-950/60">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Q-Trace · SIH AI-Assisted Quantum Learning Platform</span>
-          <span className="font-mono text-[11px] text-zinc-400">
+      <footer className="border-t border-line py-4 px-4 bg-panel/40">
+        <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-ink-faint">
+          <span className="font-display font-medium tracking-wide text-ink-dim">
+            Q-Trace · AI-Assisted Quantum Learning Platform
+          </span>
+          <span className="font-mono text-[11px]">
             Mathematical representation, not physical trajectory. Seeded offline mode enabled.
           </span>
         </div>
