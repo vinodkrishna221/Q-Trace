@@ -128,10 +128,17 @@ async def health_check():
 
 @app.get("/ready", tags=["ops"])
 async def readiness_check():
-    """Readiness check — reports primary adapter availability and demo flags."""
-    enable_qiskit = os.getenv("ENABLE_QISKIT", "1") == "1"
-    enable_pennylane = os.getenv("ENABLE_PENNYLANE", "1") == "1"
+    """Readiness check — reports primary adapter availability and demo flags.
+
+    SIM-8: one-worker model note added so Railway health checks understand
+    that state lives in the process (DEMO_LOCAL=1) or Atlas (DEMO_LOCAL=0).
+    ENABLE_QISKIT=0 marks the primary adapter disabled; /v1/simulation-runs
+    returns 503 immediately in that case so workers never hang.
+    """
+    enable_qiskit = os.getenv("ENABLE_QISKIT", "1") != "0"
+    enable_pennylane = os.getenv("ENABLE_PENNYLANE", "1") != "0"
     demo_local = os.getenv("DEMO_LOCAL", "1") == "1"
+    demo_fallback = os.getenv("DEMO_FALLBACK", "1") == "1"
 
     # Primary adapter is QISKIT_AER; PennyLane is a conformance adapter only.
     adapters = {
@@ -142,7 +149,12 @@ async def readiness_check():
     return {
         "status": "ready",
         "primaryAdapter": "QISKIT_AER",
+        "primaryAdapterEnabled": enable_qiskit,
         "adapters": adapters,
         "demoLocal": demo_local,
-        "demoFallback": os.getenv("DEMO_FALLBACK", "1") == "1",
+        "demoFallback": demo_fallback,
+        # SIM-8: state lives in-process (DEMO_LOCAL) or Atlas.
+        # One uvicorn worker is the safe default on Railway free tier.
+        "workerNote": "single-worker; state is in-process (DEMO_LOCAL) or Atlas",
     }
+
