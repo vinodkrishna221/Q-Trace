@@ -62,7 +62,7 @@ DELIVERABLE: Create typed repository protocols, dependency selector and determin
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_memory_repository.py` resets twice to identical IDs and proves create/get plus atomic progress update primitives.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-4,DATA-2
 DEMO: Plumbing for every P0 endpoint and the venue-safe store.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-2 · Seed learner, content and challenge truth                        [timebox: 3h]
 CONTEXT: Repository protocol exists. Load PRD vocabulary, SCHEMA seed plan and learning/progress contracts. Seed content is vetted and idempotent.
@@ -70,7 +70,7 @@ DELIVERABLE: Add Aarav, Meera, Dr. Rao session metadata, three Modules, two Lear
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_core_seed.py` seeds twice with no duplicates and retrieves every ID referenced by the contracts.
 DEPENDS: DATA-1          UNBLOCKS: AI-3,DATA-3
 DEMO: The prototype opens with all three users and a coherent Bell learning journey.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-3 · Persist Challenge Attempts and progress atomically                        [timebox: 2h]
 CONTEXT: Core seeds exist; diagnosis may still use fixtures. Load progress contract and keep grading deterministic outside the repository.
@@ -78,7 +78,7 @@ DELIVERABLE: Implement Challenge, Attempt, Progress and Instructor routers/servi
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_progress_flow.py` posts a passing Bell attempt twice and proves one attempt, one 100-point increment and updated Instructor Insight.
 DEPENDS: DATA-2          UNBLOCKS: UX-4,DATA-4,QA-3,QA-5
 DEMO: Aarav’s repair visibly changes progress and Dr. Rao’s aggregate proof.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 
@@ -88,7 +88,7 @@ DELIVERABLE: Add async Mongo repository, collection getters, schemaVersion guard
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_mongo_repository.py` runs repository parity against isolated Mongo and verifies required index names.
 DEPENDS: DATA-3          UNBLOCKS: DATA-5
 DEMO: The live platform persists learner and simulation history credibly.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-5 · Seed the synthetic cohort and complete Learning Paths                        [timebox: 3h]
 CONTEXT: DATA-4 makes Mongo and memory share a repository protocol. Load the SCHEMA seed plan, `learning-content.md`, `progress-analytics.md` and synthetic-data disclosure; preserve stable hero IDs.
@@ -96,7 +96,7 @@ DELIVERABLE: Create deterministic 30-profile cohort, 60–90 attempts, 35–50 m
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_demo_seed_story.py` proves exact counts/ranges, idempotency, disclosure text and Aarav live-attempt override.
 DEPENDS: DATA-4          UNBLOCKS: UX-6,AI-7,DATA-6
 DEMO: Instructor charts look populated while clearly disclosing synthetic data.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 
@@ -106,7 +106,7 @@ DELIVERABLE: Run one behavioral contract suite against memory and Atlas, add see
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_repository_contract.py` passes both backends; `uv run --project apps/api python apps/api/scripts/seed.py --check` reports the same hero IDs.
 DEPENDS: DATA-5,QA-3          UNBLOCKS: SIM-7,DATA-7,SHIP-6
 DEMO: The cloud demo and laptop demo tell the same story.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ### DATA-7 · Harden analytics aggregation and idempotency                        [timebox: 2h]
 CONTEXT: DATA-6 and AI-4 provide deployed cohort seeds and Misconception Signals. Load `progress-analytics.md`, SCHEMA query/index notes and idempotency fixtures; keep Instructor Insight computed, not a second persisted truth.
@@ -114,7 +114,7 @@ DELIVERABLE: Implement indexed aggregation, 10-second cache, empty cohort respon
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_instructor_analytics.py` verifies rates, top misconception counts, empty cohort and no double score under concurrent duplicate requests.
 DEPENDS: DATA-6,AI-4          UNBLOCKS: UX-7,DATA-8,QA-6
 DEMO: Dr. Rao sees fast, consistent analytics after Aarav’s live repair.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
 
 ## P3 · Polish — due 28 Aug 2026 09:00 IST (pre-cut-listed)
 
@@ -124,4 +124,4 @@ DELIVERABLE: Lock schemaVersion/index list, verify long/empty/failed rows, add d
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` snapshots field/index names and verifies all edge responses match contracts.
 DEPENDS: DATA-7,QA-7          UNBLOCKS: —
 DEMO: The demo never reveals empty mystery cards or undisclosed synthetic analytics.
-PERSONA: Atlas           STATUS: [ ] todo
+PERSONA: Atlas           STATUS: [x] done
