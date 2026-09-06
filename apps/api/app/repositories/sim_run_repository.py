@@ -151,21 +151,11 @@ class MongoSimRunRepo:
 
     def _run_async(self, coro) -> object:  # type: ignore[return]
         """Run an async coroutine synchronously from a sync call site."""
+        new_loop = asyncio.new_event_loop()
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                new_loop = asyncio.new_event_loop()
-                try:
-                    return new_loop.run_until_complete(coro)
-                finally:
-                    new_loop.close()
-            return loop.run_until_complete(coro)
-        except RuntimeError:
-            new_loop = asyncio.new_event_loop()
-            try:
-                return new_loop.run_until_complete(coro)
-            finally:
-                new_loop.close()
+            return new_loop.run_until_complete(coro)
+        finally:
+            new_loop.close()
 
     def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
         """Persist a SimulationRun via the DATA-6 repository protocol.
