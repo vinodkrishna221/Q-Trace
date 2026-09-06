@@ -57,4 +57,4 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 23 Aug 11:25 Orion: FULL blueprint drafted; quantum-ui/runtime diff approved, applied and synced; artifacts later approved.
 - 23 Aug 10:57 Orion: FULL kickoff drafted after approved broad platform + Quantum Flight Recorder direction; PRD later approved.
 - 06 Sep 09:11 Uday: SIM-7 green — SimulationRunRepositoryProtocol defined, InMemorySimRunRepo encapsulated, MongoSimRunRepo wired to DATA-6 DataRepositoryProtocol (mock path: graceful fallback when entities unavailable), router injected via FastAPI Depends, DEMO_LOCAL=1 selects memory; 13/13 card tests + 155/155 regression passed; PR ready for Warden review.
-
+- 06 Sep 09:49 Uday: SIM-8 green — 1500ms timeout locked (QTRACE_SIM_TIMEOUT_S default=1.5), ENABLE_QISKIT=0→503 ADAPTER_UNAVAILABLE, ENABLE_PENNYLANE=0→skippedReason PENNYLANE_DISABLED, structured duration/error logs, /ready hardened (primaryAdapterEnabled, workerNote), railway.toml (SHIP-4 mock path); 10/10 card tests + 165/165 regression passed; PR ready for Warden review.
