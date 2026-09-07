@@ -88,7 +88,7 @@ DELIVERABLE: Implement allowlisted Python AST parser for the frozen Qiskit gramm
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_code_and_qasm.py` round-trips Bell and rejects loops, imports, file/network calls, expressions and unsupported gates.
 DEPENDS: SIM-4          UNBLOCKS: UX-8,QA-4
 DEMO: Meera edits one supported Qiskit line and judges can export the circuit safely.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-5-parse-safe-qiskit-and-export`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -98,7 +98,7 @@ DELIVERABLE: Compile supported Circuit Models to `default.qubit`, normalize prob
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_pennylane_conformance.py` passes Bell and asymmetric fixtures and fails a deliberately reversed basis mapping.
 DEPENDS: SIM-4,QA-1          UNBLOCKS: UX-6,SIM-7,QA-4
 DEMO: The prototype demonstrates two genuine simulators without making the second one demo-critical.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-6-add-pennylane-conformance-and-circuit`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -108,7 +108,7 @@ DELIVERABLE: Inject the shared repository into simulation routes, persist immuta
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_repository_swap.py` runs the same contract suite against memory and an isolated Mongo test database.
 DEPENDS: SIM-6,DATA-6          UNBLOCKS: SIM-8
 DEMO: Simulation history works on live deploy while venue mode remains independent.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-7-swap-routes-to-the-production`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -118,7 +118,7 @@ DELIVERABLE: Add adapter flags, 1500ms timeout, threadpool boundary, structured 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/simulation/test_runtime_guards.py` proves timeout, disabled PennyLane, no NaN/Infinity and one-worker readiness behavior.
 DEPENDS: SIM-7,SHIP-4          UNBLOCKS: SIM-9,QA-6
 DEMO: The live and local APIs fail softly instead of freezing during judging.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-8-harden-timeouts-flags-and-deployed`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
