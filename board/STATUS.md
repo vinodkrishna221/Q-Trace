@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
+| learning-ux | plan + Venu mission + UX-1..UX-6 | UX-6 merged to main | UX-7 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-8 | SIM-8 merged to main | — |
 | ai-pedagogy | plan + Rajeswari mission + AI-1 + AI-2 | AI-1 & AI-2 merged to main | AI-3 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 27 Aug 14:30 Venu: UX-6 green — Three-Module catalogue with Aarav (FOUNDATIONS) vs Meera (THEORY_TO_CODE) entry badges, Superposition & Measurement guided lesson pages, BlochSphereView supporting pure vs mixed subsystem states (with MIXED_SUBSYSTEM / PURE_SUBSYSTEM labels and purity metrics), and resilient static SVG/table fallbacks established; 6/6 learning visuals tests passed (36/36 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 07 Sep 20:05 Patch: AI-1 & AI-2 merged to main (PR #26, PR #25 closed) — deterministic misconception rules (rules.py), sealed evidence registry, POST /v1/flight-recorder/diagnose endpoint, repository signal persistence, and error mappings verified; 45/45 AI suite passed, 270/270 full API suite passed.
 - 07 Sep 17:00 Rajeswari: AI-2 green — POST /v1/flight-recorder/diagnose implemented; persisted MisconceptionSignal via repository protocol; contract error codes (404, 409, 422) and deterministic two-step replay headlines verified; 18/18 unit tests passed (45/45 AI suite passed), PR ready for Warden review.
 - 05 Sep 20:32 Rajeswari: AI-1 green — deterministic misconception rules (SUPERPOSITION_VS_ENTANGLEMENT, MEASUREMENT_DETERMINISM, GATE_ORDER, NO_SIGNAL) and pure diagnosis functions created in apps/api/app/services/diagnosis/rules.py; evidence-key registry sealed; no LLM calls; 27/27 unit tests passed, PR ready for Warden review.
