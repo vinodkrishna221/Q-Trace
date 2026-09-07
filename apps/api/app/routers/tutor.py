@@ -17,6 +17,7 @@ from app.services.tutor.fallback import (
     SUPPORTED_INTENTS,
     get_curated_bell_explanation,
 )
+from app.services.tutor.service import default_tutor_service
 from app.services.tutor.validator import (
     EvidenceKeyValidationError,
     FabricatedClaimError,
@@ -200,18 +201,34 @@ async def explain_divergence(request: TutorExplainRequest) -> TutorExplainRespon
     # 5. Retrieve misconception signal or use mock fixture
     signal = await repo.get_misconception_signal(request.misconceptionSignalId)
     misconception_code = "SUPERPOSITION_VS_ENTANGLEMENT"
+    prediction = None
+    verified_behavior = None
+    first_divergence_step = None
+
     if signal:
         misconception_code = signal.code
+        if hasattr(signal, "evidence") and isinstance(signal.evidence, dict):
+            prediction = signal.evidence.get("prediction")
+            verified_behavior = signal.evidence.get("verifiedBehavior")
+        first_divergence_step = getattr(signal, "firstDivergenceStep", None)
     elif request.misconceptionSignalId == BELL_MISCONCEPTION_SIGNAL_FIXTURE["id"]:
         misconception_code = BELL_MISCONCEPTION_SIGNAL_FIXTURE["code"]
+        prediction = BELL_MISCONCEPTION_SIGNAL_FIXTURE["evidence"]["prediction"]
+        verified_behavior = BELL_MISCONCEPTION_SIGNAL_FIXTURE["evidence"]["verifiedBehavior"]
+        first_divergence_step = BELL_MISCONCEPTION_SIGNAL_FIXTURE["firstDivergenceStep"]
 
-    # 6. Generate curated fallback explanation with verified evidence validation
+    # 6. Generate explanation with verified evidence validation and fallback protection
     try:
-        explanation = get_curated_bell_explanation(
+        explanation = await default_tutor_service.generate_explanation(
             state_trace=state_trace,
-            misconception_code=misconception_code,
+            learner_profile_id=request.learnerProfileId,
             module_id=request.moduleId,
+            misconception_code=misconception_code,
             intent=request.intent,
+            learner_question=request.learnerQuestion,
+            prediction=prediction,
+            verified_behavior=verified_behavior,
+            first_divergence_step=first_divergence_step,
         )
     except (EvidenceKeyValidationError, FabricatedClaimError) as err:
         raise HTTPException(

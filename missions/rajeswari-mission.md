@@ -87,7 +87,7 @@ DELIVERABLE: Implement one provider adapter interface, structured response schem
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_tutor_provider_contract.py` uses a fake provider for success, malformed output, timeout and 429; every failure returns the curated fallback.
 DEPENDS: AI-4          UNBLOCKS: AI-6
 DEMO: When configured, judges see contextual AI without gambling the demo on it.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/ai-pedagogy/ai-5-add-the-optional-structured-tutor`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

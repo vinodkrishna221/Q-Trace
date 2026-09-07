@@ -96,7 +96,7 @@ DELIVERABLE: Implement one provider adapter interface, structured response schem
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_tutor_provider_contract.py` uses a fake provider for success, malformed output, timeout and 429; every failure returns the curated fallback.
 DEPENDS: AI-4          UNBLOCKS: AI-6
 DEMO: When configured, judges see contextual AI without gambling the demo on it.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 
