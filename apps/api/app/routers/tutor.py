@@ -18,6 +18,10 @@ from app.services.tutor.fallback import (
     SUPPORTED_INTENTS,
     get_curated_bell_explanation,
 )
+from app.services.tutor.recommendation import (
+    ModuleRecommendationResponse,
+    recommend_next_module,
+)
 from app.services.tutor.service import default_tutor_service
 from app.services.tutor.validator import (
     EvidenceKeyValidationError,
@@ -240,3 +244,61 @@ async def explain_divergence(request: TutorExplainRequest) -> TutorExplainRespon
 
     # 7. Strictly DO NOT persist free-form learnerQuestion or explanation
     return TutorExplainResponse(tutorResponse=TutorResponsePayload(**explanation))
+
+
+class TutorRecommendModuleRequest(BaseModel):
+    """Request schema for deterministic next module recommendation."""
+
+    learnerProfileId: str
+    passed: bool
+    misconceptionCode: Optional[str] = None
+    currentModuleId: Optional[str] = None
+    challengeId: Optional[str] = None
+    learnerRole: Optional[str] = None
+
+
+class TutorRecommendModuleResponse(BaseModel):
+    """Response schema wrapping ModuleRecommendationResponse."""
+
+    recommendation: ModuleRecommendationResponse
+
+
+@router.post(
+    "/recommend-module",
+    response_model=TutorRecommendModuleResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def recommend_module_endpoint(
+    request: TutorRecommendModuleRequest,
+) -> TutorRecommendModuleResponse:
+    """POST /v1/tutor/recommend-module
+    
+    Recommends the next module deterministically based on verified challenge outcomes
+    and misconception signal.
+    """
+    repo = get_repository()
+    learner = await repo.get_learner_profile(request.learnerProfileId)
+    role = request.learnerRole
+    if not role and learner:
+        role = getattr(learner, "role", None)
+
+    rec = recommend_next_module(
+        passed=request.passed,
+        misconception_code=request.misconceptionCode,
+        current_module_id=request.currentModuleId,
+        challenge_id=request.challengeId,
+        learner_role=role,
+    )
+
+    return TutorRecommendModuleResponse(
+        recommendation=ModuleRecommendationResponse(
+            nextModuleId=rec.nextModuleId,
+            recommendationReason=rec.recommendationReason,
+            remedial=rec.remedial,
+            targetMisconceptionCode=rec.targetMisconceptionCode,
+            confidence=rec.confidence,
+            featureFlagActive=rec.featureFlagActive,
+            rulesVersion=rec.rulesVersion,
+        )
+    )
+
