@@ -24,6 +24,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.models.errors import ErrorDetail, ErrorEnvelope
 from app.repositories import get_repository, seed_core_truth
 from app.routers import circuits, simulation_runs
+from app.routers.flight_recorder import router as flight_recorder_router
 from app.routers.instructor import router as instructor_router
 from app.routers.learning import router as learning_router
 from app.routers.progress import router as progress_router
@@ -138,6 +139,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 app.include_router(circuits.router)
 app.include_router(simulation_runs.router)
+app.include_router(flight_recorder_router)
 app.include_router(learning_router, prefix="/v1")
 app.include_router(progress_router, prefix="/v1")
 app.include_router(instructor_router, prefix="/v1")
