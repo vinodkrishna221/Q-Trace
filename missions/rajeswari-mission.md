@@ -47,7 +47,7 @@ DELIVERABLE: Create versioned diagnosis rule data and pure functions for `SUPERP
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_diagnosis_rules.py` maps all seeded predictions/traces to expected codes and never emits an unknown evidence key.
 DEPENDS: —          UNBLOCKS: AI-2
 DEMO: Creates the reliable intellectual engine behind the Flight Recorder.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/ai-pedagogy/ai-1-define-deterministic-misconception-rules`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -57,7 +57,7 @@ DELIVERABLE: Implement diagnosis service/router, persisted Misconception Signal 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_flight_recorder_route.py` posts the Bell fixture and returns firstDivergenceStep=1 plus the repair challenge ID.
 DEPENDS: AI-1          UNBLOCKS: AI-3
 DEMO: The UI can reveal exactly where Aarav’s understanding diverged.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/ai-pedagogy/ai-2-expose-flight-recorder-diagnosis-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

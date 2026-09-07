@@ -11,6 +11,7 @@ SIM-1 additions over the SHIP-1 skeleton:
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 import logging
 import os
 import uuid
@@ -21,10 +22,28 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.models.errors import ErrorDetail, ErrorEnvelope
+from app.repositories import get_repository, seed_core_truth
 from app.routers import circuits, simulation_runs
+from app.routers.flight_recorder import router as flight_recorder_router
+from app.routers.instructor import router as instructor_router
+from app.routers.learning import router as learning_router
+from app.routers.progress import router as progress_router
 
 logger = logging.getLogger("qtrace.api")
 logging.basicConfig(level=logging.INFO)
+
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler to ensure core truth is seeded on startup."""
+    repo = get_repository()
+    await seed_core_truth(repo)
+    yield
+
 
 # ---------------------------------------------------------------------------
 # Application
@@ -34,6 +53,7 @@ app = FastAPI(
     title="Q-Trace API",
     description="Backend API for Q-Trace quantum learning platform",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 # ---------------------------------------------------------------------------
@@ -91,7 +111,12 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     envelope = ErrorEnvelope(
         error=ErrorDetail(code=code, message=message, requestId=rid, details=details)
     )
-    return JSONResponse(status_code=exc.status_code, content=envelope.model_dump())
+    content = envelope.model_dump()
+    if isinstance(exc.detail, dict):
+        content["detail"] = exc.detail
+    else:
+        content["detail"] = {"code": code, "message": message, "details": details}
+    return JSONResponse(status_code=exc.status_code, content=content)
 
 
 @app.exception_handler(Exception)
@@ -114,6 +139,10 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 app.include_router(circuits.router)
 app.include_router(simulation_runs.router)
+app.include_router(flight_recorder_router)
+app.include_router(learning_router, prefix="/v1")
+app.include_router(progress_router, prefix="/v1")
+app.include_router(instructor_router, prefix="/v1")
 
 # ---------------------------------------------------------------------------
 # Core endpoints
@@ -128,10 +157,17 @@ async def health_check():
 
 @app.get("/ready", tags=["ops"])
 async def readiness_check():
-    """Readiness check — reports primary adapter availability and demo flags."""
-    enable_qiskit = os.getenv("ENABLE_QISKIT", "1") == "1"
-    enable_pennylane = os.getenv("ENABLE_PENNYLANE", "1") == "1"
+    """Readiness check — reports primary adapter availability and demo flags.
+
+    SIM-8: one-worker model note added so Railway health checks understand
+    that state lives in the process (DEMO_LOCAL=1) or Atlas (DEMO_LOCAL=0).
+    ENABLE_QISKIT=0 marks the primary adapter disabled; /v1/simulation-runs
+    returns 503 immediately in that case so workers never hang.
+    """
+    enable_qiskit = os.getenv("ENABLE_QISKIT", "1") != "0"
+    enable_pennylane = os.getenv("ENABLE_PENNYLANE", "1") != "0"
     demo_local = os.getenv("DEMO_LOCAL", "1") == "1"
+    demo_fallback = os.getenv("DEMO_FALLBACK", "1") == "1"
 
     # Primary adapter is QISKIT_AER; PennyLane is a conformance adapter only.
     adapters = {
@@ -142,7 +178,12 @@ async def readiness_check():
     return {
         "status": "ready",
         "primaryAdapter": "QISKIT_AER",
+        "primaryAdapterEnabled": enable_qiskit,
         "adapters": adapters,
         "demoLocal": demo_local,
-        "demoFallback": os.getenv("DEMO_FALLBACK", "1") == "1",
+        "demoFallback": demo_fallback,
+        # SIM-8: state lives in-process (DEMO_LOCAL) or Atlas.
+        # One uvicorn worker is the safe default on Railway free tier.
+        "workerNote": "single-worker; state is in-process (DEMO_LOCAL) or Atlas",
     }
+
