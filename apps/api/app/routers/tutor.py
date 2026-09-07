@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.repositories import get_repository
+from app.services.tutor.badge import TutorBadge
 from app.services.tutor.fallback import (
     SUPPORTED_INTENTS,
     get_curated_bell_explanation,
@@ -146,6 +147,7 @@ class TutorResponsePayload(BaseModel):
     fallbackUsed: bool = True
     model: str = "DEMO_FALLBACK"
     safetyNote: str
+    badge: Optional[TutorBadge] = None
 
 
 class TutorExplainResponse(BaseModel):
