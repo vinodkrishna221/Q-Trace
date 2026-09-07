@@ -23,7 +23,10 @@ import {
   LearningPathResponse,
   LearningPath,
   DemoProfilesResponse,
+  ExportOpenQasm3Request,
+  ExportOpenQasm3Response,
 } from './contracts';
+import { generateOpenQasm3 } from '@/features/circuit/circuit-qasm-exporter';
 import {
   DEMO_SIMULATION_RUN,
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
@@ -442,6 +445,38 @@ export const apiClient = {
         data: {
           profiles: Object.values(DEMO_LEARNER_PROFILES),
           instructor: DEMO_INSTRUCTOR_PROFILE,
+        },
+        meta: { requestId: `req_fb_${Date.now().toString(36)}`, isFallback: true },
+      };
+    }
+  },
+
+  /**
+   * POST /v1/circuits/export-openqasm3
+   */
+  async exportOpenQasm3(
+    payload: ExportOpenQasm3Request
+  ): Promise<ApiResponseWithMeta<ExportOpenQasm3Response>> {
+    try {
+      const { data, requestId } = await requestJson<ExportOpenQasm3Response>(
+        '/v1/circuits/export-openqasm3',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        }
+      );
+      return {
+        data,
+        meta: { requestId, isFallback: false },
+      };
+    } catch {
+      const qasm = generateOpenQasm3(payload.circuitModel);
+      return {
+        data: {
+          openQasmVersion: '3.0',
+          openQasm3: qasm,
+          lossy: false,
+          warnings: [],
         },
         meta: { requestId: `req_fb_${Date.now().toString(36)}`, isFallback: true },
       };

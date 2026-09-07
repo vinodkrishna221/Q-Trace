@@ -11,9 +11,7 @@
 
 ## Tracks
 
-| Track | Done | In flight | Next |
-|---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1..UX-7 | UX-7 merged to main | UX-8 |
+| learning-ux | plan + Venu mission + UX-1..UX-8 | PR review (UX-8) | UX-9 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-8 | SIM-8 merged to main | — |
 | ai-pedagogy | plan + Rajeswari mission + AI-1 + AI-2 | AI-1 & AI-2 merged to main | AI-3 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
@@ -42,6 +40,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 27 Aug 17:30 Venu: UX-8 green — OpenQASM 3.0 download and generation, byte-for-byte equivalent Circuit Model JSON export/reimport with deterministic column normalization, safe validation/rejection for unsupported gates and bounds, and CircuitSharePanel with explicit LOCAL ARTIFACT SHARING disclosure banner established; 13/13 circuit-share unit tests passed (53/53 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 07 Sep 20:10 Patch: UX-7 merged to main (PR #28) — Live Progress Record (/progress), three-card/one-chart Instructor Insight (/instructor) with responsive SVG and accessible table fallback, 1500ms simulation timeout recovery with retry banner, and curated trace-aware explanation fallback (DEMO_FALLBACK) verified; 4/4 resilient journey tests passed, 40/40 full web suite passed.
 - 27 Aug 16:00 Venu: UX-7 green — Live Progress Record, three-card/one-chart Instructor Insight with responsive SVG and accessible table fallback, provider/fallback badges, empty/loading/timeout states, and simulation timeout recovery with retry action established; 4/4 resilient journey tests passed (40/40 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 27 Aug 14:30 Venu: UX-6 green — Three-Module catalogue with Aarav (FOUNDATIONS) vs Meera (THEORY_TO_CODE) entry badges, Superposition & Measurement guided lesson pages, BlochSphereView supporting pure vs mixed subsystem states (with MIXED_SUBSYSTEM / PURE_SUBSYSTEM labels and purity metrics), and resilient static SVG/table fallbacks established; 6/6 learning visuals tests passed (36/36 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
