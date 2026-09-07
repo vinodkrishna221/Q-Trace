@@ -83,8 +83,45 @@ body {
   scrollbar-color: var(--line-bright) transparent;
 }
 
+/* High contrast accessible focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* KaTeX inherits our ink, tinted toward accent for state formulas */
 .katex {
   color: var(--accent);
   font-size: 1.05em;
+}
+
+/* Projector-optimized readability helpers (1366x768 and large presentation displays) */
+@media screen and (max-width: 1366px) {
+  .projector-safe {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* Reduced-motion accessibility: clamp animations, transitions, and pulsating indicators */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-pulse,
+  .animate-spin,
+  .animate-ping {
+    animation: none !important;
+  }
+
+  .shadow-glow,
+  .shadow-glow-soft {
+    box-shadow: none !important;
+  }
 }

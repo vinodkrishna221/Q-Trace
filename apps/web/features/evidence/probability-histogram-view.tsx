@@ -67,8 +67,9 @@ export function ProbabilityHistogramView({
               <button
                 type="button"
                 data-testid="toggle-histogram-mode"
+                aria-pressed={forceStaticFallback}
                 onClick={() => setForceStaticFallback(!forceStaticFallback)}
-                className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded bg-raised border border-line hover:border-line-bright text-ink-dim hover:text-ink transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded bg-raised border border-line hover:border-line-bright text-ink-dim hover:text-ink transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {forceStaticFallback ? (
                   <>
@@ -200,14 +201,15 @@ export function ProbabilityHistogramView({
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse" aria-label="Quantum State Evidence Data Table">
+                  <caption className="sr-only">Quantum State Basis Probabilities and Measurement Counts</caption>
                   <thead>
-                    <tr className="border-b border-line text-ink-faint text-[10px]">
-                      <th className="py-1.5 px-2">Basis State |ψ⟩</th>
-                      <th className="py-1.5 px-2">Ideal Probability P</th>
-                      <th className="py-1.5 px-2">Sampled Counts</th>
-                      <th className="py-1.5 px-2">Empirical %</th>
-                      <th className="py-1.5 px-2">Correlation Status</th>
+                    <tr className="border-b border-line text-ink-dim text-[11px]">
+                      <th scope="col" className="py-2 px-2.5 font-semibold">Basis State |ψ⟩</th>
+                      <th scope="col" className="py-2 px-2.5 font-semibold">Ideal Probability P</th>
+                      <th scope="col" className="py-2 px-2.5 font-semibold">Sampled Counts</th>
+                      <th scope="col" className="py-2 px-2.5 font-semibold">Empirical %</th>
+                      <th scope="col" className="py-2 px-2.5 font-semibold">Correlation Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line/40 text-xs">
@@ -219,17 +221,17 @@ export function ProbabilityHistogramView({
 
                       return (
                         <tr key={k} className={isSupport ? 'bg-accent/5' : 'opacity-60'}>
-                          <td className="py-1.5 px-2 font-bold text-ink">|{k}⟩</td>
-                          <td className="py-1.5 px-2 text-accent font-semibold">{p.toFixed(4)}</td>
-                          <td className="py-1.5 px-2 text-evidence">{c}</td>
-                          <td className="py-1.5 px-2 text-ink-dim">{emp}%</td>
-                          <td className="py-1.5 px-2">
+                          <th scope="row" className="py-2 px-2.5 font-bold text-ink">|{k}⟩</th>
+                          <td className="py-2 px-2.5 text-accent font-semibold">{p.toFixed(4)}</td>
+                          <td className="py-2 px-2.5 text-evidence font-medium">{c}</td>
+                          <td className="py-2 px-2.5 text-ink-dim">{emp}%</td>
+                          <td className="py-2 px-2.5">
                             {isSupport ? (
-                              <Badge variant="outline" className="text-[9px] text-accent border-accent/40">
+                              <Badge variant="outline" className="text-[9px] font-mono text-accent border-accent/40">
                                 ACTIVE SUPPORT
                               </Badge>
                             ) : (
-                              <span className="text-[10px] text-ink-faint">ZERO PROBABILITY</span>
+                              <span className="text-[10px] text-ink-faint font-mono">ZERO PROBABILITY</span>
                             )}
                           </td>
                         </tr>

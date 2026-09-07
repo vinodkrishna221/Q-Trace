@@ -69,8 +69,9 @@ export function BlochSphereView({
           <button
             type="button"
             data-testid="toggle-plotly-fallback"
+            aria-pressed={forceStaticFallback}
             onClick={() => setForceStaticFallback(!forceStaticFallback)}
-            className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded bg-raised border border-line hover:border-line-bright text-ink-dim hover:text-ink transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded bg-raised border border-line hover:border-line-bright text-ink-dim hover:text-ink transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {forceStaticFallback ? (
               <>
@@ -98,15 +99,22 @@ export function BlochSphereView({
 
       <CardContent className="p-4 md:p-6 space-y-6">
         {/* Qubit Selector Tabs */}
-        <div className="flex items-center gap-2 border-b border-line pb-3">
+        <div
+          className="flex items-center gap-2 border-b border-line pb-3"
+          role="tablist"
+          aria-label="Qubit Wire Subsystem Selector"
+        >
           <span className="text-xs font-mono text-ink-dim mr-2">Select Qubit Wire:</span>
           {reducedQubits.map((rq, idx) => (
             <button
               key={rq.qubit}
               type="button"
+              role="tab"
+              aria-selected={selectedQubitIndex === idx}
+              aria-controls="bloch-visual-container"
               data-testid={`qubit-tab-${rq.qubit}`}
               onClick={() => setSelectedQubitIndex(idx)}
-              className={`px-3 py-1 text-xs font-mono rounded-md border transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-3 py-1 text-xs font-mono rounded-md border transition-all cursor-pointer flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 selectedQubitIndex === idx
                   ? 'border-accent bg-accent/15 text-accent font-bold shadow-glow'
                   : 'border-line bg-raised/50 text-ink-dim hover:text-ink hover:border-line-bright'
@@ -116,8 +124,8 @@ export function BlochSphereView({
               <span
                 className={`text-[10px] px-1 rounded ${
                   rq.label === 'MIXED_SUBSYSTEM'
-                    ? 'bg-violet/20 text-violet'
-                    : 'bg-accent/20 text-accent'
+                    ? 'bg-violet/20 text-violet font-semibold'
+                    : 'bg-accent/20 text-accent font-semibold'
                 }`}
               >
                 {rq.label === 'MIXED_SUBSYSTEM' ? 'MIXED' : 'PURE'}
@@ -131,6 +139,7 @@ export function BlochSphereView({
           <div
             className="flex flex-col items-center justify-center p-4 bg-abyss rounded-lg border border-line relative min-h-[260px]"
             data-testid="bloch-visual-container"
+            id="bloch-visual-container"
           >
             {forceStaticFallback ? (
               /* Static 2D/3D SVG Projection Fallback */
@@ -173,24 +182,24 @@ export function BlochSphereView({
 
                   {/* Coordinate Axes */}
                   {/* Z Axis (Vertical: |0> at top, |1> at bottom) */}
-                  <line x1="0" y1="-95" x2="0" y2="95" stroke="#71717a" strokeWidth="1.5" />
-                  <polygon points="0,-98 -3,-90 3,-90" fill="#71717a" />
-                  <text x="8" y="-85" fill="#a1a1aa" fontSize="10" fontFamily="monospace">
+                  <line x1="0" y1="-95" x2="0" y2="95" stroke="#94a3b8" strokeWidth="1.5" />
+                  <polygon points="0,-98 -3,-90 3,-90" fill="#94a3b8" />
+                  <text x="8" y="-85" fill="#38bdf8" fontSize="11" fontFamily="monospace" fontWeight="bold">
                     +Z |0⟩
                   </text>
-                  <text x="8" y="92" fill="#a1a1aa" fontSize="10" fontFamily="monospace">
+                  <text x="8" y="92" fill="#94a3b8" fontSize="11" fontFamily="monospace" fontWeight="bold">
                     -Z |1⟩
                   </text>
 
                   {/* X Axis (Diagonal forward) */}
-                  <line x1="60" y1="20" x2="-60" y2="-20" stroke="#52525b" strokeWidth="1.2" />
-                  <text x="64" y="24" fill="#71717a" fontSize="9" fontFamily="monospace">
+                  <line x1="60" y1="20" x2="-60" y2="-20" stroke="#64748b" strokeWidth="1.2" />
+                  <text x="64" y="24" fill="#cbd5e1" fontSize="10" fontFamily="monospace" fontWeight="bold">
                     +X |+⟩
                   </text>
 
                   {/* Y Axis (Horizontal) */}
-                  <line x1="-95" y1="0" x2="95" y2="0" stroke="#52525b" strokeWidth="1.2" />
-                  <text x="80" y="-6" fill="#71717a" fontSize="9" fontFamily="monospace">
+                  <line x1="-95" y1="0" x2="95" y2="0" stroke="#64748b" strokeWidth="1.2" />
+                  <text x="80" y="-6" fill="#cbd5e1" fontSize="10" fontFamily="monospace" fontWeight="bold">
                     +Y |+i⟩
                   </text>
 
@@ -264,13 +273,15 @@ export function BlochSphereView({
                   <ellipse cx="0" cy="0" rx="28" ry="80" fill="none" stroke="#1e293b" strokeWidth="1" strokeDasharray="2 2" />
 
                   {/* Z Axis */}
-                  <line x1="0" y1="-95" x2="0" y2="95" stroke="#64748b" strokeWidth="1.5" />
-                  <text x="8" y="-85" fill="#38bdf8" fontSize="10" fontFamily="monospace" fontWeight="bold">|0⟩</text>
-                  <text x="8" y="92" fill="#64748b" fontSize="10" fontFamily="monospace">|1⟩</text>
+                  <line x1="0" y1="-95" x2="0" y2="95" stroke="#94a3b8" strokeWidth="1.5" />
+                  <text x="8" y="-85" fill="#38bdf8" fontSize="11" fontFamily="monospace" fontWeight="bold">|0⟩</text>
+                  <text x="8" y="92" fill="#94a3b8" fontSize="11" fontFamily="monospace" fontWeight="bold">|1⟩</text>
 
                   {/* X and Y Axes */}
-                  <line x1="-90" y1="0" x2="90" y2="0" stroke="#475569" strokeWidth="1" />
-                  <line x1="55" y1="22" x2="-55" y2="-22" stroke="#475569" strokeWidth="1" />
+                  <line x1="-90" y1="0" x2="90" y2="0" stroke="#64748b" strokeWidth="1" />
+                  <line x1="55" y1="22" x2="-55" y2="-22" stroke="#64748b" strokeWidth="1" />
+                  <text x="64" y="24" fill="#cbd5e1" fontSize="10" fontFamily="monospace" fontWeight="bold">+X</text>
+                  <text x="78" y="-6" fill="#cbd5e1" fontSize="10" fontFamily="monospace" fontWeight="bold">+Y</text>
 
                   {/* Vector */}
                   {(() => {

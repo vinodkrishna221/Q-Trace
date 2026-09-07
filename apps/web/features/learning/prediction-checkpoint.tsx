@@ -82,7 +82,7 @@ export function PredictionCheckpoint({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-2.5 pt-1">
+      <CardContent className="space-y-2.5 pt-1" role="radiogroup" aria-label="Prediction hypothesis choices">
         {checkpoint.answerSchema.options.map((opt) => {
           const isSelected = selectedAnswer === opt;
           const isCommonMisconception = opt === 'INDEPENDENT_RANDOM';
@@ -91,9 +91,17 @@ export function PredictionCheckpoint({
             <button
               key={opt}
               type="button"
+              role="radio"
+              aria-checked={isSelected}
               data-testid={`prediction-opt-${opt}`}
               onClick={() => handleSelectOption(opt)}
-              className={`w-full text-left p-3.5 rounded-lg text-xs font-mono transition-all flex items-center justify-between border cursor-pointer ${
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectOption(opt);
+                }
+              }}
+              className={`w-full text-left p-3.5 rounded-lg text-xs font-mono transition-all flex items-center justify-between border cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isSelected
                   ? 'border-accent bg-accent/10 text-ink ring-1 ring-accent shadow-glow'
                   : 'border-line bg-abyss text-ink-dim hover:text-ink hover:border-line-bright'
@@ -104,6 +112,7 @@ export function PredictionCheckpoint({
                   className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
                     isSelected ? 'border-accent bg-accent text-abyss font-bold' : 'border-line-bright bg-panel'
                   }`}
+                  aria-hidden="true"
                 >
                   {isSelected && '✓'}
                 </div>

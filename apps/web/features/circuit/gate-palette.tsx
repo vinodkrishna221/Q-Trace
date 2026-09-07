@@ -22,6 +22,17 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
     circuit,
   } = useCircuitStore();
 
+  // Global Escape key listener to disarm palette gate
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedGateToPlace) {
+        selectGateToPlace(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedGateToPlace, selectGateToPlace]);
+
   return (
     <Card className="border-line bg-panel shadow-sm" data-testid="gate-palette-card">
       <CardHeader className="py-3 px-4 bg-raised/40 border-b border-line">
@@ -38,7 +49,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               variant="outline"
               onClick={resetToBellSeed}
               data-testid="reset-bell-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-ink hover:border-accent/40"
+              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-ink hover:border-accent/40 focus-visible:ring-2 focus-visible:ring-accent"
               title="Reset to seeded Bell State circuit (H + CNOT)"
             >
               <RotateCcw className="w-3 h-3 mr-1 text-accent" />
@@ -49,7 +60,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               variant="outline"
               onClick={clearCircuit}
               data-testid="clear-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-caution hover:border-caution/40"
+              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-caution hover:border-caution/40 focus-visible:ring-2 focus-visible:ring-accent"
               title="Clear all gates from circuit wires"
             >
               <Trash2 className="w-3 h-3 mr-1" />
@@ -85,7 +96,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                 onClick={() => {
                   selectGateToPlace(isSelected ? null : gateKey);
                 }}
-                className={`flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all duration-150 relative cursor-pointer select-none group ${
+                className={`flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all duration-150 relative cursor-pointer select-none group outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-abyss ${
                   isSelected
                     ? 'ring-2 ring-accent border-accent bg-accent/20 shadow-glow'
                     : 'border-line bg-abyss hover:border-line-bright hover:bg-raised/60'
