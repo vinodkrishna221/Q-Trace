@@ -104,7 +104,7 @@ DELIVERABLE: Render the three-Module catalogue, Aarav/Meera entry differences, P
 TEST: `pnpm --dir apps/web test:e2e -- learning-visuals` shows all three Modules, different entry badges, a mixed reduced-state label and functional static fallback with Plotly disabled.
 DEPENDS: UX-4,DATA-5,SIM-6          UNBLOCKS: UX-7
 DEMO: The prototype visibly covers structured learning and scientifically honest visualization.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 
@@ -114,7 +114,7 @@ DELIVERABLE: Add live Progress Record, three-card/one-chart Instructor Insight, 
 TEST: `pnpm --dir apps/web test:e2e -- resilient-journey` completes with cloud Tutor off and then renders a simulation-timeout recovery without blank UI.
 DEPENDS: UX-6,DATA-7,AI-6          UNBLOCKS: UX-9,QA-6
 DEMO: The demo survives failures and closes with Dr. Rao seeing the same learner event.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-8 · Add supported circuit sharing and export                        [timebox: 2h]
 CONTEXT: The Circuit Model and OpenQASM export endpoint are stable. Load `circuit-simulation.md`; collaboration scope is artifact sharing, not realtime editing.

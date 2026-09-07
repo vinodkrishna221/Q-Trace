@@ -108,7 +108,7 @@ DELIVERABLE: Add live Progress Record, three-card/one-chart Instructor Insight, 
 TEST: `pnpm --dir apps/web test:e2e -- resilient-journey` completes with cloud Tutor off and then renders a simulation-timeout recovery without blank UI.
 DEPENDS: UX-6,DATA-7,AI-6          UNBLOCKS: UX-9,QA-6
 DEMO: The demo survives failures and closes with Dr. Rao seeing the same learner event.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-7-integrate-progress-instructor-proof-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
