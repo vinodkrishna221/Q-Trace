@@ -46,8 +46,9 @@ export function CohortAnalyticsChart({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              aria-pressed={showTableFallback}
               onClick={() => setShowTableFallback(!showTableFallback)}
-              className="text-[11px] font-mono text-ink-dim hover:text-accent flex items-center gap-1 px-2 py-1 rounded bg-abyss border border-line cursor-pointer"
+              className="text-[11px] font-mono text-ink-dim hover:text-accent flex items-center gap-1 px-2 py-1 rounded bg-abyss border border-line cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent"
               data-testid="toggle-chart-fallback-btn"
             >
               <Table className="w-3 h-3" />
@@ -71,7 +72,7 @@ export function CohortAnalyticsChart({
               {/* Metric 1: Module Completion */}
               <div className="p-3.5 rounded-lg bg-abyss border border-line space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-ink-dim">Module Progress Rate</span>
+                  <span className="text-ink-dim font-medium">Module Progress Rate</span>
                   <span className="text-evidence font-bold">{completionRate}%</span>
                 </div>
                 <div className="w-full h-3 bg-raised rounded overflow-hidden">
@@ -89,7 +90,7 @@ export function CohortAnalyticsChart({
               {/* Metric 2: Challenge Pass Rate */}
               <div className="p-3.5 rounded-lg bg-abyss border border-line space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-ink-dim">Repair Pass Rate</span>
+                  <span className="text-ink-dim font-medium">Repair Pass Rate</span>
                   <span className="text-accent font-bold">{passRate}%</span>
                 </div>
                 <div className="w-full h-3 bg-raised rounded overflow-hidden">
@@ -107,7 +108,7 @@ export function CohortAnalyticsChart({
               {/* Metric 3: Misconception Prevalence */}
               <div className="p-3.5 rounded-lg bg-abyss border border-line space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-ink-dim">Misconception Rate</span>
+                  <span className="text-ink-dim font-medium">Misconception Rate</span>
                   <span className="text-caution font-bold">{misconceptionRate}%</span>
                 </div>
                 <div className="w-full h-3 bg-raised rounded overflow-hidden">
@@ -142,7 +143,7 @@ export function CohortAnalyticsChart({
                 <line x1="120" y1="100" x2="560" y2="100" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
 
                 {/* Row 1: Module Completion */}
-                <text x="10" y="24" fill="#94A3B8" fontSize="11" fontFamily="monospace">
+                <text x="10" y="24" fill="#E2E8F0" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   Completion
                 </text>
                 <rect x="120" y="14" width="440" height="14" rx="3" fill="#1E293B" />
@@ -154,12 +155,12 @@ export function CohortAnalyticsChart({
                   rx="3"
                   fill="#10B981"
                 />
-                <text x="568" y="25" fill="#10B981" fontSize="11" fontFamily="monospace" fontWeight="bold">
+                <text x="568" y="25" fill="#34D399" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   {completionRate}%
                 </text>
 
                 {/* Row 2: Pass Rate */}
-                <text x="10" y="64" fill="#94A3B8" fontSize="11" fontFamily="monospace">
+                <text x="10" y="64" fill="#E2E8F0" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   Repair Pass
                 </text>
                 <rect x="120" y="54" width="440" height="14" rx="3" fill="#1E293B" />
@@ -171,12 +172,12 @@ export function CohortAnalyticsChart({
                   rx="3"
                   fill="#06B6D4"
                 />
-                <text x="568" y="65" fill="#06B6D4" fontSize="11" fontFamily="monospace" fontWeight="bold">
+                <text x="568" y="65" fill="#22D3EE" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   {passRate}%
                 </text>
 
                 {/* Row 3: Misconception */}
-                <text x="10" y="104" fill="#94A3B8" fontSize="11" fontFamily="monospace">
+                <text x="10" y="104" fill="#E2E8F0" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   Divergence
                 </text>
                 <rect x="120" y="94" width="440" height="14" rx="3" fill="#1E293B" />
@@ -188,7 +189,7 @@ export function CohortAnalyticsChart({
                   rx="3"
                   fill="#F59E0B"
                 />
-                <text x="568" y="105" fill="#F59E0B" fontSize="11" fontFamily="monospace" fontWeight="bold">
+                <text x="568" y="105" fill="#FBBF24" fontSize="12" fontFamily="monospace" fontWeight="bold">
                   {misconceptionRate}%
                 </text>
               </svg>
@@ -200,32 +201,33 @@ export function CohortAnalyticsChart({
             className="rounded-lg border border-line bg-abyss overflow-hidden text-xs font-mono"
             data-testid="cohort-table-fallback"
           >
-            <table className="w-full text-left">
+            <table className="w-full text-left" aria-label="Cohort Performance and Misconception Metrics">
+              <caption className="sr-only">Cohort Performance and Misconception Metrics</caption>
               <thead className="bg-raised text-ink-dim border-b border-line">
                 <tr>
-                  <th className="p-3">Cohort Metric</th>
-                  <th className="p-3">Value / Count</th>
-                  <th className="p-3">Percentage / Rate</th>
-                  <th className="p-3">Sample Base</th>
+                  <th scope="col" className="p-3 font-semibold">Cohort Metric</th>
+                  <th scope="col" className="p-3 font-semibold">Value / Count</th>
+                  <th scope="col" className="p-3 font-semibold">Percentage / Rate</th>
+                  <th scope="col" className="p-3 font-semibold">Sample Base</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line text-ink">
                 <tr>
-                  <td className="p-3 text-evidence font-bold">Module Completion (Bell State)</td>
+                  <th scope="row" className="p-3 text-evidence font-bold text-left">Module Completion (Bell State)</th>
                   <td className="p-3">{bellCompletion?.completed || 0} learners</td>
-                  <td className="p-3 text-evidence">{completionRate}%</td>
+                  <td className="p-3 text-evidence font-semibold">{completionRate}%</td>
                   <td className="p-3 text-ink-faint">{bellCompletion?.assigned || 30} assigned</td>
                 </tr>
                 <tr>
-                  <td className="p-3 text-accent font-bold">Challenge Pass (ch_bell_repair)</td>
+                  <th scope="row" className="p-3 text-accent font-bold text-left">Challenge Pass (ch_bell_repair)</th>
                   <td className="p-3">{repairChallenge?.passed || 0} passed</td>
-                  <td className="p-3 text-accent">{passRate}%</td>
+                  <td className="p-3 text-accent font-semibold">{passRate}%</td>
                   <td className="p-3 text-ink-faint">{repairChallenge?.attempted || 24} attempts</td>
                 </tr>
                 <tr>
-                  <td className="p-3 text-caution font-bold">Top Misconception (Entanglement)</td>
+                  <th scope="row" className="p-3 text-caution font-bold text-left">Top Misconception (Entanglement)</th>
                   <td className="p-3">{primaryMisconception?.occurrences || 0} occurrences</td>
-                  <td className="p-3 text-caution">{misconceptionRate}% of cohort</td>
+                  <td className="p-3 text-caution font-semibold">{misconceptionRate}% of cohort</td>
                   <td className="p-3 text-ink-faint">{learnerCount} learners</td>
                 </tr>
               </tbody>

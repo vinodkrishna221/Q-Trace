@@ -21,9 +21,12 @@ export function RoleSwitcher() {
             return (
               <button
                 key={role.id}
+                type="button"
                 data-testid={`role-btn-${role.name.toLowerCase().replace(/[^a-z]/g, '')}`}
+                aria-pressed={isSelected}
+                aria-label={`Switch demo role to ${role.name} (${role.roleTag})`}
                 onClick={() => setRole(role.id)}
-                className={`px-2.5 py-1 rounded-md transition-all font-medium flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md transition-all font-medium flex items-center gap-1.5 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   isSelected
                     ? 'bg-accent/15 text-accent border border-accent/50 shadow-glow'
                     : 'bg-transparent text-ink-dim border border-transparent hover:text-ink hover:bg-raised'

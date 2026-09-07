@@ -40,7 +40,7 @@ export function AppHeader() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
             {navItems.map((item) => {
               if (item.hideFor && activeRole.roleType === item.hideFor) return null;
               const isActive = pathname?.startsWith(item.activePrefix);
@@ -49,7 +49,8 @@ export function AppHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     isActive
                       ? 'text-accent'
                       : 'text-ink-dim hover:text-ink hover:bg-raised'

@@ -96,10 +96,12 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-cnot-control"
-                    className="w-5 h-5 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex items-center justify-center text-[10px] text-abyss font-bold shadow-lg"
+                    className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-abyss font-bold shadow-lg"
                     title="CNOT Control (q[0])"
+                    aria-label="CNOT Control on q[0] targeting q[1]"
                   >
-                    ●
+                    <span>●</span>
+                    <span className="sr-only">CNOT Control</span>
                   </div>
                 </div>
 
@@ -108,6 +110,7 @@ export function CircuitWorkspaceReadonly({
                   <div
                     data-testid="gate-op_3"
                     className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
+                    aria-label="Measure gate on q[0] into c[0]"
                   >
                     <span className="text-caution">MEASURE</span>
                     <span className="text-[9px] text-ink-dim font-normal">→ c[0]</span>
@@ -149,10 +152,12 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-op_2"
-                    className="w-10 h-10 rounded-full bg-violet/20 border-2 border-violet text-violet flex items-center justify-center font-bold text-lg shadow-lg"
+                    className="w-11 h-11 rounded-full bg-violet/20 border-2 border-violet text-violet flex flex-col items-center justify-center font-bold text-sm shadow-lg"
                     title="CNOT Target (q[1])"
+                    aria-label="CNOT Target on q[1] controlled by q[0]"
                   >
-                    ⊕
+                    <span className="text-base leading-none">⊕</span>
+                    <span className="text-[8px] font-mono text-violet tracking-tighter">CX</span>
                   </div>
                 </div>
 
@@ -161,6 +166,7 @@ export function CircuitWorkspaceReadonly({
                   <div
                     data-testid="gate-op_4"
                     className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
+                    aria-label="Measure gate on q[1] into c[1]"
                   >
                     <span className="text-caution">MEASURE</span>
                     <span className="text-[9px] text-ink-dim font-normal">→ c[1]</span>

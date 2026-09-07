@@ -128,7 +128,7 @@ DELIVERABLE: Fix keyboard order, focus states, color-independent gate labels, 13
 TEST: `pnpm --dir apps/web test:e2e -- accessibility-projector` passes keyboard-only Bell construction and captures all scripted screens at 1366×768 with no clipped primary evidence.
 DEPENDS: UX-7,QA-6          UNBLOCKS: —
 DEMO: The learner demo remains readable and operable on the judging projector.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-9-polish-accessibility-and-projector-readability`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

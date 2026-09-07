@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1..UX-8 | PR review (UX-8) | UX-9 |
+| learning-ux | plan + Venu mission + UX-1..UX-9 | PR review (UX-9) | — (Track complete) |
 | simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 27 Aug 19:30 Venu: UX-9 green — Accessibility and projector readability polished across all scripted routes: keyboard-only navigation & focus-visible rings for circuit workspace/palette/radios/scrubber, color-independent textual and symbolic gate/wire labels (●/CX/H/X/Y/Z/M), projector-safe text sizes/contrast (12px bold SVG text, high-contrast tables with accessible headers), and prefers-reduced-motion CSS rules; 4/4 acceptance tests passed (57/57 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 
 - 27 Aug 17:30 Venu: UX-8 green — OpenQASM 3.0 download and generation, byte-for-byte equivalent Circuit Model JSON export/reimport with deterministic column normalization, safe validation/rejection for unsupported gates and bounds, and CircuitSharePanel with explicit LOCAL ARTIFACT SHARING disclosure banner established; 13/13 circuit-share unit tests passed (53/53 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 27 Aug 16:00 Venu: UX-7 green — Live Progress Record, three-card/one-chart Instructor Insight with responsive SVG and accessible table fallback, provider/fallback badges, empty/loading/timeout states, and simulation timeout recovery with retry action established; 4/4 resilient journey tests passed (40/40 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.

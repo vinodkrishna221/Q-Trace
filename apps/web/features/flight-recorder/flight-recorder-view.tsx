@@ -140,8 +140,10 @@ export function FlightRecorderView({
                   key={step.stepIndex}
                   type="button"
                   data-testid={`step-btn-${step.stepIndex}`}
+                  aria-current={isSelected ? 'step' : undefined}
+                  aria-label={`Step ${step.stepIndex}: ${step.label}${isDivergence ? ' (First Conceptual Divergence)' : ''}`}
                   onClick={() => handleStepClick(step.stepIndex)}
-                  className={`p-3.5 rounded-lg border text-left font-mono transition-all cursor-pointer ${
+                  className={`p-3.5 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     isSelected
                       ? 'border-accent bg-accent/10 ring-1 ring-accent text-ink shadow-glow'
                       : 'border-line bg-abyss text-ink-dim hover:border-line-bright hover:text-ink'
