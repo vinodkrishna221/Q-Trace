@@ -32,7 +32,8 @@ import { ProgressSuccessCard } from '@/features/progress/progress-success-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Cpu, ShieldCheck, Radio, Server, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, Cpu, ShieldCheck, Radio, Server, CheckCircle2, RefreshCw, AlertTriangle } from 'lucide-react';
 import {
   ChallengeAttempt,
   ProgressRecord,
@@ -69,6 +70,10 @@ export default function BellStateLearnPage() {
   const [hasSimulated, setHasSimulated] = React.useState(true);
   const [latestRequestId, setLatestRequestId] = React.useState<string>('req_demo_001');
   const [isFallbackActive, setIsFallbackActive] = React.useState<boolean>(false);
+  const [simulationError, setSimulationError] = React.useState<{
+    message: string;
+    isTimeout: boolean;
+  } | null>(null);
 
   const isExecutingPipeline =
     simulationMutation.isPending || diagnoseMutation.isPending || tutorMutation.isPending;
@@ -76,6 +81,7 @@ export default function BellStateLearnPage() {
   const { circuit: activeCircuit } = useCircuitStore();
 
   const handleRunSimulation = async (circuitOverride?: CircuitModel) => {
+    setSimulationError(null);
     try {
       const savedDraft = getPredictionDraft(learnerProfileId, moduleData.id);
       const predictionAnswer = savedDraft?.answer || 'INDEPENDENT_RANDOM';
@@ -99,6 +105,7 @@ export default function BellStateLearnPage() {
       setLatestRequestId(simResult.meta.requestId);
       setIsFallbackActive(simResult.meta.isFallback);
       setHasSimulated(true);
+      setSimulationError(null);
 
       // 2. Automatically trigger Flight Recorder diagnosis
       const diagResult = await diagnoseMutation.mutateAsync({
@@ -116,10 +123,25 @@ export default function BellStateLearnPage() {
         intent: 'EXPLAIN_DIVERGENCE',
       });
       setTutorResponse(tutorResult.data.tutorResponse);
-    } catch {
-      // Retain fallback state on unexpected error
-      setIsFallbackActive(true);
-      setHasSimulated(true);
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string; status?: number; code?: string };
+      const isTimeout = Boolean(
+        errorObj?.message?.toLowerCase().includes('timeout') ||
+        errorObj?.message?.toLowerCase().includes('timed out') ||
+        errorObj?.status === 504 ||
+        errorObj?.code === 'SIMULATION_TIMEOUT'
+      );
+
+      if (isTimeout) {
+        setSimulationError({
+          message: errorObj?.message || 'Simulation execution exceeded 1500ms timeout threshold.',
+          isTimeout: true,
+        });
+      } else {
+        // Retain fallback state on unexpected offline/network error
+        setIsFallbackActive(true);
+        setHasSimulated(true);
+      }
     }
   };
 
@@ -335,10 +357,49 @@ export default function BellStateLearnPage() {
         <InteractiveCircuitWorkspace
           initialCircuit={DEMO_STARTER_CIRCUIT}
           isSimulating={isExecutingPipeline}
-          hasExecuted={hasSimulated}
+          hasExecuted={hasSimulated && !simulationError}
           onRunSimulation={handleRunSimulation}
         />
       </div>
+
+      {/* Simulation Timeout & Error Recovery Banner */}
+      {simulationError && (
+        <Card
+          className="border-caution/60 bg-caution/10 p-5 space-y-3"
+          data-testid="simulation-error-banner"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-caution mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <div className="text-sm font-semibold text-ink flex items-center gap-2">
+                  <span>Simulation Execution Failed / Timed Out</span>
+                  <Badge variant="warning" className="text-[10px] font-mono">
+                    {simulationError.isTimeout ? 'TIMEOUT 1500ms' : 'RUNTIME ERROR'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-ink-dim leading-relaxed">
+                  {simulationError.message}
+                </p>
+                <p className="text-[11px] text-ink-faint">
+                  The circuit workspace remains intact. Click retry to rerun simulation on Qiskit Aer runtime.
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => handleRunSimulation()}
+              disabled={isExecutingPipeline}
+              className="text-xs font-mono shrink-0 bg-caution hover:bg-caution/80 text-abyss font-bold"
+              data-testid="retry-simulation-btn"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isExecutingPipeline ? 'animate-spin' : ''}`} />
+              Retry Simulation
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Pipeline execution indicator */}
       {isExecutingPipeline && (

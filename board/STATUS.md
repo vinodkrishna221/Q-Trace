@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1..UX-6 | PR review (UX-6) | UX-7 |
+| learning-ux | plan + Venu mission + UX-1..UX-7 | PR review (UX-7) | UX-8 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-4 | SIM-4 merged to main | SIM-5 |
 | ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
 | data-analytics | plan + Rani mission + DATA-1 | PR review (DATA-1) | DATA-2 |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 27 Aug 16:00 Venu: UX-7 green — Live Progress Record, three-card/one-chart Instructor Insight with responsive SVG and accessible table fallback, provider/fallback badges, empty/loading/timeout states, and simulation timeout recovery with retry action established; 4/4 resilient journey tests passed (40/40 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 27 Aug 14:30 Venu: UX-6 green — Three-Module catalogue with Aarav (FOUNDATIONS) vs Meera (THEORY_TO_CODE) entry badges, Superposition & Measurement guided lesson pages, BlochSphereView supporting pure vs mixed subsystem states (with MIXED_SUBSYSTEM / PURE_SUBSYSTEM labels and purity metrics), and resilient static SVG/table fallbacks established; 6/6 learning visuals tests passed (36/36 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 
 - 27 Aug 12:45 Venu: UX-5 green — Interactive Circuit Workspace with dnd-kit qubit wires, H/X/Y/Z/CNOT/Measure placement/removal, keyboard/click alternatives, Zustand workspace slice, generated Qiskit code editor with AST-safe parse-and-replace edit flow, and unsupported RX rejection without model mutation established; 12/12 circuit workspace tests passed (30/30 suite), Next.js build passed (9/9 static routes), PR ready for Warden review.

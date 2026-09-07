@@ -136,7 +136,19 @@ export const apiClient = {
           durationMs: Date.now() - startTime,
         },
       };
-    } catch {
+    } catch (err: unknown) {
+      const errorObj = err as { message?: string; status?: number; code?: string };
+      const isTimeout =
+        Boolean(
+          errorObj?.message?.toLowerCase().includes('timeout') ||
+          errorObj?.message?.toLowerCase().includes('timed out') ||
+          errorObj?.status === 504 ||
+          errorObj?.code === 'SIMULATION_TIMEOUT'
+        );
+      if (isTimeout) {
+        throw err;
+      }
+
       // Offline / DEMO_LOCAL fallback path
       const fallbackRun: SimulationRun = {
         ...DEMO_SIMULATION_RUN,
