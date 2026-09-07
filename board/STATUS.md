@@ -15,7 +15,7 @@
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1 + UX-2 + UX-3 + UX-4 + UX-5 | UX-5 merged to main | UX-6 |
 | simulation-api | plan + Uday mission + SIM-1..SIM-8 | SIM-8 merged to main | — |
-| ai-pedagogy | plan + Rajeswari mission | mission acceptance | AI-1 immediately |
+| ai-pedagogy | plan + Rajeswari mission + AI-1 + AI-2 | PR review (AI-2) | AI-3 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 07 Sep 17:00 Rajeswari: AI-2 green — POST /v1/flight-recorder/diagnose implemented; persisted MisconceptionSignal via repository protocol; contract error codes (404, 409, 422) and deterministic two-step replay headlines verified; 18/18 unit tests passed (45/45 AI suite passed), PR ready for Warden review.
 - 05 Sep 20:32 Rajeswari: AI-1 green — deterministic misconception rules (SUPERPOSITION_VS_ENTANGLEMENT, MEASUREMENT_DETERMINISM, GATE_ORDER, NO_SIGNAL) and pure diagnosis functions created in apps/api/app/services/diagnosis/rules.py; evidence-key registry sealed; no LLM calls; 27/27 unit tests passed, PR ready for Warden review.
 - 04 Sep 17:20 Rani: DATA-8 green — schema_freeze.py manifest (SCHEMA_VERSION=1, 11 collections, 26 indexes, 12 entity field snapshots) and test_schema_freeze.py created; edge states (long name, empty cohort 404, failed attempt shape, learner 404) verified; synthetic dataDisclosure enforced; reset/pre-warm runbook added to DEPLOY-RUNBOOK.md; 16/16 unit tests passed (60/60 data suite passed), PR ready for Warden review.
 - 05 Sep 19:42 Patch: DATA-7 merged to main (PR #19) — 10-second TTL cache for instructor insights, empty cohort 404 response, liveDemoLearner marker, and thread-safe concurrent challenge attempt locking verified; 4/4 test_instructor_analytics passed, 44/44 data suite passed, full 161/161 API suite passed, 30/30 web suite passed.

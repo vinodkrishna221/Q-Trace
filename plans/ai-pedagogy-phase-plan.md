@@ -70,7 +70,7 @@ DELIVERABLE: Implement diagnosis service/router, persisted Misconception Signal 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_flight_recorder_route.py` posts the Bell fixture and returns firstDivergenceStep=1 plus the repair challenge ID.
 DEPENDS: AI-1          UNBLOCKS: AI-3
 DEMO: The UI can reveal exactly where Aarav’s understanding diverged.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 
 ### AI-3 · Ship the evidence-bound Tutor fallback                        [timebox: 2h]
 CONTEXT: Diagnosis and seeded Challenge exist. Load AI pack and Tutor contract. P0 must work with no provider key.
