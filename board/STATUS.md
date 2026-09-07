@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 07 Sep 2026 20:13 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 07 Sep 2026 20:17 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -13,7 +13,7 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 done | — (Track complete) |
+| learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 merged to main | — (Track complete) |
 | simulation-api | plan + Uday mission + SIM-1..SIM-8 | SIM-8 merged to main | — |
 | ai-pedagogy | plan + Rajeswari mission + AI-1 + AI-2 | AI-1 & AI-2 merged to main | AI-3 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 07 Sep 20:17 Patch: UX-9 merged to main (PR #30) — Complete keyboard-only navigation & focus-visible rings, color-independent gate/wire labels, 1366x768 projector readability with accessible table fallbacks, and prefers-reduced-motion verified; 4/4 acceptance tests passed, 57/57 full web test suite passed. learning-ux track complete.
 - 27 Aug 19:30 Venu: UX-9 green — Accessibility and projector readability polished across all scripted routes: keyboard-only navigation & focus-visible rings for circuit workspace/palette/radios/scrubber, color-independent textual and symbolic gate/wire labels (●/CX/H/X/Y/Z/M), projector-safe text sizes/contrast (12px bold SVG text, high-contrast tables with accessible headers), and prefers-reduced-motion CSS rules; 4/4 acceptance tests passed (57/57 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 07 Sep 20:12 Patch: UX-8 merged to main (PR #29) — OpenQASM 3.0 export and download, byte-for-byte Circuit Model JSON serialization/reimport with deterministic column normalization, safe validation/rejection for unsupported gates and bounds, and CircuitSharePanel with LOCAL ARTIFACT SHARING disclosure banner verified; 13/13 circuit-share unit tests passed, 53/53 web test suite passed.
 - 27 Aug 17:30 Venu: UX-8 green — OpenQASM 3.0 download and generation, byte-for-byte equivalent Circuit Model JSON export/reimport with deterministic column normalization, safe validation/rejection for unsupported gates and bounds, and CircuitSharePanel with explicit LOCAL ARTIFACT SHARING disclosure banner established; 13/13 circuit-share unit tests passed (53/53 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
