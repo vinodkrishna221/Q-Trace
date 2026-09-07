@@ -6,10 +6,11 @@ import { useCircuitStore } from '@/lib/circuit-store';
 import { GatePalette } from './gate-palette';
 import { QubitWiresGrid } from './qubit-wire';
 import { QiskitCodeEditor } from './qiskit-code-editor';
+import { CircuitSharePanel } from './circuit-share-panel';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Cpu, Play, CheckCircle2, RefreshCw, Zap, SlidersHorizontal } from 'lucide-react';
+import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2 } from 'lucide-react';
 
 interface InteractiveCircuitWorkspaceProps {
   initialCircuit?: CircuitModel;
@@ -27,6 +28,7 @@ export function InteractiveCircuitWorkspace({
   readOnly = false,
 }: InteractiveCircuitWorkspaceProps) {
   const { circuit, setCircuit } = useCircuitStore();
+  const [showSharePanel, setShowSharePanel] = React.useState(false);
 
   // Initialize store with initialCircuit if provided on mount
   React.useEffect(() => {
@@ -62,6 +64,17 @@ export function InteractiveCircuitWorkspace({
               <Badge variant="outline" className="text-[10px] font-mono text-ink-dim">
                 v{circuit.modelVersion}
               </Badge>
+              <Button
+                variant={showSharePanel ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowSharePanel(!showSharePanel)}
+                className="h-7 px-2.5 text-xs font-medium ml-1"
+                data-testid="open-share-panel-btn"
+                aria-expanded={showSharePanel}
+              >
+                <Share2 className="w-3.5 h-3.5 mr-1" />
+                <span>Share &amp; Export</span>
+              </Button>
             </div>
           </div>
           <CardTitle className="text-base text-ink flex items-center gap-2 mt-1">
@@ -115,6 +128,14 @@ export function InteractiveCircuitWorkspace({
           </Button>
         </CardFooter>
       </Card>
+
+      {/* Share & Export Panel */}
+      {showSharePanel && (
+        <CircuitSharePanel
+          onClose={() => setShowSharePanel(false)}
+          onImportSuccess={() => setShowSharePanel(false)}
+        />
+      )}
 
       {/* Synchronized Qiskit Code Panel & Editor */}
       <QiskitCodeEditor isReadOnly={readOnly} />

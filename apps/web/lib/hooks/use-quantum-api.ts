@@ -16,6 +16,8 @@ import {
   ModuleDetail,
   LearningPath,
   DemoProfilesResponse,
+  ExportOpenQasm3Request,
+  ExportOpenQasm3Response,
 } from '@/lib/contracts';
 
 export const QUERY_KEYS = {
@@ -134,3 +136,13 @@ export function useDemoProfilesQuery() {
     queryFn: () => apiClient.getDemoProfiles(),
   });
 }
+
+/**
+ * Mutation to export OpenQASM 3.0 (POST /v1/circuits/export-openqasm3)
+ */
+export function useExportOpenQasm3Mutation() {
+  return useMutation<ApiResponseWithMeta<ExportOpenQasm3Response>, Error, ExportOpenQasm3Request>({
+    mutationFn: (payload: ExportOpenQasm3Request) => apiClient.exportOpenQasm3(payload),
+  });
+}
+

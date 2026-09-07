@@ -118,7 +118,7 @@ DELIVERABLE: Add OpenQASM download, Circuit Model JSON copy/import for the suppo
 TEST: `pnpm --dir apps/web test -- circuit-share` exports the Bell model, reimports it and obtains a byte-for-byte equivalent normalized Circuit Model.
 DEPENDS: UX-5,SIM-5          UNBLOCKS: —
 DEMO: Judges see credible modular/collaborative learning without a fake multiplayer claim.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/learning-ux/ux-8-add-supported-circuit-sharing-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
