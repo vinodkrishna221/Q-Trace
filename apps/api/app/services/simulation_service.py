@@ -125,6 +125,7 @@ def build_simulation_run(
     elif request.runConformance and not _pennylane_enabled():
         # SIM-8: ENABLE_PENNYLANE=0 — surface a clear skip reason so UI/demo
         # can display the correct message instead of a generic stub.
+        # SIM-9: "PENNYLANE_DISABLED" → cleaner UI code
         conformance = ConformanceResult(
             adapter="PENNYLANE",
             maxProbabilityDelta=0.0,
@@ -134,12 +135,13 @@ def build_simulation_run(
         )
     else:
         # runConformance=False → skip; existing route tests use this path.
+        # SIM-9: "PENNYLANE_NOT_REQUESTED" is clearer for the UI than NOT_ENABLED
         conformance = ConformanceResult(
             adapter="PENNYLANE",
             maxProbabilityDelta=0.0,
             epsilon=1e-6,
             passed=False,
-            skippedReason="PENNYLANE_NOT_ENABLED",
+            skippedReason="PENNYLANE_NOT_REQUESTED",
         )
 
     return SimulationRunOut(

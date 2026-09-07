@@ -125,9 +125,15 @@ async def create_simulation_run(
             status_code=504,
             detail={
                 "code": "SIMULATION_TIMEOUT",
-                "message": "Simulation exceeded the 1500ms budget.",
+                "message": (
+                    "Simulation exceeded the 1 500 ms budget. "
+                    "Try a shorter circuit (≤ 5 qubits, ≤ 20 gates)."
+                ),
                 "requestId": request_id,
-                "details": {"timeoutMs": int(_TIMEOUT_S * 1000)},
+                "details": {
+                    "timeoutMs": int(_TIMEOUT_S * 1000),
+                    "hint": "Reduce circuit depth or qubit count and retry.",
+                },
             },
         )
 

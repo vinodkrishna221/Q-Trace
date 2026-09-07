@@ -128,7 +128,7 @@ DELIVERABLE: Profile the Bell path, remove avoidable setup work, pre-initialize 
 TEST: `bash scripts/smoke.sh --mode local --repeat 5` completes every run within budget and returns identical ideal probabilities.
 DEPENDS: SIM-8,QA-7          UNBLOCKS: —
 DEMO: The quantum execution beat feels instant and its failures remain explainable.
-PERSONA: Forge           STATUS: [ ] todo
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/simulation-api/sim-9-tune-the-supported-runtime-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

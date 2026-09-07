@@ -11,9 +11,11 @@ SIM-1 additions over the SHIP-1 skeleton:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +24,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.models.errors import ErrorDetail, ErrorEnvelope
 from app.routers import circuits, simulation_runs
+from app.services.quantum.adapter import prewarm_adapters
 
 logger = logging.getLogger("qtrace.api")
 logging.basicConfig(level=logging.INFO)
@@ -30,10 +33,25 @@ logging.basicConfig(level=logging.INFO)
 # Application
 # ---------------------------------------------------------------------------
 
+
+@asynccontextmanager
+async def _lifespan(application: FastAPI):  # noqa: ARG001
+    """Startup: pre-warm Qiskit Aer adapters (SIM-9).
+
+    Runs in the process before the first request is served.
+    Guarded inside prewarm_adapters() by ENABLE_QISKIT env flag.
+    """
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, prewarm_adapters)
+    yield
+    # shutdown: nothing to clean up for stateless adapters
+
+
 app = FastAPI(
     title="Q-Trace API",
     description="Backend API for Q-Trace quantum learning platform",
     version="0.1.0",
+    lifespan=_lifespan,
 )
 
 # ---------------------------------------------------------------------------

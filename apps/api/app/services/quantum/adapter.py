@@ -1,4 +1,4 @@
-"""Qiskit Aer adapter — SIM-3.
+"""Qiskit Aer adapter — SIM-3 / SIM-9.
 
 Converts a validated CircuitModel into a State Trace + measurement results
 using Qiskit Aer statevector simulation.
@@ -13,7 +13,15 @@ Key rules from quantum-runtime.md:
   - Purity < 1 must carry MIXED_SUBSYSTEM label.
   - JSON complex: {re, im}.
 
-This module imports Qiskit only inside the function — the import happens AFTER
+SIM-9 performance tuning:
+  - AerSimulator instances are cached at module level (created once per process).
+    Per-call construction triggered JIT compilation on every invocation; caching
+    drops warm-path latency by eliminating that overhead.
+  - prewarm_adapters() is called from main.py startup so the first real request
+    hits the warm path immediately.  Guarded by ENABLE_QISKIT so disabled
+    deployments pay zero cost.
+
+This module still imports Qiskit inside functions — the import happens AFTER
 CircuitModel validation (per quantum-runtime.md: "Reject outside the subset
 before importing a quantum SDK").
 """
@@ -30,6 +38,47 @@ from app.services.quantum.normalizer import (
     build_normalized_probability_map,
     normalize_counts,
 )
+
+# ---------------------------------------------------------------------------
+# SIM-9: Module-level cached simulators (created once per process, not per call)
+# ---------------------------------------------------------------------------
+# AerSimulator construction per-call triggered JIT compilation each time.
+# Caching at module level eliminates that cost on warm paths.
+# Both are None until prewarm_adapters() is called (or first use in run_qiskit_aer).
+# ENABLE_QISKIT guard: if the flag is off, prewarm_adapters() is a no-op.
+
+import logging as _logging
+import os as _os
+
+_adapter_logger = _logging.getLogger("qtrace.adapter")
+_sv_simulator = None   # AerSimulator(method="statevector") — reused across calls
+_meas_simulator = None  # AerSimulator() — reused across calls
+
+
+def prewarm_adapters() -> None:
+    """Pre-initialize Qiskit Aer simulators so the first real request hits
+    the warm path without JIT/setup overhead.
+
+    Called from main.py on startup (SIM-9). Skipped when ENABLE_QISKIT=0.
+    Thread-safe for single-worker deployments (Railway free tier uses 1 worker).
+    """
+    global _sv_simulator, _meas_simulator  # noqa: PLW0603
+    if _os.getenv("ENABLE_QISKIT", "1") == "0":
+        _adapter_logger.info("adapter.prewarm_skip reason=ENABLE_QISKIT=0")
+        return
+    if _sv_simulator is not None:
+        _adapter_logger.info("adapter.prewarm_skip reason=already_warm")
+        return
+
+    import time as _time  # noqa: PLC0415
+    from qiskit_aer import AerSimulator as _AerSimulator  # noqa: PLC0415
+
+    t0 = _time.monotonic()
+    _sv_simulator = _AerSimulator(method="statevector")
+    _meas_simulator = _AerSimulator()
+    elapsed_ms = int((_time.monotonic() - t0) * 1000)
+    _adapter_logger.info("adapter.prewarm_ok elapsedMs=%d", elapsed_ms)
+
 
 # ---------------------------------------------------------------------------
 # Output data classes (no Pydantic here — plain Python, fast to instantiate)
@@ -207,7 +256,8 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
     qr = QuantumRegister(n_qubits, "q")
     qc_trace = QuantumCircuit(qr)
 
-    sv_simulator = AerSimulator(method="statevector")
+    # SIM-9: reuse cached simulator instance; create one only if cache is cold
+    sv_simulator = _sv_simulator if _sv_simulator is not None else AerSimulator(method="statevector")
 
     for op in non_measure_ops:
         gate = op.gate
@@ -299,7 +349,8 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
             for t, c in zip(op.targets, op.classicalTargets):
                 qc_measure.measure(t, c)
 
-        meas_simulator = AerSimulator()
+        # SIM-9: reuse cached meas simulator; create one only if cache is cold
+        meas_simulator = _meas_simulator if _meas_simulator is not None else AerSimulator()
         job_meas = meas_simulator.run(qc_measure, shots=shots)
         raw_counts = job_meas.result().get_counts(qc_measure)
         counts = normalize_counts(dict(raw_counts), n_classical)
