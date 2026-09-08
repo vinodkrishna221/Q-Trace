@@ -29,6 +29,7 @@ from app.routers.flight_recorder import router as flight_recorder_router
 from app.routers.instructor import router as instructor_router
 from app.routers.learning import router as learning_router
 from app.routers.progress import router as progress_router
+from app.routers.tutor import router as tutor_router
 from app.services.quantum.adapter import prewarm_adapters
 
 logger = logging.getLogger("qtrace.api")
@@ -110,16 +111,18 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     else:
         code = "HTTP_ERROR"
         message = str(exc.detail)
+        if isinstance(exc.detail, str) and ": " in exc.detail:
+            candidate_code, _, candidate_msg = exc.detail.partition(": ")
+            if candidate_code.isupper() and " " not in candidate_code:
+                code = candidate_code
+                message = candidate_msg
         details = None
         rid = request_id
     envelope = ErrorEnvelope(
         error=ErrorDetail(code=code, message=message, requestId=rid, details=details)
     )
     content = envelope.model_dump()
-    if isinstance(exc.detail, dict):
-        content["detail"] = exc.detail
-    else:
-        content["detail"] = {"code": code, "message": message, "details": details}
+    content["detail"] = exc.detail
     return JSONResponse(status_code=exc.status_code, content=content)
 
 
@@ -147,6 +150,7 @@ app.include_router(flight_recorder_router)
 app.include_router(learning_router, prefix="/v1")
 app.include_router(progress_router, prefix="/v1")
 app.include_router(instructor_router, prefix="/v1")
+app.include_router(tutor_router, prefix="/v1")
 
 # ---------------------------------------------------------------------------
 # Core endpoints

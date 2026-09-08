@@ -78,7 +78,7 @@ DELIVERABLE: Implement curated Bell explanation, evidence-key validator, fallbac
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_tutor_fallback.py` validates both numerical evidence keys and rejects a fabricated probability claim.
 DEPENDS: AI-2,DATA-2          UNBLOCKS: UX-4,AI-4,QA-3
 DEMO: Aarav receives an immediate grounded explanation and repair task offline.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 
