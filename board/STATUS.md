@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1..QA-3 | QA-3 merged to main | QA-4 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-4 | QA-4 merged to main | QA-5 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 08 Sep 16:16 Patch: QA-4 merged to main (PR #41) — 36 cross-track quantum acceptance and parser security tests verified; Qiskit/PennyLane tolerance within 1e-6, basis endianness with reversed-mapper detection, MEASURE-exclusion from stateTrace, post-CNOT subsystem purity, and malicious AST allowlist corpus confirmed; 36/36 targeted suite and 536/536 full API suite green. Unblocks SHIP-6.
 
 - 08 Sep 15:55 Patch: QA-3 merged to main (PR #40) — walking-skeleton runner implemented in scripts/smoke.sh and clean SimulationRun repository bridge with predictionResponse persistence (ADR-11); 6/6 HTTP learner loop endpoints verified (SUCCEEDED Bell simulation, divergence diagnosis, DEMO_FALLBACK tutor, repair challenge, 100-pt progress record, instructor insight); 173/173 simulation tests green, smoke.sh exits 0. Unblocks DATA-6, SHIP-4.
 
