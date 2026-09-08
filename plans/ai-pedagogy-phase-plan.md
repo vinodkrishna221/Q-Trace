@@ -88,7 +88,7 @@ DELIVERABLE: Add rules/tests for measurement determinism and gate order, learner
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_taxonomy_matrix.py` covers every prediction option, code and learner role with no unhandled branch.
 DEPENDS: AI-3,SIM-4          UNBLOCKS: AI-5,AI-7,DATA-7,QA-5
 DEMO: The Flight Recorder remains useful beyond a single hard-coded sentence.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 
 ### AI-5 · Add the optional structured Tutor provider                        [timebox: 3h]
 CONTEXT: AI-4 makes deterministic fallback and taxonomy complete. Load `ai-llm.md`, `flight-recorder-tutor.md`, evidence-key fixtures and environment flag names; provider credentials/model are environment-selected and never assumed.

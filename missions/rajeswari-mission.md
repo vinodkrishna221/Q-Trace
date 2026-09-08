@@ -77,7 +77,7 @@ DELIVERABLE: Add rules/tests for measurement determinism and gate order, learner
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_taxonomy_matrix.py` covers every prediction option, code and learner role with no unhandled branch.
 DEPENDS: AI-3,SIM-4          UNBLOCKS: AI-5,AI-7,DATA-7,QA-5
 DEMO: The Flight Recorder remains useful beyond a single hard-coded sentence.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/ai-pedagogy/ai-4-complete-the-misconception-taxonomy-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
