@@ -34,7 +34,7 @@ import asyncio
 import logging
 import os
 import time
-from typing import Optional, Protocol, runtime_checkable
+from typing import Any, Optional, Protocol, runtime_checkable
 
 from app.models.simulation import SimulationRunOut
 
@@ -51,7 +51,12 @@ _TTL_SECONDS: float = 60.0
 class SimulationRunRepositoryProtocol(Protocol):
     """Minimal persistence interface for Simulation Runs."""
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         """Persist a simulation run (immutable snapshot)."""
         ...
 
@@ -88,10 +93,52 @@ class InMemorySimRunRepo:
         self._store: dict[str, SimulationRunOut] = {}
         self._idempotency: dict[str, tuple[SimulationRunOut, float]] = {}
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         self._store[run.id] = run
         if request_id:
             self._idempotency[request_id] = (run, time.monotonic())
+
+        # Bridge to shared DataRepositoryProtocol so downstream diagnosis & progress find it
+        try:
+            from app.models.entities import SimulationRun as SimRunEntity
+            from app.repositories import get_repository
+
+            payload = SimRunEntity(
+                id=run.id,
+                learnerProfileId=run.learnerProfileId,
+                moduleId=run.moduleId,
+                circuitModelId=run.circuitModelId,
+                predictionResponse=prediction_response,
+                adapter=run.adapter,
+                shots=run.shots,
+                status=run.status,
+                probabilities=run.probabilities,
+                counts=run.counts,
+                stateTrace=[s.model_dump() for s in run.stateTrace],
+                conformance=run.conformance.model_dump() if run.conformance else None,
+                durationMs=run.durationMs,
+                createdAt=run.createdAt,
+            )
+            data_repo = get_repository()
+            if hasattr(data_repo, "_simulation_runs"):
+                data_repo._simulation_runs[payload.id] = payload
+            else:
+                try:
+                    loop = asyncio.get_running_loop()
+                    loop.create_task(data_repo.create_simulation_run(payload))
+                except RuntimeError:
+                    new_loop = asyncio.new_event_loop()
+                    try:
+                        new_loop.run_until_complete(data_repo.create_simulation_run(payload))
+                    finally:
+                        new_loop.close()
+        except Exception as exc:
+            logger.debug("Could not mirror simulation run to data repo: %s", exc)
 
     def get(self, run_id: str) -> Optional[SimulationRunOut]:
         return self._store.get(run_id)
@@ -157,7 +204,12 @@ class MongoSimRunRepo:
         finally:
             new_loop.close()
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         """Persist a SimulationRun via the DATA-6 repository protocol.
 
         When app.models.entities is available (DATA-6 merged), converts to
@@ -174,6 +226,7 @@ class MongoSimRunRepo:
                     learnerProfileId=run.learnerProfileId,
                     moduleId=run.moduleId,
                     circuitModelId=run.circuitModelId,
+                    predictionResponse=prediction_response,
                     adapter=run.adapter,
                     shots=run.shots,
                     status=run.status,
