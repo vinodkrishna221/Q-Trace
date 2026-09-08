@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 export default function Loading() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto" data-testid="learn-loading-skeleton">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line pb-5">
         <div className="space-y-2">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-8 w-72" />
@@ -15,7 +15,7 @@ export default function Loading() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-zinc-800">
+          <Card className="border-line">
             <CardHeader>
               <Skeleton className="h-5 w-40" />
             </CardHeader>
@@ -26,7 +26,7 @@ export default function Loading() {
             </CardContent>
           </Card>
 
-          <Card className="border-zinc-800">
+          <Card className="border-line">
             <CardHeader>
               <Skeleton className="h-5 w-56" />
               <Skeleton className="h-4 w-72" />
@@ -40,7 +40,7 @@ export default function Loading() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-zinc-800">
+          <Card className="border-line">
             <CardHeader>
               <Skeleton className="h-5 w-36" />
             </CardHeader>

@@ -70,7 +70,7 @@ DELIVERABLE: Implement the Bell Module page with concept blocks, prior-knowledge
 TEST: `pnpm --dir apps/web test -- bell-prediction` selects `INDEPENDENT_RANDOM`, reloads the route and shows the saved choice before Run is enabled.
 DEPENDS: UX-1          UNBLOCKS: UX-3
 DEMO: Aarav makes the wrong prediction judges will watch the Flight Recorder repair.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-3 · Build the mocked learner evidence loop                        [timebox: 2h]
 CONTEXT: UX-2 captures the Prediction Checkpoint. Load `quantum-ui.md` and fixture responses for Simulation Run, Flight Recorder, Tutor, Repair Challenge and Progress. This is a contract-shaped UI slice, not live integration.
@@ -78,7 +78,7 @@ DELIVERABLE: Add a read-only two-wire Circuit Workspace, generated Qiskit panel,
 TEST: `pnpm --dir apps/web test -- mocked-bell-loop` walks every state and verifies basis labels `00`/`11`, `MIXED_SUBSYSTEM`, evidence keys and repair success.
 DEPENDS: UX-2          UNBLOCKS: UX-4
 DEMO: The full 90-second learner story can be rehearsed before backend merge.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-4 · Swap the Bell journey to live contracts                        [timebox: 2h]
 CONTEXT: The mocked loop is green and P0 domain endpoints exist. Load all four contracts and keep fixtures behind `DEMO_LOCAL` fallback. Do not redesign screens or alter response shapes.
@@ -86,7 +86,7 @@ DELIVERABLE: Replace P0 fixture calls with TanStack Query mutations/queries for 
 TEST: `pnpm --dir apps/web test:e2e -- bell-live` against the local API completes prediction → run → diagnosis → repair → progress and exposes the request ID.
 DEPENDS: UX-3,SIM-4,AI-3,DATA-3          UNBLOCKS: UX-5,UX-6,QA-3,SHIP-5
 DEMO: Aarav completes the real HTTP walking skeleton; this unblocks the global smoke test.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 
@@ -96,7 +96,7 @@ DELIVERABLE: Implement ordered dnd-kit qubit wires with H/X/Y/Z/CNOT/Measure pla
 TEST: `pnpm --dir apps/web test -- circuit-workspace` places H+CNOT, serializes stable columns, round-trips the supported code edit and rejects an unsupported RX without mutating the model.
 DEPENDS: UX-4          UNBLOCKS: UX-8,QA-5
 DEMO: Judges build the Bell circuit visually and see synchronized Qiskit code.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-6 · Complete learning paths and visual evidence                        [timebox: 3h]
 CONTEXT: P0 proves one Bell route. Load `learning-content.md`, `circuit-simulation.md` and visualization law. The three-Module catalogue may use concise seeded content, but Bell remains the complete path.
@@ -104,7 +104,7 @@ DELIVERABLE: Render the three-Module catalogue, Aarav/Meera entry differences, P
 TEST: `pnpm --dir apps/web test:e2e -- learning-visuals` shows all three Modules, different entry badges, a mixed reduced-state label and functional static fallback with Plotly disabled.
 DEPENDS: UX-4,DATA-5,SIM-6          UNBLOCKS: UX-7
 DEMO: The prototype visibly covers structured learning and scientifically honest visualization.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 
@@ -114,7 +114,7 @@ DELIVERABLE: Add live Progress Record, three-card/one-chart Instructor Insight, 
 TEST: `pnpm --dir apps/web test:e2e -- resilient-journey` completes with cloud Tutor off and then renders a simulation-timeout recovery without blank UI.
 DEPENDS: UX-6,DATA-7,AI-6          UNBLOCKS: UX-9,QA-6
 DEMO: The demo survives failures and closes with Dr. Rao seeing the same learner event.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ### UX-8 · Add supported circuit sharing and export                        [timebox: 2h]
 CONTEXT: The Circuit Model and OpenQASM export endpoint are stable. Load `circuit-simulation.md`; collaboration scope is artifact sharing, not realtime editing.
@@ -122,7 +122,7 @@ DELIVERABLE: Add OpenQASM download, Circuit Model JSON copy/import for the suppo
 TEST: `pnpm --dir apps/web test -- circuit-share` exports the Bell model, reimports it and obtains a byte-for-byte equivalent normalized Circuit Model.
 DEPENDS: UX-5,SIM-5          UNBLOCKS: —
 DEMO: Judges see credible modular/collaborative learning without a fake multiplayer claim.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
 
 ## P3 · Polish — due 28 Aug 2026 09:00 IST (pre-cut-listed)
 
@@ -132,4 +132,4 @@ DELIVERABLE: Fix keyboard order, focus states, color-independent gate labels, 13
 TEST: `pnpm --dir apps/web test:e2e -- accessibility-projector` passes keyboard-only Bell construction and captures all scripted screens at 1366×768 with no clipped primary evidence.
 DEPENDS: UX-7,QA-6          UNBLOCKS: —
 DEMO: The learner demo remains readable and operable on the judging projector.
-PERSONA: Nova           STATUS: [ ] todo
+PERSONA: Nova           STATUS: [x] done
