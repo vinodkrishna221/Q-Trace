@@ -62,7 +62,7 @@ DELIVERABLE: Create golden Bell, asymmetric bit-order, invalid gate, wrong predi
 TEST: `python3 scripts/validate_fixtures.py` parses every JSON file, checks IDs/basis order/probability sums and reports zero drift from contract examples.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-6,QA-2,QA-4
 DEMO: Provides one trusted story every track can build against without waiting.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 
 ### QA-2 · Enforce contract shapes at both boundaries                        [timebox: 2h]
 CONTEXT: Golden payloads exist. Load API-contract skill; generate validators from one source per language rather than hand-copying expected shapes.
