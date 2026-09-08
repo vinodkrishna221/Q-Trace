@@ -31,6 +31,7 @@ Idempotency cache (contract NOTES: "request ID provides idempotency for 60s"):
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import logging
 import os
 import time
@@ -93,6 +94,22 @@ class InMemorySimRunRepo:
         self._store: dict[str, SimulationRunOut] = {}
         self._idempotency: dict[str, tuple[SimulationRunOut, float]] = {}
 
+    def _run_async(self, coro) -> object:
+        """Run an async coroutine synchronously from a sync call site."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(asyncio.run, coro).result()
+        new_loop = asyncio.new_event_loop()
+        try:
+            return new_loop.run_until_complete(coro)
+        finally:
+            new_loop.close()
+
     def save(
         self,
         run: SimulationRunOut,
@@ -125,18 +142,7 @@ class InMemorySimRunRepo:
                 createdAt=run.createdAt,
             )
             data_repo = get_repository()
-            if hasattr(data_repo, "_simulation_runs"):
-                data_repo._simulation_runs[payload.id] = payload
-            else:
-                try:
-                    loop = asyncio.get_running_loop()
-                    loop.create_task(data_repo.create_simulation_run(payload))
-                except RuntimeError:
-                    new_loop = asyncio.new_event_loop()
-                    try:
-                        new_loop.run_until_complete(data_repo.create_simulation_run(payload))
-                    finally:
-                        new_loop.close()
+            self._run_async(data_repo.create_simulation_run(payload))
         except Exception as exc:
             logger.debug("Could not mirror simulation run to data repo: %s", exc)
 
@@ -198,6 +204,14 @@ class MongoSimRunRepo:
 
     def _run_async(self, coro) -> object:  # type: ignore[return]
         """Run an async coroutine synchronously from a sync call site."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(asyncio.run, coro).result()
         new_loop = asyncio.new_event_loop()
         try:
             return new_loop.run_until_complete(coro)
@@ -233,7 +247,7 @@ class MongoSimRunRepo:
                     probabilities=run.probabilities,
                     counts=run.counts,
                     stateTrace=[s.model_dump() for s in run.stateTrace],
-                    conformance=run.conformance.model_dump(),
+                    conformance=run.conformance.model_dump() if run.conformance else None,
                     durationMs=run.durationMs,
                     createdAt=run.createdAt,
                 )

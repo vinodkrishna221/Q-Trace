@@ -268,3 +268,28 @@ def test_post_idempotency_with_same_request_id(client):
         f"Idempotency failed: first POST got '{run_id_1}', "
         f"second POST (same X-Request-ID) got '{run_id_2}'"
     )
+
+
+# ---------------------------------------------------------------------------
+# 11. Shared data repository: POST with predictionResponse stores in DataRepository
+# ---------------------------------------------------------------------------
+
+def test_post_stores_in_shared_data_repo_with_prediction_response(posted_run):
+    """POST /v1/simulation-runs with predictionResponse must persist the entity
+
+    in the shared DataRepositoryProtocol singleton for downstream diagnosis.
+    """
+    import asyncio
+    from app.repositories import get_repository
+
+    run_id = posted_run.json()["simulationRun"]["id"]
+    data_repo = get_repository()
+    stored = asyncio.run(data_repo.get_simulation_run(run_id))
+    assert stored is not None, f"Expected run '{run_id}' in shared data repository"
+    assert stored.id == run_id
+    assert stored.learnerProfileId == "lp_aarav"
+    assert stored.moduleId == "mod_bell"
+    assert stored.predictionResponse == {
+        "checkpointId": "pc_bell_outcomes",
+        "answer": "INDEPENDENT_RANDOM",
+    }

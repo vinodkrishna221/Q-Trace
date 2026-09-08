@@ -10,7 +10,7 @@ This shim is retained so existing tests remain green; do not add new callers.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from app.models.simulation import SimulationRunOut
 from app.repositories.sim_run_repository import InMemorySimRunRepo
@@ -19,9 +19,13 @@ from app.repositories.sim_run_repository import InMemorySimRunRepo
 from app.repositories.sim_run_repository import _memory_repo as _repo
 
 
-def save(run: SimulationRunOut, request_id: str | None = None) -> None:
+def save(
+    run: SimulationRunOut,
+    request_id: str | None = None,
+    prediction_response: Optional[dict[str, Any]] = None,
+) -> None:
     """Persist a simulation run by its ID (immutable snapshot)."""
-    _repo.save(run, request_id=request_id)
+    _repo.save(run, request_id=request_id, prediction_response=prediction_response)
 
 
 def get(run_id: str) -> Optional[SimulationRunOut]:
