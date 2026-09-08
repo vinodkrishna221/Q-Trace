@@ -124,4 +124,4 @@ DELIVERABLE: Tighten prompts/fallback copy so hints precede answers, add safety 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_pedagogy_release.py` scans responses/log fixtures for uncited numbers, answer leakage and persisted learner questions.
 DEPENDS: AI-6,QA-7          UNBLOCKS: —
 DEMO: Judges hear a defensible “AI guides reasoning; it does not do the exercise” answer.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done

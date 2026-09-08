@@ -27,6 +27,12 @@ from app.services.tutor.parity import (
     extract_cited_step_indexes,
     verify_cloud_fallback_parity,
 )
+from app.services.tutor.pedagogy_qa import (
+    JUDGE_TECHNICAL_ANSWERS,
+    JudgeTechnicalAnswer,
+    get_all_judge_answers,
+    get_judge_answer,
+)
 from app.services.tutor.recommendation import (
     KNOWN_MODULE_IDS,
     ModuleRecommendation,
@@ -63,6 +69,8 @@ __all__ = [
     "EvidenceKeyValidationError",
     "FabricatedClaimError",
     "FakeTutorProvider",
+    "JUDGE_TECHNICAL_ANSWERS",
+    "JudgeTechnicalAnswer",
     "KNOWN_MODULE_IDS",
     "ModuleRecommendation",
     "ModuleRecommendationResponse",
@@ -86,7 +94,9 @@ __all__ = [
     "extract_available_evidence_keys",
     "extract_claimed_value",
     "extract_cited_step_indexes",
+    "get_all_judge_answers",
     "get_curated_bell_explanation",
+    "get_judge_answer",
     "get_tutor_provider",
     "is_recommendation_feature_enabled",
     "recommend_next_module",

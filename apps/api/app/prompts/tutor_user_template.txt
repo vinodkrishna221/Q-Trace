@@ -17,4 +17,7 @@ Verified Simulation StateTrace:
 Available Valid Evidence Keys:
 {available_evidence_keys}
 
-Please generate an evidence-bound explanation as a structured JSON object according to your system prompt instructions. Cite only available valid evidence keys.
+Please generate an evidence-bound explanation as a structured JSON object according to your system prompt instructions.
+- Provide progressive Socratic hints explaining the divergence mechanism.
+- DO NOT provide the circuit solution code for {repair_challenge_id}.
+- Cite only available valid evidence keys and include the standard safety note.
