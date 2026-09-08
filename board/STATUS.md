@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 08 Sep 2026 11:17 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 08 Sep 2026 11:30 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -15,7 +15,7 @@
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 merged to main | — (Track complete) |
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
-| ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | PR review (AI-8) | — (Track complete) |
+| ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 08 Sep 11:30 Patch: AI-8 merged to main (PR #37) — Socratic anti-copy guidance, safety notes, 8 prepared <=20s judge explanations (pedagogy_qa.py), zero learner free-text persistence guarantees, and release test suite verified; 9/9 release tests passed, 232/232 AI unit suite passed, 464/464 full API suite passed. ai-pedagogy track complete.
 - 08 Sep 11:15 Rajeswari: AI-8 green — polished anti-copy guidance and Socratic prompt constraints, eight <=20-second judge technical explanations, zero learner free-text persistence guarantees, and release test suite implemented in apps/api/app/prompts/, apps/api/app/services/tutor/pedagogy_qa.py, and apps/api/tests/unit/ai/test_pedagogy_release.py; 9/9 release tests passed (214/214 ai suite passed, 274/274 full unit passed), PR ready for Warden review.
 
 - 08 Sep 11:17 Patch: AI-6 merged to main (PR #35) — Proven cloud and fallback parity across all misconception scenarios, runtime execution mode badges (CLOUD_VERIFIED, FALLBACK_CURATED, FALLBACK_TIMEOUT, FALLBACK_RATE_LIMIT, FALLBACK_MALFORMED, FALLBACK_EVIDENCE_MISMATCH, FALLBACK_ERROR), redacted [llm] telemetry with secret scrubbing, and 7-scenario resilience drill runner verified; 8/8 card tests passed, 140/140 AI suite passed, 372/372 full API suite passed.
