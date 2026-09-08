@@ -1,0 +1,20 @@
+Learner Context:
+- Profile ID: {learner_profile_id}
+- Module ID: {module_id}
+- Intent: {intent}
+- Learner Question: {learner_question}
+
+Diagnostic Misconception:
+- Code: {misconception_code}
+- First Divergence Step: {first_divergence_step}
+- Learner Prediction: {prediction}
+- Verified Simulator Behavior: {verified_behavior}
+- Recommended Repair Challenge: {repair_challenge_id}
+
+Verified Simulation StateTrace:
+{state_trace_json}
+
+Available Valid Evidence Keys:
+{available_evidence_keys}
+
+Please generate an evidence-bound explanation as a structured JSON object according to your system prompt instructions. Cite only available valid evidence keys.
