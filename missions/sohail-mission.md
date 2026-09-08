@@ -1,7 +1,7 @@
-# Mission — Akshaya · Contract fixtures, end-to-end proof and release confidence
+# Mission — Sohail · Contract fixtures, end-to-end proof and release confidence
 
 > Context capsule: this file + the repo = everything needed in any tool, cold.
-> ACCEPTED: [ ] **Akshaya ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
+> ACCEPTED: [ ] **Sohail ticks this after reading; unaccepted by the next 4-hour standup is reassigned by Vinod.**
 
 ## The project in 30 seconds
 
@@ -47,7 +47,7 @@ DELIVERABLE: Create golden Bell, asymmetric bit-order, invalid gate, wrong predi
 TEST: `python3 scripts/validate_fixtures.py` parses every JSON file, checks IDs/basis order/probability sums and reports zero drift from contract examples.
 DEPENDS: SHIP-1          UNBLOCKS: SIM-6,QA-2,QA-4
 DEMO: Provides one trusted story every track can build against without waiting.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 BRANCH: `feat/fixtures-qa/qa-1-freeze-golden-quantum-and-contract`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -157,11 +157,11 @@ Explain the real HTTP smoke path, malicious-code rejection, cross-backend tolera
 - WhatsApp is urgent-only: blocked critical path, venue/power/network issue or voice handoff. Copy the resulting decision back to Discord/DECISIONS.
 - Standups: 10:00 / 14:00 / 18:00 / 22:00 IST daily. Read `board/STATUS.md` first; post `OFFSHIFT` when unavailable.
 - Blocked >20 minutes: add STATUS blocker + Discord ping Vinod + move to the next dependency-safe card. Silent hero-debugging is banned.
-- Every PR gets a fresh-session Warden review. Akshaya coordinates release evidence but is not the only reviewer.
+- Every PR gets a fresh-session Warden review. Sohail coordinates release evidence but is not the only reviewer.
 - Contract change: edit contract → bump version/changelog → DECISIONS entry → ping consumers in Discord → then change code.
 
 ## Acceptance
 
-- [ ] I, **Akshaya**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
+- [ ] I, **Sohail**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
 - [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.

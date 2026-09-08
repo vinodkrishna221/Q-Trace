@@ -1,0 +1,58 @@
+{
+  "_fixture": {
+    "id": "bell_simulation_run",
+    "version": 1,
+    "contractSource": "circuit-simulation v1",
+    "description": "Successful Bell-state simulation run (QISKIT_AER, 1024 shots, CNOT entanglement, P(00)=P(11)=0.5). Primary fixture for SIM-6, QA-2, QA-4."
+  },
+  "simulationRun": {
+    "id": "sr_demo_001",
+    "learnerProfileId": "lp_aarav",
+    "moduleId": "mod_bell",
+    "circuitModelId": "cm_bell_seed",
+    "adapter": "QISKIT_AER",
+    "shots": 1024,
+    "status": "SUCCEEDED",
+    "probabilities": {"00": 0.5, "11": 0.5},
+    "counts": {"00": 512, "11": 512},
+    "stateTrace": [
+      {
+        "stepIndex": 0,
+        "operationId": "op_1",
+        "label": "After H",
+        "basisProbabilities": {"00": 0.5, "10": 0.5},
+        "amplitudes": {
+          "00": {"re": 0.70710678, "im": 0.0},
+          "10": {"re": 0.70710678, "im": 0.0}
+        },
+        "reducedQubits": [
+          {"qubit": 0, "bloch": {"x": 1.0, "y": 0.0, "z": 0.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"},
+          {"qubit": 1, "bloch": {"x": 0.0, "y": 0.0, "z": 1.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"}
+        ]
+      },
+      {
+        "stepIndex": 1,
+        "operationId": "op_2",
+        "label": "After CNOT",
+        "basisProbabilities": {"00": 0.5, "11": 0.5},
+        "amplitudes": {
+          "00": {"re": 0.70710678, "im": 0.0},
+          "11": {"re": 0.70710678, "im": 0.0}
+        },
+        "reducedQubits": [
+          {"qubit": 0, "bloch": {"x": 0.0, "y": 0.0, "z": 0.0}, "purity": 0.5, "label": "MIXED_SUBSYSTEM"},
+          {"qubit": 1, "bloch": {"x": 0.0, "y": 0.0, "z": 0.0}, "purity": 0.5, "label": "MIXED_SUBSYSTEM"}
+        ]
+      }
+    ],
+    "conformance": {
+      "adapter": "PENNYLANE",
+      "maxProbabilityDelta": 0.0,
+      "epsilon": 0.000001,
+      "passed": true,
+      "skippedReason": null
+    },
+    "durationMs": 84,
+    "createdAt": "2026-08-23T05:27:00Z"
+  }
+}

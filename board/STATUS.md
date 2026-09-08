@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
+| fixtures-qa | plan + Sohail mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
@@ -89,7 +89,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 23 Aug 13:00 Vinod: SHIP-1 green — monorepo scaffold, layout check (52/52), .env.example contract, and workspace scripts established; PR prepared for Warden review.
 - 23 Aug 12:04 Orion: six mission briefs generated and audited — 50 cards exactly once, 108h total, unique branches, external mock paths and 33.6h load gate PASS; acceptance next.
 - 23 Aug 12:04 Vinod: all six declared 48h; track mapping and stage roles frozen; Discord canonical and WhatsApp urgent-only; mission load gate PASS.
-- 23 Aug 11:52 Vinod: phase plans approved; sixth member named Akshaya; later roster inputs resolved.
+- 23 Aug 11:52 Vinod: phase plans approved; sixth member named Sohail; later roster inputs resolved.
 - 23 Aug 11:31 Orion: six FULL track plans generated and audited — 50 cards/108h, acyclic DAG, P0 complete; plans later approved.
 - 23 Aug 11:25 Orion: FULL blueprint drafted; quantum-ui/runtime diff approved, applied and synced; artifacts later approved.
 - 23 Aug 10:57 Orion: FULL kickoff drafted after approved broad platform + Quantum Flight Recorder direction; PRD later approved.
@@ -98,3 +98,4 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 07 Sep 20:59 Uday: SIM-9 green — AerSimulator cached at module level (prewarm_adapters on startup), lifespan startup event in main.py, SIMULATION_TIMEOUT detail includes UI hint, skippedReason PENNYLANE_NOT_REQUESTED (polished from NOT_ENABLED), scripts/smoke.sh (mock path for QA-7); 7/7 card tests + 172/172 regression passed; PR ready for Warden review.
 - 27 Aug 12:30 Vinod: SHIP-3 green — docs/DEMO-SCRIPT.md v0 created with 90-second learner-led script, 8 timed beats (B1–B8), PPT outline (8 sections sourced), fallback cue, judge Q&A pre-arms, sourced evidence ledger (7 URLs), submission checklist; scripts/check_story_claims.py written; python scripts/check_story_claims.py passed 4/4 checks; PR ready for Warden review. SHIP-5 now unblocked.
 - 06 Sep 16:15 Patch: SIM-8 merged to main (PR #24) — execution timeout guards, railway.toml, flags and deployed readiness verified; 10/10 test_runtime_guards passed, 225/225 full API suite passed.
+- 08 Sep 13:44 Sohail: QA-1 green — 7 golden fixtures created (bell_simulation_run, asymmetric_bit_order_run, invalid_gate_error, wrong_prediction_run, diagnosis_result, tutor_response, progress_after_repair) under apps/api/tests/fixtures/golden/ and frontend mirror golden.ts under apps/web/tests/fixtures/; scripts/validate_fixtures.py written; python scripts/validate_fixtures.py passed 7/7 fixtures (zero contract drift); PR ready for Warden review. Unblocks SIM-6, QA-2, QA-4.

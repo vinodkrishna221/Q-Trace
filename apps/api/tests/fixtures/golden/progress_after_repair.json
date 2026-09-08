@@ -1,0 +1,44 @@
+{
+  "_fixture": {
+    "id": "progress_after_repair",
+    "version": 1,
+    "contractSource": "progress-analytics v1",
+    "description": "Combined ChallengeAttempt + ProgressRecord after Aarav successfully repairs the Bell circuit (passed=true, score=100, totalPoints=100). Verbatim from progress-analytics.md v1 POST /v1/challenge-attempts RESPONSE 201."
+  },
+  "request": {
+    "challengeId": "ch_bell_repair",
+    "learnerProfileId": "lp_aarav",
+    "submittedAnswer": {"type": "CIRCUIT_MODEL", "circuitModelId": "cm_aarav_repaired"},
+    "simulationRunId": "sr_demo_002"
+  },
+  "response": {
+    "challengeAttempt": {
+      "id": "ca_demo_001",
+      "challengeId": "ch_bell_repair",
+      "learnerProfileId": "lp_aarav",
+      "simulationRunId": "sr_demo_002",
+      "submittedAnswer": {"type": "CIRCUIT_MODEL", "circuitModelId": "cm_aarav_repaired"},
+      "passed": true,
+      "score": 100,
+      "feedbackCode": "BELL_SUPPORT_CORRECT",
+      "attemptNumber": 1,
+      "createdAt": "2026-08-23T05:28:00Z"
+    },
+    "progressRecord": {
+      "id": "progress_lp_aarav",
+      "learnerProfileId": "lp_aarav",
+      "completedModuleIds": ["mod_bell"],
+      "skillStates": [
+        {"skillId": "skill_create_bell", "status": "MASTERED", "score": 100},
+        {"skillId": "skill_explain_correlation", "status": "PRACTICING", "score": 70}
+      ],
+      "latestChallengeAttemptId": "ca_demo_001",
+      "misconceptionSummary": [
+        {"code": "SUPERPOSITION_VS_ENTANGLEMENT", "count": 1, "latestAt": "2026-08-23T05:27:01Z"}
+      ],
+      "totalPoints": 100,
+      "updatedAt": "2026-08-23T05:28:00Z"
+    }
+  },
+  "_httpStatus": 201
+}

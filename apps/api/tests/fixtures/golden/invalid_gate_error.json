@@ -1,0 +1,18 @@
+{
+  "_fixture": {
+    "id": "invalid_gate_error",
+    "version": 1,
+    "contractSource": "circuit-simulation v1",
+    "description": "422 UNSUPPORTED_GATE error response for gate RX (outside the H/X/Y/Z/CNOT/MEASURE allowlist). Used by QA-2 error-shape suite."
+  },
+  "error": {
+    "code": "UNSUPPORTED_GATE",
+    "message": "Gate RX is outside the prototype subset.",
+    "requestId": "req_demo_001",
+    "details": {
+      "operationIndex": 2,
+      "allowedGates": ["H", "X", "Y", "Z", "CNOT", "MEASURE"]
+    }
+  },
+  "_httpStatus": 422
+}

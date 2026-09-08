@@ -1,0 +1,42 @@
+{
+  "_fixture": {
+    "id": "diagnosis_result",
+    "version": 1,
+    "contractSource": "flight-recorder-tutor v1",
+    "description": "Deterministic Flight Recorder diagnosis response for Aarav's INDEPENDENT_RANDOM prediction against Bell run sr_demo_001. Code: SUPERPOSITION_VS_ENTANGLEMENT, firstDivergenceStep: 1."
+  },
+  "request": {
+    "learnerProfileId": "lp_aarav",
+    "simulationRunId": "sr_demo_001"
+  },
+  "response": {
+    "misconceptionSignal": {
+      "id": "ms_demo_001",
+      "learnerProfileId": "lp_aarav",
+      "simulationRunId": "sr_demo_001",
+      "code": "SUPERPOSITION_VS_ENTANGLEMENT",
+      "firstDivergenceStep": 1,
+      "evidence": {
+        "prediction": "INDEPENDENT_RANDOM",
+        "verifiedBehavior": "CORRELATED_00_11",
+        "stateTraceStepIndexes": [0, 1]
+      },
+      "confidence": 1.0,
+      "repairChallengeId": "ch_bell_repair",
+      "createdAt": "2026-08-23T05:27:01Z"
+    },
+    "replay": [
+      {
+        "stepIndex": 0,
+        "headline": "Superposition created",
+        "evidenceKeys": ["stateTrace.0.basisProbabilities"]
+      },
+      {
+        "stepIndex": 1,
+        "headline": "Correlation introduced",
+        "evidenceKeys": ["stateTrace.1.basisProbabilities", "stateTrace.1.reducedQubits"]
+      }
+    ]
+  },
+  "_httpStatus": 201
+}
