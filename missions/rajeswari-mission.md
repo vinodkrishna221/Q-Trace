@@ -107,7 +107,7 @@ DELIVERABLE: Implement a small rules table mapping Challenge outcome + latest Mi
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_recommendation_rules.py` covers pass/fail/no-signal combinations and returns only known Module IDs.
 DEPENDS: AI-4,DATA-5          UNBLOCKS: —
 DEMO: The platform demonstrates personalized progression without opaque AI decisions.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/ai-pedagogy/ai-7-recommend-the-next-module-from`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
