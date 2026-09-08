@@ -78,7 +78,7 @@ DELIVERABLE: Implement `scripts/smoke.sh`: reset seeds, start/check local stack,
 TEST: `bash scripts/smoke.sh --mode local` exits 0 and prints each real endpoint, expected signal code and final 100-point Progress Record; any contract mismatch exits non-zero.
 DEPENDS: QA-2,UX-4,SIM-4,AI-3,DATA-3,SHIP-2          UNBLOCKS: DATA-6,SHIP-4
 DEMO: Proves the entire learner loop before the 25 Aug 09:00 skeleton deadline.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 
 ## P1 · Core — due 26 Aug 2026 18:00 IST
 

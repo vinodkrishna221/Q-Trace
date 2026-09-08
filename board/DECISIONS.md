@@ -51,3 +51,8 @@ AFFECTS: plans are frozen; Rani=data, Rajeswari=AI pedagogy and Akshaya=fixtures
 CHOSE: Declare 48 usable hours per member; use Discord as canonical record and WhatsApp for urgent pings; Venu operates/narrates learner-flow beats while all six share the pitch and Vinod owns opening/architecture/Q&A.
 BECAUSE: 48h gives a 33.6h card cap, so every 16–20h track passes the 70% law with substantial integration buffer.
 AFFECTS: `/missions` prerequisites pass; every brief receives a domain speaking beat and must use Discord acceptance/status protocol.
+
+### 11 · Shared repository bridge for InMemorySimRunRepo     8 Sep 2026 · by Vinod + Lead Engineer
+CHOSE: Connect InMemorySimRunRepo to DataRepositoryProtocol via an async execution helper (_run_async) passing typed SimulationRun with predictionResponse.
+BECAUSE: DEMO_LOCAL=1 requires learner-loop parity across simulation and diagnosis without violating encapsulation through private attribute access.
+AFFECTS: apps/api/app/repositories/sim_run_repository.py, apps/api/app/routers/simulation_runs.py, QA-3 smoke runner, and cross-track contract integrity.

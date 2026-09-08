@@ -145,7 +145,12 @@ async def create_simulation_run(
         run.adapter,
     )
 
-    repo.save(run, request_id=request_id)
+    pred_dict = (
+        body.predictionResponse.model_dump()
+        if body.predictionResponse is not None
+        else None
+    )
+    repo.save(run, request_id=request_id, prediction_response=pred_dict)
     return SimulationRunResponse(simulationRun=run)
 
 

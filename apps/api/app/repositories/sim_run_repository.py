@@ -31,10 +31,11 @@ Idempotency cache (contract NOTES: "request ID provides idempotency for 60s"):
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import logging
 import os
 import time
-from typing import Optional, Protocol, runtime_checkable
+from typing import Any, Optional, Protocol, runtime_checkable
 
 from app.models.simulation import SimulationRunOut
 
@@ -51,7 +52,12 @@ _TTL_SECONDS: float = 60.0
 class SimulationRunRepositoryProtocol(Protocol):
     """Minimal persistence interface for Simulation Runs."""
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         """Persist a simulation run (immutable snapshot)."""
         ...
 
@@ -88,10 +94,57 @@ class InMemorySimRunRepo:
         self._store: dict[str, SimulationRunOut] = {}
         self._idempotency: dict[str, tuple[SimulationRunOut, float]] = {}
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def _run_async(self, coro) -> object:
+        """Run an async coroutine synchronously from a sync call site."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(asyncio.run, coro).result()
+        new_loop = asyncio.new_event_loop()
+        try:
+            return new_loop.run_until_complete(coro)
+        finally:
+            new_loop.close()
+
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         self._store[run.id] = run
         if request_id:
             self._idempotency[request_id] = (run, time.monotonic())
+
+        # Bridge to shared DataRepositoryProtocol so downstream diagnosis & progress find it
+        try:
+            from app.models.entities import SimulationRun as SimRunEntity
+            from app.repositories import get_repository
+
+            payload = SimRunEntity(
+                id=run.id,
+                learnerProfileId=run.learnerProfileId,
+                moduleId=run.moduleId,
+                circuitModelId=run.circuitModelId,
+                predictionResponse=prediction_response,
+                adapter=run.adapter,
+                shots=run.shots,
+                status=run.status,
+                probabilities=run.probabilities,
+                counts=run.counts,
+                stateTrace=[s.model_dump() for s in run.stateTrace],
+                conformance=run.conformance.model_dump() if run.conformance else None,
+                durationMs=run.durationMs,
+                createdAt=run.createdAt,
+            )
+            data_repo = get_repository()
+            self._run_async(data_repo.create_simulation_run(payload))
+        except Exception as exc:
+            logger.debug("Could not mirror simulation run to data repo: %s", exc)
 
     def get(self, run_id: str) -> Optional[SimulationRunOut]:
         return self._store.get(run_id)
@@ -151,13 +204,26 @@ class MongoSimRunRepo:
 
     def _run_async(self, coro) -> object:  # type: ignore[return]
         """Run an async coroutine synchronously from a sync call site."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(asyncio.run, coro).result()
         new_loop = asyncio.new_event_loop()
         try:
             return new_loop.run_until_complete(coro)
         finally:
             new_loop.close()
 
-    def save(self, run: SimulationRunOut, request_id: str | None = None) -> None:
+    def save(
+        self,
+        run: SimulationRunOut,
+        request_id: str | None = None,
+        prediction_response: Optional[dict[str, Any]] = None,
+    ) -> None:
         """Persist a SimulationRun via the DATA-6 repository protocol.
 
         When app.models.entities is available (DATA-6 merged), converts to
@@ -174,13 +240,14 @@ class MongoSimRunRepo:
                     learnerProfileId=run.learnerProfileId,
                     moduleId=run.moduleId,
                     circuitModelId=run.circuitModelId,
+                    predictionResponse=prediction_response,
                     adapter=run.adapter,
                     shots=run.shots,
                     status=run.status,
                     probabilities=run.probabilities,
                     counts=run.counts,
                     stateTrace=[s.model_dump() for s in run.stateTrace],
-                    conformance=run.conformance.model_dump(),
+                    conformance=run.conformance.model_dump() if run.conformance else None,
                     durationMs=run.durationMs,
                     createdAt=run.createdAt,
                 )

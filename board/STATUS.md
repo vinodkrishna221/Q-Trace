@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1, QA-2 | QA-2 merged to main | QA-3 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-3 | QA-3 green | QA-4 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 08 Sep 15:30 Sohail: QA-3 green — walking-skeleton runner implemented in scripts/smoke.sh; end-to-end HTTP learner loop verified (Bell simulation run, diagnosis, fallback tutor, repair challenge, progress record, instructor insight); bash scripts/smoke.sh --mode local exits 0; PR ready for Warden review. Unblocks DATA-6, SHIP-4.
 - 08 Sep 14:56 Patch: QA-2 merged to main (PR #39) — Backend Pydantic serialization tests (35/35) and frontend Zod contract schemas & fixture tests (25/25) verified across all four contracts and error envelopes; deliberate breakages (renamed fields, missing requestId/id, ObjectId leaks) rejected at both boundaries; scripts/contract-check.sh passes; 82/82 full web test suite green, Next.js build passed. Unblocks QA-3.
 - 08 Sep 13:52 Patch: QA-1 merged to main (PR #38) — 7 golden quantum and contract fixtures, frontend golden.ts mirror, and validate_fixtures.py verified; 7/7 fixtures valid (zero contract drift), 464/464 API and 57/57 Web test suites green. Unblocks SIM-6, QA-2, QA-4.
 - 08 Sep 11:30 Patch: AI-8 merged to main (PR #37) — Socratic anti-copy guidance, safety notes, 8 prepared <=20s judge explanations (pedagogy_qa.py), zero learner free-text persistence guarantees, and release test suite verified; 9/9 release tests passed, 232/232 AI unit suite passed, 464/464 full API suite passed. ai-pedagogy track complete.
