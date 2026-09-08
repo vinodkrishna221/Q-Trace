@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 07 Sep 2026 20:17 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 08 Sep 2026 11:17 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -15,7 +15,7 @@
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 merged to main | — (Track complete) |
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
-| ai-pedagogy | plan + Rajeswari mission + AI-1..AI-6 | AI-6 done | AI-7 |
+| ai-pedagogy | plan + Rajeswari mission + AI-1..AI-6 | AI-6 merged to main | AI-7 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
@@ -42,6 +42,7 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 08 Sep 11:17 Patch: AI-6 merged to main (PR #35) — Proven cloud and fallback parity across all misconception scenarios, runtime execution mode badges (CLOUD_VERIFIED, FALLBACK_CURATED, FALLBACK_TIMEOUT, FALLBACK_RATE_LIMIT, FALLBACK_MALFORMED, FALLBACK_EVIDENCE_MISMATCH, FALLBACK_ERROR), redacted [llm] telemetry with secret scrubbing, and 7-scenario resilience drill runner verified; 8/8 card tests passed, 140/140 AI suite passed, 372/372 full API suite passed.
 - 07 Sep 20:17 Patch: UX-9 merged to main (PR #30) — Complete keyboard-only navigation & focus-visible rings, color-independent gate/wire labels, 1366x768 projector readability with accessible table fallbacks, and prefers-reduced-motion verified; 4/4 acceptance tests passed, 57/57 full web test suite passed. learning-ux track complete.
 - 27 Aug 19:30 Venu: UX-9 green — Accessibility and projector readability polished across all scripted routes: keyboard-only navigation & focus-visible rings for circuit workspace/palette/radios/scrubber, color-independent textual and symbolic gate/wire labels (●/CX/H/X/Y/Z/M), projector-safe text sizes/contrast (12px bold SVG text, high-contrast tables with accessible headers), and prefers-reduced-motion CSS rules; 4/4 acceptance tests passed (57/57 suite), Next.js build passed (11/11 static routes), PR ready for Warden review.
 - 07 Sep 20:12 Patch: UX-8 merged to main (PR #29) — OpenQASM 3.0 export and download, byte-for-byte Circuit Model JSON serialization/reimport with deterministic column normalization, safe validation/rejection for unsupported gates and bounds, and CircuitSharePanel with LOCAL ARTIFACT SHARING disclosure banner verified; 13/13 circuit-share unit tests passed, 53/53 web test suite passed.
