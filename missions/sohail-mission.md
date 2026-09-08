@@ -77,7 +77,7 @@ DELIVERABLE: Add cross-track acceptance tests for Qiskit/PennyLane tolerance, as
 TEST: `uv run --project apps/api pytest apps/api/tests/acceptance/quantum apps/api/tests/security/test_qiskit_ast.py` passes and catches a deliberately reversed mapper.
 DEPENDS: SIM-5,SIM-6,QA-1          UNBLOCKS: SHIP-6
 DEMO: Gives judges defensible proof that multiple backends and code editing are real and safe.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 BRANCH: `feat/fixtures-qa/qa-4-test-adapters-parser-safety-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

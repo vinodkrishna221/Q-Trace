@@ -88,7 +88,7 @@ DELIVERABLE: Add cross-track acceptance tests for Qiskit/PennyLane tolerance, as
 TEST: `uv run --project apps/api pytest apps/api/tests/acceptance/quantum apps/api/tests/security/test_qiskit_ast.py` passes and catches a deliberately reversed mapper.
 DEPENDS: SIM-5,SIM-6,QA-1          UNBLOCKS: SHIP-6
 DEMO: Gives judges defensible proof that multiple backends and code editing are real and safe.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 
 ### QA-5 · Test diagnosis, grading and critical UI states                        [timebox: 2h]
 CONTEXT: AI-4, DATA-3 and UX-5 provide the taxonomy, progress flow and interactive workspace. Load `flight-recorder-tutor.md`, `progress-analytics.md` and quantum-ui/runtime packs; consume but never modify implementation-owned files.
