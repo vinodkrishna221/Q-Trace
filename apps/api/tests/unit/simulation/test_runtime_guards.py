@@ -77,7 +77,7 @@ def _slow_build(*args, **kwargs):
 
 
 # ---------------------------------------------------------------------------
-# Test 1 — 504 SIMULATION_TIMEOUT when executor hangs past budget
+# Test 1 â€” 504 SIMULATION_TIMEOUT when executor hangs past budget
 # ---------------------------------------------------------------------------
 
 def test_timeout_returns_504():
@@ -101,7 +101,7 @@ def test_timeout_returns_504():
 
 
 # ---------------------------------------------------------------------------
-# Test 2 — 504 detail includes timeoutMs
+# Test 2 â€” 504 detail includes timeoutMs
 # ---------------------------------------------------------------------------
 
 def test_timeout_detail_includes_timeout_ms():
@@ -125,7 +125,7 @@ def test_timeout_detail_includes_timeout_ms():
 
 
 # ---------------------------------------------------------------------------
-# Test 3 — ENABLE_PENNYLANE=0 ? skippedReason=PENNYLANE_DISABLED
+# Test 3 â€” ENABLE_PENNYLANE=0 ? skippedReason=PENNYLANE_DISABLED
 # ---------------------------------------------------------------------------
 
 def test_pennylane_disabled_flag_skips_conformance():
@@ -157,7 +157,7 @@ def test_pennylane_disabled_flag_skips_conformance():
 
 
 # ---------------------------------------------------------------------------
-# Test 4 — No NaN/Infinity: _assert_finite raises on bad values
+# Test 4 â€” No NaN/Infinity: _assert_finite raises on bad values
 # ---------------------------------------------------------------------------
 
 def test_assert_finite_raises_on_nan():
@@ -181,7 +181,7 @@ def test_assert_finite_passes_on_valid_float():
 
 
 # ---------------------------------------------------------------------------
-# Test 5 — /ready reflects primaryAdapterEnabled=True when unset
+# Test 5 â€” /ready reflects primaryAdapterEnabled=True when unset
 # ---------------------------------------------------------------------------
 
 def test_ready_reflects_qiskit_enabled():
@@ -199,7 +199,7 @@ def test_ready_reflects_qiskit_enabled():
 
 
 # ---------------------------------------------------------------------------
-# Test 6 — /ready reflects primaryAdapterEnabled=False when ENABLE_QISKIT=0
+# Test 6 â€” /ready reflects primaryAdapterEnabled=False when ENABLE_QISKIT=0
 # ---------------------------------------------------------------------------
 
 def test_ready_reflects_qiskit_disabled():
@@ -214,7 +214,7 @@ def test_ready_reflects_qiskit_disabled():
 
 
 # ---------------------------------------------------------------------------
-# Test 7 — /ready shows PENNYLANE disabled
+# Test 7 â€” /ready shows PENNYLANE disabled
 # ---------------------------------------------------------------------------
 
 def test_ready_pennylane_disabled_visible():
@@ -228,7 +228,7 @@ def test_ready_pennylane_disabled_visible():
 
 
 # ---------------------------------------------------------------------------
-# Test 8 — ENABLE_QISKIT=0 ? 503 ADAPTER_UNAVAILABLE from route
+# Test 8 â€” ENABLE_QISKIT=0 ? 503 ADAPTER_UNAVAILABLE from route
 # ---------------------------------------------------------------------------
 
 def test_qiskit_disabled_returns_503():
