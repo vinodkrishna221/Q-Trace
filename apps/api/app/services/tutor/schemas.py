@@ -12,6 +12,8 @@ import uuid
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.services.tutor.badge import TutorBadge
+
 
 class TutorStep(BaseModel):
     """Step in an evidence-grounded tutor explanation."""
@@ -61,4 +63,8 @@ class StructuredTutorResponse(BaseModel):
     safetyNote: str = Field(
         default="Explanation is grounded in this Simulation Run; it is not a hardware claim.",
         description="Required disclaimer regarding simulation vs physical quantum hardware",
+    )
+    badge: Optional[TutorBadge] = Field(
+        default=None,
+        description="Optional UI badge indicating mode and failover resilience state",
     )

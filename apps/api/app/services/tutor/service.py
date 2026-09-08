@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -23,11 +24,13 @@ from app.services.tutor.adapter import (
     TutorProviderError,
     get_tutor_provider,
 )
+from app.services.tutor.badge import TutorBadge, compute_tutor_badge
 from app.services.tutor.fallback import (
     get_curated_bell_explanation,
     select_repair_challenge,
 )
 from app.services.tutor.schemas import StructuredTutorResponse
+from app.services.tutor.telemetry import telemetry
 from app.services.tutor.validator import (
     EvidenceKeyValidationError,
     FabricatedClaimError,
@@ -111,6 +114,8 @@ class TutorService:
         Evaluates environment flags, prepares evidence injection, attempts provider inference,
         validates post-generation numerical claims, and seamlessly falls back on any failure.
         """
+        start_time = time.perf_counter()
+
         # Determine whether cloud inference is active
         demo_fallback_flag = os.getenv("DEMO_FALLBACK", "1") == "1"
         enable_cloud_flag = os.getenv("ENABLE_TUTOR_CLOUD", "0") == "1"
@@ -124,12 +129,29 @@ class TutorService:
 
         # 1. If fallback requested or cloud disabled, return curated fallback immediately
         if should_fallback and provider_override is None:
-            return get_curated_bell_explanation(
+            explanation = get_curated_bell_explanation(
                 state_trace=state_trace,
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
             )
+            duration_ms = int((time.perf_counter() - start_time) * 1000)
+            badge = compute_tutor_badge(
+                fallback_used=True,
+                model=explanation["model"],
+                trigger_reason="Configured offline fallback active",
+            )
+            explanation["badge"] = badge.model_dump()
+            telemetry.record(
+                provider="fallback",
+                model=explanation["model"],
+                duration_ms=duration_ms,
+                status="fallback",
+                badge_type=badge.badgeType,
+                fallback_used=True,
+                fallback_reason="Configured offline fallback active",
+            )
+            return explanation
 
         # 2. Select provider
         active_provider = provider_override or self.provider or get_tutor_provider()
@@ -161,35 +183,71 @@ class TutorService:
                 timeout_seconds=timeout_seconds,
             )
         except (TutorProviderError, Exception) as err:
+            duration_ms = int((time.perf_counter() - start_time) * 1000)
             logger.warning("[llm] Provider failure, triggering curated fallback: %s", err)
-            print(f"[llm] fallback_triggered provider_error={err}")
-            return get_curated_bell_explanation(
+            fallback_res = get_curated_bell_explanation(
                 state_trace=state_trace,
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
             )
+            badge = compute_tutor_badge(
+                fallback_used=True,
+                model=fallback_res["model"],
+                trigger_reason=str(err),
+            )
+            fallback_res["badge"] = badge.model_dump()
+            status_tag = (
+                "timeout"
+                if "timeout" in str(err).lower()
+                else ("rate_limit" if "429" in str(err) or "rate" in str(err).lower() else "error")
+            )
+            telemetry.record(
+                provider=active_provider.name,
+                model=active_provider.model,
+                duration_ms=duration_ms,
+                status=status_tag,
+                badge_type=badge.badgeType,
+                fallback_used=True,
+                fallback_reason=str(err),
+            )
+            return fallback_res
 
         # 5. Schema validation of structured LLM output
         structured_response: StructuredTutorResponse
         try:
-            # Ensure model and repairChallengeId are correctly set
-            if not raw_output.get("repairChallengeId"):
-                raw_output["repairChallengeId"] = repair_challenge_id
+            # Deterministically enforce repairChallengeId from pedagogy engine
+            raw_output["repairChallengeId"] = repair_challenge_id
             if not raw_output.get("model"):
                 raw_output["model"] = active_provider.model
             raw_output["fallbackUsed"] = False
 
             structured_response = StructuredTutorResponse(**raw_output)
         except (ValidationError, TypeError, ValueError) as err:
+            duration_ms = int((time.perf_counter() - start_time) * 1000)
             logger.warning("[llm] Schema validation error, triggering curated fallback: %s", err)
-            print(f"[llm] fallback_triggered schema_validation_error={err}")
-            return get_curated_bell_explanation(
+            fallback_res = get_curated_bell_explanation(
                 state_trace=state_trace,
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
             )
+            badge = compute_tutor_badge(
+                fallback_used=True,
+                model=fallback_res["model"],
+                trigger_reason=f"malformed_schema: {err}",
+            )
+            fallback_res["badge"] = badge.model_dump()
+            telemetry.record(
+                provider=active_provider.name,
+                model=active_provider.model,
+                duration_ms=duration_ms,
+                status="malformed",
+                badge_type=badge.badgeType,
+                fallback_used=True,
+                fallback_reason=f"malformed_schema: {err}",
+            )
+            return fallback_res
 
         # 6. Post-generation evidence validation: verify evidence keys and numerical claims
         try:
@@ -201,16 +259,45 @@ class TutorService:
                 state_trace=state_trace,
             )
         except (EvidenceKeyValidationError, FabricatedClaimError) as err:
+            duration_ms = int((time.perf_counter() - start_time) * 1000)
             logger.warning("[llm] Evidence claim validation failed, triggering curated fallback: %s", err)
-            print(f"[llm] fallback_triggered claim_validation_error={err}")
-            return get_curated_bell_explanation(
+            fallback_res = get_curated_bell_explanation(
                 state_trace=state_trace,
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
             )
+            badge = compute_tutor_badge(
+                fallback_used=True,
+                model=fallback_res["model"],
+                trigger_reason=f"evidence_claim_invalid: {err}",
+            )
+            fallback_res["badge"] = badge.model_dump()
+            telemetry.record(
+                provider=active_provider.name,
+                model=active_provider.model,
+                duration_ms=duration_ms,
+                status="evidence_invalid",
+                badge_type=badge.badgeType,
+                fallback_used=True,
+                fallback_reason=f"evidence_claim_invalid: {err}",
+            )
+            return fallback_res
 
         # 7. Success: Return verified cloud response
+        duration_ms = int((time.perf_counter() - start_time) * 1000)
+        cloud_badge = compute_tutor_badge(fallback_used=False, model=structured_response.model)
+        structured_response.badge = cloud_badge
+        est_tokens = len(formatted_user_prompt.split()) + len(structured_response.summary.split())
+        telemetry.record(
+            provider=active_provider.name,
+            model=structured_response.model,
+            duration_ms=duration_ms,
+            status="success",
+            badge_type=cloud_badge.badgeType,
+            estimated_tokens=est_tokens,
+            fallback_used=False,
+        )
         return structured_response.model_dump()
 
 

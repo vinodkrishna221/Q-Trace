@@ -106,7 +106,7 @@ DELIVERABLE: Add parity fixtures, provider/fallback badges, redacted telemetry a
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/ai/test_cloud_fallback_parity.py` proves both modes cite the same trace steps and repair challenge.
 DEPENDS: AI-5,SHIP-4          UNBLOCKS: UX-7,AI-8,QA-6
 DEMO: The team can deliberately demonstrate resilience if judges question AI reliability.
-PERSONA: Sage           STATUS: [ ] todo
+PERSONA: Sage           STATUS: [x] done
 
 ### AI-7 · Recommend the next Module from verified outcomes                        [timebox: 2h]
 CONTEXT: AI-4 and DATA-5 provide the misconception taxonomy, Learning Paths and seeded Progress Records. Load `learning-content.md` and `progress-analytics.md`; this SHOULD scope is deterministic, not autonomous planning.

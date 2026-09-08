@@ -10,10 +10,22 @@ from app.services.tutor.adapter import (
     TutorTimeoutError,
     get_tutor_provider,
 )
+from app.services.tutor.badge import TutorBadge, compute_tutor_badge
+from app.services.tutor.drill import (
+    DrillStepReport,
+    DrillSummary,
+    run_tutor_resilience_drill,
+)
 from app.services.tutor.fallback import (
     SUPPORTED_INTENTS,
     get_curated_bell_explanation,
     select_repair_challenge,
+)
+from app.services.tutor.parity import (
+    PARITY_FIXTURES,
+    ParityCheckResult,
+    extract_cited_step_indexes,
+    verify_cloud_fallback_parity,
 )
 from app.services.tutor.schemas import (
     NumericalClaim,
@@ -25,6 +37,7 @@ from app.services.tutor.service import (
     default_tutor_service,
     extract_available_evidence_keys,
 )
+from app.services.tutor.telemetry import TelemetryBuffer, TelemetryEvent, telemetry
 from app.services.tutor.validator import (
     EvidenceKeyValidationError,
     FabricatedClaimError,
@@ -37,25 +50,37 @@ from app.services.tutor.validator import (
 __all__ = [
     "BaseTutorProvider",
     "CloudTutorProvider",
+    "DrillStepReport",
+    "DrillSummary",
     "EvidenceKeyValidationError",
     "FabricatedClaimError",
     "FakeTutorProvider",
     "NumericalClaim",
+    "PARITY_FIXTURES",
+    "ParityCheckResult",
     "SUPPORTED_INTENTS",
     "StructuredTutorResponse",
+    "TelemetryBuffer",
+    "TelemetryEvent",
+    "TutorBadge",
     "TutorMalformedOutputError",
     "TutorProviderError",
     "TutorRateLimitError",
     "TutorService",
     "TutorStep",
     "TutorTimeoutError",
+    "compute_tutor_badge",
     "default_tutor_service",
     "extract_available_evidence_keys",
     "extract_claimed_value",
+    "extract_cited_step_indexes",
     "get_curated_bell_explanation",
     "get_tutor_provider",
     "resolve_evidence_key",
+    "run_tutor_resilience_drill",
     "select_repair_challenge",
+    "telemetry",
     "validate_numerical_claim",
     "validate_tutor_response_evidence",
+    "verify_cloud_fallback_parity",
 ]
