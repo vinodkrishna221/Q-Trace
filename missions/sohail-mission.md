@@ -57,7 +57,7 @@ DELIVERABLE: Add backend Pydantic serialization tests, frontend Zod fixture test
 TEST: `bash scripts/contract-check.sh` passes valid examples and deliberately fails a renamed field, ObjectId leak and missing requestId.
 DEPENDS: QA-1          UNBLOCKS: QA-3
 DEMO: Prevents integration drift before the live swap.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 BRANCH: `feat/fixtures-qa/qa-2-enforce-contract-shapes-at-both`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
