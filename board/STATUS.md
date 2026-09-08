@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1..QA-3 | QA-3 green | QA-4 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-3 | QA-3 merged to main | QA-4 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 08 Sep 15:55 Patch: QA-3 merged to main (PR #40) — walking-skeleton runner implemented in scripts/smoke.sh and clean SimulationRun repository bridge with predictionResponse persistence (ADR-11); 6/6 HTTP learner loop endpoints verified (SUCCEEDED Bell simulation, divergence diagnosis, DEMO_FALLBACK tutor, repair challenge, 100-pt progress record, instructor insight); 173/173 simulation tests green, smoke.sh exits 0. Unblocks DATA-6, SHIP-4.
 
 - 08 Sep 15:30 Sohail: QA-3 green — walking-skeleton runner implemented in scripts/smoke.sh; end-to-end HTTP learner loop verified (Bell simulation run, diagnosis, fallback tutor, repair challenge, progress record, instructor insight); bash scripts/smoke.sh --mode local exits 0; PR ready for Warden review. Unblocks DATA-6, SHIP-4.
 - 08 Sep 14:56 Patch: QA-2 merged to main (PR #39) — Backend Pydantic serialization tests (35/35) and frontend Zod contract schemas & fixture tests (25/25) verified across all four contracts and error envelopes; deliberate breakages (renamed fields, missing requestId/id, ObjectId leaks) rejected at both boundaries; scripts/contract-check.sh passes; 82/82 full web test suite green, Next.js build passed. Unblocks QA-3.
