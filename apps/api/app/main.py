@@ -11,10 +11,11 @@ SIM-1 additions over the SHIP-1 skeleton:
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
+import asyncio
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,6 +29,7 @@ from app.routers.flight_recorder import router as flight_recorder_router
 from app.routers.instructor import router as instructor_router
 from app.routers.learning import router as learning_router
 from app.routers.progress import router as progress_router
+from app.services.quantum.adapter import prewarm_adapters
 
 logger = logging.getLogger("qtrace.api")
 logging.basicConfig(level=logging.INFO)
@@ -39,9 +41,11 @@ logging.basicConfig(level=logging.INFO)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan event handler to ensure core truth is seeded on startup."""
+    """Lifespan event handler to ensure core truth is seeded and adapters pre-warmed."""
     repo = get_repository()
     await seed_core_truth(repo)
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, prewarm_adapters)
     yield
 
 

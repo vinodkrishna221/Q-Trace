@@ -14,7 +14,7 @@
 | Track | Done | In flight | Next |
 |---|---|---|---|
 | learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 merged to main | — (Track complete) |
-| simulation-api | plan + Uday mission + SIM-1..SIM-8 | SIM-8 merged to main | — |
+| simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1 + AI-2 | AI-1 & AI-2 merged to main | AI-3 |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Akshaya mission | mission acceptance | QA-1 after SHIP-1 |
@@ -86,5 +86,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 23 Aug 10:57 Orion: FULL kickoff drafted after approved broad platform + Quantum Flight Recorder direction; PRD later approved.
 - 06 Sep 09:11 Uday: SIM-7 green — SimulationRunRepositoryProtocol defined, InMemorySimRunRepo encapsulated, MongoSimRunRepo wired to DATA-6 DataRepositoryProtocol (mock path: graceful fallback when entities unavailable), router injected via FastAPI Depends, DEMO_LOCAL=1 selects memory; 13/13 card tests + 155/155 regression passed; PR ready for Warden review.
 - 06 Sep 09:49 Uday: SIM-8 green — 1500ms timeout locked (QTRACE_SIM_TIMEOUT_S default=1.5), ENABLE_QISKIT=0→503 ADAPTER_UNAVAILABLE, ENABLE_PENNYLANE=0→skippedReason PENNYLANE_DISABLED, structured duration/error logs, /ready hardened (primaryAdapterEnabled, workerNote), railway.toml (SHIP-4 mock path); 10/10 card tests + 165/165 regression passed; PR ready for Warden review.
+- 07 Sep 20:59 Uday: SIM-9 green — AerSimulator cached at module level (prewarm_adapters on startup), lifespan startup event in main.py, SIMULATION_TIMEOUT detail includes UI hint, skippedReason PENNYLANE_NOT_REQUESTED (polished from NOT_ENABLED), scripts/smoke.sh (mock path for QA-7); 7/7 card tests + 172/172 regression passed; PR ready for Warden review.
 - 27 Aug 12:30 Vinod: SHIP-3 green — docs/DEMO-SCRIPT.md v0 created with 90-second learner-led script, 8 timed beats (B1–B8), PPT outline (8 sections sourced), fallback cue, judge Q&A pre-arms, sourced evidence ledger (7 URLs), submission checklist; scripts/check_story_claims.py written; python scripts/check_story_claims.py passed 4/4 checks; PR ready for Warden review. SHIP-5 now unblocked.
 - 06 Sep 16:15 Patch: SIM-8 merged to main (PR #24) — execution timeout guards, railway.toml, flags and deployed readiness verified; 10/10 test_runtime_guards passed, 225/225 full API suite passed.

@@ -239,7 +239,7 @@ class TestSimulationServiceConformanceFlag:
         from app.services.simulation_service import build_simulation_run
         req = self._make_request(run_conformance=False)
         result = build_simulation_run(req, "req_sim6_stub")
-        assert result.conformance.skippedReason == "PENNYLANE_NOT_ENABLED"
+        assert result.conformance.skippedReason == "PENNYLANE_NOT_REQUESTED"
         assert result.conformance.passed is False
 
     def test_run_conformance_true_returns_live_result(self):
