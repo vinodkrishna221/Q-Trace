@@ -9,7 +9,7 @@
 #      Tests include valid-example round-trips AND three deliberate-breakage
 #      categories: renamed field, ObjectId leak, missing requestId.
 #   2. Runs apps/web/tests/fixtures/contract.test.ts via vitest.
-#      Same three breakage categories; no Zod — uses TypeScript type guards.
+#      Same three breakage categories; verified via runtime Zod schemas.
 #
 # Exit codes:
 #   0 — all tests pass (valid examples pass, all deliberate breakages caught)
@@ -53,7 +53,7 @@ hr
 echo ""
 echo "  Q-Trace · QA-2 contract-check.sh"
 echo "  Validates contract shapes at API (Python/Pydantic) and"
-echo "  frontend (TypeScript/Vitest) boundaries."
+echo "  frontend (TypeScript/Zod/Vitest) boundaries."
 echo ""
 info "Repository root: ${REPO_ROOT}"
 echo ""
@@ -91,10 +91,10 @@ fi
 hr
 
 # =============================================================================
-# Step 2 — Frontend: TypeScript fixture shape tests
+# Step 2 — Frontend: Zod schema contract validation tests
 # =============================================================================
 echo ""
-echo "  STEP 2/2 · Frontend — TypeScript contract shapes"
+echo "  STEP 2/2 · Frontend — Zod schema contract validation"
 echo "  Suite : apps/web/tests/fixtures/contract.test.ts"
 echo "  Runner: pnpm --dir apps/web test"
 echo ""
@@ -110,9 +110,9 @@ else
     if pnpm --dir "${WEB_DIR}" exec vitest run \
             "${FRONTEND_TEST}" \
             2>&1; then
-        pass "Frontend contract shape tests"
+        pass "Frontend Zod contract shape tests"
     else
-        fail "Frontend contract shape tests"
+        fail "Frontend Zod contract shape tests"
         OVERALL_EXIT=1
     fi
 fi
@@ -125,11 +125,11 @@ hr
 echo ""
 if [ "${OVERALL_EXIT}" -eq 0 ]; then
     echo -e "${GREEN}  RESULT: contract-check PASS${NC}"
-    echo "  Valid examples: accepted at both boundaries."
+    echo "  Valid examples: accepted at both boundaries (Pydantic & Zod)."
     echo "  Deliberate breakages caught:"
-    echo "    • renamed field   — value not found at wrong key"
-    echo "    • ObjectId leak   — _id / \$oid stripped / detected"
-    echo "    • missing requestId — validation error raised"
+    echo "    • renamed field   — rejected by Pydantic / ZodError"
+    echo "    • ObjectId leak   — _id / \$oid stripped / rejected by strict schema"
+    echo "    • missing requestId — validation error raised at both boundaries"
 else
     echo -e "${RED}  RESULT: contract-check FAIL${NC}"
     echo "  One or more suites reported failures — see output above."
