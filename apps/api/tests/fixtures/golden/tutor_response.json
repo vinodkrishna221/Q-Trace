@@ -1,0 +1,44 @@
+{
+  "_fixture": {
+    "id": "tutor_response",
+    "version": 1,
+    "contractSource": "flight-recorder-tutor v1",
+    "description": "Evidence-bound fallback Tutor explanation for Aarav's SUPERPOSITION_VS_ENTANGLEMENT misconception. fallbackUsed=true, model=DEMO_FALLBACK. All numericalClaims have matching evidenceKeys from sr_demo_001 stateTrace."
+  },
+  "request": {
+    "learnerProfileId": "lp_aarav",
+    "moduleId": "mod_bell",
+    "simulationRunId": "sr_demo_001",
+    "misconceptionSignalId": "ms_demo_001",
+    "intent": "EXPLAIN_DIVERGENCE",
+    "learnerQuestion": "Why are the outcomes random but still linked?"
+  },
+  "response": {
+    "tutorResponse": {
+      "responseId": "tr_demo_001",
+      "intent": "EXPLAIN_DIVERGENCE",
+      "summary": "The Hadamard gate made qubit 0 uncertain; the CNOT then tied qubit 1 to that branch. Each shot is random, but the pair is correlated.",
+      "steps": [
+        {
+          "title": "After H",
+          "body": "The verified probabilities are 00 = 0.5 and 10 = 0.5.",
+          "evidenceKeys": ["stateTrace.0.basisProbabilities"]
+        },
+        {
+          "title": "After CNOT",
+          "body": "The verified support moves to 00 = 0.5 and 11 = 0.5.",
+          "evidenceKeys": ["stateTrace.1.basisProbabilities"]
+        }
+      ],
+      "numericalClaims": [
+        {"claim": "P(00)=0.5", "evidenceKey": "stateTrace.1.basisProbabilities.00"},
+        {"claim": "P(11)=0.5", "evidenceKey": "stateTrace.1.basisProbabilities.11"}
+      ],
+      "repairChallengeId": "ch_bell_repair",
+      "fallbackUsed": true,
+      "model": "DEMO_FALLBACK",
+      "safetyNote": "Explanation is grounded in this Simulation Run; it is not a hardware claim."
+    }
+  },
+  "_httpStatus": 200
+}

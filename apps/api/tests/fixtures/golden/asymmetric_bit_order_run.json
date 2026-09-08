@@ -1,0 +1,45 @@
+{
+  "_fixture": {
+    "id": "asymmetric_bit_order_run",
+    "version": 1,
+    "contractSource": "circuit-simulation v1",
+    "description": "Single-qubit H on qubit-0 only (qubit-1 idle). Verifies basis-key order: qubit-0 is the leftmost bit. Expected: P(00)=0.5, P(10)=0.5. Unblocks QA-4 asymmetric mapper test."
+  },
+  "simulationRun": {
+    "id": "sr_asymmetric_001",
+    "learnerProfileId": "lp_aarav",
+    "moduleId": "mod_superposition",
+    "circuitModelId": "cm_h_qubit0_only",
+    "adapter": "QISKIT_AER",
+    "shots": 1024,
+    "status": "SUCCEEDED",
+    "probabilities": {"00": 0.5, "10": 0.5},
+    "counts": {"00": 512, "10": 512},
+    "stateTrace": [
+      {
+        "stepIndex": 0,
+        "operationId": "op_1",
+        "label": "After H on qubit-0",
+        "basisProbabilities": {"00": 0.5, "10": 0.5},
+        "amplitudes": {
+          "00": {"re": 0.70710678, "im": 0.0},
+          "10": {"re": 0.70710678, "im": 0.0}
+        },
+        "reducedQubits": [
+          {"qubit": 0, "bloch": {"x": 1.0, "y": 0.0, "z": 0.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"},
+          {"qubit": 1, "bloch": {"x": 0.0, "y": 0.0, "z": 1.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"}
+        ]
+      }
+    ],
+    "conformance": {
+      "adapter": "PENNYLANE",
+      "maxProbabilityDelta": 0.0,
+      "epsilon": 0.000001,
+      "passed": true,
+      "skippedReason": null
+    },
+    "durationMs": 41,
+    "createdAt": "2026-08-23T05:27:00Z"
+  },
+  "_basisOrderNote": "Qubit-0 is the most-significant bit in the basis string. '10' means qubit-0=1, qubit-1=0. A reversed mapper would produce {'01':0.5,'00':0.5} — that is the deliberately-wrong variant QA-4 must catch."
+}
