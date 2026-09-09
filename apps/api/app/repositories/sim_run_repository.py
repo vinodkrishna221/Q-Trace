@@ -52,7 +52,7 @@ _TTL_SECONDS: float = 60.0
 class SimulationRunRepositoryProtocol(Protocol):
     """Minimal persistence interface for Simulation Runs."""
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -61,7 +61,7 @@ class SimulationRunRepositoryProtocol(Protocol):
         """Persist a simulation run (immutable snapshot)."""
         ...
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         """Retrieve a run by ID, or None."""
         ...
 
@@ -110,7 +110,7 @@ class InMemorySimRunRepo:
         finally:
             new_loop.close()
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -142,11 +142,11 @@ class InMemorySimRunRepo:
                 createdAt=run.createdAt,
             )
             data_repo = get_repository()
-            self._run_async(data_repo.create_simulation_run(payload))
+            await data_repo.create_simulation_run(payload)
         except Exception as exc:
             logger.debug("Could not mirror simulation run to data repo: %s", exc)
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         return self._store.get(run_id)
 
     def get_by_request_id(
@@ -218,7 +218,7 @@ class MongoSimRunRepo:
         finally:
             new_loop.close()
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -259,7 +259,7 @@ class MongoSimRunRepo:
                 )
                 payload = run
 
-            self._run_async(self._repo.create_simulation_run(payload))  # type: ignore[attr-defined]
+            await self._repo.create_simulation_run(payload)  # type: ignore[attr-defined]
         except Exception as exc:
             logger.error("MongoSimRunRepo.save failed: %s", exc)
             raise
@@ -267,11 +267,9 @@ class MongoSimRunRepo:
         if request_id:
             self._idempotency[request_id] = (run, time.monotonic())
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         try:
-            raw = self._run_async(
-                self._repo.get_simulation_run(run_id)  # type: ignore[attr-defined]
-            )
+            raw = await self._repo.get_simulation_run(run_id)  # type: ignore[attr-defined]
             if raw is None:
                 return None
             # If already a SimulationRunOut (mock path), return as-is.
