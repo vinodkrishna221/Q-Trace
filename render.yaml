@@ -27,7 +27,7 @@ services:
       - key: ENABLE_TUTOR_CLOUD
         value: "0"
       - key: QTRACE_SIM_TIMEOUT_S
-        value: "1.5"
+        value: "5.0"
       - key: MONGODB_DB
         value: qtrace_prod
       - key: MONGODB_URI

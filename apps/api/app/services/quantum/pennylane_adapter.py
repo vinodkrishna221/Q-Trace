@@ -221,3 +221,29 @@ def run_pennylane_conformance(
         skipped_reason=None,
         pl_probabilities=pl_probs,
     )
+
+
+_pl_warmed: bool = False
+
+
+def prewarm_pennylane() -> None:
+    """Pre-initialize PennyLane so the first simulation request hits the warm path.
+
+    Compiles a minimal 2-qubit circuit on default.qubit.
+    Guarded so it only runs once per process.
+    """
+    global _pl_warmed
+    if _pl_warmed:
+        return
+    import pennylane as qml  # noqa: PLC0415
+
+    dev = qml.device("default.qubit", wires=2)
+
+    @qml.qnode(dev)
+    def _warmup():
+        qml.Hadamard(wires=0)
+        qml.CNOT(wires=[0, 1])
+        return qml.probs(wires=[0, 1])
+
+    _warmup()
+    _pl_warmed = True

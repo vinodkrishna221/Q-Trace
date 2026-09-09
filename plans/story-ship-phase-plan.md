@@ -96,7 +96,7 @@ DELIVERABLE: Create PPT source/assets for problem evidence, personas, learner fl
 TEST: `python3 scripts/check_deck.py` verifies required sections, source URLs, readable screenshots and no roadmap feature presented as live.
 DEPENDS: SHIP-3,UX-4          UNBLOCKS: —
 DEMO: The PPT covers the official statement and gives judges a retellable innovation.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 

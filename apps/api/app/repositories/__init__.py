@@ -1,5 +1,5 @@
-"""Repository module and dependency injection selectors for Q-Trace."""
-
+import logging
+import os
 from typing import Optional
 from app.repositories.base import DataRepositoryProtocol
 from app.repositories.memory import InMemoryRepository
@@ -20,14 +20,41 @@ from app.repositories.seeds import (
     seed_synthetic_cohort,
 )
 
+logger = logging.getLogger("qtrace.repository")
+
 _default_repository: Optional[DataRepositoryProtocol] = None
+_mongo_client: Optional[object] = None
 
 
 def get_repository() -> DataRepositoryProtocol:
-    """Dependency provider returning the active datastore repository singleton."""
-    global _default_repository
+    """Dependency provider returning the active datastore repository singleton.
+
+    When DEMO_LOCAL=0 and MONGODB_URI is configured, instantiates and returns
+    MongoRepository backed by MongoDB.
+    Otherwise (DEMO_LOCAL=1 or MONGODB_URI unset), returns InMemoryRepository.
+    """
+    global _default_repository, _mongo_client
     if _default_repository is None:
-        _default_repository = InMemoryRepository()
+        demo_local = os.getenv("DEMO_LOCAL", "1") == "1"
+        mongodb_uri = os.getenv("MONGODB_URI", "").strip()
+        if not demo_local and mongodb_uri:
+            try:
+                from pymongo import AsyncMongoClient
+
+                db_name = os.getenv("MONGODB_DB", "qtrace_prod")
+                _mongo_client = AsyncMongoClient(mongodb_uri)
+                db = _mongo_client[db_name]
+                _default_repository = MongoRepository(db=db)
+                logger.info("Initialized MongoRepository for database '%s'", db_name)
+            except Exception as exc:
+                logger.warning(
+                    "Failed to connect to MongoDB (%s); falling back to InMemoryRepository: %s",
+                    mongodb_uri[:25] + "...",
+                    exc,
+                )
+                _default_repository = InMemoryRepository()
+        else:
+            _default_repository = InMemoryRepository()
     return _default_repository
 
 

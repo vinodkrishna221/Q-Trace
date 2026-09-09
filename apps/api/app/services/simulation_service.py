@@ -109,19 +109,31 @@ def build_simulation_run(
     if request.runConformance and _pennylane_enabled():
         # Deferred import: PennyLane only imported when conformance is requested
         # and ENABLE_PENNYLANE != 0.
-        from app.services.quantum.pennylane_adapter import run_pennylane_conformance  # noqa: PLC0415
+        try:
+            from app.services.quantum.pennylane_adapter import run_pennylane_conformance  # noqa: PLC0415
 
-        pl_result = run_pennylane_conformance(
-            circuit=request.circuitModel,
-            qiskit_probabilities=aer_result.probabilities,
-        )
-        conformance = ConformanceResult(
-            adapter="PENNYLANE",
-            maxProbabilityDelta=pl_result.max_probability_delta,
-            epsilon=pl_result.epsilon,
-            passed=pl_result.passed,
-            skippedReason=pl_result.skipped_reason,
-        )
+            pl_result = run_pennylane_conformance(
+                circuit=request.circuitModel,
+                qiskit_probabilities=aer_result.probabilities,
+            )
+            conformance = ConformanceResult(
+                adapter="PENNYLANE",
+                maxProbabilityDelta=pl_result.max_probability_delta,
+                epsilon=pl_result.epsilon,
+                passed=pl_result.passed,
+                skippedReason=pl_result.skipped_reason,
+            )
+        except Exception as exc:
+            logger.warning(
+                "sim_service.conformance_failed requestId=%s error=%s", request_id, exc
+            )
+            conformance = ConformanceResult(
+                adapter="PENNYLANE",
+                maxProbabilityDelta=0.0,
+                epsilon=1e-6,
+                passed=False,
+                skippedReason="PENNYLANE_UNAVAILABLE",
+            )
     elif request.runConformance and not _pennylane_enabled():
         # SIM-8: ENABLE_PENNYLANE=0 — surface a clear skip reason so UI/demo
         # can display the correct message instead of a generic stub.
