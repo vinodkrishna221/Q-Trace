@@ -106,7 +106,7 @@ DELIVERABLE: Create Playwright test for Aarav prediction → build/run → evide
 TEST: `pnpm --dir apps/web playwright test bell-journey.spec.ts` passes against local mode and records trace/video only on failure.
 DEPENDS: UX-7,SIM-8,AI-6,DATA-7          UNBLOCKS: UX-9,QA-7,SHIP-7
 DEMO: Rehearses the exact 90-second path automatically.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 
 ### QA-7 · Run offline, live-deploy and Warden release gates                        [timebox: 2h]
 CONTEXT: QA-6 and SHIP-6 provide the automated journey plus merged local/cloud stacks. Load `arenas/sih.md`, `40-endgame.md`, all contracts and the PR-review skill before issuing a release verdict.

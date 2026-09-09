@@ -29,6 +29,8 @@ build/
 out/
 .turbo/
 *.log
+test-results/
+playwright-report/
 
 # OS / IDE
 .DS_Store
