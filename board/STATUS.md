@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 08 Sep 2026 14:56 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 09 Sep 2026 18:21 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1..QA-4 | QA-4 merged to main | QA-5 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-5 | QA-5 merged to main | QA-6 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
 
 ## Blockers
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 09 Sep 18:21 Patch: QA-5 merged to main (PR #38) — cross-track diagnosis, grading, and Tutor evidence acceptance tests (120/120 API acceptance) and critical UI state fixtures (29 circuit-workspace + 25 fallback-state + 12 workspace unit, 66/66 web acceptance) verified; scripts/test-core.sh verified; unblocks SHIP-6.
 
 - 08 Sep 16:16 Patch: QA-4 merged to main (PR #41) — 36 cross-track quantum acceptance and parser security tests verified; Qiskit/PennyLane tolerance within 1e-6, basis endianness with reversed-mapper detection, MEASURE-exclusion from stateTrace, post-CNOT subsystem purity, and malicious AST allowlist corpus confirmed; 36/36 targeted suite and 536/536 full API suite green. Unblocks SHIP-6.
 
