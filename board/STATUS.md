@@ -18,7 +18,7 @@
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Sohail mission + QA-1..QA-5 | QA-5 merged to main | QA-6 |
-| story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
+| story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | PR ready (SHIP-4) | SHIP-5 |
 
 ## Blockers
 
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 09 Sep 18:30 Vinod: SHIP-4 green — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) established; bash scripts/smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); PR ready for Warden review. Unblocks SHIP-6.
 
 - 09 Sep 18:21 Patch: QA-5 merged to main (PR #38) — cross-track diagnosis, grading, and Tutor evidence acceptance tests (120/120 API acceptance) and critical UI state fixtures (29 circuit-workspace + 25 fallback-state + 12 workspace unit, 66/66 web acceptance) verified; scripts/test-core.sh verified; unblocks SHIP-6.
 

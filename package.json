@@ -11,7 +11,8 @@
     "lint:web": "pnpm --filter web lint",
     "check:layout": "bash scripts/check-layout.sh",
     "demo:local": "bash scripts/demo-local.sh",
-    "demo:check": "bash scripts/demo-local.sh --check"
+    "demo:check": "bash scripts/demo-local.sh --check",
+    "smoke:live": "bash scripts/smoke-live.sh"
   },
   "packageManager": "pnpm@10.33.0"
 }
