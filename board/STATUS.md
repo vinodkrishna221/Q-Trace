@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 09 Sep 2026 18:21 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 09 Sep 2026 18:40 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -6,7 +6,7 @@
 ## Now
 
 **Clock:** preparation day 1/7 · **Skeleton:** 🟡 missions ready for acceptance; deadline 25 Aug 2026 09:00 IST
-**Deploy:** 🔴 targets frozen, resources not yet created · last smoke: not started
+**Deploy:** 🟡 targets configured & verified · last smoke: smoke-live 5/5 green
 **Rubric (Oracle, ASSUMED):** I9.2 T8.7 Im9.2 P9.5 → 9.15 · FIX-THIS-HOUR: all six accept missions; Vinod merges SHIP-1, then P0 lanes fan out
 
 ## Tracks
@@ -18,7 +18,7 @@
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Sohail mission + QA-1..QA-5 | QA-5 merged to main | QA-6 |
-| story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | PR ready (SHIP-4) | SHIP-5 |
+| story-ship | plan + Vinod mission + SHIP-1..SHIP-4 | SHIP-4 merged to main | SHIP-5 |
 
 ## Blockers
 
@@ -41,6 +41,8 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 09 Sep 18:40 Patch: SHIP-4 merged to main — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) verified; smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); unblocks SIM-8, AI-6, SHIP-6.
 
 - 09 Sep 18:30 Vinod: SHIP-4 green — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) established; bash scripts/smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); PR ready for Warden review. Unblocks SHIP-6.
 
