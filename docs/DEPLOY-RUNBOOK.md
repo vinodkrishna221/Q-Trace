@@ -9,7 +9,7 @@ Q-Trace deploys on managed infrastructure without custom orchestrators or comple
 | Component | Target Platform | URL Placeholder | Deployment Config | Health/Status Check |
 |---|---|---|---|---|
 | **Frontend** | Vercel (Next.js 15) | `https://qtrace-web.vercel.app` | `vercel.json`, `apps/web/vercel.json` | `GET /` & `GET /learn/bell-state` |
-| **Backend** | Railway (FastAPI / Python 3.12) | `https://qtrace-api.up.railway.app` | `railway.toml`, `apps/api/railway.toml` | `GET /health` & `GET /ready` |
+| **Backend** | Render / Railway (FastAPI / Python 3.12) | `https://qtrace-api.onrender.com` / `https://qtrace-api.up.railway.app` | `render.yaml`, `railway.toml` | `GET /health` & `GET /ready` |
 | **Database** | MongoDB Atlas (M0 Free Tier) | `mongodb+srv://...` | Server-side connection string | `seed.py --check` |
 
 > [!IMPORTANT]
@@ -62,7 +62,32 @@ For staging or live deployment:
   - Open `https://qtrace-web.vercel.app/learn/bell-state`
   - Confirm page renders with 0 console errors.
 
-### 2. Railway (FastAPI Backend)
+### 2. Railway / Render (FastAPI Backend)
+
+#### Option A: Render (Free Web Service or Blueprint)
+- **Service Name:** `qtrace-api`
+- **Environment / Runtime:** `Python 3`
+- **Root Directory:** `apps/api`
+- **Build Command:** `pip install --upgrade pip && pip install ".[quantum]"`
+- **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1`
+- **Plan:** Free
+- **Health Check Path:** `/health`
+- **Environment Variables:**
+  - `PYTHON_VERSION`: `3.12.0`
+  - `MONGODB_URI`: Atlas connection string
+  - `MONGODB_DB`: `qtrace_prod`
+  - `DEMO_LOCAL`: `0`
+  - `DEMO_FALLBACK`: `1`
+  - `ENABLE_QISKIT`: `1`
+  - `ENABLE_PENNYLANE`: `1`
+  - `ENABLE_TUTOR_CLOUD`: `0`
+  - `QTRACE_SIM_TIMEOUT_S`: `1.5`
+  - `WEB_ORIGIN`: Vercel frontend URL (e.g. `https://qtrace-web.vercel.app`)
+- **Verification:**
+  - `curl -sf https://qtrace-api.onrender.com/health` returns `{"status":"ok"}`
+  - `curl -sf https://qtrace-api.onrender.com/ready` returns `{"status":"ready"}`
+
+#### Option B: Railway (FastAPI Backend)
 - **Service Name:** `qtrace-api`
 - **Builder:** `NIXPACKS`
 - **Start Command:** `uv run --project apps/api uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1`
