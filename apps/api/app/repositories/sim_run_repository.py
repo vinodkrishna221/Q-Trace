@@ -361,21 +361,30 @@ _memory_repo: InMemorySimRunRepo = InMemorySimRunRepo()
 
 
 def _build_mongo_repo() -> Optional[MongoSimRunRepo]:
-    """Try to build a MongoSimRunRepo by importing DATA-6's live objects.
+    """Try to build a MongoSimRunRepo by wrapping the active MongoDB repository.
 
-    Returns None if DATA-6 is not yet available (branch not merged),
-    which causes the factory to fall back to the in-memory implementation.
+    Returns None if MongoDB is unconfigured or unavailable, which causes
+    the caller to fall back to the in-memory implementation.
     """
     try:
-        from app.repositories.base import DataRepositoryProtocol  # noqa: PLC0415
+        from app.repositories import get_repository  # noqa: PLC0415
         from app.repositories.mongo import MongoRepository  # noqa: PLC0415
 
-        repo = MongoRepository()  # type: ignore[call-arg]
-        if isinstance(repo, DataRepositoryProtocol):
-            return MongoSimRunRepo(repo)
+        active_repo = get_repository()
+        if isinstance(active_repo, MongoRepository):
+            return MongoSimRunRepo(active_repo)
+
+        mongodb_uri = os.getenv("MONGODB_URI", "").strip()
+        if mongodb_uri:
+            from pymongo import AsyncMongoClient  # noqa: PLC0415
+
+            db_name = os.getenv("MONGODB_DB", "qtrace_prod")
+            client = AsyncMongoClient(mongodb_uri)
+            db = client[db_name]
+            return MongoSimRunRepo(MongoRepository(db=db))
     except Exception as exc:
         logger.warning(
-            "MongoSimRunRepo not available (DATA-6 not merged?): %s — using memory fallback.",
+            "MongoSimRunRepo not available: %s — using memory fallback.",
             exc,
         )
     return None
@@ -390,8 +399,8 @@ def get_sim_run_repo() -> SimulationRunRepositoryProtocol:
     """Select the active SimulationRun repository based on DEMO_LOCAL env var.
 
     DEMO_LOCAL=1  (default) → InMemorySimRunRepo  (venue-safe)
-    DEMO_LOCAL=0            → MongoSimRunRepo if DATA-6 is available,
-                              else falls back to InMemorySimRunRepo with a warning.
+    DEMO_LOCAL=0            → MongoSimRunRepo if MongoDB is available,
+                              else falls back to InMemorySimRunRepo.
     """
     demo_local = os.getenv("DEMO_LOCAL", "1") == "1"
     if demo_local:
@@ -401,8 +410,8 @@ def get_sim_run_repo() -> SimulationRunRepositoryProtocol:
     if mongo is not None:
         return mongo
 
-    logger.warning(
-        "DEMO_LOCAL=0 but MongoSimRunRepo is unavailable; "
-        "falling back to InMemorySimRunRepo for this request."
+    logger.info(
+        "DEMO_LOCAL=0 but MongoDB is not configured or unavailable; "
+        "using InMemorySimRunRepo for this request."
     )
     return _memory_repo
