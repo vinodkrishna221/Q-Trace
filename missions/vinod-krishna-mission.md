@@ -87,7 +87,7 @@ DELIVERABLE: Create PPT source/assets for problem evidence, personas, learner fl
 TEST: `python3 scripts/check_deck.py` verifies required sections, source URLs, readable screenshots and no roadmap feature presented as live.
 DEPENDS: SHIP-3,UX-4          UNBLOCKS: —
 DEMO: The PPT covers the official statement and gives judges a retellable innovation.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 BRANCH: `feat/story-ship/ship-5-build-the-internal-round-ppt`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
