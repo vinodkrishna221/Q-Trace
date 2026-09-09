@@ -6,6 +6,7 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:api": "uvicorn apps.api.app.main:app --reload --port 8000",
+    "build": "pnpm --filter web build",
     "build:web": "pnpm --filter web build",
     "test:web": "pnpm --filter web test",
     "lint:web": "pnpm --filter web lint",
