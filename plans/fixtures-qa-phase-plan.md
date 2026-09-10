@@ -124,4 +124,4 @@ DELIVERABLE: Execute keyboard/projector run, 5× smoke, backup recording verific
 TEST: `bash scripts/final-certify.sh` emits `board/RELEASE-CERT.md` with all gates green and package/video/PPT hashes.
 DEPENDS: QA-7,SHIP-7          UNBLOCKS: SHIP-8
 DEMO: The team enters the internal round with a rehearsed primary and verified backup.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
