@@ -79,6 +79,17 @@ def prewarm_adapters() -> None:
     elapsed_ms = int((_time.monotonic() - t0) * 1000)
     _adapter_logger.info("adapter.prewarm_ok elapsedMs=%d", elapsed_ms)
 
+    if _os.getenv("ENABLE_PENNYLANE", "1") != "0":
+        try:
+            t_pl = _time.monotonic()
+            from app.services.quantum.pennylane_adapter import prewarm_pennylane  # noqa: PLC0415
+
+            prewarm_pennylane()
+            pl_elapsed = int((_time.monotonic() - t_pl) * 1000)
+            _adapter_logger.info("adapter.prewarm_pennylane_ok elapsedMs=%d", pl_elapsed)
+        except Exception as exc:
+            _adapter_logger.warning("adapter.prewarm_pennylane_skip reason=%s", exc)
+
 
 # ---------------------------------------------------------------------------
 # Output data classes (no Pydantic here — plain Python, fast to instantiate)

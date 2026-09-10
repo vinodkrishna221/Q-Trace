@@ -1,0 +1,36 @@
+# ==============================================================================
+# Render Blueprint Configuration — Q-Trace API Service
+# ==============================================================================
+# Deploys the FastAPI backend on Render Free Tier.
+# Single worker is required: state lives in-process (DEMO_LOCAL=1) or in Atlas (DEMO_LOCAL=0).
+
+services:
+  - type: web
+    name: qtrace-api
+    runtime: python
+    rootDir: apps/api
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install ".[quantum]"
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DEMO_LOCAL
+        value: "0"
+      - key: DEMO_FALLBACK
+        value: "1"
+      - key: ENABLE_QISKIT
+        value: "1"
+      - key: ENABLE_PENNYLANE
+        value: "1"
+      - key: ENABLE_TUTOR_CLOUD
+        value: "0"
+      - key: QTRACE_SIM_TIMEOUT_S
+        value: "5.0"
+      - key: MONGODB_DB
+        value: qtrace_prod
+      - key: MONGODB_URI
+        sync: false
+      - key: WEB_ORIGIN
+        sync: false
