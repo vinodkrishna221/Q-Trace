@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Trace — SIH 2026 Presentation Asset Deck</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0b0f19;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 32px 20px;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+    }
+    .header-bar {
+      max-width: 1280px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: #1e293b;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      background: #312e81;
+      color: #a5b4fc;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .slide-container {
+      max-width: 1280px;
+      width: 100%;
+      background: #1e293b;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .slide-meta {
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      border-bottom: 1px solid #334155;
+    }
+    .slide-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .slide-description {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .image-slot {
+      width: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-slot img {
+      width: 100%;
+      height: auto;
+      max-height: 720px;
+      object-fit: contain;
+      display: block;
+    }
+    .modular-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      background: #0f172a;
+    }
+    .modular-card {
+      background: #1e293b;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modular-card img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .modular-card-title {
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: #1e293b;
+      border-top: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header-bar">
+    <div>
+      <span class="badge">Smart India Hackathon 2026</span>
+      <h1 class="title" style="margin-top: 6px;">Q-Trace Presentation Visual Deck</h1>
+    </div>
+    <div style="text-align: right; font-size: 13px; color: #94a3b8;">
+      Team: <strong>Bit-Storm · Q-Trace</strong><br>
+      Theme: Smart Education / EdTech
+    </div>
+  </header>
+
+  <!-- Slide 4 Feasibility and Viability -->
+  <section class="slide-container">
+    <div class="slide-meta">
+      <span class="slide-tag">Slide 4 — Master Template (Full 16:9)</span>
+      <span class="slide-description">Feasibility & Viability: 4-Pillar Tree Diagram + Strategies for Overcoming Challenges</span>
+    </div>
+    <div class="image-slot">
+      <img src="assets/slide4-feasibility-viability.png" alt="Slide 4 Feasibility and Viability">
+    </div>
+    <div class="modular-grid">
+      <div class="modular-card">
+        <img src="assets/slide4-feasibility-tree.png" alt="Slide 4 Feasibility Tree Diagram">
+        <div class="modular-card-title">Pillar Tree: Technical, Financial, Operational, Social</div>
+      </div>
+      <div class="modular-card">
+        <img src="assets/slide4-challenges-panel.png" alt="Slide 4 Challenges Panel">
+        <div class="modular-card-title">Mitigations: Technical, Financial, Operational Challenges</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5 Impact and Benefits -->
+  <section class="slide-container">
+    <div class="slide-meta">
+      <span class="slide-tag">Slide 5 — Master Template (Full 16:9)</span>
+      <span class="slide-description">Impact & Benefits: Stakeholder Impact (Learner, Instructor, National) + 5D Benefits Matrix</span>
+    </div>
+    <div class="image-slot">
+      <img src="assets/slide5-impact-benefits.png" alt="Slide 5 Impact and Benefits">
+    </div>
+    <div class="modular-grid">
+      <div class="modular-card">
+        <img src="assets/slide5-instructor-insight.png" alt="Slide 5 Instructor Insight Dashboard">
+        <div class="modular-card-title">Live UI Route: Instructor Insight with Top Misconceptions & Synthetic Data Disclosure</div>
+      </div>
+      <div class="modular-card">
+        <img src="assets/slide4-live-smoke-result.png" alt="Slide 4 Smoke Result Proof">
+        <div class="modular-card-title">Terminal Proof: 6/6 Green Offline Learner Loop Verification (DEMO_LOCAL=1)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2 Hero Comparison -->
+  <section class="slide-container">
+    <div class="slide-meta">
+      <span class="slide-tag">Slide 2 — Core Differentiator Infographic</span>
+      <span class="slide-description">The Paradigm Shift: Generic Disconnected Tools vs Q-Trace Closed-Loop Engine</span>
+    </div>
+    <div class="image-slot">
+      <img src="assets/slide2-hero-comparison.png" alt="Slide 2 Hero Comparison Infographic">
+    </div>
+  </section>
+
+  <!-- Slide 3 Architecture Diagram -->
+  <section class="slide-container">
+    <div class="slide-meta">
+      <span class="slide-tag">Slide 3 — System Architecture</span>
+      <span class="slide-description">4-Tier System Architecture: Next.js Web, FastAPI Backend, Quantum Runtime, Data</span>
+    </div>
+    <div class="image-slot">
+      <img src="assets/slide3-architecture-diagram.png" alt="Slide 3 System Architecture">
+    </div>
+  </section>
+
+</body>
+</html>

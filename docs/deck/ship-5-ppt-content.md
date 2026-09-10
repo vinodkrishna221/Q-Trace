@@ -1,4 +1,4 @@
-﻿# Q-Trace — Internal-Round PPT Evidence Package · SHIP-5
+# Q-Trace — Internal-Round PPT Evidence Package · SHIP-5
 
 > **Source file:** `docs/deck/ship-5-ppt-content.md`
 > **Deck version:** 1.0 · **Authored:** 09 Sep 2026 · **Author:** Vinod Krishna (Herald persona)
@@ -45,26 +45,32 @@ NOTES:
 
 **Section heading (bold underline, per template):** Proposed Solution — Describe your Idea / Solution / Prototype
 
-**Bullet 1 — Problem evidence:**
-- Quantum learners face a hidden failure mode: they reproduce circuits but carry fundamental misconceptions.
-- Research shows correct reasoning on quantum state-count questions improved from ~50% to ~80% after guided interactive simulation with evidence-based feedback (McKagan et al., 2010 — source [1]).
-- Existing tools — circuit builders, generic chatbots — do not record the learner's prediction or locate the first gate of divergence.
+**Layout structure:** 4-Quadrant Stacked Visual Grid (Top: UI Screenshot / Pills · Bottom: 2 punchy bullets)
 
-**Bullet 2 — Proposed solution:**
-- Q-Trace is a web-based quantum learning platform where a learner predicts, builds, simulates, inspects, and repairs a circuit in one continuous loop.
-- The **Quantum Flight Recorder** replays the State Trace gate by gate, finds the first prediction-simulator mismatch, names the Misconception Signal, and issues a targeted Repair Challenge.
-- The Tutor explains the divergence using verified simulator output — it cannot invent a probability or change a count.
-- Progress Record and Instructor Insight update from a single live attempt; all cohort data is disclosed as synthetic.
+### Quadrant 1 (Top-Left) — Challenges & Problems [Step 1: Predict]
+- **Visual:** Screenshot of Prediction Checkpoint UI (`assets/slide2-q1-prediction.png`)
+- **Bullet 1 (Problem evidence):** Hidden Misconception Trap: Quantum learners assemble circuits without intuition; ~50% baseline failure rate without evidence-based feedback (McKagan et al., 2010 — source [1]).
+- **Bullet 2 (Uncaptured Hypotheses):** Existing circuit builders and generic chatbots hide errors until final execution, never capturing what the student expected or where their mental model broke.
 
-**Bullet 3 — Innovation and uniqueness:**
-- **Quantum Flight Recorder** is the differentiator: captures the learner's prediction before execution -> derives a deterministic gate-level State Trace from real simulator output -> locates the first prediction-versus-trace mismatch -> produces an instructor-visible Misconception Signal and a targeted Repair Challenge.
-- Connects four features competitors assemble separately into one traceable misconception-repair loop.
-- AI explains simulator evidence; it never invents quantum results — a category distinction from generic chatbots.
+### Quadrant 2 (Bottom-Left) — Proposed Solution [Step 2: Build & Code]
+- **Visual:** Screenshot of Circuit Workspace UI (`assets/slide2-q2-workspace.png`)
+- **Bullet 1 (Visual-to-Code Parity):** Interactive drag-and-drop qubit canvas paired with instant bi-directional Qiskit Python code generation via CodeMirror 6.
+- **Bullet 2 (Offline Execution):** 100% offline dual simulation: local Qiskit Aer statevector simulation verified against PennyLane; runs on one laptop with zero cloud dependencies (`DEMO_LOCAL=1`).
 
-[PLACEHOLDER: assets/slide2-hero-comparison.png — two-column comparison: "Generic tools" (builder + chatbot, disconnected) vs "Q-Trace" (prediction -> trace -> diagnosis -> repair -> progress, one loop). Use Observatory Dark palette.]
+### Quadrant 3 (Top-Right) — Innovation & Uniqueness [Core Differentiators]
+- **Visual:** 4 Colored Pill Badges (Quantum Flight Recorder · Evidence-Bound AI Tutor · Dual-Engine Conformance · Closed-Loop Pedagogy)
+- **Bullet 1 (Quantum Flight Recorder):** Replays the State Trace gate-by-gate to locate the exact gate of prediction divergence and name the Misconception Signal.
+- **Bullet 2 (Evidence-Bound AI Tutor):** AI explains verified simulator evidence; mathematically impossible to hallucinate or invent quantum probabilities.
+
+### Quadrant 4 (Bottom-Right) — How it Addresses Problems [Step 4: Repair Loop]
+- **Visual:** Screenshot of AI Tutor & Repair Challenge UI (`assets/slide2-q4-repairtutor.png`)
+- **Bullet 1 (Targeted Repair):** Diagnoses specific root causes (e.g. `SUPERPOSITION_VS_ENTANGLEMENT`) and generates targeted single-gate repair challenges to lift mastery from ~50% to ~80%.
+- **Bullet 2 (Progress Record):** Live attempts update learner mastery records and instructor analytics instantly without invasive chat surveillance.
+
+[PLACEHOLDER: assets/slide2-hero-comparison.png — 4-quadrant layout composite or interactive preview at docs/deck/slide2-preview.html]
 
 NOTES:
-> "The innovation is not the circuit builder or the chatbot — those are table stakes. The innovation is connecting a learner's wrong prediction to the exact gate that broke their understanding and turning that into a repair. Venu, show them."
+> "Our innovation isn't another circuit builder or chatbot — those are table stakes. The innovation is connecting a learner's wrong prediction to the exact gate where their intuition broke, and turning that into an immediate repair challenge. Venu, show them live."
 > Vinod -> Venu handoff at 20 s mark.
 
 ---
@@ -136,6 +142,7 @@ NOTES:
 | Visualizations teaching a false model | Every view labeled with mathematical representation; MIXED_SUBSYSTEM label for entangled subsystems |
 | Instructor Insight lacking real data | 40 seeded synthetic cohort sessions; live demo attempt writes one real record into the same schema |
 
+[VISUAL: assets/slide4-feasibility-viability.png — official SIH 4-pillar feasibility tree + strategies for overcoming challenges master slide]
 [PLACEHOLDER: assets/slide4-live-smoke-result.png — terminal screenshot of bash scripts/smoke.sh --mode local showing 6/6 green checks. Redact any keys or connection strings.]
 
 NOTES:
@@ -170,6 +177,7 @@ NOTES:
 | National / strategic | Supports India's quantum workforce readiness goal; QPU-ready architecture |
 | Environmental | Local CPU simulation uses negligible energy vs. cloud QPU submission |
 
+[VISUAL: assets/slide5-impact-benefits.png — official SIH 3-pillar stakeholder impact + 5-dimensional benefits matrix master slide]
 [PLACEHOLDER: assets/slide5-instructor-insight.png — screenshot of /instructor route showing SUPERPOSITION_VS_ENTANGLEMENT as the top misconception signal. MUST show the "SYNTHETIC DATA — 40 seeded learner sessions" disclosure label visible in the UI.]
 
 NOTES:
