@@ -52,7 +52,7 @@ _TTL_SECONDS: float = 60.0
 class SimulationRunRepositoryProtocol(Protocol):
     """Minimal persistence interface for Simulation Runs."""
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -61,7 +61,7 @@ class SimulationRunRepositoryProtocol(Protocol):
         """Persist a simulation run (immutable snapshot)."""
         ...
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         """Retrieve a run by ID, or None."""
         ...
 
@@ -110,7 +110,7 @@ class InMemorySimRunRepo:
         finally:
             new_loop.close()
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -142,11 +142,11 @@ class InMemorySimRunRepo:
                 createdAt=run.createdAt,
             )
             data_repo = get_repository()
-            self._run_async(data_repo.create_simulation_run(payload))
+            await data_repo.create_simulation_run(payload)
         except Exception as exc:
             logger.debug("Could not mirror simulation run to data repo: %s", exc)
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         return self._store.get(run_id)
 
     def get_by_request_id(
@@ -218,7 +218,7 @@ class MongoSimRunRepo:
         finally:
             new_loop.close()
 
-    def save(
+    async def save(
         self,
         run: SimulationRunOut,
         request_id: str | None = None,
@@ -259,7 +259,7 @@ class MongoSimRunRepo:
                 )
                 payload = run
 
-            self._run_async(self._repo.create_simulation_run(payload))  # type: ignore[attr-defined]
+            await self._repo.create_simulation_run(payload)  # type: ignore[attr-defined]
         except Exception as exc:
             logger.error("MongoSimRunRepo.save failed: %s", exc)
             raise
@@ -267,11 +267,9 @@ class MongoSimRunRepo:
         if request_id:
             self._idempotency[request_id] = (run, time.monotonic())
 
-    def get(self, run_id: str) -> Optional[SimulationRunOut]:
+    async def get(self, run_id: str) -> Optional[SimulationRunOut]:
         try:
-            raw = self._run_async(
-                self._repo.get_simulation_run(run_id)  # type: ignore[attr-defined]
-            )
+            raw = await self._repo.get_simulation_run(run_id)  # type: ignore[attr-defined]
             if raw is None:
                 return None
             # If already a SimulationRunOut (mock path), return as-is.
@@ -361,21 +359,30 @@ _memory_repo: InMemorySimRunRepo = InMemorySimRunRepo()
 
 
 def _build_mongo_repo() -> Optional[MongoSimRunRepo]:
-    """Try to build a MongoSimRunRepo by importing DATA-6's live objects.
+    """Try to build a MongoSimRunRepo by wrapping the active MongoDB repository.
 
-    Returns None if DATA-6 is not yet available (branch not merged),
-    which causes the factory to fall back to the in-memory implementation.
+    Returns None if MongoDB is unconfigured or unavailable, which causes
+    the caller to fall back to the in-memory implementation.
     """
     try:
-        from app.repositories.base import DataRepositoryProtocol  # noqa: PLC0415
+        from app.repositories import get_repository  # noqa: PLC0415
         from app.repositories.mongo import MongoRepository  # noqa: PLC0415
 
-        repo = MongoRepository()  # type: ignore[call-arg]
-        if isinstance(repo, DataRepositoryProtocol):
-            return MongoSimRunRepo(repo)
+        active_repo = get_repository()
+        if isinstance(active_repo, MongoRepository):
+            return MongoSimRunRepo(active_repo)
+
+        mongodb_uri = os.getenv("MONGODB_URI", "").strip()
+        if mongodb_uri:
+            from pymongo import AsyncMongoClient  # noqa: PLC0415
+
+            db_name = os.getenv("MONGODB_DB", "qtrace_prod")
+            client = AsyncMongoClient(mongodb_uri)
+            db = client[db_name]
+            return MongoSimRunRepo(MongoRepository(db=db))
     except Exception as exc:
         logger.warning(
-            "MongoSimRunRepo not available (DATA-6 not merged?): %s — using memory fallback.",
+            "MongoSimRunRepo not available: %s — using memory fallback.",
             exc,
         )
     return None
@@ -390,8 +397,8 @@ def get_sim_run_repo() -> SimulationRunRepositoryProtocol:
     """Select the active SimulationRun repository based on DEMO_LOCAL env var.
 
     DEMO_LOCAL=1  (default) → InMemorySimRunRepo  (venue-safe)
-    DEMO_LOCAL=0            → MongoSimRunRepo if DATA-6 is available,
-                              else falls back to InMemorySimRunRepo with a warning.
+    DEMO_LOCAL=0            → MongoSimRunRepo if MongoDB is available,
+                              else falls back to InMemorySimRunRepo.
     """
     demo_local = os.getenv("DEMO_LOCAL", "1") == "1"
     if demo_local:
@@ -401,8 +408,8 @@ def get_sim_run_repo() -> SimulationRunRepositoryProtocol:
     if mongo is not None:
         return mongo
 
-    logger.warning(
-        "DEMO_LOCAL=0 but MongoSimRunRepo is unavailable; "
-        "falling back to InMemorySimRunRepo for this request."
+    logger.info(
+        "DEMO_LOCAL=0 but MongoDB is not configured or unavailable; "
+        "using InMemorySimRunRepo for this request."
     )
     return _memory_repo

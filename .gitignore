@@ -7,6 +7,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.*.example
 *.pem
 *.key
 
@@ -31,6 +32,8 @@ out/
 *.log
 test-results/
 playwright-report/
+.demo_logs/
+*.tsbuildinfo
 
 # OS / IDE
 .DS_Store

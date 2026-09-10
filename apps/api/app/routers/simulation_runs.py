@@ -150,7 +150,7 @@ async def create_simulation_run(
         if body.predictionResponse is not None
         else None
     )
-    repo.save(run, request_id=request_id, prediction_response=pred_dict)
+    await repo.save(run, request_id=request_id, prediction_response=pred_dict)
     return SimulationRunResponse(simulationRun=run)
 
 
@@ -161,7 +161,7 @@ async def get_simulation_run(
     repo: _Repo,
 ) -> SimulationRunGetResponse:
     """GET /v1/simulation-runs/{simulationRunId} — retrieve a persisted run."""
-    run = repo.get(simulation_run_id)
+    run = await repo.get(simulation_run_id)
     if run is None:
         request_id: str = getattr(request.state, "request_id", "req_unknown")
         raise HTTPException(

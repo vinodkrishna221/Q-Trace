@@ -87,7 +87,7 @@ DELIVERABLE: Add cross-track diagnosis/grading/Tutor evidence acceptance tests u
 TEST: `bash scripts/test-core.sh` runs all unit and QA-owned acceptance suites and proves no numerical claim lacks evidence.
 DEPENDS: AI-4,DATA-3,UX-5          UNBLOCKS: SHIP-6
 DEMO: Protects the wow moment and repair outcome from regression.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 BRANCH: `feat/fixtures-qa/qa-5-test-diagnosis-grading-and-critical`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
