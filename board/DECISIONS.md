@@ -56,3 +56,9 @@ AFFECTS: `/missions` prerequisites pass; every brief receives a domain speaking 
 CHOSE: Connect InMemorySimRunRepo to DataRepositoryProtocol via an async execution helper (_run_async) passing typed SimulationRun with predictionResponse.
 BECAUSE: DEMO_LOCAL=1 requires learner-loop parity across simulation and diagnosis without violating encapsulation through private attribute access.
 AFFECTS: apps/api/app/repositories/sim_run_repository.py, apps/api/app/routers/simulation_runs.py, QA-3 smoke runner, and cross-track contract integrity.
+
+### 12 · Learn Page Stepper & Algorithm Sidebar Layout           10 Sep 2026 · by Vinod
+CHOSE: Redesign `/learn` into a sequential step-by-step learning progression with an interactive stepper and a dedicated left-rail algorithm navigator containing Bell Correlation (Hero Lab) and a 6-algorithm future roadmap.
+BECAUSE: Learners need progressive mental-model construction (superposition → measurement → entanglement) without cognitive overload, and future algorithm placeholders clarify platform trajectory.
+AFFECTS: apps/web/app/(app)/learn/page.tsx, apps/web/features/learning/learn-sidebar.tsx, learn-layout.test.tsx.
+
