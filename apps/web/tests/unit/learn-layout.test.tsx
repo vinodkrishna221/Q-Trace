@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import { render } from '../test-utils';
 import LearnIndexPage from '@/app/(app)/learn/page';
+import BellStateLearnPage from '@/app/(app)/learn/bell-state/page';
 import { useRoleStore } from '@/lib/role-store';
 
 describe('Learn Page Layout, Stepper & Algorithm Sidebar Suite', () => {
@@ -16,7 +17,7 @@ describe('Learn Page Layout, Stepper & Algorithm Sidebar Suite', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders the guided pedagogical prompt card and step progression directive', () => {
+  it('renders the guided pedagogical prompt card and step progression directive on /learn catalogue', () => {
     render(<LearnIndexPage />);
 
     // 1. Guided Prompt
@@ -52,7 +53,7 @@ describe('Learn Page Layout, Stepper & Algorithm Sidebar Suite', () => {
     expect(screen.getByText('Variational Quantum Eigensolver (VQE)')).toBeDefined();
   });
 
-  it('supports stepping through one by one via Next Step and Prev Step buttons', () => {
+  it('supports stepping through one by one via Next Step and Prev Step buttons on /learn', () => {
     render(<LearnIndexPage />);
 
     // Initial state: Step 1 in focus
@@ -74,11 +75,32 @@ describe('Learn Page Layout, Stepper & Algorithm Sidebar Suite', () => {
     expect(screen.getByText(/Step 2 of 3 in focus/i)).toBeDefined();
   });
 
-  it('automatically sets Step 3 (Bell State) in focus for fast-tracked learner Meera', () => {
-    useRoleStore.getState().setRole('role_meera');
-    render(<LearnIndexPage />);
+  it('renders the LearnSidebar and step-by-step controller on the Bell State lesson page (/learn/bell-state)', () => {
+    render(<BellStateLearnPage />);
 
-    expect(screen.getByText(/Step 3 of 3 in focus/i)).toBeDefined();
-    expect(screen.getByText(/Foundations are credited — you may jump straight to Step 3/i)).toBeDefined();
+    // 1. Sidebar presence
+    const sidebar = screen.getByTestId('learn-sidebar');
+    expect(sidebar).toBeDefined();
+    expect(screen.getByText('Bell State Correlation')).toBeDefined();
+    expect(screen.getByText('Future Algorithms')).toBeDefined();
+
+    // 2. Stepper controller
+    expect(screen.getByText('Interactive Learning Stepper')).toBeDefined();
+    expect(screen.getByText(/Step 1 of 7/i)).toBeDefined();
+
+    // 3. Step 1 Prediction Directive Prompt
+    expect(screen.getByText(/Step 01 · Initial Prediction Directive/i)).toBeDefined();
+
+    // 4. Stepping forward: Click Next -> Step 2
+    const nextBtn = screen.getByRole('button', { name: /Next: Step 2 — Build & Simulate Circuit/i });
+    fireEvent.click(nextBtn);
+    expect(screen.getByText(/Step 2 of 7/i)).toBeDefined();
+    expect(screen.getByText(/Interactive Circuit Workspace & Qiskit Aer/i)).toBeDefined();
+
+    // 5. Toggle View All Mode
+    const viewAllBtn = screen.getByRole('button', { name: /View All/i });
+    fireEvent.click(viewAllBtn);
+    expect(screen.getByTestId('prediction-checkpoint-card')).toBeDefined();
+    expect(screen.getByTestId('interactive-circuit-workspace')).toBeDefined();
   });
 });
