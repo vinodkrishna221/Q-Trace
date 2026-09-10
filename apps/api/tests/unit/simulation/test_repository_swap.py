@@ -141,17 +141,17 @@ def mongo_repo(mock_data_repo: MagicMock) -> MongoSimRunRepo:
 # ---------------------------------------------------------------------------
 
 
-def _run_contract_suite(repo: InMemorySimRunRepo | MongoSimRunRepo) -> None:
+async def _run_contract_suite(repo: InMemorySimRunRepo | MongoSimRunRepo) -> None:
     """Run the same assertions against either backend implementation."""
     run = _make_run("sr_contract_001")
     req_id = f"req_{uuid.uuid4().hex[:12]}"
 
     # 1. get() returns None before save
-    assert repo.get("sr_contract_001") is None, "expect None before save"
+    assert await repo.get("sr_contract_001") is None, "expect None before save"
 
     # 2. save() and get() round-trip
-    repo.save(run, request_id=req_id)
-    retrieved = repo.get("sr_contract_001")
+    await repo.save(run, request_id=req_id)
+    retrieved = await repo.get("sr_contract_001")
     assert retrieved is not None, "expect run after save"
     assert retrieved.id == "sr_contract_001"
     assert retrieved.probabilities == {"00": 0.5, "11": 0.5}
@@ -170,49 +170,49 @@ def _run_contract_suite(repo: InMemorySimRunRepo | MongoSimRunRepo) -> None:
     assert repo.get_by_request_id("req_unknown_xyz") is None
 
     # 6. clear() resets state
-    repo.save(run)  # re-save (idempotency entry was evicted)
+    await repo.save(run)  # re-save (idempotency entry was evicted)
     repo.clear()
-    assert repo.get("sr_contract_001") is None, "expect None after clear"
+    assert await repo.get("sr_contract_001") is None, "expect None after clear"
 
 
 class TestInMemorySimRunRepo:
     """Contract suite for the in-memory implementation."""
 
-    def test_contract_suite(self, memory_repo: InMemorySimRunRepo) -> None:
-        _run_contract_suite(memory_repo)
+    async def test_contract_suite(self, memory_repo: InMemorySimRunRepo) -> None:
+        await _run_contract_suite(memory_repo)
 
-    def test_multiple_runs(self, memory_repo: InMemorySimRunRepo) -> None:
+    async def test_multiple_runs(self, memory_repo: InMemorySimRunRepo) -> None:
         run_a = _make_run("sr_a")
         run_b = _make_run("sr_b")
-        memory_repo.save(run_a)
-        memory_repo.save(run_b)
-        assert memory_repo.get("sr_a") is not None
-        assert memory_repo.get("sr_b") is not None
-        assert memory_repo.get("sr_c") is None
+        await memory_repo.save(run_a)
+        await memory_repo.save(run_b)
+        assert await memory_repo.get("sr_a") is not None
+        assert await memory_repo.get("sr_b") is not None
+        assert await memory_repo.get("sr_c") is None
 
-    def test_clear_leaves_other_instance_untouched(self) -> None:
+    async def test_clear_leaves_other_instance_untouched(self) -> None:
         """Each InMemorySimRunRepo instance has its own isolated store."""
         repo1 = InMemorySimRunRepo()
         repo2 = InMemorySimRunRepo()
-        repo1.save(_make_run("sr_isolated"))
+        await repo1.save(_make_run("sr_isolated"))
         repo2.clear()
-        assert repo1.get("sr_isolated") is not None, "repo2.clear must not affect repo1"
+        assert await repo1.get("sr_isolated") is not None, "repo2.clear must not affect repo1"
 
 
 class TestMongoSimRunRepo:
     """Contract suite for the Mongo-backed implementation (mock DATA-6 path)."""
 
-    def test_contract_suite(self, mongo_repo: MongoSimRunRepo) -> None:
-        _run_contract_suite(mongo_repo)
+    async def test_contract_suite(self, mongo_repo: MongoSimRunRepo) -> None:
+        await _run_contract_suite(mongo_repo)
 
-    def test_save_persists_to_data_repo(
+    async def test_save_persists_to_data_repo(
         self, mongo_repo: MongoSimRunRepo, mock_data_repo: MagicMock
     ) -> None:
         """Saving a run should invoke create_simulation_run on the data repo."""
         run = _make_run("sr_mongo_001")
-        mongo_repo.save(run, request_id="req_mongo_001")
+        await mongo_repo.save(run, request_id="req_mongo_001")
         # The underlying async call was made (we check via get)
-        retrieved = mongo_repo.get("sr_mongo_001")
+        retrieved = await mongo_repo.get("sr_mongo_001")
         assert retrieved is not None
         assert retrieved.id == "sr_mongo_001"
 
@@ -279,7 +279,7 @@ class TestRouterWithRepositorySwap:
         yield client, isolated_repo
         app.dependency_overrides.clear()
 
-    def test_post_and_get_uses_injected_repo(
+    async def test_post_and_get_uses_injected_repo(
         self, client_with_memory_repo
     ) -> None:
         """POST then GET a run; confirm the injected repo holds the data."""
@@ -343,7 +343,7 @@ class TestRouterWithRepositorySwap:
         run_id = data["simulationRun"]["id"]
 
         # The run must now be in the injected repo
-        assert repo.get(run_id) is not None
+        assert await repo.get(run_id) is not None
 
         # GET must retrieve the same run
         get_resp = client.get(f"/v1/simulation-runs/{run_id}")
