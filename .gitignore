@@ -30,6 +30,8 @@ build/
 out/
 .turbo/
 *.log
+test-results/
+playwright-report/
 .demo_logs/
 *.tsbuildinfo
 

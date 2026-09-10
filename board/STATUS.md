@@ -17,7 +17,7 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1..QA-5 | QA-5 merged to main | QA-6 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-6 | QA-6 merged to main | QA-7 |
 | story-ship | plan + Vinod mission + SHIP-1..SHIP-4 | SHIP-4 merged to main | SHIP-5 |
 
 ## Blockers
@@ -116,6 +116,8 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 08 Sep 14:44 Sohail: QA-2 blocker resolved — frontend Zod contract schemas implemented in apps/web/tests/fixtures/contract.test.ts for all 4 contracts and error envelope; strict schemas reject renamed fields, missing requestId/id, and ObjectId leaks via ZodError; scripts/contract-check.sh updated; 35/35 backend + 25/25 frontend tests green, 82/82 full web test suite green, Next.js build passed (11/11 static routes); PR ready for Warden re-review.
 - 08 Sep 16:10 Sohail: QA-4 green — 36 cross-track acceptance and security tests created (12 acceptance: Qiskit/PennyLane tolerance within 1e-6, asymmetric basis-order mapping, trace-before-measurement, post-CNOT MIXED_SUBSYSTEM purity; 24 security: malicious AST corpus covers exec/eval/compile, arbitrary imports, loops, functions, file access, unsupported gates, obfuscation, circuit-limit and reversed-mapper detection); 36/36 QA-4 suite passed, 536/536 full API regression passed. Unblocks SHIP-6. PR ready for Warden review.
 - 08 Sep 21:05 Sohail: QA-5 green — cross-track diagnosis/grading/Tutor acceptance tests (87 diagnosis/grading + 33 Tutor evidence) and frontend acceptance fixtures (29 circuit-workspace + 25 fallback-state) verified; scripts/test-core.sh created with portable command discovery across uv/python and pnpm/npx/node; 7/7 suites green (465 API unit, 120 QA-5 acceptance, 36 QA-4 regression, 136 web suite, 54 web acceptance). Unblocks SHIP-6. PR ready for Warden re-review.
+
+- 09 Sep 19:40 Sohail: QA-6 green — Playwright learner-led journey E2E test created in apps/web/e2e/bell-journey.spec.ts covering Beats B1–B8 (role entry, prediction checkpoint, circuit workspace + code sync, dual simulation run, visual evidence, Flight Recorder wow moment with MIXED_SUBSYSTEM, evidence-bound tutor with fallback badge, repair challenge attempt, /progress record, /instructor cohort proof); pnpm --dir apps/web playwright test bell-journey.spec.ts passed (1/1 green); trace/video recorded only on failure; PR ready for Warden review. Unblocks UX-9, QA-7, SHIP-7.
 
 - 09 Sep 19:40 Vinod: SHIP-5 green — internal-round PPT evidence package implemented; docs/deck/ship-5-ppt-content.md created with all 6 SIH slides, 11 required sections, 7 sourced URLs, 4 screenshot placeholders, synthetic data disclosure, and roadmap-vs-live boundary; scripts/check_deck.py created and passes 36/36 checks (file existence, 6-slide structure, 11 sections, 7 URLs, 4 screenshot markers, 6 roadmap guards, synthetic disclosure); no roadmap feature presented as live; PR ready for Warden review.
 - 10 Sep 09:45 Vinod: QA browser test reports and synthesized Final Enhancement Report established in reports/ across Aarav, Meera, and Dr. Rao with 33 screenshot captures and cross-persona friction heatmap.

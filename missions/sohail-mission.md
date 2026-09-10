@@ -97,7 +97,7 @@ DELIVERABLE: Create Playwright test for Aarav prediction → build/run → evide
 TEST: `pnpm --dir apps/web playwright test bell-journey.spec.ts` passes against local mode and records trace/video only on failure.
 DEPENDS: UX-7,SIM-8,AI-6,DATA-7          UNBLOCKS: UX-9,QA-7,SHIP-7
 DEMO: Rehearses the exact 90-second path automatically.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 BRANCH: `feat/fixtures-qa/qa-6-automate-the-learner-led-playwright`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
