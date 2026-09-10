@@ -114,7 +114,7 @@ DELIVERABLE: Add forced-offline/fallback drill, live CORS/readiness smoke, contr
 TEST: `bash scripts/release-gate.sh` passes local-offline and live URLs or returns a single ranked blocker list.
 DEPENDS: QA-6,SHIP-6          UNBLOCKS: SIM-9,AI-8,DATA-8,QA-8
 DEMO: Ensures “show us” works with bad venue Wi-Fi and no last-minute contract drift.
-PERSONA: Warden           STATUS: [ ] todo
+PERSONA: Warden           STATUS: [x] done
 
 ## P3 · Polish — due 28 Aug 2026 09:00 IST (pre-cut-listed)
 
