@@ -1,0 +1,349 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Trace — Slide 2 Preview (SIH 2026)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      color: #334155;
+    }
+    .slide-wrapper {
+      width: 1280px;
+      height: 720px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide-header {
+      height: 68px;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #e2e8f0;
+      background: #fafafa;
+    }
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 18px;
+      border: 2px solid #6366f1;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 15px;
+      color: #4338ca;
+      letter-spacing: 0.5px;
+      background: #eef2ff;
+    }
+    .slide-title-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .brand-text {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+    .brand-tagline {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-left: 6px;
+      padding-left: 8px;
+      border-left: 2px solid #cbd5e1;
+    }
+    .sih-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: right;
+    }
+    .sih-logo-placeholder {
+      font-weight: 900;
+      font-size: 13px;
+      color: #047857;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .slide-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 12px;
+      padding: 12px 20px;
+      background: #f8fafc;
+    }
+    .quadrant-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid #f1f5f9;
+    }
+    .card-heading {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .step-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .step-tag-1 { background: #fee2e2; color: #b91c1c; }
+    .step-tag-2 { background: #e0e7ff; color: #4338ca; }
+    .step-tag-3 { background: #fef3c7; color: #b45309; }
+    .step-tag-4 { background: #dcfce7; color: #15803d; }
+    .img-frame {
+      flex: 1;
+      width: 100%;
+      min-height: 145px;
+      max-height: 160px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      background: #090d16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+    .img-caption-pill {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      color: #38bdf8;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .card-bullets {
+      margin-top: 8px;
+      padding-left: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .card-bullets li {
+      font-size: 11px;
+      line-height: 1.35;
+      color: #334155;
+      position: relative;
+      padding-left: 14px;
+    }
+    .card-bullets li::before {
+      content: "•";
+      color: #4f46e5;
+      font-weight: 900;
+      font-size: 14px;
+      position: absolute;
+      left: 2px;
+      top: -1px;
+    }
+    .card-bullets strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+    .pills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .pill-item {
+      padding: 6px 8px;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid transparent;
+    }
+    .pill-blue   { background: #eff6ff; border-color: #bfdbfe; }
+    .pill-teal   { background: #f0fdf4; border-color: #bbf7d0; }
+    .pill-amber  { background: #fffbeb; border-color: #fde68a; }
+    .pill-purple { background: #faf5ff; border-color: #e9d5ff; }
+    .pill-title {
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .pill-blue .pill-title   { color: #1d4ed8; }
+    .pill-teal .pill-title   { color: #047857; }
+    .pill-amber .pill-title  { color: #b45309; }
+    .pill-purple .pill-title { color: #7e22ce; }
+    .pill-desc {
+      font-size: 9.5px;
+      line-height: 1.25;
+      color: #475569;
+      font-weight: 500;
+    }
+    .notes-footer {
+      margin-top: 14px;
+      max-width: 1280px;
+      width: 100%;
+      background: #1e293b;
+      padding: 12px 18px;
+      border-radius: 6px;
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .notes-footer strong {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-wrapper">
+    <header class="slide-header">
+      <div class="team-badge">Bit-Storm · Q-Trace</div>
+      <div class="slide-title-block">
+        <div class="brand-icon">Q</div>
+        <div class="brand-text">Q-Trace</div>
+        <span class="brand-tagline">Build it · See it · Repair it</span>
+      </div>
+      <div class="sih-badge">
+        <div class="sih-logo-placeholder">Smart India<br>Hackathon 2026</div>
+      </div>
+    </header>
+    <main class="slide-body">
+      <section class="quadrant-card">
+        <div class="card-header">
+          <h2 class="card-heading"><span>⚠️</span> Challenges & Problems</h2>
+          <span class="step-tag step-tag-1">Step 1: Predict</span>
+        </div>
+        <div class="img-frame">
+          <img src="assets/slide2-q1-prediction.png" alt="Prediction Checkpoint UI">
+          <span class="img-caption-pill">Prediction Checkpoint Modal</span>
+        </div>
+        <ul class="card-bullets">
+          <li><strong>Hidden Misconception Trap:</strong> Learners assemble circuits without quantum intuition; ~50% baseline failure rate without evidence-based feedback (McKagan et al., 2010).</li>
+          <li><strong>Uncaptured Hypotheses:</strong> Existing tools hide mistakes until final shots, never capturing <em>what</em> the student expected or <em>where</em> their mental model broke.</li>
+        </ul>
+      </section>
+
+      <section class="quadrant-card">
+        <div class="card-header">
+          <h2 class="card-heading"><span>✨</span> Innovation & Uniqueness</h2>
+          <span class="step-tag step-tag-3">Core Differentiators</span>
+        </div>
+        <div class="pills-grid">
+          <div class="pill-item pill-blue">
+            <span class="pill-title">Quantum Flight Recorder</span>
+            <span class="pill-desc">Gate-by-gate state trace replay to locate the exact gate of prediction divergence.</span>
+          </div>
+          <div class="pill-item pill-teal">
+            <span class="pill-title">Evidence-Bound AI Tutor</span>
+            <span class="pill-desc">Strictly grounded in real Qiskit statevectors; mathematically impossible to hallucinate.</span>
+          </div>
+          <div class="pill-item pill-amber">
+            <span class="pill-title">Dual-Engine Conformance</span>
+            <span class="pill-desc">Qiskit Aer primary verified against PennyLane for multi-framework truth.</span>
+          </div>
+          <div class="pill-item pill-purple">
+            <span class="pill-title">Closed-Loop Pedagogy</span>
+            <span class="pill-desc">Unifies prediction, visual build, simulation, diagnosis & repair in one flow.</span>
+          </div>
+        </div>
+        <ul class="card-bullets">
+          <li><strong>Deterministic Diagnosis:</strong> Compares student hypothesis directly against simulator statevectors to trigger pinpointed signals (e.g. <code>SUPERPOSITION_VS_ENTANGLEMENT</code>).</li>
+          <li><strong>Ground Truth First:</strong> AI explains simulator evidence — never invents probabilities or alters quantum counts.</li>
+        </ul>
+      </section>
+
+      <section class="quadrant-card">
+        <div class="card-header">
+          <h2 class="card-heading"><span>🛠️</span> Proposed Solution</h2>
+          <span class="step-tag step-tag-2">Step 2: Build & Code</span>
+        </div>
+        <div class="img-frame">
+          <img src="assets/slide2-q2-workspace.png" alt="Circuit Workspace UI">
+          <span class="img-caption-pill">Circuit Grid + Synced Qiskit Code</span>
+        </div>
+        <ul class="card-bullets">
+          <li><strong>Visual-to-Code Parity:</strong> Interactive drag-and-drop qubit canvas paired with instant bi-directional Qiskit Python code generation via CodeMirror 6.</li>
+          <li><strong>100% Offline Dual Execution:</strong> Local Qiskit Aer statevector simulation runs on one laptop without internet or paid cloud infrastructure (DEMO_LOCAL=1).</li>
+        </ul>
+      </section>
+
+      <section class="quadrant-card">
+        <div class="card-header">
+          <h2 class="card-heading"><span>🎯</span> How it Addresses the Problems</h2>
+          <span class="step-tag step-tag-4">Step 4: Repair Loop</span>
+        </div>
+        <div class="img-frame">
+          <img src="assets/slide2-q4-repairtutor.png" alt="AI Tutor and Repair Challenge">
+          <span class="img-caption-pill">Misconception Diagnosis & Targeted Challenge</span>
+        </div>
+        <ul class="card-bullets">
+          <li><strong>Targeted Repair Challenges:</strong> Converts diagnosed misconceptions into active single-gate challenges, boosting conceptual mastery from ~50% to ~80%.</li>
+          <li><strong>Progress & Instructor Insight:</strong> Live attempt updates learner record and instructor dashboard instantly without invasive surveillance.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+  <div class="notes-footer">
+    <strong>Speaker Delivery Note (Vinod &rarr; Venu handoff, ~20s):</strong><br>
+    "Our innovation isn't another circuit builder or chatbot — those are table stakes. The innovation is connecting a learner's wrong prediction to the exact gate where their intuition broke, and turning that into an immediate repair challenge. Venu, show them live."
+  </div>
+</body>
+</html>
