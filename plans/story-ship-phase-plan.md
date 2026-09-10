@@ -88,7 +88,7 @@ DELIVERABLE: Configure Vercel web, Railway API, Atlas M0, CORS/env templates, se
 TEST: `bash scripts/smoke-live.sh` reaches deployed web, `/health`, `/ready` and seeded Bell Module without exposing keys.
 DEPENDS: QA-3          UNBLOCKS: SIM-8,AI-6,SHIP-6
 DEMO: Judges can open live URLs well before the final day.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 
 ### SHIP-5 · Build the internal-round PPT evidence package                        [timebox: 2h]
 CONTEXT: SHIP-3 and UX-4 provide the narrative and learner skeleton screenshots. Load IDEA-BRIEF, PRD, ARCHITECTURE, source ledger and any official college template; keep content modular if the template has not arrived.
@@ -96,7 +96,7 @@ DELIVERABLE: Create PPT source/assets for problem evidence, personas, learner fl
 TEST: `python3 scripts/check_deck.py` verifies required sections, source URLs, readable screenshots and no roadmap feature presented as live.
 DEPENDS: SHIP-3,UX-4          UNBLOCKS: —
 DEMO: The PPT covers the official statement and gives judges a retellable innovation.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 
 ## P2 · Integration — due 27 Aug 2026 18:00 IST
 

@@ -77,7 +77,7 @@ DELIVERABLE: Configure Vercel web, Railway API, Atlas M0, CORS/env templates, se
 TEST: `bash scripts/smoke-live.sh` reaches deployed web, `/health`, `/ready` and seeded Bell Module without exposing keys.
 DEPENDS: QA-3          UNBLOCKS: SIM-8,AI-6,SHIP-6
 DEMO: Judges can open live URLs well before the final day.
-PERSONA: Patch           STATUS: [ ] todo
+PERSONA: Patch           STATUS: [x] done
 BRANCH: `feat/story-ship/ship-4-deploy-frontend-api-and-atlas`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -87,7 +87,7 @@ DELIVERABLE: Create PPT source/assets for problem evidence, personas, learner fl
 TEST: `python3 scripts/check_deck.py` verifies required sections, source URLs, readable screenshots and no roadmap feature presented as live.
 DEPENDS: SHIP-3,UX-4          UNBLOCKS: —
 DEMO: The PPT covers the official statement and gives judges a retellable innovation.
-PERSONA: Herald           STATUS: [ ] todo
+PERSONA: Herald           STATUS: [x] done
 BRANCH: `feat/story-ship/ship-5-build-the-internal-round-ppt`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

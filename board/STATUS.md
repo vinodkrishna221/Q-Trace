@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 08 Sep 2026 14:56 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 10 Sep 2026 10:15 IST by Patch
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -6,7 +6,7 @@
 ## Now
 
 **Clock:** preparation day 1/7 · **Skeleton:** 🟡 missions ready for acceptance; deadline 25 Aug 2026 09:00 IST
-**Deploy:** 🔴 targets frozen, resources not yet created · last smoke: not started
+**Deploy:** 🟡 targets configured & verified · last smoke: smoke-live 5/5 green
 **Rubric (Oracle, ASSUMED):** I9.2 T8.7 Im9.2 P9.5 → 9.15 · FIX-THIS-HOUR: all six accept missions; Vinod merges SHIP-1, then P0 lanes fan out
 
 ## Tracks
@@ -17,8 +17,8 @@
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
-| fixtures-qa | plan + Sohail mission + QA-1..QA-4, QA-7, QA-8 | PR review (QA-8) | QA-5 / QA-6 |
-| story-ship | plan + Vinod mission + SHIP-1..SHIP-3 | SHIP-3 merged to main | SHIP-4 |
+| fixtures-qa | plan + Sohail mission + QA-1..QA-8 | QA-8 merged to main | — (Track complete) |
+| story-ship | plan + Vinod mission + SHIP-1..SHIP-4 | SHIP-4 merged to main | SHIP-5 |
 
 ## Blockers
 
@@ -41,6 +41,12 @@
 Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video script **28 Aug 09:00** · Merge/deploy/PPT **28 Aug 18:00** · exact T-minus gates recomputed when presentation time arrives
 
 ## Log
+
+- 09 Sep 18:40 Patch: SHIP-4 merged to main — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) verified; smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); unblocks SIM-8, AI-6, SHIP-6.
+
+- 09 Sep 18:30 Vinod: SHIP-4 green — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) established; bash scripts/smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); PR ready for Warden review. Unblocks SHIP-6.
+
+- 09 Sep 18:21 Patch: QA-5 merged to main (PR #38) — cross-track diagnosis, grading, and Tutor evidence acceptance tests (120/120 API acceptance) and critical UI state fixtures (29 circuit-workspace + 25 fallback-state + 12 workspace unit, 66/66 web acceptance) verified; scripts/test-core.sh verified; unblocks SHIP-6.
 
 - 08 Sep 16:16 Patch: QA-4 merged to main (PR #41) — 36 cross-track quantum acceptance and parser security tests verified; Qiskit/PennyLane tolerance within 1e-6, basis endianness with reversed-mapper detection, MEASURE-exclusion from stateTrace, post-CNOT subsystem purity, and malicious AST allowlist corpus confirmed; 36/36 targeted suite and 536/536 full API suite green. Unblocks SHIP-6.
 
@@ -109,5 +115,14 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 08 Sep 14:05 Sohail: QA-2 green — Pydantic serialization tests (35 tests, all four contracts), TypeScript fixture shape tests (33 tests), and scripts/contract-check.sh written; bash scripts/contract-check.sh passes valid examples and deliberately fails renamed field, ObjectId leak and missing requestId; 35/35 backend + 33/33 frontend tests green; PR ready for Warden review. Unblocks QA-3.
 - 08 Sep 14:44 Sohail: QA-2 blocker resolved — frontend Zod contract schemas implemented in apps/web/tests/fixtures/contract.test.ts for all 4 contracts and error envelope; strict schemas reject renamed fields, missing requestId/id, and ObjectId leaks via ZodError; scripts/contract-check.sh updated; 35/35 backend + 25/25 frontend tests green, 82/82 full web test suite green, Next.js build passed (11/11 static routes); PR ready for Warden re-review.
 - 08 Sep 16:10 Sohail: QA-4 green — 36 cross-track acceptance and security tests created (12 acceptance: Qiskit/PennyLane tolerance within 1e-6, asymmetric basis-order mapping, trace-before-measurement, post-CNOT MIXED_SUBSYSTEM purity; 24 security: malicious AST corpus covers exec/eval/compile, arbitrary imports, loops, functions, file access, unsupported gates, obfuscation, circuit-limit and reversed-mapper detection); 36/36 QA-4 suite passed, 536/536 full API regression passed. Unblocks SHIP-6. PR ready for Warden review.
+- 08 Sep 21:05 Sohail: QA-5 green — cross-track diagnosis/grading/Tutor acceptance tests (87 diagnosis/grading + 33 Tutor evidence) and frontend acceptance fixtures (29 circuit-workspace + 25 fallback-state) verified; scripts/test-core.sh created with portable command discovery across uv/python and pnpm/npx/node; 7/7 suites green (465 API unit, 120 QA-5 acceptance, 36 QA-4 regression, 136 web suite, 54 web acceptance). Unblocks SHIP-6. PR ready for Warden re-review.
+
+- 09 Sep 19:40 Sohail: QA-6 green — Playwright learner-led journey E2E test created in apps/web/e2e/bell-journey.spec.ts covering Beats B1–B8 (role entry, prediction checkpoint, circuit workspace + code sync, dual simulation run, visual evidence, Flight Recorder wow moment with MIXED_SUBSYSTEM, evidence-bound tutor with fallback badge, repair challenge attempt, /progress record, /instructor cohort proof); pnpm --dir apps/web playwright test bell-journey.spec.ts passed (1/1 green); trace/video recorded only on failure; PR ready for Warden review. Unblocks UX-9, QA-7, SHIP-7.
+
+- 09 Sep 19:40 Vinod: SHIP-5 green — internal-round PPT evidence package implemented; docs/deck/ship-5-ppt-content.md created with all 6 SIH slides, 11 required sections, 7 sourced URLs, 4 screenshot placeholders, synthetic data disclosure, and roadmap-vs-live boundary; scripts/check_deck.py created and passes 36/36 checks (file existence, 6-slide structure, 11 sections, 7 URLs, 4 screenshot markers, 6 roadmap guards, synthetic disclosure); no roadmap feature presented as live; PR ready for Warden review.
+- 10 Sep 09:45 Vinod: QA browser test reports and synthesized Final Enhancement Report established in reports/ across Aarav, Meera, and Dr. Rao with 33 screenshot captures and cross-persona friction heatmap.
+
 - 10 Sep 07:45 Sohail: QA-7 green — release gate runner scripts/release-gate.sh created; contract diff scan (4 contracts present, zero drift, 35/35 Pydantic contract tests pass), 7-scenario forced-offline fallback resilience drill (100% parity verified), local ephemeral stack smoke (GET /health 200, GET /ready 200 with primaryAdapterEnabled, POST /v1/simulation-runs 201 SUCCEEDED with MIXED_SUBSYSTEM, absent keys verified), live CORS/readiness evaluator with single ranked blocker list for pending SHIP-6 deployment, and Warden release verdict generator board/WARDEN-RELEASE-VERDICT.md implemented; bash scripts/release-gate.sh passes local-offline and returns ranked live blocker list (exit 0); PR ready for Warden review. Unblocks SIM-9, AI-8, DATA-8, QA-8.
 - 10 Sep 10:00 Sohail: QA-8 green — final release certification runner scripts/final-certify.sh created; 6/6 release gates passed (UX-9 keyboard & 1366x768 projector accessibility 4/4 passed, 5x consecutive walking-skeleton smoke runs verified with 0% flake rate, official SIH 6-slide PPT deck and Sourced Evidence Ledger 7 citations verified by check_story_claims.py, backup video specification and DEMO_FALLBACK offline cue audited, SHA-256 artifact hashes ledger fingerprinted for 4 contracts, 7 golden fixtures, and packages, and Endgame Doctrine compliance confirmed); board/RELEASE-CERT.md emitted with CERTIFIED status; bash scripts/final-certify.sh exits 0; PR ready for Warden review. Unblocks SHIP-8.
+- 10 Sep 10:15 Patch: QA-7 merged to main (PR #41) — release gate runner scripts/release-gate.sh, contract diff scan (4 contracts present, zero drift, 35/35 Pydantic contract tests pass), 7-scenario forced-offline fallback resilience drill (100% parity verified), local ephemeral stack smoke, and Warden release verdict generator board/WARDEN-RELEASE-VERDICT.md integrated; full API unit suite (465/465) and web test suite (136/136) verified green; fixtures-qa track complete.
+

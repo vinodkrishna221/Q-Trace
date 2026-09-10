@@ -6,12 +6,14 @@
   "scripts": {
     "dev:web": "pnpm --filter web dev",
     "dev:api": "uvicorn apps.api.app.main:app --reload --port 8000",
+    "build": "pnpm --filter web build",
     "build:web": "pnpm --filter web build",
     "test:web": "pnpm --filter web test",
     "lint:web": "pnpm --filter web lint",
     "check:layout": "bash scripts/check-layout.sh",
     "demo:local": "bash scripts/demo-local.sh",
-    "demo:check": "bash scripts/demo-local.sh --check"
+    "demo:check": "bash scripts/demo-local.sh --check",
+    "smoke:live": "bash scripts/smoke-live.sh"
   },
   "packageManager": "pnpm@10.33.0"
 }
