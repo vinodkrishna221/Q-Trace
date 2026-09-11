@@ -25,6 +25,16 @@ services:
       - key: ENABLE_PENNYLANE
         value: "1"
       - key: ENABLE_TUTOR_CLOUD
+        value: "1"
+      - key: TUTOR_PROVIDER
+        value: openrouter
+      - key: TUTOR_MODEL
+        value: inclusionai/ling-3.0-flash-vl:free
+      - key: TUTOR_API_KEY
+        sync: false
+      - key: TUTOR_TIMEOUT_SECONDS
+        value: "25.0"
+      - key: TUTOR_STRUCTURED_OUTPUTS
         value: "0"
       - key: QTRACE_SIM_TIMEOUT_S
         value: "5.0"
