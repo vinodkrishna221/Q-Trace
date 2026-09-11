@@ -153,35 +153,63 @@ NOTES:
 
 ## Slide 5 — Impact and Benefits
 
-**Bullet 1 — Learner impact (Aarav + Meera):**
-- Guided interactive simulation with evidence-based feedback improves correct reasoning on quantum state-count questions from ~50% to ~80% (McKagan et al., 2010 — source [1]).
-- Q-Trace applies this pedagogical model at scale: every learner gets a personalized misconception-repair loop.
-- Two entry personas: Aarav (beginner B.Tech CSE, visual-first), Meera (physics undergrad, code-first) — same platform, adaptive path.
+**Slide Layout Structure (Two-Column Widescreen):**
+- **Left Column (Visual Panel 1):** Benefits of Q-Trace & Stakeholder Impact Mind-Map
+- **Right Column (Visual Panel 2):** Business Model, Funding Sources & Scalability Framework
 
-**Bullet 2 — Instructor impact (Dr. Rao):**
-- Instructor Insight surfaces aggregate Misconception Signals without private chat surveillance.
-- Faculty identify which concepts the cohort misunderstands before the exam, not after.
-- SYNTHETIC DATA DISCLOSURE: Instructor Insight demo data = 40 seeded synthetic learner sessions, labeled in the UI. Only Aarav's live demo attempt is real.
+---
 
-**Bullet 3 — Institutional and national impact:**
-- One deployable platform covers NQM/AICTE quantum lab requirement with no paid QPU credits or proprietary licenses.
-- Roadmap: Bhashini multilingual Tutor (regional-language students), Cirq/qBraid adapters, real QPU when institutional partnerships mature.
+### Left Column — Benefits & Stakeholder Impact
 
-**Bullet 4 — Social, economic, and national benefits:**
+[IMAGE: assets/slide5-benefits-impact.jpg — High-resolution 4:3 infographic panel featuring the central Benefits Hub & Spoke diagram and 5 potential impact dimensions.]
 
-| Dimension | Benefit |
-|---|---|
-| Social | Democratizes quantum education — existing hardware, offline, zero per-student cost |
-| Economic | Eliminates friction for college labs; reduces quantum workforce skill gap identified by NQM |
-| Educational | Prediction -> simulation -> repair loop grounded in physics-education research, not gamification |
-| National / strategic | Supports India's quantum workforce readiness goal; QPU-ready architecture |
-| Environmental | Local CPU simulation uses negligible energy vs. cloud QPU submission |
+**1. Stakeholder Hub & Spoke Benefits:**
+- **For Students & Learners (Aarav & Meera):** Guided interactive simulation, prediction checkpoints, active misconception repair (~50% to ~80% conceptual reasoning gain).
+- **For Instructors & Faculty (Dr. Rao):** Aggregate Misconception Signals without private surveillance; diagnostic cohort radar before exams.
+- **For Colleges & Universities:** Zero hardware/QPU cost; runs on standard commodity PC labs offline; aligned with AICTE quantum curriculum mandate.
+- **For National Mission & Environment:** Directly fuels India's National Quantum Mission (NQM) workforce; eco-friendly local CPU simulation uses negligible power vs cloud QPUs.
+
+**2. Potential Impacts on Target Audience:**
+- **For Education:** ~50% to ~80% jump in conceptual reasoning on quantum state counts (McKagan et al., 2010 — source [1]).
+- **For Economy:** Eliminates prohibitive QPU credit costs for institutions; closes India's quantum talent gap.
+- **For Society:** Democratizes deep-tech education for Tier-2 and Tier-3 institutions with zero per-student fee.
+- **For Infrastructure:** Open, framework-neutral standard (Qiskit + PennyLane + OpenQASM 3).
+- **For Policy & Governance:** Direct mandate alignment with AICTE UG quantum courses (source [5]) and DST National Quantum Mission (source [6]).
+
+---
+
+### Right Column — Business Model & Sustainability
+
+[IMAGE: assets/slide5-business-model.jpg — High-resolution 4:3 infographic panel featuring the Funding Sources, Supporting Sources, and 4-pillar strategic business grid.]
+
+**1. Funding Sources for Sustainability:**
+- **State & University Budgets:** Funding support from state technical universities & AICTE laboratory modernization funds.
+- **Central Govt Schemes:** National Quantum Mission (NQM), DST quantum skilling grants, and Digital India initiatives.
+- **Industry & CSR:** Deep-tech workforce development grants and academic programs from enterprise tech leaders (IBM Quantum, TCS, Infosys).
+
+**2. Supporting Sources:**
+- **Academic Subscriptions:** Department-level licenses for multi-cohort analytics, LMS synchronization, and custom lab manuals.
+- **PPP Partnerships:** Public-Private Partnerships for sponsored cloud QPU gateway access and hardware credits.
+- **Skill Certifications:** Assessment and credentialing fees for proctored quantum developer skill badges.
+
+**3. Four Strategic Pillars:**
+- **Target Customers:** AICTE engineering colleges, university physics & CS departments, autonomous institutes, and faculty introducing quantum labs.
+- **Financial Model:** 100% free open-source core for offline student labs; tiered institutional SaaS for cohort analytics and LMS sync.
+- **Value Added Services:** Standardized quantum lab manuals, Canvas/Moodle LMS integration, certified skill badges, and cloud QPU gateway access.
+- **Scalability Roadmap:** Phase 1: 10 pilot engineering college labs -> Phase 2: State technical universities onboarding -> Phase 3: Pan-India integration with SWAYAM & NPTEL.
+
+---
+
+### Instructor Insight Cohort Evidence (Live / Demo Verification)
 
 [VISUAL: assets/slide5-impact-benefits.png — official SIH 3-pillar stakeholder impact + 5-dimensional benefits matrix master slide]
 [PLACEHOLDER: assets/slide5-instructor-insight.png — screenshot of /instructor route showing SUPERPOSITION_VS_ENTANGLEMENT as the top misconception signal. MUST show the "SYNTHETIC DATA — 40 seeded learner sessions" disclosure label visible in the UI.]
 
+**Mandatory Synthetic Data Disclosure:**
+> SYNTHETIC DATA — 40 seeded learner sessions. Only Aarav's live demo attempt is real.
+
 NOTES:
-> "Build it. See it. Repair it. Q-Trace turns one laptop into a quantum learning lab that finds where understanding broke and fixes it — for every student, every time."
+> "Build it. See it. Repair it. Q-Trace turns one laptop into a quantum learning lab that finds where understanding broke and fixes it — for every student, every time. With zero recurring infrastructure cost and full alignment with the National Quantum Mission, we give every college in India a quantum lab tomorrow morning."
 > Vinod delivers the closing beat, ~15 s.
 
 ---
@@ -231,6 +259,8 @@ Used by scripts/check_deck.py to verify deck completeness before PR.
 | assets/slide2-hero-comparison.png | [PLACEHOLDER] | Create from wireframe or design tool |
 | assets/slide3-architecture-diagram.png | [PLACEHOLDER] | Export rendered ARCHITECTURE.md mermaid diagram |
 | assets/slide4-live-smoke-result.png | [PLACEHOLDER] | Terminal screenshot of bash scripts/smoke.sh --mode local (6/6 green) |
+| assets/slide5-benefits-impact.jpg | [READY] | Generated 4:3 high-res infographic panel via Nano Banana Pro |
+| assets/slide5-business-model.jpg | [READY] | Generated 4:3 high-res infographic panel via Nano Banana Pro |
 | assets/slide5-instructor-insight.png | [PLACEHOLDER] | Screenshot of /instructor route with synthetic data disclosure visible |
 
 Capture instructions: run bash scripts/demo-local.sh --check; navigate to each route at 1366x768; screenshot at >=1280px wide; verify SYNTHETIC DATA disclosure label is visible on Instructor Insight screenshot before saving.
