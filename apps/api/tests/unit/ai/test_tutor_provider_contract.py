@@ -395,3 +395,21 @@ async def test_free_text_not_persisted_in_cloud_mode(monkeypatch):
     if hasattr(repo, "challenge_attempts"):
         for ca in repo.challenge_attempts.values():
             assert secret_marker not in str(ca)
+
+
+def test_openrouter_provider_configuration(monkeypatch):
+    """OpenRouter provider defaults to https://openrouter.ai/api/v1 and uses CloudTutorProvider."""
+    from app.services.tutor.adapter import CloudTutorProvider, get_tutor_provider
+
+    monkeypatch.setenv("TUTOR_PROVIDER", "openrouter")
+    monkeypatch.setenv("TUTOR_MODEL", "meta-llama/llama-3.3-70b-instruct")
+    monkeypatch.setenv("TUTOR_API_KEY", "sk-or-test-key")
+    monkeypatch.delenv("TUTOR_API_BASE_URL", raising=False)
+
+    provider = get_tutor_provider()
+    assert isinstance(provider, CloudTutorProvider)
+    assert provider.name == "openrouter"
+    assert provider.model == "meta-llama/llama-3.3-70b-instruct"
+    assert provider.api_base_url == "https://openrouter.ai/api/v1"
+    assert provider.api_key == "sk-or-test-key"
+

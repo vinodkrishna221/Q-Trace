@@ -93,7 +93,7 @@ def extract_claimed_value(claim: str) -> float:
     # If format contains '=', extract the right-hand side first
     search_target = claim.split("=")[-1] if "=" in claim else claim
 
-    match = re.search(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", search_target)
+    match = re.search(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?", search_target)
     if not match:
         raise FabricatedClaimError(f"No numeric value found in claim: '{claim}'.")
 
@@ -112,19 +112,32 @@ def validate_numerical_claim(
     """Verify that a numerical claim matches the verified simulator evidence at evidence_key."""
     actual_value = resolve_evidence_key(evidence_key, state_trace)
 
-    if not isinstance(actual_value, (int, float)):
+    target_values: list[float] = []
+    if isinstance(actual_value, (int, float)):
+        target_values.append(float(actual_value))
+    elif isinstance(actual_value, dict):
+        for v in actual_value.values():
+            if isinstance(v, (int, float)):
+                target_values.append(float(v))
+
+    if not target_values:
         raise EvidenceKeyValidationError(
             f"Evidence key '{evidence_key}' resolved to non-numeric value: {actual_value!r}."
         )
 
+    # 1. Try standard extraction first
     claimed_val = extract_claimed_value(claim)
+    if any(abs(claimed_val - tv) <= tolerance for tv in target_values):
+        return True
 
-    if abs(claimed_val - float(actual_value)) > tolerance:
-        raise FabricatedClaimError(
-            f"Fabricated claim: claimed {claimed_val} in '{claim}' but verified evidence at '{evidence_key}' is {actual_value} (tolerance {tolerance})."
-        )
+    # 2. If natural language claim contains multiple numbers, check if any matches any target value
+    all_numbers = [float(n) for n in re.findall(r"[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?", claim) if n]
+    if any(abs(num - tv) <= tolerance for num in all_numbers for tv in target_values):
+        return True
 
-    return True
+    raise FabricatedClaimError(
+        f"Fabricated claim: claimed {claimed_val} in '{claim}' but verified evidence at '{evidence_key}' has values {target_values} (tolerance {tolerance})."
+    )
 
 
 def validate_tutor_response_evidence(

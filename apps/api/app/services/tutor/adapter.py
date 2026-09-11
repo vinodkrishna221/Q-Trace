@@ -244,7 +244,13 @@ class CloudTutorProvider(BaseTutorProvider):
             initial_retry_delay=initial_retry_delay,
         )
         self.api_key = api_key or os.getenv("TUTOR_API_KEY", "")
-        self.api_base_url = api_base_url or os.getenv("TUTOR_API_BASE_URL", "https://api.openai.com/v1")
+        default_base_url = (
+            "https://openrouter.ai/api/v1"
+            if (name == "openrouter" or "openrouter" in str(model_name).lower())
+            else "https://api.openai.com/v1"
+        )
+        self.api_base_url = api_base_url or os.getenv("TUTOR_API_BASE_URL", default_base_url)
+        self.supports_response_format = os.getenv("TUTOR_STRUCTURED_OUTPUTS", "1") != "0"
 
     async def generate(
         self,
@@ -259,15 +265,21 @@ class CloudTutorProvider(BaseTutorProvider):
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
             }
-            body = {
+            if self.name == "openrouter" or "openrouter.ai" in self.api_base_url:
+                headers["HTTP-Referer"] = os.getenv("OPENROUTER_HTTP_REFERER", "https://qtrace.dev")
+                headers["X-Title"] = os.getenv("OPENROUTER_TITLE", "Q-Trace")
+
+            use_response_format = self.supports_response_format
+            body: Dict[str, Any] = {
                 "model": self.model,
                 "temperature": 0.1,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                "response_format": {"type": "json_object"},
             }
+            if use_response_format:
+                body["response_format"] = {"type": "json_object"}
 
             async with httpx.AsyncClient(timeout=timeout_seconds) as client:
                 try:
@@ -281,6 +293,18 @@ class CloudTutorProvider(BaseTutorProvider):
                 except httpx.HTTPError as err:
                     raise TutorProviderError(f"HTTP transport failure: {err}") from err
 
+                # Auto-fallback if provider rejects structured-outputs / response_format
+                if response.status_code == 400 and use_response_format and (
+                    "structured-output" in response.text.lower()
+                    or "response_format" in response.text.lower()
+                ):
+                    body.pop("response_format", None)
+                    response = await client.post(
+                        f"{self.api_base_url.rstrip('/')}/chat/completions",
+                        json=body,
+                        headers=headers,
+                    )
+
                 if response.status_code == 429:
                     raise TutorRateLimitError("429 Rate Limit Exceeded")
                 elif response.status_code >= 400:
@@ -288,7 +312,15 @@ class CloudTutorProvider(BaseTutorProvider):
 
                 try:
                     raw_json = response.json()
-                    content = raw_json["choices"][0]["message"]["content"]
+                    content = raw_json["choices"][0]["message"]["content"].strip()
+                    if content.startswith("```"):
+                        lines = content.splitlines()
+                        if lines and lines[0].startswith("```"):
+                            lines = lines[1:]
+                        if lines and lines[-1].startswith("```"):
+                            lines = lines[:-1]
+                        content = "\n".join(lines).strip()
+
                     parsed = json.loads(content)
                     if not isinstance(parsed, dict):
                         raise ValueError("Root JSON is not an object")
@@ -310,7 +342,7 @@ def get_tutor_provider(
     prov = (provider_type or os.getenv("TUTOR_PROVIDER", "mock")).lower().strip()
     if prov in ("mock", "fake"):
         return FakeTutorProvider(model=model or os.getenv("TUTOR_MODEL", "mock-tutor-v1"))
-    elif prov in ("cloud", "openai", "anthropic", "gemini"):
+    elif prov in ("cloud", "openai", "anthropic", "gemini", "openrouter"):
         return CloudTutorProvider(name=prov, model=model, api_key=api_key)
     else:
         # Unknown provider falls back to safe FakeTutorProvider in mock mode

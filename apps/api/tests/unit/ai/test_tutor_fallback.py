@@ -101,6 +101,8 @@ def test_validates_both_numerical_evidence_keys():
         ("P(11)=0.75", "stateTrace.1.basisProbabilities.11"),
         ("P(11)=0.0", "stateTrace.1.basisProbabilities.11"),
         ("P(00)=0.5001", "stateTrace.1.basisProbabilities.00"),
+        ("P(00)=0.99", "stateTrace.0.basisProbabilities"),
+        ("After H, probability of measuring 00 is 0.85 (step 0)", "stateTrace.0.basisProbabilities"),
     ],
 )
 def test_rejects_fabricated_probability_claim(bad_claim: str, key: str):
@@ -109,6 +111,16 @@ def test_rejects_fabricated_probability_claim(bad_claim: str, key: str):
     with pytest.raises(FabricatedClaimError) as exc_info:
         validate_numerical_claim(claim=bad_claim, evidence_key=key, state_trace=trace)
     assert "Fabricated claim" in str(exc_info.value)
+
+
+def test_validates_container_key_and_natural_language_claim():
+    """Validates natural language claims and container evidence keys like basisProbabilities."""
+    trace = copy.deepcopy(BELL_SIMULATION_RUN_FIXTURE["stateTrace"])
+    assert validate_numerical_claim(
+        claim="After H, the probability of measuring 00 is 0.5 (step 0)",
+        evidence_key="stateTrace.0.basisProbabilities",
+        state_trace=trace,
+    ) is True
 
 
 @pytest.mark.parametrize(

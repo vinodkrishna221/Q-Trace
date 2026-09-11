@@ -107,7 +107,7 @@ class TutorService:
         first_divergence_step: Optional[int] = 1,
         force_fallback: Optional[bool] = None,
         provider_override: Optional[BaseTutorProvider] = None,
-        timeout_seconds: float = 2.0,
+        timeout_seconds: Optional[float] = None,
     ) -> Dict[str, Any]:
         """Main entrypoint for tutor explanations.
         
@@ -175,12 +175,17 @@ class TutorService:
         )
 
         # 4. Invoke provider with retry and timeout protection
+        effective_timeout = (
+            timeout_seconds
+            if timeout_seconds is not None
+            else float(os.getenv("TUTOR_TIMEOUT_SECONDS", "2.0"))
+        )
         raw_output: Dict[str, Any]
         try:
             raw_output = await active_provider.generate(
                 system_prompt=system_prompt,
                 user_prompt=formatted_user_prompt,
-                timeout_seconds=timeout_seconds,
+                timeout_seconds=effective_timeout,
             )
         except (TutorProviderError, Exception) as err:
             duration_ms = int((time.perf_counter() - start_time) * 1000)
