@@ -73,7 +73,12 @@ class TutorService:
         prompts_dir: Optional[Path] = None,
     ) -> None:
         self.provider = provider
-        self.prompts_dir = prompts_dir or (Path(__file__).resolve().parent.parent.parent / "prompts")
+        if prompts_dir:
+            self.prompts_dir = prompts_dir
+        else:
+            cand1 = Path(__file__).resolve().parent.parent / "prompts"
+            cand2 = Path(__file__).resolve().parent.parent.parent / "prompts"
+            self.prompts_dir = cand1 if cand1.exists() else cand2
         self._system_prompt_cached: Optional[str] = None
         self._user_template_cached: Optional[str] = None
 
@@ -120,10 +125,21 @@ class TutorService:
         # Determine whether cloud inference is active
         demo_fallback_flag = os.getenv("DEMO_FALLBACK", "1") == "1"
         enable_cloud_flag = os.getenv("ENABLE_TUTOR_CLOUD", "0") == "1"
+        active_provider = provider_override or self.provider or get_tutor_provider()
+        api_key_val = getattr(active_provider, "api_key", None) or os.getenv("TUTOR_API_KEY", "")
+        has_api_key = bool(api_key_val and str(api_key_val).strip())
+        is_fake_provider = getattr(active_provider, "name", "") in ("fake", "mock")
 
         should_fallback = (
             force_fallback is True
-            or (force_fallback is None and (demo_fallback_flag or not enable_cloud_flag))
+            or (
+                force_fallback is None
+                and (
+                    demo_fallback_flag
+                    or not enable_cloud_flag
+                    or (not has_api_key and not is_fake_provider)
+                )
+            )
         )
 
         repair_challenge_id = select_repair_challenge(misconception_code, module_id)
@@ -155,8 +171,7 @@ class TutorService:
             )
             return explanation
 
-        # 2. Select provider
-        active_provider = provider_override or self.provider or get_tutor_provider()
+        # 2. Select provider (active_provider already resolved above)
 
         # 3. Load prompts and perform evidence injection
         system_prompt, user_template = self._load_prompts()
@@ -310,6 +325,222 @@ class TutorService:
             fallback_used=False,
         )
         return structured_response.model_dump()
+
+    async def chat_with_tutor(
+        self,
+        learner_profile_id: str,
+        question: str,
+        history: Optional[List[Dict[str, str]]] = None,
+        circuit: Optional[Dict[str, Any]] = None,
+        prediction: Optional[str] = None,
+        state_trace: Optional[List[Dict[str, Any]]] = None,
+        misconception_code: Optional[str] = None,
+        learner_role: Optional[str] = None,
+        module_id: str = "mod_bell",
+        timeout_seconds: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Socratic conversational interactive tutor grounded in circuit and simulation evidence."""
+        start_time = time.perf_counter()
+        active_provider = self.provider or get_tutor_provider()
+        enable_cloud_flag = os.getenv("ENABLE_TUTOR_CLOUD", "0") == "1"
+        api_key_val = getattr(active_provider, "api_key", None) or os.getenv("TUTOR_API_KEY", "")
+        has_api_key = bool(api_key_val and str(api_key_val).strip())
+        demo_fallback_flag = os.getenv("DEMO_FALLBACK", "0") == "1"
+
+        use_cloud = (self.provider is not None) or (
+            enable_cloud_flag and has_api_key and not demo_fallback_flag and active_provider.name != "fake"
+        )
+
+        # Construct Pedagogical System Prompt with strict quantum grounding
+        role_guidance = (
+            "The learner has a physics background (PHYSICS_TO_CODE). Use rigorous notation: statevectors (|Ψ⟩), tensor products (H ⊗ I), density matrices (ρ = Tr_B(|Φ+⟩⟨Φ+|)), and Hilbert space dimension. Avoid pop-science hand-waving."
+            if learner_role == "PHYSICS_TO_CODE"
+            else "The learner is a computer science undergraduate (BEGINNER_CSE). Use intuitive computational state branches, bitstrings (00, 11), probabilities (50%), and step-by-step logic. Avoid unnecessary advanced tensor algebra."
+        )
+
+        circuit_summary = "Bell State Starter Circuit (Hadamard on q[0], CNOT with control q[0] and target q[1])"
+        if circuit and isinstance(circuit, dict) and "operations" in circuit:
+            ops_desc = [
+                f"{op.get('gate')}(targets={op.get('targets')}, ctrl={op.get('controls', [])})"
+                for op in circuit.get("operations", [])
+            ]
+            circuit_summary = f"Circuit ({circuit.get('qubitCount', 2)} qubits): " + ", ".join(ops_desc)
+
+        pred_summary = (
+            f"Learner's prediction: {prediction}"
+            if prediction
+            else "Learner's prediction: INDEPENDENT_RANDOM"
+        )
+
+        trace_summary = (
+            "StateTrace: Step 0 (After H): P(00)=0.5, P(10)=0.5, purity=1.0. "
+            "Step 1 (After CNOT): P(00)=0.5, P(11)=0.5, reduced qubit 0 purity=0.5 (MIXED_SUBSYSTEM)."
+        )
+        if state_trace and isinstance(state_trace, list):
+            steps_desc = []
+            for s in state_trace:
+                lbl = s.get("label", f"Step {s.get('stepIndex')}")
+                probs = s.get("basisProbabilities", {})
+                p_str = ", ".join(f"{k}={v}" for k, v in probs.items())
+                red_purity = ""
+                if s.get("reducedQubits"):
+                    red_purity = f", qubit 0 purity={s['reducedQubits'][0].get('purity')}"
+                steps_desc.append(f"{lbl}: [{p_str}]{red_purity}")
+            if steps_desc:
+                trace_summary = "StateTrace: " + " | ".join(steps_desc)
+
+        rules_text = (
+            "PEDAGOGICAL & INTERACTION RULES:\n"
+            "1. Grounding: Answer questions using the verified simulation evidence above. Remind the student that Q-Trace is running on an ideal Qiskit Aer simulator with 0 noise unless configured otherwise. Do NOT invent hardware decoherence.\n"
+            "2. Socratic & Conversational:\n"
+            "   - For greetings like 'hi', 'hello', be welcoming, friendly, and invite the learner to ask about their Bell state circuit or simulation outcomes.\n"
+            "   - For quantum questions, provide an intuitive yet mathematically sound explanation and conclude with a reflective Socratic follow-up question to deepen understanding.\n"
+            "   - If asked why tracing out one qubit produces a mixed state: Explain that in an entangled state like |Φ+⟩, the individual qubit possesses no independent statevector; partial trace over the other qubit yields a density matrix with purity 0.5 (Tr(ρ²)=0.5), meaning it is maximally mixed.\n"
+            "   - If asked about faster-than-light communication: Cite the No-Communication Theorem; measurement outcomes are intrinsically random (50/50), so without classical message transmission, no information can be sent.\n"
+            "3. LaTeX Math Formatting:\n"
+            "   - ALWAYS format mathematical formulas, statevectors, and operators in standard LaTeX ($...$ for inline like $|0\\rangle$, $|\\Phi^+\\rangle$, and $$...$$ for display equations).\n"
+            "   - Use standard Dirac notation with \\rangle and \\langle (e.g., |0\\rangle, \\rho_A = \\frac{1}{2}|0\\rangle\\langle 0| + \\frac{1}{2}|1\\rangle\\langle 1|).\n"
+            "4. Length & Token Economy: Keep answers concise, clear, and under 200 words (2-3 short, focused paragraphs). Never write full code solutions for repair challenges.\n"
+        )
+
+        system_prompt = (
+            "You are Q-Trace Socratic Tutor, an expert quantum computing pedagogical AI pair-programming with a student in the Q-Trace IDE.\n\n"
+            "GROUNDED QUANTUM CONTEXT FOR THIS RUN:\n"
+            f"- Module: {module_id}\n"
+            f"- Active Circuit: {circuit_summary}\n"
+            f"- {pred_summary}\n"
+            f"- Misconception / Hypothesis Signal: {misconception_code or 'SUPERPOSITION_VS_ENTANGLEMENT'}\n"
+            f"- Verified Simulation Evidence: {trace_summary}\n"
+            f"- Learner Role & Pedagogical Calibration: {role_guidance}\n\n"
+            + rules_text
+        )
+
+        messages_payload: List[Dict[str, str]] = []
+        if history:
+            # Token minimization: window to last 2 turns (4 messages max) and truncate past replies
+            for msg in history[-4:]:
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+                if role in ("user", "assistant") and content:
+                    messages_payload.append({"role": role, "content": content[:400]})
+
+        messages_payload.append({"role": "user", "content": question})
+
+        if use_cloud:
+            try:
+                chat_timeout_env = os.getenv("TUTOR_CHAT_TIMEOUT_SECONDS")
+                if chat_timeout_env:
+                    default_timeout = float(chat_timeout_env)
+                else:
+                    default_timeout = min(float(os.getenv("TUTOR_TIMEOUT_SECONDS", "14.0")), 15.0)
+                effective_timeout = timeout_seconds or default_timeout
+                chat_res = await active_provider.chat_completion(
+                    messages=messages_payload,
+                    system_prompt=system_prompt,
+                    timeout_seconds=effective_timeout,
+                )
+                if isinstance(chat_res, tuple) and len(chat_res) == 2:
+                    reply_text, model_used = chat_res[0], chat_res[1]
+                else:
+                    reply_text, model_used = str(chat_res), getattr(active_provider, "model", "unknown")
+                duration_ms = int((time.perf_counter() - start_time) * 1000)
+                print(f"[llm-chat] provider={active_provider.name} model={model_used} duration_ms={duration_ms} status=success")
+                telemetry.record(
+                    provider=active_provider.name,
+                    model=model_used,
+                    duration_ms=duration_ms,
+                    status="success",
+                    badge_type="live_verified",
+                    fallback_used=False,
+                )
+                return {
+                    "answer": reply_text,
+                    "model": model_used,
+                    "fallbackUsed": False,
+                    "groundedEvidenceKeys": ["stateTrace.1.basisProbabilities", "stateTrace.1.reducedQubits"],
+                }
+            except Exception as err:
+                duration_ms = int((time.perf_counter() - start_time) * 1000)
+                print(f"[llm-chat] Cloud provider error, using smart fallback: {err}")
+                telemetry.record(
+                    provider=active_provider.name,
+                    model=active_provider.model,
+                    duration_ms=duration_ms,
+                    status="rate_limit" if "429" in str(err) or "rate" in str(err).lower() else "fallback",
+                    badge_type="curated_grounded",
+                    fallback_used=True,
+                    fallback_reason=str(err),
+                )
+
+        # Smart contextual fallback if offline or cloud failed
+        duration_ms = int((time.perf_counter() - start_time) * 1000)
+        fallback_answer = self._generate_smart_fallback_answer(question, learner_role)
+        if not use_cloud:
+            telemetry.record(
+                provider="fallback",
+                model="DEMO_FALLBACK",
+                duration_ms=duration_ms,
+                status="fallback",
+                badge_type="curated_grounded",
+                fallback_used=True,
+                fallback_reason="Configured offline fallback active",
+            )
+        return {
+            "answer": fallback_answer,
+            "model": "DEMO_FALLBACK",
+            "fallbackUsed": True,
+            "groundedEvidenceKeys": ["stateTrace.1.basisProbabilities"],
+        }
+
+    def _generate_smart_fallback_answer(
+        self,
+        question: str,
+        learner_role: Optional[str] = None,
+    ) -> str:
+        """Deterministic context-aware answer for demo resilience when offline."""
+        q = question.lower().strip()
+        if any(greet in q for greet in ["hi", "hello", "hey"]):
+            return (
+                "Hello! I am your Q-Trace Socratic Tutor. You're currently exploring the 2-qubit Bell state circuit "
+                "($H$ on $q[0]$, $\\text{CNOT}$ targeting $q[1]$). Ask me anything about how superposition evolves into entanglement, "
+                "why measurements correlate, or what happens when you trace out a qubit!"
+            )
+        if "mixed" in q or "trace" in q or "purity" in q:
+            return (
+                "When two qubits are in the maximally entangled Bell state $|\\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$, "
+                "the joint state is pure ($\\text{Tr}(\\rho^2)=1$), but individual subsystems are not separable.\n\n"
+                "Tracing out qubit 1 yields the reduced density operator $\\rho_0 = \\text{Tr}_1(|\\Phi^+\\rangle\\langle\\Phi^+|) = \\frac{1}{2}|0\\rangle\\langle 0| + \\frac{1}{2}|1\\rangle\\langle 1|$. "
+                "Its purity is $\\text{Tr}(\\rho_0^2) = (0.5)^2 + (0.5)^2 = 0.5$, which represents a **maximally mixed state**.\n\n"
+                "*Socratic Question:* Why do you think measuring one qubit instantly determines the state of the other if neither qubit has a definite state beforehand?"
+            )
+        if "faster" in q or "ftl" in q or "light" in q or "communication" in q:
+            return (
+                "**No-Communication Theorem**: Quantum entanglement cannot transmit information faster than light.\n\n"
+                "Although measurement outcomes at both qubits are 100% correlated ($00$ or $11$ with 50% probability each), "
+                "an observer measuring only qubit 0 sees completely random 50/50 outcomes. Without a classical communication channel to compare results, "
+                "no message has been sent.\n\n"
+                "*Socratic Question:* If Bob measures his qubit in New York and Alice is on Mars, what would Bob observe if Alice didn't measure at all?"
+            )
+        if "swap" in q or "order" in q or "gate" in q and "order" in q:
+            return (
+                "If you swap the gate order by applying CNOT before the Hadamard gate on initial state $|00\\rangle$, "
+                "the control qubit $q[0]$ is $|0\\rangle$, so CNOT acts as the identity operation and does nothing!\n\n"
+                "The subsequent Hadamard gate then only superposes qubit 0, yielding $(|0\\rangle + |1\\rangle)|0\\rangle / \\sqrt{2}$. "
+                "The qubits remain completely unentangled (a product state $|+0\\rangle$), rather than an entangled Bell pair $|\\Phi^+\\rangle$."
+            )
+        if "01" in q or "10" in q or "zero" in q or "support" in q:
+            return (
+                "In the verified Qiskit Aer state trace, $P(01)$ and $P(10)$ are exactly $0.0$ because the CNOT gate flips qubit 1 "
+                "**if and only if** qubit 0 is $|1\\rangle$. Since Hadamard created the superposition $(|0\\rangle + |1\\rangle)/\\sqrt{2}$, "
+                "the branches $|0\\rangle|0\\rangle \\to |00\\rangle$ and $|1\\rangle|0\\rangle \\to |11\\rangle$ receive all the amplitude support, "
+                "leaving $|01\\rangle$ and $|10\\rangle$ with zero amplitude."
+            )
+        return (
+            "In this simulation run, the Hadamard gate placed qubit 0 in equal superposition $(|00\\rangle + |10\\rangle)/\\sqrt{2}$, "
+            "and the CNOT gate entangled qubit 1 to it, yielding the Bell state $|\\Phi^+\\rangle = (|00\\rangle + |11\\rangle)/\\sqrt{2}$.\n\n"
+            "Notice that outcomes $01$ and $10$ have probability exactly $0.0$, while $00$ and $11$ each occur with probability $0.5$. "
+            "What do you observe about the Bloch sphere vector length for either qubit after the CNOT gate?"
+        )
 
 
 # Singleton service instance

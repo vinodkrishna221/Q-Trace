@@ -413,3 +413,526 @@ def test_openrouter_provider_configuration(monkeypatch):
     assert provider.api_base_url == "https://openrouter.ai/api/v1"
     assert provider.api_key == "sk-or-test-key"
 
+
+@pytest.mark.asyncio
+async def test_tutor_chat_endpoint_success(monkeypatch):
+    """POST /v1/tutor/chat succeeds and returns socratic grounded answer."""
+    fake_provider = FakeTutorProvider(model="test-model-chat")
+    monkeypatch.setattr(default_tutor_service, "provider", fake_provider)
+    monkeypatch.setenv("ENABLE_TUTOR_CLOUD", "1")
+    monkeypatch.setenv("TUTOR_API_KEY", "sk-fake-key")
+    monkeypatch.setenv("DEMO_FALLBACK", "0")
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        payload = {
+            "learnerProfileId": "lp_aarav",
+            "question": "Why does tracing out one qubit produce a mixed state?",
+            "circuit": {"qubitCount": 2, "operations": [{"gate": "H", "targets": [0], "controls": []}]},
+            "stateTrace": [
+                {"stepIndex": 1, "basisProbabilities": {"00": 0.5, "11": 0.5}, "reducedQubits": [{"qubit": 0, "purity": 0.5}]}
+            ],
+            "prediction": "INDEPENDENT_RANDOM",
+            "learnerRole": "BEGINNER_CSE",
+        }
+        res = await ac.post("/v1/tutor/chat", json=payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert "mixed state" in data["answer"].lower()
+        assert data["fallbackUsed"] is False
+        assert data["model"] == "test-model-chat"
+
+
+@pytest.mark.asyncio
+async def test_tutor_chat_smart_fallback_when_offline(monkeypatch):
+    """POST /v1/tutor/chat provides smart fallback when offline."""
+    monkeypatch.setenv("ENABLE_TUTOR_CLOUD", "0")
+    monkeypatch.setenv("DEMO_FALLBACK", "1")
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        payload = {
+            "learnerProfileId": "lp_aarav",
+            "question": "hi",
+        }
+        res = await ac.post("/v1/tutor/chat", json=payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["fallbackUsed"] is True
+        assert "hello" in data["answer"].lower()
+
+
+@pytest.mark.asyncio
+async def test_generate_explanation_falls_back_when_api_key_missing(monkeypatch):
+    """Problem 1.4: generate_explanation immediately falls back without 401 retries when TUTOR_API_KEY is empty."""
+    monkeypatch.setenv("ENABLE_TUTOR_CLOUD", "1")
+    monkeypatch.setenv("DEMO_FALLBACK", "0")
+    monkeypatch.setenv("TUTOR_PROVIDER", "openrouter")
+    monkeypatch.setenv("TUTOR_API_KEY", "")
+
+    # Clean default_tutor_service without pre-injected fake provider
+    service = TutorService()
+    trace = copy.deepcopy(BELL_SIMULATION_RUN_FIXTURE["stateTrace"])
+
+    result = await service.generate_explanation(
+        state_trace=trace,
+        learner_profile_id="lp_aarav",
+        module_id="mod_bell",
+    )
+
+    assert result["fallbackUsed"] is True
+    assert result["model"] == "DEMO_FALLBACK"
+    assert result["repairChallengeId"] == "ch_bell_repair"
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_candidate_failover_on_timeout(monkeypatch):
+    """Problem 1.1: Candidate 1 timeout immediately fails over to Candidate 2."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="inclusionai/ling-3.0-flash-vl:free",
+        api_key="test-api-key",
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "nex-agi/nex-n2.5-mini:free")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "0.1")
+
+    call_models = []
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        model = json.get("model")
+        call_models.append(model)
+        if model == "inclusionai/ling-3.0-flash-vl:free":
+            # Simulate candidate 1 timing out
+            raise httpx.TimeoutException("Candidate 1 timed out")
+        # Candidate 2 responds successfully
+        return httpx.Response(
+            status_code=200,
+            json={
+                "choices": [
+                    {"message": {"content": "Candidate 2 answered successfully with $|\\Phi^+\\rangle$."}}
+                ]
+            },
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    result = await provider.chat_completion(
+        messages=[{"role": "user", "content": "Explain Bell state"}],
+        system_prompt="You are a tutor",
+        timeout_seconds=5.0,
+    )
+
+    assert "Candidate 2 answered" in result
+    assert "inclusionai/ling-3.0-flash-vl:free" in call_models
+    assert "nex-agi/nex-n2.5-mini:free" in call_models
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_all_candidates_timeout_raises_tutor_timeout_error(monkeypatch):
+    """Problem 1.1: When both candidates time out, raises TutorTimeoutError immediately without retrying Candidate 1."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider, TutorTimeoutError
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="inclusionai/ling-3.0-flash-vl:free",
+        api_key="test-api-key",
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "nex-agi/nex-n2.5-mini:free")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "0.1")
+
+    call_attempts = []
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        call_attempts.append(json.get("model"))
+        raise httpx.TimeoutException("Provider candidate timed out")
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    with pytest.raises(TutorTimeoutError):
+        await provider.chat_completion(
+            messages=[{"role": "user", "content": "Explain Bell state"}],
+            system_prompt="You are a tutor",
+            timeout_seconds=5.0,
+        )
+
+    # Candidate 1 and Candidate 2 should each be called once (not repeatedly retrying Candidate 1)
+    assert call_attempts.count("inclusionai/ling-3.0-flash-vl:free") == 1
+    assert call_attempts.count("nex-agi/nex-n2.5-mini:free") == 1
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_candidate_timeout_larger_than_overall_budget(monkeypatch):
+    """Problem 1.1: Even if TUTOR_CANDIDATE_TIMEOUT_SECONDS is configured larger than overall timeout, Candidate 1 does not starve Candidate 2."""
+    import asyncio
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="inclusionai/ling-3.0-flash-vl:free",
+        api_key="test-api-key",
+        max_retries=1,
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "nex-agi/nex-n2.5-mini:free")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "10.0")
+
+    call_models = []
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        model = json.get("model")
+        call_models.append(model)
+        if model == "inclusionai/ling-3.0-flash-vl:free":
+            # Simulate candidate 1 hanging indefinitely
+            await asyncio.sleep(5.0)
+        return httpx.Response(
+            status_code=200,
+            json={
+                "choices": [
+                    {"message": {"content": "Candidate 2 responded successfully within budget."}}
+                ]
+            },
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    result = await provider.chat_completion(
+        messages=[{"role": "user", "content": "Explain Bell state"}],
+        system_prompt="You are a tutor",
+        timeout_seconds=2.0,
+    )
+
+    assert "Candidate 2 responded successfully" in result
+    assert call_models == ["inclusionai/ling-3.0-flash-vl:free", "nex-agi/nex-n2.5-mini:free"]
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_candidate_404_not_retried(monkeypatch):
+    """Problem 1.1: Candidate 1 returning 404 is never retried on outer retry cycles."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider, TutorProviderError
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="inclusionai/ling-3.0-flash-vl:free",
+        api_key="test-api-key",
+        max_retries=1,
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "nex-agi/nex-n2.5-mini:free")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "0.5")
+
+    call_models = []
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        model = json.get("model")
+        call_models.append(model)
+        if model == "inclusionai/ling-3.0-flash-vl:free":
+            return httpx.Response(status_code=404, text="Model not found")
+        return httpx.Response(status_code=429, text="Rate limited")
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    with pytest.raises((TutorProviderError, Exception)):
+        await provider.chat_completion(
+            messages=[{"role": "user", "content": "Explain Bell state"}],
+            system_prompt="You are a tutor",
+            timeout_seconds=2.0,
+        )
+
+    # Candidate 1 must only be called once, not retried after 404
+    assert call_models.count("inclusionai/ling-3.0-flash-vl:free") == 1
+
+
+@pytest.mark.asyncio
+async def test_cloud_generate_strips_markdown_and_trailing_commentary(monkeypatch):
+    """Problem 2.3: Boundary regex extraction cleanly parses JSON with markdown fences and trailing commentary."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="inclusionai/ling-3.0-flash-vl:free",
+        api_key="test-api-key",
+    )
+
+    messy_response_content = (
+        "Here is the quantum diagnostic analysis:\n"
+        "```json\n"
+        "{\n"
+        '  "responseId": "tr_messy_001",\n'
+        '  "intent": "EXPLAIN_DIVERGENCE",\n'
+        '  "summary": "Superposition correctly identified.",\n'
+        '  "steps": [\n'
+        '    {"title": "Step 0", "body": "Hadamard superposition.", "evidenceKeys": ["stateTrace.0.basisProbabilities"]}\n'
+        "  ],\n"
+        '  "numericalClaims": [\n'
+        '    {"claim": "P(00)=0.5", "evidenceKey": "stateTrace.0.basisProbabilities.00"}\n'
+        "  ],\n"
+        '  "repairChallengeId": "ch_bell_repair",\n'
+        '  "fallbackUsed": false,\n'
+        '  "model": "inclusionai/ling-3.0-flash-vl:free",\n'
+        '  "safetyNote": "Grounded in stateTrace."\n'
+        "}\n"
+        "```\n"
+        "Hope this helps! Feel free to ask more questions."
+    )
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        return httpx.Response(
+            status_code=200,
+            json={"choices": [{"message": {"content": messy_response_content}}]},
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    result = await provider.generate("system", "user", timeout_seconds=2.0)
+    assert result["responseId"] == "tr_messy_001"
+    assert result["summary"] == "Superposition correctly identified."
+    assert result["fallbackUsed"] is False
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_model_attribution_on_failover(monkeypatch):
+    """Problem 2.5: Failover returns actual model used and service records it."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+    from app.services.tutor.service import TutorService
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="primary-candidate-model",
+        api_key="test-api-key",
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "backup-candidate-model")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "0.1")
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        model = json.get("model")
+        if model == "primary-candidate-model":
+            raise httpx.TimeoutException("Primary model timeout")
+        return httpx.Response(
+            status_code=200,
+            json={"choices": [{"message": {"content": "Backup model replied."}}]},
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    # 1. Direct adapter call returns ChatCompletionResult with actual model
+    chat_res = await provider.chat_completion(
+        messages=[{"role": "user", "content": "Explain Bell state"}],
+        system_prompt="You are a tutor",
+        timeout_seconds=2.0,
+    )
+    assert isinstance(chat_res, tuple)
+    content, model_used = chat_res
+    assert content == "Backup model replied."
+    assert model_used == "backup-candidate-model"
+    assert "Backup model replied." in chat_res
+
+    # 2. Service level chat_with_tutor records actual model in response dict
+    service = TutorService(provider=provider)
+    svc_res = await service.chat_with_tutor(
+        learner_profile_id="lp_test",
+        question="Explain Bell state",
+        timeout_seconds=2.0,
+    )
+    assert svc_res["model"] == "backup-candidate-model"
+    assert svc_res["fallbackUsed"] is False
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_candidate_429_fails_fast_without_calling_candidate_2(monkeypatch):
+    """Problem 2.6: HTTP 429 halts candidate loop immediately and fails fast to protect shared API key."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider, TutorAccountRateLimitError
+    from app.services.tutor.service import TutorService
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="primary-candidate-model",
+        api_key="test-api-key",
+    )
+    monkeypatch.setenv("TUTOR_BACKUP_MODEL", "backup-candidate-model")
+    monkeypatch.setenv("TUTOR_CANDIDATE_TIMEOUT_SECONDS", "0.5")
+
+    called_models = []
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        model = json.get("model")
+        called_models.append(model)
+        return httpx.Response(status_code=429, text="Account rate limit exceeded")
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    # 1. Adapter call raises TutorAccountRateLimitError and does not call backup
+    with pytest.raises(TutorAccountRateLimitError):
+        await provider.chat_completion(
+            messages=[{"role": "user", "content": "Explain Bell state"}],
+            system_prompt="You are a tutor",
+            timeout_seconds=2.0,
+        )
+
+    assert called_models == ["primary-candidate-model"]
+    assert "backup-candidate-model" not in called_models
+
+    # 2. Service level chat_with_tutor catches it and drops to DEMO_FALLBACK smoothly
+    service = TutorService(provider=provider)
+    svc_res = await service.chat_with_tutor(
+        learner_profile_id="lp_test",
+        question="Explain Bell state",
+        timeout_seconds=2.0,
+    )
+    assert svc_res["model"] == "DEMO_FALLBACK"
+    assert svc_res["fallbackUsed"] is True
+
+
+@pytest.mark.asyncio
+async def test_cloud_generate_429_fails_fast_without_retrying(monkeypatch):
+    """Problem 2.6: generate() raises TutorAccountRateLimitError on HTTP 429 and fails fast without retrying."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider, TutorAccountRateLimitError
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="primary-candidate-model",
+        api_key="test-api-key",
+        max_retries=2,
+    )
+
+    call_count = 0
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        return httpx.Response(status_code=429, text="Account rate limit exceeded")
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    with pytest.raises(TutorAccountRateLimitError):
+        await provider.generate(
+            system_prompt="System",
+            user_prompt="User",
+            timeout_seconds=2.0,
+        )
+
+    # Must fail fast on 1st attempt and not retry 2 more times
+    assert call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_cloud_generate_strips_think_tags_with_curly_braces(monkeypatch):
+    """Problem 2.3 & 3.2: Reasoning models emitting <think> tags with braces do not corrupt JSON parsing."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="deepseek/deepseek-r1:free",
+        api_key="test-api-key",
+    )
+
+    reasoning_response = (
+        "<think>\n"
+        "Let's analyze the state: { 'qubits': 2, 'state': '|Φ+>' }.\n"
+        "We need to return JSON format.\n"
+        "</think>\n"
+        "```json\n"
+        "{\n"
+        '  "responseId": "tr_think_001",\n'
+        '  "intent": "EXPLAIN_DIVERGENCE",\n'
+        '  "summary": "Bell state correctly diagnosed.",\n'
+        '  "steps": [\n'
+        '    {"title": "Step 0", "body": "Superposition.", "evidenceKeys": ["stateTrace.0.basisProbabilities"]}\n'
+        "  ],\n"
+        '  "numericalClaims": [\n'
+        '    {"claim": "P(00)=0.5", "evidenceKey": "stateTrace.0.basisProbabilities.00"}\n'
+        "  ],\n"
+        '  "repairChallengeId": "ch_bell_repair",\n'
+        '  "fallbackUsed": false,\n'
+        '  "model": "deepseek/deepseek-r1:free",\n'
+        '  "safetyNote": "Grounded in stateTrace."\n'
+        "}\n"
+        "```\n"
+        "Hope this helps!"
+    )
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        return httpx.Response(
+            status_code=200,
+            json={"choices": [{"message": {"content": reasoning_response}}]},
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    result = await provider.generate("system", "user", timeout_seconds=2.0)
+    assert result["responseId"] == "tr_think_001"
+    assert result["summary"] == "Bell state correctly diagnosed."
+
+
+@pytest.mark.asyncio
+async def test_chat_completion_strips_think_tags(monkeypatch):
+    """Problem 3.2: <think> internal thoughts are stripped before returning conversational answers."""
+    import httpx
+    from app.services.tutor.adapter import CloudTutorProvider
+
+    provider = CloudTutorProvider(
+        name="openrouter",
+        model="deepseek/deepseek-r1:free",
+        api_key="test-api-key",
+    )
+
+    raw_answer = (
+        "<think>\n"
+        "User is asking about Bell state.\n"
+        "</think>\n"
+        "In a Bell state $|\\Phi^+\\rangle$, both qubits are entangled."
+    )
+
+    async def mock_post(self, url, json=None, headers=None, **kwargs):
+        return httpx.Response(
+            status_code=200,
+            json={"choices": [{"message": {"content": raw_answer}}]},
+        )
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
+    res = await provider.chat_completion(
+        messages=[{"role": "user", "content": "Explain Bell state"}],
+        system_prompt="You are a tutor",
+        timeout_seconds=2.0,
+    )
+    assert "<think>" not in res.content
+    assert res.content == "In a Bell state $|\\Phi^+\\rangle$, both qubits are entangled."
+
+
+@pytest.mark.asyncio
+async def test_chat_with_tutor_records_telemetry(monkeypatch):
+    """Problem 2.5: chat_with_tutor records telemetry with model_used on success and fallback."""
+    from app.services.tutor.adapter import FakeTutorProvider
+    from app.services.tutor.service import TutorService
+    from app.services.tutor.telemetry import telemetry
+
+    provider = FakeTutorProvider(mode="success", model="test-chat-model")
+    service = TutorService(provider=provider)
+
+    events_before = len(telemetry.get_events())
+    svc_res = await service.chat_with_tutor(
+        learner_profile_id="lp_test",
+        question="Why is purity 0.5?",
+        timeout_seconds=2.0,
+    )
+    assert svc_res["model"] == "test-chat-model"
+    events_after = telemetry.get_events()
+    assert len(events_after) == events_before + 1
+    last_event = events_after[-1]
+    assert last_event.model == "test-chat-model"
+    assert last_event.status == "success"
+
+
+
+
+
+

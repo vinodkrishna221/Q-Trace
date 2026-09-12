@@ -99,6 +99,14 @@ export default function BellStateLearnPage() {
   const [activeStep, setActiveStep] = React.useState<number>(1);
   const [viewMode, setViewMode] = React.useState<'step-by-step' | 'all'>('step-by-step');
 
+  // Pre-warm backend API on page load (Render free-tier cold-start mitigation)
+  React.useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    fetch(`${apiBase.replace(/\/$/, '')}/health`).catch(() => {
+      // Fire-and-forget non-blocking ping
+    });
+  }, []);
+
   const isExecutingPipeline =
     simulationMutation.isPending || diagnoseMutation.isPending || tutorMutation.isPending;
 
@@ -223,14 +231,11 @@ export default function BellStateLearnPage() {
       }
     } catch (err: unknown) {
       const errorObj = err as { message?: string; status?: number; code?: string };
-      const isTimeout = Boolean(
-        errorObj?.message?.toLowerCase().includes('timeout') ||
-        errorObj?.message?.toLowerCase().includes('timed out') ||
-        errorObj?.status === 504 ||
-        errorObj?.code === 'SIMULATION_TIMEOUT'
-      );
+      // Only treat explicit backend application simulation timeouts as engine timeouts.
+      // Generic network / proxy 504 errors trigger graceful local offline simulation fallback.
+      const isEngineTimeout = errorObj?.code === 'SIMULATION_TIMEOUT';
 
-      if (isTimeout) {
+      if (isEngineTimeout) {
         setSimulationError({
           message: errorObj?.message || 'Simulation execution exceeded 1500ms timeout threshold.',
           isTimeout: true,
@@ -619,6 +624,23 @@ export default function BellStateLearnPage() {
               <span className="text-xs font-mono text-ink-dim">Drag/Click gates onto wires</span>
             </div>
 
+            {isFallbackActive && (
+              <div
+                className="rounded-lg bg-accent/5 border border-accent/25 px-4 py-2.5 flex items-center justify-between gap-3 text-xs font-mono text-ink-dim"
+                data-testid="backend-warming-indicator"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
+                  <span>
+                    Running on <strong className="text-accent">verified local simulation</strong> (cloud backend warming up). Full StateTrace &amp; Flight Recorder active.
+                  </span>
+                </div>
+                <Badge variant="outline" className="text-[10px] border-accent/40 text-accent font-mono shrink-0">
+                  DEMO_LOCAL
+                </Badge>
+              </div>
+            )}
+
             <InteractiveCircuitWorkspace
               initialCircuit={DEMO_STARTER_CIRCUIT}
               isSimulating={isExecutingPipeline}
@@ -784,6 +806,15 @@ export default function BellStateLearnPage() {
                       diagnosis.misconceptionSignal.evidence.prediction ===
                         diagnosis.misconceptionSignal.evidence.verifiedBehavior)
                 )}
+                circuit={activeCircuit || DEMO_STARTER_CIRCUIT}
+                prediction={getPredictionDraft(learnerProfileId, moduleData.id)?.answer || 'INDEPENDENT_RANDOM'}
+                stateTrace={simulationRun?.stateTrace}
+                learnerProfileId={learnerProfileId}
+                learnerRole={
+                  activeLearnerProfile?.role ||
+                  (activeRole.id === 'role_meera' ? 'PHYSICS_TO_CODE' : 'BEGINNER_CSE')
+                }
+                misconceptionCode={diagnosis?.misconceptionSignal?.code}
               />
             )}
 

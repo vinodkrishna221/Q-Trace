@@ -17,6 +17,7 @@ import {
   AlertCircle,
   ShieldCheck,
 } from 'lucide-react';
+import { renderMathText } from '@/lib/math-renderer';
 
 interface FlightRecorderViewProps {
   diagnosis: DiagnoseResponse;
@@ -449,7 +450,9 @@ export function FlightRecorderView({
                 <Lightbulb className="w-3.5 h-3.5 text-accent" />
                 <span>Pedagogical Analysis</span>
               </div>
-              <p className="text-ink font-medium leading-relaxed">{tutorResponse.summary}</p>
+              <p className="text-ink font-medium leading-relaxed">
+                {renderMathText(tutorResponse.summary)}
+              </p>
             </div>
 
             {/* Trace Steps Breakdown */}
@@ -478,7 +481,7 @@ export function FlightRecorderView({
                           ))}
                         </div>
                       </div>
-                      <p className="text-ink-dim font-sans text-[11px] leading-normal">{step.body}</p>
+                      <p className="text-ink-dim font-sans text-[11px] leading-normal">{renderMathText(step.body)}</p>
                     </div>
                   ))}
                 </div>
@@ -502,7 +505,7 @@ export function FlightRecorderView({
                       key={idx}
                       className="grid grid-cols-2 p-2 border-b border-line last:border-0 items-center text-[11px]"
                     >
-                      <span className="text-evidence font-bold">{item.claim}</span>
+                      <span className="text-evidence font-bold">{renderMathText(item.claim)}</span>
                       <span className="text-ink-dim text-[10px]">{item.evidenceKey}</span>
                     </div>
                   ))}

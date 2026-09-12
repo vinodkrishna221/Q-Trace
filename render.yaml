@@ -19,7 +19,7 @@ services:
       - key: DEMO_LOCAL
         value: "0"
       - key: DEMO_FALLBACK
-        value: "1"
+        value: "0"
       - key: ENABLE_QISKIT
         value: "1"
       - key: ENABLE_PENNYLANE

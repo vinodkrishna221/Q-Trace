@@ -344,5 +344,52 @@ qc.cx(0, 1)
       const ops = useCircuitStore.getState().circuit.operations;
       expect(ops.some((op) => op.gate === 'X' && op.targets.includes(0))).toBe(true);
     });
+
+    it('locks the circuit workspace and prevents gate mutations when isSimulating is true (Problem 1.3)', () => {
+      render(
+        <InteractiveCircuitWorkspace
+          initialCircuit={DEMO_STARTER_CIRCUIT}
+          isSimulating={true}
+        />
+      );
+
+      // 1. Gate Palette MUST NOT be rendered while simulation is in flight
+      expect(screen.queryByTestId('gate-palette-card')).toBeNull();
+
+      // 2. Share & Export button must be disabled
+      const shareBtn = screen.getByTestId('open-share-panel-btn');
+      expect(shareBtn.hasAttribute('disabled')).toBe(true);
+
+      // 3. Run simulation button must be disabled with spinner
+      const runBtn = screen.getByTestId('run-simulation-btn');
+      expect(runBtn.hasAttribute('disabled')).toBe(true);
+      expect(screen.getByText(/Simulating on Aer.../i)).toBeDefined();
+
+      // 4. Keyboard shortcuts on wire cells must be ignored
+      const cell = screen.getByTestId('wire-cell-0-3');
+      const opsBefore = useCircuitStore.getState().circuit.operations.length;
+      fireEvent.keyDown(cell, { key: 'x' });
+      expect(useCircuitStore.getState().circuit.operations).toHaveLength(opsBefore);
+
+      // 5. Code editor must be in read-only mode (input and apply buttons suppressed)
+      expect(screen.getByText('Read-Only')).toBeDefined();
+      expect(screen.queryByTestId('apply-code-btn')).toBeNull();
+      expect(screen.queryByTestId('qiskit-code-editor-input')).toBeNull();
+      expect(screen.getByTestId('qiskit-code-content')).toBeDefined();
+    });
+
+    it('disables the run simulation button and palette when readOnly is true', () => {
+      render(
+        <InteractiveCircuitWorkspace
+          initialCircuit={DEMO_STARTER_CIRCUIT}
+          readOnly={true}
+        />
+      );
+
+      const runBtn = screen.getByTestId('run-simulation-btn');
+      expect(runBtn.hasAttribute('disabled')).toBe(true);
+      expect(screen.queryByTestId('gate-palette-card')).toBeNull();
+    });
   });
 });
+

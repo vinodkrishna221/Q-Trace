@@ -29,6 +29,7 @@ export function InteractiveCircuitWorkspace({
 }: InteractiveCircuitWorkspaceProps) {
   const { circuit, setCircuit } = useCircuitStore();
   const [showSharePanel, setShowSharePanel] = React.useState(false);
+  const isLocked = Boolean(readOnly || isSimulating);
 
   // Initialize store with initialCircuit if provided on mount
   React.useEffect(() => {
@@ -51,7 +52,11 @@ export function InteractiveCircuitWorkspace({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="text-xs font-mono">
-                {readOnly ? 'STEP 2 · CIRCUIT WORKSPACE (READ-ONLY)' : 'STEP 2 · INTERACTIVE CIRCUIT WORKSPACE'}
+                {readOnly
+                  ? 'STEP 2 · CIRCUIT WORKSPACE (READ-ONLY)'
+                  : isSimulating
+                  ? 'STEP 2 · SIMULATION IN PROGRESS (LOCKED)'
+                  : 'STEP 2 · INTERACTIVE CIRCUIT WORKSPACE'}
               </Badge>
               <span className="text-xs font-mono text-ink-dim" data-testid="circuit-name-badge">
                 {circuit.name}
@@ -68,6 +73,7 @@ export function InteractiveCircuitWorkspace({
                 variant={showSharePanel ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setShowSharePanel(!showSharePanel)}
+                disabled={isLocked}
                 className="h-7 px-2.5 text-xs font-medium ml-1"
                 data-testid="open-share-panel-btn"
                 aria-expanded={showSharePanel}
@@ -88,10 +94,10 @@ export function InteractiveCircuitWorkspace({
 
         <CardContent className="p-4 md:p-6 space-y-5">
           {/* Gate Palette */}
-          {!readOnly && <GatePalette />}
+          {!isLocked && <GatePalette />}
 
           {/* Interactive Wires Grid */}
-          <QubitWiresGrid readOnly={readOnly} />
+          <QubitWiresGrid readOnly={isLocked} />
         </CardContent>
 
         <CardFooter className="bg-raised/40 p-4 border-t border-line flex flex-wrap items-center justify-between gap-3">
@@ -104,7 +110,7 @@ export function InteractiveCircuitWorkspace({
 
           <Button
             onClick={handleRun}
-            disabled={isSimulating}
+            disabled={isLocked}
             data-testid="run-simulation-btn"
             variant={hasExecuted ? 'outline' : 'default'}
             className="font-semibold"
@@ -130,7 +136,7 @@ export function InteractiveCircuitWorkspace({
       </Card>
 
       {/* Share & Export Panel */}
-      {showSharePanel && (
+      {showSharePanel && !isLocked && (
         <CircuitSharePanel
           onClose={() => setShowSharePanel(false)}
           onImportSuccess={() => setShowSharePanel(false)}
@@ -138,7 +144,7 @@ export function InteractiveCircuitWorkspace({
       )}
 
       {/* Synchronized Qiskit Code Panel & Editor */}
-      <QiskitCodeEditor isReadOnly={readOnly} />
+      <QiskitCodeEditor isReadOnly={isLocked} />
     </div>
   );
 }

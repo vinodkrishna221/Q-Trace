@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { TutorExplanation } from '@/lib/contracts';
+import { TutorExplanation, TutorChatMessage } from '@/lib/contracts';
+import { useTutorChatMutation } from '@/lib/hooks/use-quantum-api';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,36 +16,232 @@ import {
   CheckCircle2,
   Send,
   HelpCircle,
+  Loader2,
+  Compass,
 } from 'lucide-react';
+import {
+  renderMathText,
+  normalizeLatexDelimiters,
+  healUnclosedLatex,
+} from '@/lib/math-renderer';
+
+export { renderMathText, normalizeLatexDelimiters, healUnclosedLatex };
 
 interface TutorCardProps {
   tutorResponse?: TutorExplanation | null;
   isCorrectPrediction?: boolean;
+  circuit?: unknown;
+  prediction?: string;
+  stateTrace?: unknown[];
+  learnerProfileId?: string;
+  learnerRole?: string;
+  misconceptionCode?: string;
 }
 
-export function TutorCard({ tutorResponse, isCorrectPrediction }: TutorCardProps) {
+/**
+ * Interactive Socratic Follow-Up Q&A Panel connected to live OpenRouter.
+ */
+function SocraticQAPanel({
+  circuit,
+  prediction,
+  stateTrace,
+  learnerProfileId,
+  learnerRole,
+  misconceptionCode,
+  title = 'Ask Socratic Follow-Up Question',
+  placeholder = 'e.g. Why does tracing out one qubit produce a mixed state?',
+}: {
+  circuit?: unknown;
+  prediction?: string;
+  stateTrace?: unknown[];
+  learnerProfileId?: string;
+  learnerRole?: string;
+  misconceptionCode?: string;
+  title?: string;
+  placeholder?: string;
+}) {
   const [questionInput, setQuestionInput] = React.useState('');
-  const [qaHistory, setQaHistory] = React.useState<Array<{ q: string; a: string }>>([]);
+  const [qaHistory, setQaHistory] = React.useState<
+    Array<{ q: string; a: string; model?: string; fallbackUsed?: boolean }>
+  >([]);
 
-  const handleAskQuestion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!questionInput.trim()) return;
+  const chatMutation = useTutorChatMutation();
 
-    const q = questionInput.trim();
-    let answer =
-      'In a maximally entangled Bell state |Φ+⟩, measurement collapses both qubits simultaneously into matching states (00 or 11) with zero local communication delay. Tracing out either qubit yields purity 0.5 (maximally mixed), proving the correlation is global.';
-    if (q.toLowerCase().includes('faster') || q.toLowerCase().includes('communication')) {
-      answer =
-        'No-Communication Theorem: Because local measurement outcomes are individually random (50/50), neither party can transmit information faster than light without a classical communication channel.';
-    } else if (q.toLowerCase().includes('bloch') || q.toLowerCase().includes('subsystem')) {
-      answer =
-        'The single-qubit Bloch vector vanishes to the origin (r=0) because an entangled qubit possesses no pure individual statevector—it can only be described by the joint 2-qubit state space.';
-    }
+  const suggestedQuestions = [
+    'Why does tracing out one qubit produce a mixed state?',
+    'Can Bell correlation transmit information faster than light?',
+    'What happens if we swap the Hadamard and CNOT gates?',
+    'Why are P(01) and P(10) strictly zero in this run?',
+  ];
 
-    setQaHistory((prev) => [...prev, { q, a: answer }]);
+  const handleAsk = async (questionText: string) => {
+    const q = questionText.trim();
+    if (!q || chatMutation.isPending) return;
+
     setQuestionInput('');
+
+    const historyPayload: TutorChatMessage[] = qaHistory.flatMap((item) => [
+      { role: 'user', content: item.q },
+      { role: 'assistant', content: item.a },
+    ]);
+
+    try {
+      const res = await chatMutation.mutateAsync({
+        learnerProfileId: learnerProfileId || 'lp_aarav',
+        question: q,
+        history: historyPayload,
+        circuit,
+        prediction,
+        stateTrace,
+        misconceptionCode,
+        learnerRole,
+      });
+
+      setQaHistory((prev) => [
+        ...prev,
+        {
+          q,
+          a: res.data.answer,
+          model: res.data.model,
+          fallbackUsed: res.data.fallbackUsed,
+        },
+      ]);
+    } catch {
+      setQaHistory((prev) => [
+        ...prev,
+        {
+          q,
+          a: 'In this simulation run, measurement collapses both qubits into correlated outcomes (00 and 11 each with probability 0.5). Tracing out either qubit yields a reduced density matrix with purity 0.5, proving the entanglement correlation is non-local.',
+          model: 'DEMO_FALLBACK',
+          fallbackUsed: true,
+        },
+      ]);
+    }
   };
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleAsk(questionInput);
+  };
+
+  return (
+    <div className="space-y-3 pt-2 border-t border-line">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-ink font-mono flex items-center gap-1.5">
+          <HelpCircle className="w-3.5 h-3.5 text-accent" />
+          {title}
+        </span>
+        <span className="text-[10px] font-mono text-ink-faint flex items-center gap-1">
+          <Compass className="w-3 h-3" />
+          Grounded in Circuit &amp; Aer Trace
+        </span>
+      </div>
+
+      {/* Suggested 1-Click Question Chips */}
+      <div className="space-y-1">
+        <div className="text-[10px] font-mono text-ink-dim font-medium">Quick Exploration Questions:</div>
+        <div className="flex flex-wrap gap-1.5">
+          {suggestedQuestions.map((sq, i) => (
+            <button
+              key={i}
+              type="button"
+              disabled={chatMutation.isPending}
+              onClick={() => handleAsk(sq)}
+              className="text-[11px] font-mono px-2.5 py-1 rounded-full border border-accent/30 bg-accent/5 hover:bg-accent/15 text-accent text-left transition-colors disabled:opacity-50 hover:border-accent/60 active:scale-95"
+            >
+              + {sq}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Interactive Input Form */}
+      <form onSubmit={onSubmitForm} className="flex gap-2">
+        <input
+          type="text"
+          value={questionInput}
+          onChange={(e) => setQuestionInput(e.target.value)}
+          disabled={chatMutation.isPending}
+          placeholder={placeholder}
+          className="flex-1 px-3 py-2 rounded-lg border border-line bg-abyss text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent disabled:opacity-60"
+        />
+        <Button
+          type="submit"
+          size="sm"
+          variant="default"
+          disabled={chatMutation.isPending || !questionInput.trim()}
+          className="gap-1 font-mono text-xs"
+        >
+          {chatMutation.isPending ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Send className="w-3 h-3" />
+          )}
+          <span>Ask</span>
+        </Button>
+      </form>
+
+      {/* Real-time Thinking Indicator */}
+      {chatMutation.isPending && (
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-accent/40 bg-accent/10 text-xs font-mono text-accent animate-pulse">
+          <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0 text-accent" />
+          <span>Tutor is analyzing your circuit trace via OpenRouter...</span>
+        </div>
+      )}
+
+      {/* Multi-turn Chat History */}
+      {qaHistory.length > 0 && (
+        <div className="space-y-2.5 pt-1">
+          {qaHistory.map((item, idx) => (
+            <div
+              key={idx}
+              className="rounded-lg border border-line bg-abyss p-3 text-xs space-y-1.5 shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="font-semibold text-accent font-mono flex items-center gap-1.5">
+                  <span className="text-accent/60">Q:</span>
+                  <span>{item.q}</span>
+                </div>
+                {item.fallbackUsed ? (
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] font-mono text-caution border-caution/40 bg-caution/10 px-1.5 py-0"
+                  >
+                    Offline Fallback
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="text-[9px] font-mono text-evidence border-evidence/40 bg-evidence/10 px-1.5 py-0 flex items-center gap-1"
+                  >
+                    <Sparkles className="w-2.5 h-2.5 text-evidence" />
+                    <span>Live AI ({item.model || 'OpenRouter'})</span>
+                  </Badge>
+                )}
+              </div>
+
+              <div className="text-ink-dim font-sans text-xs leading-relaxed pl-2 border-l-2 border-evidence/40">
+                <strong className="text-evidence font-mono text-[11px]">Tutor: </strong>
+                {renderMathText(item.a)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function TutorCard({
+  tutorResponse,
+  isCorrectPrediction,
+  circuit,
+  prediction,
+  stateTrace,
+  learnerProfileId,
+  learnerRole,
+  misconceptionCode,
+}: TutorCardProps) {
   // If hypothesis confirmed / correct prediction
   if (isCorrectPrediction || !tutorResponse) {
     return (
@@ -88,46 +285,23 @@ export function TutorCard({ tutorResponse, isCorrectPrediction }: TutorCardProps
               <span>Theory Mastery Confirmed</span>
             </div>
             <p className="text-ink font-medium">
-              You correctly predicted that the Hadamard and CNOT gates create non-local quantum correlation (|Φ+⟩ = (|00⟩ + |11⟩)/√2). Because no conceptual divergence was detected, remedial tutoring is bypassed.
+              {renderMathText(
+                'You correctly predicted that the Hadamard and CNOT gates create non-local quantum correlation (|Φ+⟩ = (|00⟩ + |11⟩)/√2). Because no conceptual divergence was detected, remedial tutoring is bypassed.'
+              )}
             </p>
           </div>
 
-          {/* Socratic Deep-Dive Follow-Up Q&A */}
-          <div className="space-y-4">
-            <span className="text-xs font-bold text-ink font-mono flex items-center gap-1.5">
-              <HelpCircle className="w-3.5 h-3.5 text-accent" />
-              Ask Tutor a Follow-Up Quantum Question
-            </span>
-
-            <form onSubmit={handleAskQuestion} className="flex gap-2">
-              <input
-                type="text"
-                value={questionInput}
-                onChange={(e) => setQuestionInput(e.target.value)}
-                placeholder="e.g. Can Bell correlation transmit information faster than light?"
-                className="flex-1 px-3 py-2 rounded-lg border border-line bg-abyss text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent"
-              />
-              <Button type="submit" size="sm" variant="default" className="gap-1 font-mono text-xs">
-                <Send className="w-3 h-3" />
-                <span>Ask</span>
-              </Button>
-            </form>
-
-            {qaHistory.length > 0 && (
-              <div className="space-y-2.5 pt-2">
-                {qaHistory.map((item, idx) => (
-                  <div key={idx} className="rounded-lg border border-line bg-abyss p-3 text-xs space-y-1">
-                    <div className="font-semibold text-accent font-mono flex items-center gap-1">
-                      <span>Q:</span> {item.q}
-                    </div>
-                    <div className="text-ink-dim font-sans text-[11px] leading-relaxed">
-                      <strong className="text-evidence">Tutor: </strong> {item.a}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Live Socratic Deep-Dive Follow-Up Q&A */}
+          <SocraticQAPanel
+            circuit={circuit}
+            prediction={prediction}
+            stateTrace={stateTrace}
+            learnerProfileId={learnerProfileId}
+            learnerRole={learnerRole}
+            misconceptionCode={misconceptionCode}
+            title="Ask Tutor a Follow-Up Quantum Question"
+            placeholder="e.g. Can Bell correlation transmit information faster than light?"
+          />
         </CardContent>
 
         <CardFooter className="bg-raised/40 p-4 border-t border-line text-[11px] text-ink-dim flex items-center justify-between">
@@ -185,7 +359,7 @@ export function TutorCard({ tutorResponse, isCorrectPrediction }: TutorCardProps
             <span>Key Pedagogical Insight</span>
           </div>
           <p className="text-ink font-medium">
-            {summary}
+            {renderMathText(summary)}
           </p>
         </div>
 
@@ -216,7 +390,7 @@ export function TutorCard({ tutorResponse, isCorrectPrediction }: TutorCardProps
                     ))}
                   </div>
                 </div>
-                <p className="text-ink-dim font-sans leading-normal">{step.body}</p>
+                <p className="text-ink-dim font-sans leading-normal">{renderMathText(step.body)}</p>
               </div>
             ))}
           </div>
@@ -242,49 +416,24 @@ export function TutorCard({ tutorResponse, isCorrectPrediction }: TutorCardProps
                 key={idx}
                 className="grid grid-cols-2 p-2.5 border-b border-line last:border-0 items-center"
               >
-                <span className="text-evidence font-bold">{item.claim}</span>
+                <span className="text-evidence font-bold">{renderMathText(item.claim)}</span>
                 <span className="text-ink-dim text-[11px]">{item.evidenceKey}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Interactive Follow-Up Q&A Panel */}
-        <div className="space-y-3 pt-2 border-t border-line">
-          <span className="text-xs font-bold text-ink font-mono flex items-center gap-1.5">
-            <HelpCircle className="w-3.5 h-3.5 text-accent" />
-            Ask Socratic Follow-Up Question
-          </span>
-
-          <form onSubmit={handleAskQuestion} className="flex gap-2">
-            <input
-              type="text"
-              value={questionInput}
-              onChange={(e) => setQuestionInput(e.target.value)}
-              placeholder="e.g. Why does tracing out one qubit produce a mixed state?"
-              className="flex-1 px-3 py-2 rounded-lg border border-line bg-abyss text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent"
-            />
-            <Button type="submit" size="sm" variant="default" className="gap-1 font-mono text-xs">
-              <Send className="w-3 h-3" />
-              <span>Ask</span>
-            </Button>
-          </form>
-
-          {qaHistory.length > 0 && (
-            <div className="space-y-2.5 pt-1">
-              {qaHistory.map((item, idx) => (
-                <div key={idx} className="rounded-lg border border-line bg-abyss p-3 text-xs space-y-1">
-                  <div className="font-semibold text-accent font-mono flex items-center gap-1">
-                    <span>Q:</span> {item.q}
-                  </div>
-                  <div className="text-ink-dim font-sans text-[11px] leading-relaxed">
-                    <strong className="text-evidence">Tutor: </strong> {item.a}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Live Interactive Follow-Up Q&A Panel */}
+        <SocraticQAPanel
+          circuit={circuit}
+          prediction={prediction}
+          stateTrace={stateTrace}
+          learnerProfileId={learnerProfileId}
+          learnerRole={learnerRole}
+          misconceptionCode={misconceptionCode}
+          title="Ask Socratic Follow-Up Question"
+          placeholder="e.g. Why does tracing out one qubit produce a mixed state?"
+        />
       </CardContent>
 
       <CardFooter className="bg-raised/40 p-4 border-t border-line text-[11px] text-ink-dim flex items-center justify-between">

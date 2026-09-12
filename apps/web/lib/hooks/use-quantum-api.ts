@@ -18,6 +18,8 @@ import {
   DemoProfilesResponse,
   ExportOpenQasm3Request,
   ExportOpenQasm3Response,
+  TutorChatRequest,
+  TutorChatResponse,
 } from '@/lib/contracts';
 
 export const QUERY_KEYS = {
@@ -52,6 +54,15 @@ export function useDiagnoseMutation() {
 export function useTutorExplainMutation() {
   return useMutation<ApiResponseWithMeta<ExplainResponse>, Error, ExplainRequest>({
     mutationFn: (payload: ExplainRequest) => apiClient.explainWithTutor(payload),
+  });
+}
+
+/**
+ * Mutation to ask Socratic Tutor follow-up question (POST /v1/tutor/chat)
+ */
+export function useTutorChatMutation() {
+  return useMutation<ApiResponseWithMeta<TutorChatResponse>, Error, TutorChatRequest>({
+    mutationFn: (payload: TutorChatRequest) => apiClient.askTutorChat(payload),
   });
 }
 

@@ -308,3 +308,50 @@ async def recommend_module_endpoint(
         )
     )
 
+
+class ChatMessagePayload(BaseModel):
+    role: str
+    content: str
+
+
+class TutorChatRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    learnerProfileId: str
+    question: str = Field(..., max_length=1000)
+    moduleId: str = "mod_bell"
+    history: list[ChatMessagePayload] = []
+    circuit: Optional[dict[str, Any]] = None
+    prediction: Optional[str] = None
+    stateTrace: Optional[list[dict[str, Any]]] = None
+    misconceptionCode: Optional[str] = None
+    learnerRole: Optional[str] = None
+
+
+class TutorChatResponse(BaseModel):
+    answer: str
+    model: str
+    fallbackUsed: bool
+    groundedEvidenceKeys: list[str]
+
+
+@router.post("/chat", response_model=TutorChatResponse, status_code=status.HTTP_200_OK)
+async def tutor_chat_endpoint(request: TutorChatRequest) -> TutorChatResponse:
+    """POST /v1/tutor/chat
+    
+    Interactive Socratic follow-up Q&A grounded in circuit and simulation evidence.
+    """
+    history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
+    result = await default_tutor_service.chat_with_tutor(
+        learner_profile_id=request.learnerProfileId,
+        question=request.question,
+        history=history_dicts,
+        circuit=request.circuit,
+        prediction=request.prediction,
+        state_trace=request.stateTrace,
+        misconception_code=request.misconceptionCode,
+        learner_role=request.learnerRole,
+        module_id=request.moduleId,
+    )
+    return TutorChatResponse(**result)
+
+

@@ -13,9 +13,11 @@
  * ensuring the UI has valid data to render for offline/fallback modes.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { apiClient } from '@/lib/api-client';
 import {
   DEMO_SIMULATION_RUN,
+  DEMO_STARTER_CIRCUIT,
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
   DEMO_TUTOR_RESPONSE,
   DEMO_CHALLENGE_ATTEMPT_RESPONSE,
@@ -245,4 +247,103 @@ describe('QA-5: Fallback state acceptance fixtures — offline demo safety', () 
       expect(typeof DEMO_PROGRESS_RECORDS).toBe('object');
     });
   });
+
+  // -------------------------------------------------------------------------
+  // E. Simulation 504 proxy vs simulator engine timeout (Problem 1.2)
+  // -------------------------------------------------------------------------
+
+  describe('apiClient.runSimulation 504 and engine timeout differentiation (Problem 1.2)', () => {
+    it('gracefully falls back to DEMO_SIMULATION_RUN when encountering a 504 Gateway Timeout without SIMULATION_TIMEOUT code', async () => {
+      vi.stubGlobal('fetch', () =>
+        Promise.resolve({
+          ok: false,
+          status: 504,
+          statusText: 'Gateway Timeout',
+          headers: new Headers(),
+          text: async () => '<html>504 Gateway Time-out: Render container spinning up</html>',
+        })
+      );
+
+      const result = await apiClient.runSimulation({
+        learnerProfileId: 'lp_aarav',
+        moduleId: 'mod_bell',
+        circuitModel: DEMO_STARTER_CIRCUIT,
+        predictionResponse: {
+          checkpointId: 'pc_bell',
+          answer: 'CORRELATED_00_11',
+        },
+      });
+
+      expect(result.meta.isFallback).toBe(true);
+      expect(result.data.id).toBe(DEMO_SIMULATION_RUN.id);
+      expect(result.data.status).toBe('SUCCEEDED');
+
+      vi.unstubAllGlobals();
+    });
+
+    it('rethrows the error when backend returns code: SIMULATION_TIMEOUT', async () => {
+      vi.stubGlobal('fetch', () =>
+        Promise.resolve({
+          ok: false,
+          status: 504,
+          statusText: 'Gateway Timeout',
+          headers: new Headers(),
+          text: async () =>
+            JSON.stringify({
+              error: {
+                code: 'SIMULATION_TIMEOUT',
+                message: 'Simulation execution exceeded 1500ms timeout threshold.',
+              },
+            }),
+        })
+      );
+
+      await expect(
+        apiClient.runSimulation({
+          learnerProfileId: 'lp_aarav',
+          moduleId: 'mod_bell',
+          circuitModel: DEMO_STARTER_CIRCUIT,
+          predictionResponse: {
+            checkpointId: 'pc_bell',
+            answer: 'CORRELATED_00_11',
+          },
+        })
+      ).rejects.toThrow('Simulation execution exceeded 1500ms timeout threshold.');
+
+      vi.unstubAllGlobals();
+    });
+
+    it('rethrows when backend returns SIMULATION_TIMEOUT inside FastAPI detail envelope', async () => {
+      vi.stubGlobal('fetch', () =>
+        Promise.resolve({
+          ok: false,
+          status: 504,
+          statusText: 'Gateway Timeout',
+          headers: new Headers(),
+          text: async () =>
+            JSON.stringify({
+              detail: {
+                code: 'SIMULATION_TIMEOUT',
+                message: 'Simulation exceeded the 1500 ms budget.',
+              },
+            }),
+        })
+      );
+
+      await expect(
+        apiClient.runSimulation({
+          learnerProfileId: 'lp_aarav',
+          moduleId: 'mod_bell',
+          circuitModel: DEMO_STARTER_CIRCUIT,
+          predictionResponse: {
+            checkpointId: 'pc_bell',
+            answer: 'CORRELATED_00_11',
+          },
+        })
+      ).rejects.toThrow('Simulation exceeded the 1500 ms budget.');
+
+      vi.unstubAllGlobals();
+    });
+  });
 });
+

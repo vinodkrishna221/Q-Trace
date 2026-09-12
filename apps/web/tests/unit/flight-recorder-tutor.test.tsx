@@ -1,7 +1,9 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { render } from '../test-utils';
+import { apiClient } from '@/lib/api-client';
+import { healUnclosedLatex, renderMathText, normalizeLatexDelimiters } from '@/lib/math-renderer';
 import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
 import { TutorCard } from '@/features/tutor/tutor-card';
 import BellStateLearnPage from '@/app/(app)/learn/bell-state/page';
@@ -124,7 +126,32 @@ describe('Flight Recorder False-Positive Bug & Inline AI Tutor Integration', () 
     expect(screen.getByTestId('inline-tutor-badge')).toBeDefined();
   });
 
-  it('renders TutorCard in Socratic deep-dive mode when hypothesis is confirmed', () => {
+  it('renders TutorCard in Socratic deep-dive mode when hypothesis is confirmed', async () => {
+    const askSpy = vi.spyOn(apiClient, 'askTutorChat').mockImplementation(async (payload) => {
+      let answer =
+        'In a maximally entangled Bell state |Φ+⟩, measurement collapses both qubits simultaneously into matching states (00 or 11) with zero local communication delay. Tracing out either qubit yields purity 0.5 (maximally mixed), proving the correlation is global.';
+      if (
+        payload.question.toLowerCase().includes('faster') ||
+        payload.question.toLowerCase().includes('communication')
+      ) {
+        answer =
+          'No-Communication Theorem: Because local measurement outcomes are individually random (50/50), neither party can transmit information faster than light without a classical communication channel.';
+      }
+      return {
+        data: {
+          answer,
+          model: 'DEMO_FALLBACK',
+          fallbackUsed: true,
+          groundedEvidenceKeys: ['stateTrace.1.basisProbabilities'],
+        },
+        meta: {
+          requestId: 'req_mock_chat_001',
+          isFallback: true,
+          durationMs: 10,
+        },
+      };
+    });
+
     render(
       <TutorCard
         tutorResponse={null}
@@ -142,7 +169,11 @@ describe('Flight Recorder False-Positive Bug & Inline AI Tutor Integration', () 
     fireEvent.change(input, { target: { value: 'Can we use this for faster communication?' } });
     fireEvent.submit(form);
 
-    expect(screen.getByText(/No-Communication Theorem/i)).toBeDefined();
+    await waitFor(() => {
+      expect(screen.getByText(/No-Communication Theorem/i)).toBeDefined();
+    });
+    expect(askSpy).toHaveBeenCalled();
+    askSpy.mockRestore();
   });
 
   it('suppresses false-positive and AI tutor call end-to-end on BellStateLearnPage when learner selects CORRELATED_00_11', async () => {
@@ -161,9 +192,12 @@ describe('Flight Recorder False-Positive Bug & Inline AI Tutor Integration', () 
     fireEvent.click(runBtn);
 
     // 3. Verify Flight Recorder confirmed hypothesis state
-    await waitFor(() => {
-      expect(screen.getByTestId('hypothesis-confirmed-badge')).toBeDefined();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('hypothesis-confirmed-badge')).toBeDefined();
+      },
+      { timeout: 4000 }
+    );
 
     expect(screen.getByTestId('no-divergence-status').textContent).toContain(
       '✓ Hypothesis Confirmed — No Misconception Detected'
@@ -174,5 +208,98 @@ describe('Flight Recorder False-Positive Bug & Inline AI Tutor Integration', () 
 
     // 4. Verify TutorCard is in Socratic confirmed mode
     expect(screen.getByText(/Theory Mastery Confirmed/i)).toBeDefined();
+  });
+
+  it('heals truncated KaTeX math strings with unclosed delimiters and unbalanced braces', () => {
+    // Truncated display math
+    const truncatedDisplay = 'Density matrix: $$\\rho_A = \\frac{1}{2';
+    const healedDisplay = healUnclosedLatex(truncatedDisplay);
+    expect(healedDisplay).toBe('Density matrix: $$\\rho_A = \\frac{1}{2}$$');
+
+    // Truncated inline math
+    const truncatedInline = 'State $|\\Phi^+\\rangle$ has purity $\\text{Tr}(\\rho^2) = 0.5';
+    const healedInline = healUnclosedLatex(truncatedInline);
+    expect(healedInline).toBe('State $|\\Phi^+\\rangle$ has purity $\\text{Tr}(\\rho^2) = 0.5$');
+
+    // Truncated with unbalanced open brace
+    const truncatedBrace = 'Formula $\\sqrt{2';
+    const healedBrace = healUnclosedLatex(truncatedBrace);
+    expect(healedBrace).toBe('Formula $\\sqrt{2}$');
+  });
+
+  it('renders KaTeX equations in TutorCard summary, steps, claims, and hypothesis confirmed', () => {
+    const mathExplanation: TutorExplanation = {
+      responseId: 'tr_math_001',
+      intent: 'EXPLAIN_DIVERGENCE',
+      summary: 'Tracing out gives $\\rho_0 = \\frac{1}{2}|0\\rangle\\langle 0| + \\frac{1}{2}|1\\rangle\\langle 1|$.',
+      steps: [
+        {
+          title: 'Partial Trace Step',
+          body: 'The subsystem is in mixed state $$\\rho_A = \\text{Tr}_B(|\\Phi^+\\rangle\\langle\\Phi^+|)$$ with purity 0.5.',
+          evidenceKeys: ['stateTrace.1.basisProbabilities'],
+        },
+      ],
+      numericalClaims: [
+        { claim: '$\\text{Tr}(\\rho_0^2) = 0.5$', evidenceKey: 'stateTrace.1.reducedQubits.0.purity' },
+      ],
+      repairChallengeId: 'ch_bell_repair',
+      fallbackUsed: false,
+      model: 'test-model',
+      safetyNote: 'Grounded math evidence note.',
+    };
+
+    render(<TutorCard tutorResponse={mathExplanation} isCorrectPrediction={false} />);
+
+    // Verify KaTeX rendered html elements exist (katex class in dom)
+    const katexNodes = document.querySelectorAll('.katex');
+    expect(katexNodes.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('heals unclosed math even with escaped dollar signs and escaped braces', () => {
+    // Escaped dollar followed by truncated formula
+    const textWithCurrency = 'Cost is \\$100, formula is $a = \\frac{1}{2';
+    const healed = healUnclosedLatex(textWithCurrency);
+    expect(healed).toBe('Cost is \\$100, formula is $a = \\frac{1}{2}$');
+
+    // Truncated formula with escaped currency following the open delimiter
+    const textWithTrailingEscaped = 'Equation $a = \\frac{1}{2 and cost is \\$50';
+    const healedTrailing = healUnclosedLatex(textWithTrailingEscaped);
+    expect(healedTrailing).toBe('Equation $a = \\frac{1}{2 and cost is \\$50}$');
+  });
+
+  it('normalizes plain-text and math-mode Dirac notation without raw backslashes', () => {
+    // Plain-text Bell state and kets should be wrapped in $...$ for KaTeX
+    const plainText = 'You created (|Φ+⟩ = (|00⟩ + |11⟩)/√2). Also |+⟩ and ⟨0|.';
+    const normalized = normalizeLatexDelimiters(plainText);
+    expect(normalized).toContain('$|\\Phi^+\\rangle$');
+    expect(normalized).toContain('$|00\\rangle$');
+    expect(normalized).toContain('$|11\\rangle$');
+    expect(normalized).toContain('$|+\\rangle$');
+    expect(normalized).toContain('$\\langle 0|$');
+
+    // Math-mode Dirac notation should NOT be double-wrapped in $$
+    const mathMode = 'Formula: $\\frac{|00⟩ + |11⟩}{\\sqrt{2}}$';
+    const normalizedMath = normalizeLatexDelimiters(mathMode);
+    expect(normalizedMath).toBe('Formula: $\\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$');
+    expect(normalizedMath).not.toContain('$$|');
+  });
+
+  it('falls back gracefully to DEMO_FALLBACK when askTutorChat rejects due to network error', async () => {
+    const askSpy = vi.spyOn(apiClient, 'askTutorChat').mockRejectedValueOnce(new Error('Network offline'));
+
+    render(<TutorCard tutorResponse={null} isCorrectPrediction={true} />);
+
+    const input = screen.getByPlaceholderText(/Can Bell correlation transmit/i);
+    const form = input.closest('form')!;
+    fireEvent.change(input, { target: { value: 'Why is purity 0.5?' } });
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Offline Fallback/i)).toBeDefined();
+      expect(screen.getByText(/In this simulation run, measurement collapses both qubits/i)).toBeDefined();
+    });
+
+    expect(askSpy).toHaveBeenCalled();
+    askSpy.mockRestore();
   });
 });

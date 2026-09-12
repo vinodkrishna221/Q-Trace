@@ -107,3 +107,28 @@ export interface CircuitHealth {
 export interface CircuitHealthResponse {
   health: CircuitHealth;
 }
+
+export interface TutorChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface TutorChatRequest {
+  learnerProfileId: string;
+  question: string;
+  moduleId?: string;
+  history?: TutorChatMessage[];
+  circuit?: unknown;
+  prediction?: string;
+  stateTrace?: unknown[];
+  misconceptionCode?: string;
+  learnerRole?: string;
+}
+
+export interface TutorChatResponse {
+  answer: string;
+  model: string;
+  fallbackUsed: boolean;
+  groundedEvidenceKeys: string[];
+}
+

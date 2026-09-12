@@ -1,10 +1,10 @@
-﻿# Q-Trace — Full Presentation & Live Demo Script
+# Q-Trace — Full Presentation & Live Demo Script
 ### Team Vanguard · SIH 2025 · Problem Statement 26140
 ### Team ID: 76239
 
-> **Members:** Vinod Krishna · Rani · Rajeswari · Venu Gopal · Uday Rohith · Sohail
-> **Note:** Venu Gopal and Sohail are quieter speakers — their lines are short, action-driven, and fully written out. They do NOT need to improvise.
-> **Demo driver:** Venu Gopal (clicks the product; Vinod talks if Venu gets stuck)
+> **Members:** Rani · Uday Rohith · Venu Gopal · Vinod Krishna · Rajeswari · Sohail
+> **Note:** Every member has a defined speaking role. Lines are action-driven and fully written out.
+> **Demo drivers:** Venu Gopal (operates product, speaks Beat 3) + Vinod Krishna (demo narration & fallbacks)
 > **Target total time:** ~3 minutes (slides + live demo)
 
 ---
@@ -21,15 +21,13 @@ Every member should know this by heart. If any judge asks "what is this?" — th
 
 | Segment | Who | Time |
 |---|---|---|
-| Opening + Slide 1 | Vinod Krishna | 0:00 – 0:20 |
-| Slide 2 — Solution | Vinod Krishna | 0:20 – 0:40 |
-| Live Demo (Beats 1–4) | Venu Gopal (clicks) + Vinod (narrates) | 0:40 – 1:20 |
-| Beat 5–6 (Wow moment) | Vinod Krishna | 1:20 – 1:45 |
-| Beat 7 — Tutor | Rajeswari | 1:45 – 2:00 |
-| Beat 8 — Progress + Analytics | Rani | 2:00 – 2:15 |
-| Slide 3 — Tech Approach | Uday Rohith | 2:15 – 2:35 |
-| Slide 4 — Feasibility | Rani (leads) + Rajeswari (one line) | 2:35 – 2:50 |
-| Slide 5 — Impact + Close | Vinod Krishna | 2:50 – 3:00 |
+| Opening + Slide 1 (Basic Details) | Rani | 0:00 – 0:15 |
+| Slide 2 — Approach (Solution & Innovation) | Uday Rohith | 0:15 – 0:35 |
+| Live Demo (Beats 1–8: Full Learner Journey) | Venu Gopal (clicks + speaks Beat 3) + Vinod Krishna (narrates) | 0:35 – 1:55 |
+| Slide 3 — Technical Approach & Architecture | Rajeswari | 1:55 – 2:15 |
+| Slide 4 — Feasibility & Viability | Sohail | 2:15 – 2:35 |
+| Slide 5 — Impact & Business Model | Rani (Impact) + Uday Rohith (Business Model) | 2:35 – 2:50 |
+| Closing | Vinod Krishna | 2:50 – 3:00 |
 
 ---
 
@@ -37,144 +35,173 @@ Every member should know this by heart. If any judge asks "what is this?" — th
 
 ---
 
-### 🟢 OPENING [0:00 – 0:20]
-**Speaker: Vinod Krishna** *(standing, facing judges)*
+### 🟢 OPENING & SLIDE 1 — BASIC DETAILS [0:00 – 0:15]
+**Speaker: Rani** *(standing, facing judges)*
 
-> **VINOD:** "Good morning. We are Team Vanguard. I'm Vinod Krishna. Problem Statement 26140 — AI-Based Interactive Quantum Algorithm Learning Platform.
+> **RANI:** "Good morning, respected judges. We are Team Vanguard, Team ID 76239. Problem Statement 26140 — AI-Based Interactive Quantum Algorithm Learning Platform under the Smart Education theme.
 >
-> Here's the problem in one sentence: a student can pass a superposition quiz and still fundamentally misunderstand entanglement — because no tool tells them *where* their mental model broke.
+> Here is the core educational challenge: quantum computing students assemble circuits without genuine intuition — facing a ~50% baseline failure rate because existing tools hide errors until final execution, never capturing what the learner expected or where their mental model broke.
 >
-> We built Q-Trace to fix that. Venu — pull up the demo."
+> Uday will present our solution approach."
 
-*(Vinod steps slightly to the side. Venu sits or stands at the laptop.)*
+*(Rani steps aside. Uday Rohith presents Slide 2.)*
 
 ---
 
-### 🟢 SLIDE 2 — SOLUTION [0:20 – 0:40]
-**Speaker: Vinod Krishna** *(gestures at the screen)*
+### 🟢 SLIDE 2 — APPROACH: PROPOSED SOLUTION & INNOVATION [0:15 – 0:35]
+**Speaker: Uday Rohith** *(gesturing at Slide 2)*
 
-> **VINOD:** "Q-Trace is a quantum learning platform with one superpower — the **Quantum Flight Recorder**. It is the only tool that records the learner's prediction before execution, replays the circuit gate by gate using real Qiskit simulator output, finds the exact gate where understanding diverged, and issues a targeted repair task. Not a chatbot. Not just a circuit builder. A misconception-repair loop. Venu — show them."
+> **UDAY ROHITH:** "Our approach breaks the misconception trap in four connected steps:
+>
+> First, **Predict** — we capture the learner's pre-execution hypothesis before any code runs.
+> Second, **Build & Code** — visual-to-code parity with an interactive drag-and-drop canvas generating real-time Qiskit code, backed by 100% offline dual simulation on Qiskit Aer and PennyLane.
+> Third, our core innovation — the **Quantum Flight Recorder**: deterministic gate-by-gate replay that pinpoints the exact divergence point.
+> Fourth, the **Repair Loop** — an evidence-bound AI Tutor and targeted single-gate repair challenges that boost conceptual mastery from 50% to 80%.
+>
+> Venu and Vinod will now demonstrate the live product."
 
 ---
 
-### 🟢 BEAT 1 [0:40 – 0:50] — Role Entry
-**Venu Gopal: clicks. Vinod narrates.**
+### 🟢 LIVE DEMO (BEATS 1–8) [0:35 – 1:55]
+**Demo Operator & Circuit Speaker: Venu Gopal · Demo Narrator: Vinod Krishna**
+
+#### 🟢 Beat 1 [0:35 – 0:45] — Role Entry
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
 > *(Venu clicks the role badge, selects **Aarav** — B.Tech CSE, beginner)*
 
-> **VINOD:** "We are logging in as Aarav — a second-year student. You can see the local-demo indicator here. This entire demo runs offline on this one laptop. No cloud. No Wi-Fi dependency."
-
-> **[VENU — if asked by a judge]:** *(just point and say)* "This is the role selector. Aarav is the beginner learner profile."
+> **VINOD:** "We log in as Aarav — a second-year learner. Notice the local demo indicator: this entire platform runs 100% offline on this single laptop with zero cloud or internet dependency."
 
 **FALLBACK for Venu:** If the role selector does not load, type `/learn/bell-state` in the URL bar and say: *"Role is already seeded — going straight in."*
 
 ---
 
-### 🟢 BEAT 2 [0:50 – 1:00] — Prediction Checkpoint
-**Venu Gopal: clicks. Vinod narrates.**
+#### 🟢 Beat 2 [0:45 – 0:55] — Prediction Checkpoint
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
 > *(Venu clicks **"Two independent random outputs"** in the Prediction Checkpoint → clicks **Record Prediction**)*
 
-> **VINOD:** "Before running anything, Aarav must record his prediction. He picks 'two independent random outputs' — the most common entanglement misconception. This is captured before any code runs."
+> **VINOD:** "Before running anything, Aarav must commit to a structured prediction. He chooses 'two independent random outputs' — the textbook entanglement misconception. We record this hypothesis before any simulation executes."
 
-**FALLBACK for Venu:** If the checkpoint does not load, read the seeded prediction aloud and move on.
+**FALLBACK for Venu:** If the checkpoint does not load, read the seeded prediction aloud and move forward.
 
 ---
 
-### 🟢 BEAT 3 [1:00 – 1:12] — Circuit Workspace
-**Venu Gopal: clicks and drags. Vinod narrates.**
+#### 🟢 Beat 3 [0:55 – 1:07] — Circuit Workspace
+**Speaker: Venu Gopal** *(clicks, drags, and speaks)*
 
 > *(Venu drags H gate → q0/col1, CNOT → q0-q1/col2, Measure → both qubits/col3)*
 
-> **VINOD:** "Aarav builds the Bell circuit by dragging gates onto the qubit wires. Watch — the Qiskit code on the right is auto-generated in real time. He does not type it — the visual model drives the code."
+> **VENU GOPAL:** "I place the Hadamard gate on wire 0, CNOT across both qubits to entangle, and measurement. Notice the right panel — Qiskit code auto-generates in real time from the visual grid, with visual-to-code parity and zero manual typing."
 
-**FALLBACK for Venu:** Click **"Load Seeded Bell Circuit"** button. Say nothing — Vinod will narrate.
+**FALLBACK for Venu:** Click **"Load Seeded Bell Circuit"** button. If fallback is used, Vinod steps in smoothly: *"Circuit loaded from seed — now let's simulate."*
 
 ---
 
-### 🟢 BEAT 4 [1:12 – 1:20] — Run Simulation
-**Venu Gopal: clicks. Vinod narrates.**
+#### 🟢 Beat 4 [1:07 – 1:15] — Run Simulation
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
 > *(Venu clicks **Run Simulation**)*
 
-> **VINOD:** "One click. The same circuit runs on Qiskit Aer and PennyLane simultaneously. Two real simulation backends. Both return 50% |00⟩, 50% |11⟩. Not mocked. Not pre-loaded."
+> **VINOD:** "One click. Dual execution on Qiskit Aer and PennyLane executes locally. Both return 50% |00⟩ and 50% |11⟩ — genuine local statevector simulation, not mocked or pre-recorded."
 
-**FALLBACK for Venu:** If it takes more than 5 seconds, click **Load Seeded Result**. Vinod will say: *"Running locally now."*
+**FALLBACK for Venu:** If simulation takes >5 seconds, click **Load Seeded Result**. Vinod will say: *"Running locally now."*
 
 ---
 
-### 🟢 BEAT 5 [1:20 – 1:30] — Visual Evidence
-**Venu Gopal: results appear automatically. Vinod narrates.**
+#### 🟢 Beat 5 [1:15 – 1:25] — Visual Evidence
+**Venu Gopal: displays results. Vinod Krishna: narrates.**
 
-> **VINOD:** "Visual Evidence — the circuit diagram, state probabilities, measurement histogram. Every representation is labeled. No misleading metaphors. Aarav sees |00⟩ and |11⟩ at 50-50. Does this match his prediction of two independent random bits? No. The Flight Recorder is about to show exactly where his thinking went wrong."
+> **VINOD:** "Visual Evidence: state probabilities and measurement histograms are rendered mathematically honestly. Aarav sees only |00⟩ and |11⟩ at 50-50. This directly contradicts his prediction of independent random bits. Watch how the Flight Recorder diagnoses where his mental model broke."
 
 **FALLBACK for Venu:** Click **Show Evidence** toggle or Seeded Evidence tab.
 
 ---
 
-### ⭐ BEAT 6 [1:30 – 1:45] — FLIGHT RECORDER — WOW MOMENT
-**Venu Gopal: clicks. Vinod narrates.**
+#### ⭐ Beat 6 [1:25 – 1:35] — Quantum Flight Recorder (Wow Moment)
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
 > *(Venu clicks **Open Flight Recorder**)*
 
-> **VINOD:** "The Quantum Flight Recorder. It replays the H gate... the CNOT gate... and at the CNOT it finds the divergence. Misconception signal: **SUPERPOSITION_VS_ENTANGLEMENT**. The platform does not just say 'wrong answer.' It names the conceptual gap, traces it to a specific gate, and generates an instructor-visible signal. That has never been done in a single integrated tool before."
+> **VINOD:** "The Quantum Flight Recorder replays intermediate quantum states gate-by-gate: the H gate... and at the CNOT, it isolates the exact divergence. It emits the signal: **SUPERPOSITION_VS_ENTANGLEMENT**. We do not just say 'wrong answer.' We trace the conceptual gap to the exact gate."
 
-*(Pause 2 seconds — let judges read the screen.)*
+*(Pause 1-2 seconds — let judges see the divergence flag on screen.)*
 
-**FALLBACK for Venu:** Click **Seeded Replay** in the fallback toolbar. Vinod will handle the narration.
+**FALLBACK for Venu:** Click **Seeded Replay** in fallback toolbar. Vinod handles narration.
 
 ---
 
-### 🟡 BEAT 7 [1:45 – 2:00] — Tutor + Repair Challenge
-**Speaker: Rajeswari** *(your moment — short and fully written — read it confidently)*
+#### 🟡 Beat 7 [1:35 – 1:45] — Evidence-Bound AI Tutor & Repair Challenge
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
 > *(Venu clicks **Explain with Tutor**)*
 
-> **RAJESWARI:** "The AI Tutor receives the State Trace as immutable evidence — it cannot invent a quantum result. It explains exactly why the CNOT created correlation, not independence. Then it gives Aarav a Repair Challenge: measure only qubit 0 and predict what qubit 1 shows. He has to understand it. He cannot skip. This is evidence-bound AI — the AI guides reasoning, it does not do the exercise."
+> **VINOD:** "The AI Tutor receives the State Trace as immutable ground truth — it cannot hallucinate or alter probabilities. It explains why CNOT created correlation instead of independence, then issues an active Repair Challenge: measure qubit 0 and predict qubit 1. Aarav must actively repair his reasoning; he cannot skip."
 
-**FALLBACK:** If the Tutor is slow, say: *"The fallback explanation is loading — same content, authored and trace-grounded."* Venu clicks **Load Fallback Explanation**.
-
-> **[If a judge asks Rajeswari something]:** "The misconception taxonomy covers four core errors: Superposition vs Entanglement, Measurement Determinism, Gate Order, and No-Signal. I built the detection rules and the Tutor evidence binding."
+**FALLBACK:** If Tutor response is delayed, Venu clicks **Load Fallback Explanation**. Vinod says: *"Fallback explanation loaded — evidence-grounded."*
 
 ---
 
-### 🟡 BEAT 8 [2:00 – 2:15] — Progress + Instructor Insight
-**Speaker: Rani** *(your moment — short and clear)*
+#### 🟡 Beat 8 [1:45 – 1:55] — Progress Record & Instructor Insight
+**Venu Gopal: clicks. Vinod Krishna: narrates.**
 
-> *(Venu submits the correct Repair answer → clicks **Switch to Dr. Rao**)*
+> *(Venu submits correct Repair answer → clicks **Switch to Dr. Rao**)*
 
-> **RANI:** "Aarav's progress updates live — one attempt, 100 points, misconception logged. Switch to Dr. Rao — the instructor view. Instructor Insight shows SUPERPOSITION_VS_ENTANGLEMENT as the cohort's most frequent gap. Aggregate signal, not individual surveillance. The 40 background profiles are synthetic, labeled in the UI. Only Aarav's live attempt is real."
+> **VINOD:** "Aarav submits, earning 100 points as his progress record updates live. Switching to Dr. Rao — the instructor view shows SUPERPOSITION_VS_ENTANGLEMENT as the cohort's primary gap, aggregating learning signals without invasive surveillance.
+>
+> Rajeswari will now walk through our technical architecture."
 
-**FALLBACK:** "If the chart does not load, here is the seeded view." *(Venu loads Seeded Dr. Rao View).*
-
-> **[If a judge asks Rani something]:** "I built the data layer — MongoDB repositories, progress tracking, analytics aggregation. The learning data and progress pipelines are mine."
-
----
-
-### 🟢 SLIDE 3 — TECHNICAL APPROACH [2:15 – 2:35]
-**Speaker: Uday Rohith** *(stand up, speak clearly — your lines are short)*
-
-> **UDAY:** "The tech stack: Next.js frontend, FastAPI Python backend, Qiskit Aer 0.17 and PennyLane 0.45 — both running locally. The key safety point: any Qiskit code a student types is parsed with Python AST only — never executed. We validate the circuit model first. State Trace is captured before measurement — that is how the Flight Recorder knows the intermediate quantum states."
-
-> **[If a judge asks Uday something]:** "I own the quantum simulation layer — Qiskit Aer adapter, PennyLane conformance, State Trace normalization, the AST-safe code parser, and timeout resilience guards."
+**FALLBACK:** If chart does not load, Venu clicks **Load Seeded Dr. Rao View**.
 
 ---
 
-### 🟡 SLIDE 4 — FEASIBILITY [2:35 – 2:50]
-**Speakers: Rani (leads) + Rajeswari (one line)**
+### 🟢 SLIDE 3 — TECHNICAL APPROACH & ARCHITECTURE [1:55 – 2:15]
+**Speaker: Rajeswari** *(standing, presenting Slide 3)*
 
-> **RANI:** "Three feasibility points. Technical: runs 100% offline on a standard college laptop. Financial: zero simulation cost — Qiskit and PennyLane are open source; MongoDB Atlas M0 is free tier. Zero per-student licensing cost."
-
-> **RAJESWARI:** "Policy alignment — DST and AICTE have mandated undergraduate quantum courses under the National Quantum Mission. Q-Trace is purpose-built for that curriculum gap."
-
-> **RANI:** "Our biggest risk was AI hallucinating quantum numbers. We solved it by making the simulator own all numerical truth. The AI receives the State Trace as read-only evidence. It cannot modify a probability."
+> **RAJESWARI:** "Our technical approach is architected in four clean, modular layers:
+>
+> **Layer 1: Next.js Web** — strict TypeScript and Tailwind CSS powering the Circuit Workspace, CodeMirror 6 synchronization, and real-time Plotly visual evidence.
+>
+> **Layer 2: FastAPI Backend** — high-performance Python services routing circuit validation, misconception diagnosis, and Tutor requests.
+>
+> **Layer 3: Quantum Runtime** — local Qiskit Aer 0.17 verified against PennyLane 0.45. For security, student Qiskit code is parsed strictly with Python AST — never executed unsafely.
+>
+> **Layer 4: Data Layer** — MongoDB Atlas M0 with deterministic in-memory fallback for offline resilience.
+>
+> Sohail will present our feasibility and reliability."
 
 ---
 
-### 🟢 SLIDE 5 + CLOSE [2:50 – 3:00]
-**Speaker: Vinod Krishna**
+### 🟡 SLIDE 4 — FEASIBILITY & VIABILITY [2:15 – 2:35]
+**Speaker: Sohail** *(standing, presenting Slide 4)*
 
-> **VINOD:** "Impact: guided simulation with evidence feedback improves correct quantum reasoning from 50% to 80% — McKagan et al., Physics Education Research 2010. For institutions: runs on hardware they already own, zero QPU cost, AICTE-aligned. For India: quantum workforce readiness that works in a tier-2 college with no internet. Build it. See it. Repair it. Q-Trace — the only platform that finds where understanding broke and fixes it."
+> **SOHAIL:** "Four pillars prove Q-Trace's feasibility:
+>
+> **Technical & Operational:** Q-Trace is certified 100% offline. Our automated smoke suite verifies all 6 HTTP learner endpoints with zero network calls and zero cloud dependencies.
+>
+> **Economic:** Zero simulation cost — Qiskit Aer and PennyLane are open-source, and MongoDB Atlas M0 is free tier. Zero per-student licensing fee.
+>
+> **Policy Alignment:** Purpose-built for DST and AICTE mandates introducing undergraduate quantum computing courses under the National Quantum Mission.
+>
+> **Risk Mitigation:** Mathematical truth is anchored in the simulator. The AI receives the State Trace as read-only evidence, completely eliminating hallucination.
+>
+> Rani and Uday will detail our impact and business model."
+
+---
+
+### 🟢 SLIDE 5 — IMPACT & BUSINESS MODEL [2:35 – 2:50]
+**Speakers: Rani (Left Panel: Benefits & Impact) + Uday Rohith (Right Panel: Business Model & Scalability)**
+
+> **RANI (Left Panel — Benefits & Impact):** "On the impact panel: for students, active evidence feedback drives conceptual reasoning from 50% to 80% based on McKagan et al.'s PER research. For instructors, Dr. Rao's cohort radar surfaces misconceptions before exams. For institutions, it eliminates expensive QPU credits, democratizing deep-tech education for tier-2 and tier-3 colleges."
+>
+> **UDAY ROHITH (Right Panel — Business Model & Scalability):** "For sustainability and business model: funding aligns with State university lab grants, AICTE modernization funds, and CSR tech partnerships. Our scalability roadmap expands from 10 pilot college labs, to state technical universities, to pan-India integration with SWAYAM and NPTEL."
+
+---
+
+### 🟢 CLOSING [2:50 – 3:00]
+**Speaker: Vinod Krishna** *(steps center stage)*
+
+> **VINOD KRISHNA:** "Build it. See it. Repair it. Q-Trace — the only platform that finds where understanding broke and repairs it. Thank you."
 
 ---
 
@@ -182,7 +209,7 @@ Every member should know this by heart. If any judge asks "what is this?" — th
 
 If **anything** fails during the live demo:
 
-> **VINOD (or whoever is speaking):** *"We designed for exactly this — every beat has a seeded fallback. Loading from local dataset now."*
+> **VINOD:** *"We designed for exactly this — every beat has a seeded fallback. Loading from local dataset now."*
 
 → **Venu clicks "Load Full Seeded Session"** (top-right fallback toolbar)
 → Continue the beat. **Do not apologize. Do not panic.**
@@ -191,19 +218,37 @@ If the laptop crashes entirely: Venu opens the backup video on the desktop. Vino
 
 ---
 
-## 💬 VENU & SOHAIL — SPECIAL NOTES
+## 💬 TEAM ROLES & SPECIAL NOTES (Judge Q&A Cheat Sheet)
 
-### Venu Gopal (Demo Driver)
-You do not need to speak much. Your job is to click the right things at the right time.
-- Follow the CLICK instructions exactly
-- If something breaks: click the FALLBACK button
-- If a judge asks you something directly, point at the screen and say: *"Yes — this is [feature name]."* Then let Vinod add detail.
-- Practice the 8 beats 3 times alone before the presentation
+### Rani (Opening & Slide 1 · Slide 5 Impact Panel)
+- **Live lines:** Delivers Opening & Slide 1 [0:00 – 0:15] and Slide 5 Benefits & Impact [2:35 – 2:43].
+- **If asked by a judge (Data & Impact):**
+  > *"I built the data layer — MongoDB schemas, progress tracking, and Dr. Rao's analytics aggregation. The PER research correlation showing ~50% to ~80% reasoning gains is grounded in McKagan et al. (2010)."*
 
-### Sohail — Your Pre-Written Answer (memorize this)
-> *"I built the end-to-end test suite — the real HTTP smoke test that hits all 6 endpoints, contract shape validation at both the frontend and backend boundary, and the offline release certification. The Playwright test automates the exact 90-second learner journey. The system is certified for offline use — I ran the release gate against both local and cloud modes."*
+### Uday Rohith (Slide 2 Approach · Slide 5 Business Model)
+- **Live lines:** Delivers Slide 2 Approach [0:15 – 0:35] and Slide 5 Business Model & Scalability [2:43 – 2:50].
+- **If asked by a judge (Quantum Simulation & Business):**
+  > *"I own the quantum simulation layer — Qiskit Aer adapter, PennyLane conformance, State Trace normalization, and AST parsing security. Our 3-phase business model scales from 10 pilot labs to state universities and pan-India NPTEL integration."*
 
-If a judge asks something you do not know: say *"Vinod can answer that in detail."* That is perfectly fine.
+### Venu Gopal (Live Demo Operator · Beat 3 Speaker)
+- **Live lines:** Speaks Beat 3 Circuit Workspace [0:55 – 1:07] and operates the demo clicks for Beats 1–8.
+- **If asked by a judge (Frontend UX):**
+  > *"I built the Next.js learner experience and the interactive Circuit Workspace using dnd-kit, with live two-way code synchronization to CodeMirror 6, Plotly visual evidence, and resilient UI fallback states."*
+
+### Vinod Krishna (Demo Narrator · Closing · Team Lead)
+- **Live lines:** Narrates Live Demo Beats 1, 2, 4, 5, 6, 7, 8 [0:35 – 1:55] and delivers Closing [2:50 – 3:00].
+- **If asked by a judge (System Architecture & Integration):**
+  > *"I lead team integration, monorepo architecture, and release engineering. The system is designed with strict contract boundaries, zero cloud dependencies for local execution, and complete demo-path safety."*
+
+### Rajeswari (Slide 3 Technical Approach & Architecture)
+- **Live lines:** Delivers Slide 3 Technical Approach & 4-Layer Architecture [1:55 – 2:15].
+- **If asked by a judge (Flight Recorder & AI Tutor):**
+  > *"The misconception taxonomy covers four core errors: Superposition vs Entanglement, Measurement Determinism, Gate Order, and No-Signal. I built the deterministic divergence rules and the Tutor evidence binding that prevents LLM hallucination."*
+
+### Sohail (Slide 4 Feasibility & Reliability · QA Lead)
+- **Live lines:** Delivers Slide 4 Feasibility & Viability [2:15 – 2:35].
+- **If asked by a judge (Testing & Verification):**
+  > *"I built the end-to-end test suite (QA-1 through QA-8) — the real HTTP smoke test that hits all 6 endpoints, contract shape validation using Pydantic and Zod, and the final release certification. The Playwright suite automates the exact 90-second learner journey offline."*
 
 ---
 

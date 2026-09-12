@@ -25,6 +25,8 @@ import {
   DemoProfilesResponse,
   ExportOpenQasm3Request,
   ExportOpenQasm3Response,
+  TutorChatRequest,
+  TutorChatResponse,
 } from './contracts';
 import { generateOpenQasm3 } from '@/features/circuit/circuit-qasm-exporter';
 import {
@@ -89,20 +91,41 @@ async function requestJson<T>(
 
     if (!res.ok) {
       const errorText = await res.text();
-      let errorJson: { error?: { message?: string; code?: string; requestId?: string } } = {};
+      let errorJson: {
+        error?: { message?: string; code?: string; requestId?: string };
+        detail?: string | { message?: string; code?: string; requestId?: string };
+        code?: string;
+        message?: string;
+      } = {};
       try {
         errorJson = JSON.parse(errorText);
       } catch {
         // non-json response
       }
+
+      let parsedCode: string | undefined = errorJson.error?.code;
+      let parsedMessage: string | undefined = errorJson.error?.message;
+      let parsedRequestId: string | undefined = errorJson.error?.requestId;
+
+      if (!parsedCode && errorJson.detail && typeof errorJson.detail === 'object') {
+        const detailObj = errorJson.detail as { code?: string; message?: string; requestId?: string };
+        parsedCode = detailObj.code;
+        parsedMessage = detailObj.message;
+        parsedRequestId = detailObj.requestId;
+      }
+      if (!parsedCode && errorJson.code) {
+        parsedCode = errorJson.code;
+        parsedMessage = errorJson.message;
+      }
+
       const err = new Error(
-        errorJson.error?.message || `HTTP ${res.status}: ${res.statusText}`
+        parsedMessage || (typeof errorJson.detail === 'string' ? errorJson.detail : undefined) || `HTTP ${res.status}: ${res.statusText}`
       );
       (err as unknown as { status: number; code?: string; requestId: string }).status = res.status;
       (err as unknown as { status: number; code?: string; requestId: string }).code =
-        errorJson.error?.code || 'HTTP_ERROR';
+        parsedCode || 'HTTP_ERROR';
       (err as unknown as { status: number; code?: string; requestId: string }).requestId =
-        errorJson.error?.requestId || responseRequestId;
+        parsedRequestId || responseRequestId;
       throw err;
     }
 
@@ -141,14 +164,10 @@ export const apiClient = {
       };
     } catch (err: unknown) {
       const errorObj = err as { message?: string; status?: number; code?: string };
-      const isTimeout =
-        Boolean(
-          errorObj?.message?.toLowerCase().includes('timeout') ||
-          errorObj?.message?.toLowerCase().includes('timed out') ||
-          errorObj?.status === 504 ||
-          errorObj?.code === 'SIMULATION_TIMEOUT'
-        );
-      if (isTimeout) {
+      // Only treat explicit backend application simulation timeouts as engine timeouts.
+      // Infrastructure/proxy 504 Gateway Timeouts (e.g. Render container cold starts) fall back gracefully to DEMO_SIMULATION_RUN.
+      const isEngineTimeout = errorObj?.code === 'SIMULATION_TIMEOUT';
+      if (isEngineTimeout) {
         throw err;
       }
 
@@ -254,6 +273,65 @@ export const apiClient = {
             fallbackUsed: true,
             model: 'DEMO_FALLBACK',
           },
+        },
+        meta: {
+          requestId: `req_fb_${Date.now().toString(36)}`,
+          isFallback: true,
+          durationMs: Date.now() - startTime,
+        },
+      };
+    }
+  },
+
+  /**
+   * POST /v1/tutor/chat - Socratic Follow-Up Q&A
+   */
+  async askTutorChat(
+    payload: TutorChatRequest
+  ): Promise<ApiResponseWithMeta<TutorChatResponse>> {
+    const startTime = Date.now();
+    try {
+      const { data, requestId } = await requestJson<TutorChatResponse>(
+        '/v1/tutor/chat',
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+        payload.learnerProfileId
+      );
+      return {
+        data,
+        meta: {
+          requestId,
+          isFallback: false,
+          durationMs: Date.now() - startTime,
+        },
+      };
+    } catch {
+      // Smart contextual client-side fallback if backend/cloud is offline
+      let answer =
+        'In this simulation run, the Hadamard gate placed qubit 0 in equal superposition (|00⟩ + |10⟩)/√2, and the CNOT gate correlated qubit 1, producing the Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2.\n\nNotice that outcomes 01 and 10 have probability exactly 0.0, while 00 and 11 each occur with probability 0.5.';
+      const q = payload.question.toLowerCase().trim();
+      if (q.includes('mixed') || q.includes('trace') || q.includes('purity')) {
+        answer =
+          'Tracing out qubit 1 from |Φ+⟩ yields the reduced density matrix ρ₀ = 0.5|0⟩⟨0| + 0.5|1⟩⟨1|. Its purity Tr(ρ₀²) = 0.5, which is a **maximally mixed state**. Neither qubit has a definite state vector on its own—the correlation is purely joint!';
+      } else if (q.includes('faster') || q.includes('ftl') || q.includes('communication') || q.includes('light')) {
+        answer =
+          '**No-Communication Theorem**: Entangled correlation cannot transmit messages faster than light. Local measurement results appear completely random (50/50) to either observer without a classical channel comparing outcomes.';
+      } else if (q.includes('swap') || q.includes('order')) {
+        answer =
+          'If you swap gate order and apply CNOT before H on |00⟩, the control qubit is |0⟩ so CNOT does nothing. Then H only superposes qubit 0, leaving an unentangled product state (|00⟩ + |10⟩)/√2 instead of a Bell pair.';
+      } else if (q.includes('hi') || q.includes('hello') || q.includes('hey')) {
+        answer =
+          "Hello! I am your Q-Trace Socratic Tutor. Ask me any question about your Bell state circuit, measurement probabilities, or why tracing out an entangled qubit produces a mixed state!";
+      }
+
+      return {
+        data: {
+          answer,
+          model: 'DEMO_FALLBACK',
+          fallbackUsed: true,
+          groundedEvidenceKeys: ['stateTrace.1.basisProbabilities'],
         },
         meta: {
           requestId: `req_fb_${Date.now().toString(36)}`,
