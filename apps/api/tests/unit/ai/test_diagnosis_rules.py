@@ -185,6 +185,13 @@ def test_correct_prediction_returns_no_signal() -> None:
     they have no misconception to diagnose."""
     result = apply_rules("CORRELATED_00_11", BELL_STATE_TRACE)
     assert result.code == "NO_SIGNAL"
+    assert result.is_correct_prediction is True
+    assert result.first_divergence_step is None
+
+    # Incorrect prediction should have is_correct_prediction = False
+    result_incorrect = apply_rules("INDEPENDENT_RANDOM", BELL_STATE_TRACE)
+    assert result_incorrect.is_correct_prediction is False
+    assert result_incorrect.first_divergence_step == 1
 
 
 # ---------------------------------------------------------------------------
@@ -197,8 +204,11 @@ def test_evidence_dict_shape() -> None:
     assert "prediction" in ev
     assert "verifiedBehavior" in ev
     assert "stateTraceStepIndexes" in ev
+    assert "predictionDescription" in ev
+    assert "verifiedBehaviorDescription" in ev
     assert isinstance(ev["stateTraceStepIndexes"], list)
     assert ev["verifiedBehavior"] == BELL_VERIFIED_BEHAVIOR
+    assert ev["predictionDescription"] == "Assumed individual 50/50 measurement without entanglement"
 
 
 # ---------------------------------------------------------------------------

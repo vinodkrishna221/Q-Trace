@@ -334,3 +334,37 @@ async def test_tutor_explain_does_not_persist_free_text():
     if hasattr(repo, "challenge_attempts"):
         for att in repo.challenge_attempts.values():
             assert unique_question not in str(att)
+
+
+@pytest.mark.asyncio
+async def test_tutor_explain_adapts_tone_for_learner_role():
+    """Verifies that passing learnerRole adapts the explanation summary."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        # Physics to code role
+        res_physics = await ac.post("/v1/tutor/explain", json={
+            "learnerProfileId": "lp_aarav",
+            "moduleId": "mod_bell",
+            "simulationRunId": "sr_demo_001",
+            "misconceptionSignalId": "ms_demo_001",
+            "intent": "EXPLAIN_DIVERGENCE",
+            "learnerRole": "PHYSICS_TO_CODE",
+        })
+        assert res_physics.status_code == 200
+        data_physics = res_physics.json()
+        summary_physics = data_physics["tutorResponse"]["summary"]
+        assert "Hadamard transformation" in summary_physics or "product state" in summary_physics
+
+        # Beginner CSE role
+        res_cse = await ac.post("/v1/tutor/explain", json={
+            "learnerProfileId": "lp_aarav",
+            "moduleId": "mod_bell",
+            "simulationRunId": "sr_demo_001",
+            "misconceptionSignalId": "ms_demo_001",
+            "intent": "EXPLAIN_DIVERGENCE",
+            "learnerRole": "BEGINNER_CSE",
+        })
+        assert res_cse.status_code == 200
+        data_cse = res_cse.json()
+        summary_cse = data_cse["tutorResponse"]["summary"]
+        assert "uncertain" in summary_cse

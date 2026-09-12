@@ -242,8 +242,12 @@ def test_correct_prediction_returns_no_signal_code(client: TestClient) -> None:
         {"learnerProfileId": "lp_aarav", "simulationRunId": "sr_correct_001"},
     )
     assert resp.status_code == 201, resp.json()
-    sig = resp.json()["misconceptionSignal"]
+    data = resp.json()
+    sig = data["misconceptionSignal"]
     assert sig["code"] == "NO_SIGNAL"
+    assert sig.get("isCorrectPrediction") is True
+    assert sig.get("firstDivergenceStep") is None
+    assert data.get("isCorrectPrediction") is True
 
 
 # ---------------------------------------------------------------------------
@@ -444,14 +448,14 @@ def test_replay_evidence_keys_are_all_registered(client: TestClient) -> None:
         ("ALWAYS_11", "MEASUREMENT_DETERMINISM", 1),
         ("ALWAYS_01", "GATE_ORDER", 0),
         ("ALWAYS_10", "GATE_ORDER", 0),
-        ("CORRELATED_00_11", "NO_SIGNAL", 0),
+        ("CORRELATED_00_11", "NO_SIGNAL", None),
     ],
 )
 def test_all_prediction_variants_return_correct_code(
     client: TestClient,
     prediction: str,
     expected_code: str,
-    expected_fds: int,
+    expected_fds: Optional[int],
 ) -> None:
     """Every prediction variant maps to the expected code and firstDivergenceStep."""
     import asyncio

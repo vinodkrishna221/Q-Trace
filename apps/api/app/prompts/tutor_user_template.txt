@@ -1,5 +1,6 @@
 Learner Context:
 - Profile ID: {learner_profile_id}
+- Learner Role: {learner_role}
 - Module ID: {module_id}
 - Intent: {intent}
 - Learner Question: {learner_question}
@@ -19,5 +20,6 @@ Available Valid Evidence Keys:
 
 Please generate an evidence-bound explanation as a structured JSON object according to your system prompt instructions.
 - Provide progressive Socratic hints explaining the divergence mechanism.
+- Tailor tone to Learner Role: for PHYSICS_TO_CODE, use formal Hilbert space / Dirac notation (|Ψ⟩, |Φ+⟩, tensor products) and avoid pop-science metaphors; for BEGINNER_CSE, use intuitive computational branches.
 - DO NOT provide the circuit solution code for {repair_challenge_id}.
 - Cite only available valid evidence keys and include the standard safety note.

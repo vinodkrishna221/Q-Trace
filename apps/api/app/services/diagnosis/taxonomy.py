@@ -581,6 +581,9 @@ class TaxonomyDiagnosis:
     confidence: float
     verified_behavior: str
     prediction: Optional[str]
+    is_correct_prediction: bool = False
+    prediction_description: Optional[str] = None
+    verified_behavior_description: Optional[str] = None
 
 
 def diagnose_with_taxonomy(
@@ -612,7 +615,9 @@ def diagnose_with_taxonomy(
     template = get_explanation_template(rule_result.code, role).to_dict()
 
     first_div = (
-        None if rule_result.code == "NO_SIGNAL" else rule_result.first_divergence_step
+        None
+        if (rule_result.is_correct_prediction or rule_result.code == "NO_SIGNAL")
+        else rule_result.first_divergence_step
     )
 
     return TaxonomyDiagnosis(
@@ -626,4 +631,7 @@ def diagnose_with_taxonomy(
         confidence=rule_result.confidence,
         verified_behavior=rule_result.verified_behavior,
         prediction=prediction_answer,
+        is_correct_prediction=rule_result.is_correct_prediction,
+        prediction_description=rule_result.prediction_description,
+        verified_behavior_description=rule_result.verified_behavior_description,
     )

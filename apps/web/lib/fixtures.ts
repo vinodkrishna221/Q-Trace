@@ -354,6 +354,8 @@ export const DEMO_FLIGHT_RECORDER_DIAGNOSIS: DiagnoseResponse = {
     evidence: {
       prediction: 'INDEPENDENT_RANDOM',
       verifiedBehavior: 'CORRELATED_00_11',
+      predictionDescription: 'Assumed individual 50/50 measurement without entanglement',
+      verifiedBehaviorDescription: 'Non-local correlation: outcomes match on 100% of shots',
       stateTraceStepIndexes: [0, 1],
     },
     confidence: 1.0,

@@ -129,4 +129,5 @@ async def post_diagnose(
     return {
         "misconceptionSignal": signal.model_dump(),
         "replay": result.replay,
+        "isCorrectPrediction": signal.isCorrectPrediction,
     }

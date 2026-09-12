@@ -13,6 +13,8 @@ export interface MisconceptionEvidence {
   prediction: string;
   verifiedBehavior: string;
   stateTraceStepIndexes: number[];
+  predictionDescription?: string;
+  verifiedBehaviorDescription?: string;
 }
 
 export interface MisconceptionSignal {
@@ -24,6 +26,7 @@ export interface MisconceptionSignal {
   evidence: MisconceptionEvidence;
   confidence: number;
   repairChallengeId: string | null;
+  isCorrectPrediction?: boolean;
   createdAt: string;
   schemaVersion?: number;
 }
@@ -42,6 +45,7 @@ export interface DiagnoseRequest {
 export interface DiagnoseResponse {
   misconceptionSignal: MisconceptionSignal;
   replay: ReplayStep[];
+  isCorrectPrediction?: boolean;
 }
 
 export type TutorIntent =
@@ -79,6 +83,7 @@ export interface ExplainRequest {
   misconceptionSignalId: string;
   intent: TutorIntent;
   learnerQuestion?: string;
+  learnerRole?: string;
 }
 
 export interface ExplainResponse {

@@ -123,6 +123,8 @@ class DiagnosisRule:
     state_trace_step_indexes: tuple[int, ...]
     confidence: float
     repair_challenge_id: str
+    prediction_description: str = ""
+    verified_behavior_description: str = ""
 
     def __post_init__(self) -> None:
         if self.code not in KNOWN_MISCONCEPTION_CODES:
@@ -162,6 +164,8 @@ RULES: tuple[DiagnosisRule, ...] = (
         state_trace_step_indexes=(0, 1),
         confidence=1.0,
         repair_challenge_id="ch_bell_repair",
+        prediction_description="Assumed individual 50/50 measurement without entanglement",
+        verified_behavior_description="Non-local correlation: outcomes match on 100% of shots",
     ),
     # ------------------------------------------------------------------
     # MEASUREMENT_DETERMINISM
@@ -182,6 +186,8 @@ RULES: tuple[DiagnosisRule, ...] = (
         state_trace_step_indexes=(1,),
         confidence=1.0,
         repair_challenge_id="ch_measurement_repair",
+        prediction_description="Predicted a fixed single outcome — measurement is probabilistic",
+        verified_behavior_description="Superposition persists: both |00⟩ and |11⟩ appear with equal probability",
     ),
     # ------------------------------------------------------------------
     # GATE_ORDER
@@ -203,6 +209,8 @@ RULES: tuple[DiagnosisRule, ...] = (
         state_trace_step_indexes=(0, 1),
         confidence=1.0,
         repair_challenge_id="ch_gate_order_repair",
+        prediction_description="Predicted reversed qubit or gate application order in mental model",
+        verified_behavior_description="Hadamard creates superposition before CNOT creates entanglement",
     ),
     # ------------------------------------------------------------------
     # NO_SIGNAL
@@ -220,6 +228,8 @@ RULES: tuple[DiagnosisRule, ...] = (
         state_trace_step_indexes=(0,),
         confidence=1.0,
         repair_challenge_id="ch_no_signal_repair",
+        prediction_description="No active prediction registered",
+        verified_behavior_description="Non-local correlation: outcomes match on 100% of shots",
     ),
 )
 
@@ -251,14 +261,22 @@ class DiagnosisResult:
     repair_challenge_id: str
     verified_behavior: str
     prediction: str | None
+    is_correct_prediction: bool = False
+    prediction_description: str = ""
+    verified_behavior_description: str = ""
 
     def evidence_dict(self) -> dict[str, Any]:
         """Return the evidence dict matching the flight-recorder-tutor contract."""
-        return {
+        res: dict[str, Any] = {
             "prediction": self.prediction or "UNKNOWN",
             "verifiedBehavior": self.verified_behavior,
             "stateTraceStepIndexes": list(self.state_trace_step_indexes),
         }
+        if self.prediction_description:
+            res["predictionDescription"] = self.prediction_description
+        if self.verified_behavior_description:
+            res["verifiedBehaviorDescription"] = self.verified_behavior_description
+        return res
 
 
 # ---------------------------------------------------------------------------
@@ -321,6 +339,9 @@ def apply_rules(
         )
 
     rule = find_rule(prediction_answer)
+    is_correct = bool(
+        prediction_answer and prediction_answer == BELL_VERIFIED_BEHAVIOR
+    )
 
     # Validate that every evidence key the rule emits is from the known set.
     # This assertion is a safety net; __post_init__ on DiagnosisRule already
@@ -330,15 +351,38 @@ def apply_rules(
             f"Internal error: rule {rule.code!r} emits unregistered key {key!r}"
         )
 
+    # For correct predictions, there is no conceptual divergence.
+    first_div = None if is_correct else rule.first_divergence_step
+    step_indexes = (
+        tuple(range(len(state_trace)))
+        if is_correct and len(state_trace) > 1
+        else rule.state_trace_step_indexes
+    )
+    evidence_keys = (
+        ("stateTrace.0.basisProbabilities", "stateTrace.1.basisProbabilities")
+        if is_correct
+        else rule.evidence_keys
+    )
+
+    if is_correct:
+        pred_desc = "Correctly predicted entangled Bell state correlation"
+        verified_desc = "Non-local correlation: outcomes match on 100% of shots"
+    else:
+        pred_desc = rule.prediction_description
+        verified_desc = rule.verified_behavior_description or "Non-local correlation: outcomes match on 100% of shots"
+
     return DiagnosisResult(
         code=rule.code,
-        first_divergence_step=rule.first_divergence_step,
-        evidence_keys=rule.evidence_keys,
-        state_trace_step_indexes=rule.state_trace_step_indexes,
+        first_divergence_step=first_div,
+        evidence_keys=evidence_keys,
+        state_trace_step_indexes=step_indexes,
         confidence=rule.confidence,
         repair_challenge_id=rule.repair_challenge_id,
         verified_behavior=BELL_VERIFIED_BEHAVIOR,
         prediction=prediction_answer,
+        is_correct_prediction=is_correct,
+        prediction_description=pred_desc,
+        verified_behavior_description=verified_desc,
     )
 
 

@@ -26,16 +26,20 @@ RESPONSE 201
     "evidence": {
       "prediction": "INDEPENDENT_RANDOM",
       "verifiedBehavior": "CORRELATED_00_11",
+      "predictionDescription": "Assumed individual 50/50 measurement without entanglement",
+      "verifiedBehaviorDescription": "Non-local correlation: outcomes match on 100% of shots",
       "stateTraceStepIndexes": [0, 1]
     },
     "confidence": 1.0,
     "repairChallengeId": "ch_bell_repair",
+    "isCorrectPrediction": false,
     "createdAt": "2026-08-23T05:27:01Z"
   },
   "replay": [
     {"stepIndex": 0, "headline": "Superposition created", "evidenceKeys": ["stateTrace.0.basisProbabilities"]},
     {"stepIndex": 1, "headline": "Correlation introduced", "evidenceKeys": ["stateTrace.1.basisProbabilities", "stateTrace.1.reducedQubits"]}
-  ]
+  ],
+  "isCorrectPrediction": false
 }
 ```
 
@@ -53,11 +57,13 @@ REQUEST
   "simulationRunId": "sr_demo_001",
   "misconceptionSignalId": "ms_demo_001",
   "intent": "EXPLAIN_DIVERGENCE",
-  "learnerQuestion": "Why are the outcomes random but still linked?"
+  "learnerQuestion": "Why are the outcomes random but still linked?",
+  "learnerRole": "BEGINNER_CSE"
 }
 ```
 - `intent`: `EXPLAIN_DIVERGENCE | EXPLAIN_CODE_ERROR | SUGGEST_OPTIMIZATION`.
 - `learnerQuestion`: string, 0–500 chars; never treated as evidence.
+- `learnerRole`: optional string (`BEGINNER_CSE | PHYSICS_TO_CODE`) to adapt pedagogical tone.
 
 RESPONSE 200
 ```json
@@ -122,7 +128,7 @@ ERRORS: `404 CIRCUIT_MODEL_NOT_FOUND` · `422 METRIC_UNAVAILABLE`.
 
 ```ts
 type MisconceptionCode = "SUPERPOSITION_VS_ENTANGLEMENT" | "MEASUREMENT_DETERMINISM" | "GATE_ORDER" | "NO_SIGNAL";
-type MisconceptionSignal = { id: string; learnerProfileId: string; simulationRunId: string; code: MisconceptionCode; firstDivergenceStep: number | null; evidence: { prediction: string; verifiedBehavior: string; stateTraceStepIndexes: number[] }; confidence: number; repairChallengeId: string | null; createdAt: string };
+type MisconceptionSignal = { id: string; learnerProfileId: string; simulationRunId: string; code: MisconceptionCode; firstDivergenceStep: number | null; evidence: { prediction: string; verifiedBehavior: string; predictionDescription?: string; verifiedBehaviorDescription?: string; stateTraceStepIndexes: number[] }; confidence: number; repairChallengeId: string | null; isCorrectPrediction?: boolean; createdAt: string };
 type TutorStep = { title: string; body: string; evidenceKeys: string[] };
 type NumericalClaim = { claim: string; evidenceKey: string };
 ```
@@ -130,3 +136,5 @@ type NumericalClaim = { claim: string; evidenceKey: string };
 ## Changelog
 
 - v1 2026-08-23: initial deterministic diagnosis, evidence-bound Tutor and circuit-health contracts.
+- v1.1 2026-09-11: added isCorrectPrediction to MisconceptionSignal and DiagnoseResponse; added learnerRole to ExplainRequest.
+- v1.2 2026-09-11: added predictionDescription and verifiedBehaviorDescription to MisconceptionEvidence.

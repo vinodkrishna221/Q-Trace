@@ -1,26 +1,60 @@
 'use client';
 
 import * as React from 'react';
-import { DiagnoseResponse, StateTraceStep } from '@/lib/contracts';
+import { DiagnoseResponse, StateTraceStep, TutorExplanation } from '@/lib/contracts';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Radio, AlertOctagon, Compass, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import {
+  Radio,
+  AlertOctagon,
+  Compass,
+  ShieldAlert,
+  Sparkles,
+  CheckCircle2,
+  Lightbulb,
+  MessageSquare,
+  CheckCheck,
+  AlertCircle,
+  ShieldCheck,
+} from 'lucide-react';
 
 interface FlightRecorderViewProps {
   diagnosis: DiagnoseResponse;
   stateTrace: StateTraceStep[];
   onSelectStep?: (stepIndex: number) => void;
+  tutorResponse?: TutorExplanation | null;
+  isTutorLoading?: boolean;
+  learnerRole?: string;
 }
 
 export function FlightRecorderView({
   diagnosis,
   stateTrace,
   onSelectStep,
+  tutorResponse,
+  isTutorLoading,
+  learnerRole,
 }: FlightRecorderViewProps) {
   const { misconceptionSignal, replay } = diagnosis;
-  const [activeStepIndex, setActiveStepIndex] = React.useState<number>(
-    misconceptionSignal.firstDivergenceStep ?? 1
+
+  // Determine if this is a correct prediction:
+  // Checked from API response flag, signal flag, or matching prediction/verifiedBehavior
+  const isCorrect = Boolean(
+    diagnosis.isCorrectPrediction ||
+      misconceptionSignal.isCorrectPrediction ||
+      (misconceptionSignal.evidence?.prediction &&
+        misconceptionSignal.evidence.prediction === misconceptionSignal.evidence.verifiedBehavior)
   );
+
+  const [activeStepIndex, setActiveStepIndex] = React.useState<number>(
+    isCorrect ? (stateTrace[0]?.stepIndex ?? 0) : (misconceptionSignal.firstDivergenceStep ?? 1)
+  );
+
+  React.useEffect(() => {
+    setActiveStepIndex(
+      isCorrect ? (stateTrace[0]?.stepIndex ?? 0) : (misconceptionSignal.firstDivergenceStep ?? 1)
+    );
+  }, [diagnosis.misconceptionSignal?.id, isCorrect, misconceptionSignal?.firstDivergenceStep, stateTrace]);
 
   const handleStepClick = (stepIndex: number) => {
     setActiveStepIndex(stepIndex);
@@ -43,10 +77,23 @@ export function FlightRecorderView({
             <Badge variant="default" className="text-xs font-mono">
               STEP 4 · QUANTUM FLIGHT RECORDER
             </Badge>
-            <Badge variant="outline" className="text-xs font-mono text-caution border-caution/40 bg-caution/10 flex items-center gap-1">
-              <AlertOctagon className="w-3 h-3" />
-              Divergence Detected
-            </Badge>
+            {isCorrect ? (
+              <Badge
+                variant="outline"
+                className="text-xs font-mono text-evidence border-evidence/40 bg-evidence/10 flex items-center gap-1"
+              >
+                <CheckCircle2 className="w-3 h-3 text-evidence" />
+                Hypothesis Confirmed
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="text-xs font-mono text-caution border-caution/40 bg-caution/10 flex items-center gap-1"
+              >
+                <AlertOctagon className="w-3 h-3" />
+                Divergence Detected
+              </Badge>
+            )}
           </div>
           <span className="text-[11px] font-mono text-ink-faint">ID: {misconceptionSignal.id}</span>
         </div>
@@ -56,66 +103,137 @@ export function FlightRecorderView({
           <span>State Trace Replay & Misconception Diagnosis</span>
         </CardTitle>
         <CardDescription className="text-xs text-ink-dim">
-          Replaying simulator-verified state evolution gate by gate to isolate where learner intuition diverged.
+          {isCorrect
+            ? 'Replaying simulator-verified state evolution gate by gate. Your prediction aligns with verified quantum behavior.'
+            : 'Replaying simulator-verified state evolution gate by gate to isolate where learner intuition diverged.'}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-4 md:p-6 space-y-6">
-        {/* Misconception Signal Banner */}
-        <div
-          className="rounded-lg border border-caution/50 bg-caution/10 p-4 space-y-3"
-          data-testid="misconception-signal-card"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-caution/20 pb-2">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-caution" />
-              <span className="text-xs font-bold text-caution uppercase tracking-wider">
-                Misconception Signal:
-              </span>
-              <span
-                data-testid="misconception-code"
-                className="text-xs font-mono font-bold text-caution px-2 py-0.5 rounded bg-abyss border border-caution/40"
-              >
-                {misconceptionSignal.code}
-              </span>
-            </div>
-            <Badge variant="outline" className="text-[10px] font-mono text-caution border-caution/40">
-              Confidence: {(misconceptionSignal.confidence * 100).toFixed(0)}% (Deterministic Rule)
-            </Badge>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-            <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-              <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
-              <span className="text-danger font-bold flex items-center gap-1.5">
-                ✕ {misconceptionSignal.evidence.prediction}
-              </span>
-              <span className="text-[10px] text-ink-dim block font-sans">
-                Assumed individual 50/50 measurement without entanglement
-              </span>
+        {/* Misconception Signal or Confirmed Hypothesis Banner */}
+        {isCorrect ? (
+          <div
+            className="rounded-lg border border-evidence/50 bg-evidence/10 p-4 space-y-3"
+            data-testid="misconception-signal-card"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-evidence/20 pb-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-evidence" />
+                <span className="text-xs font-bold text-evidence uppercase tracking-wider">
+                  Hypothesis Confirmed:
+                </span>
+                <span
+                  data-testid="hypothesis-confirmed-badge"
+                  className="text-xs font-mono font-bold text-evidence px-2 py-0.5 rounded bg-abyss border border-evidence/40"
+                >
+                  NO MISCONCEPTION DETECTED
+                </span>
+              </div>
+              <Badge variant="outline" className="text-[10px] font-mono text-evidence border-evidence/40">
+                Confidence: 100% (Deterministic Match)
+              </Badge>
             </div>
 
-            <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-              <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
-              <span className="text-evidence font-bold flex items-center gap-1.5">
-                ✓ {misconceptionSignal.evidence.verifiedBehavior}
-              </span>
-              <span className="text-[10px] text-ink-dim block font-sans">
-                Non-local correlation: outcomes match on 100% of shots
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
+                <span className="text-evidence font-bold flex items-center gap-1.5">
+                  ✓ {misconceptionSignal.evidence?.prediction ?? 'CORRELATED_00_11'}
+                </span>
+                <span className="text-[10px] text-ink-dim block font-sans">
+                  {misconceptionSignal.evidence?.predictionDescription ??
+                    'Correctly predicted entangled Bell state correlation'}
+                </span>
+              </div>
+
+              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
+                <span className="text-evidence font-bold flex items-center gap-1.5">
+                  ✓ {misconceptionSignal.evidence?.verifiedBehavior ?? 'CORRELATED_00_11'}
+                </span>
+                <span className="text-[10px] text-ink-dim block font-sans">
+                  {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
+                    'Non-local correlation: outcomes match on 100% of shots'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-evidence pt-1">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-evidence" />
+                <span>Status:</span>
+                <strong data-testid="no-divergence-status" className="font-mono text-evidence">
+                  ✓ Hypothesis Confirmed — No Misconception Detected
+                </strong>
               </span>
             </div>
           </div>
+        ) : (
+          <div
+            className="rounded-lg border border-caution/50 bg-caution/10 p-4 space-y-3"
+            data-testid="misconception-signal-card"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-caution/20 pb-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-caution" />
+                <span className="text-xs font-bold text-caution uppercase tracking-wider">
+                  Misconception Signal:
+                </span>
+                <span
+                  data-testid="misconception-code"
+                  className="text-xs font-mono font-bold text-caution px-2 py-0.5 rounded bg-abyss border border-caution/40"
+                >
+                  {misconceptionSignal.code}
+                </span>
+              </div>
+              <Badge variant="outline" className="text-[10px] font-mono text-caution border-caution/40">
+                Confidence: {(misconceptionSignal.confidence * 100).toFixed(0)}% (Deterministic Rule)
+              </Badge>
+            </div>
 
-          <div className="flex items-center justify-between text-xs text-caution pt-1">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-caution animate-ping" />
-              <span>First Conceptual Divergence Point:</span>
-              <strong data-testid="first-divergence-step" className="font-mono underline decoration-caution">
-                Step {misconceptionSignal.firstDivergenceStep} (After CNOT)
-              </strong>
-            </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
+                <span className="text-danger font-bold flex items-center gap-1.5">
+                  ✕ {misconceptionSignal.evidence.prediction}
+                </span>
+                <span className="text-[10px] text-ink-dim block font-sans">
+                  {misconceptionSignal.evidence?.predictionDescription ??
+                    (tutorResponse?.summary ? 'Analyzed by Socratic Tutor' : misconceptionSignal.code)}
+                </span>
+              </div>
+
+              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
+                <span className="text-evidence font-bold flex items-center gap-1.5">
+                  ✓ {misconceptionSignal.evidence.verifiedBehavior}
+                </span>
+                <span className="text-[10px] text-ink-dim block font-sans">
+                  {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
+                    'Non-local correlation: outcomes match on 100% of shots'}
+                </span>
+              </div>
+            </div>
+
+            {misconceptionSignal.firstDivergenceStep !== null && misconceptionSignal.firstDivergenceStep !== undefined && (
+              <div className="flex items-center justify-between text-xs text-caution pt-1">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-caution animate-ping" />
+                  <span>First Conceptual Divergence Point:</span>
+                  <strong data-testid="first-divergence-step" className="font-mono underline decoration-caution">
+                    Step {misconceptionSignal.firstDivergenceStep}{' '}
+                    {(() => {
+                      const divStep = stateTrace.find(
+                        (s) => s.stepIndex === misconceptionSignal.firstDivergenceStep
+                      );
+                      return divStep?.label ? `(${divStep.label})` : '';
+                    })()}
+                  </strong>
+                </span>
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Replay Controls & Steps Scrubber */}
         <div className="space-y-4">
@@ -132,7 +250,7 @@ export function FlightRecorderView({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {stateTrace.map((step) => {
               const isSelected = activeStepIndex === step.stepIndex;
-              const isDivergence = step.stepIndex === misconceptionSignal.firstDivergenceStep;
+              const isDivergence = !isCorrect && step.stepIndex === misconceptionSignal.firstDivergenceStep;
               const stepReplay = replay.find((r) => r.stepIndex === step.stepIndex);
 
               return (
@@ -163,11 +281,15 @@ export function FlightRecorderView({
                       <span className="text-xs font-semibold text-ink">{step.label}</span>
                     </div>
 
-                    {isDivergence && (
+                    {isCorrect ? (
+                      <span className="text-[10px] font-mono text-evidence px-1.5 py-0.5 rounded bg-evidence/15 border border-evidence/40">
+                        VERIFIED
+                      </span>
+                    ) : isDivergence ? (
                       <span className="text-[10px] font-mono text-caution px-1.5 py-0.5 rounded bg-caution/15 border border-caution/40">
                         DIVERGENCE
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   <div className="text-xs text-ink-dim font-sans font-medium mb-2">
@@ -254,6 +376,144 @@ export function FlightRecorderView({
                   );
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dynamic Inline AI Tutor Explanation for Detected Misconceptions */}
+        {!isCorrect && isTutorLoading && (
+          <div
+            className="rounded-lg border border-accent/30 bg-raised/30 p-4 space-y-3 animate-pulse"
+            data-testid="tutor-loading-skeleton"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-accent animate-spin" />
+                <span className="text-xs font-mono font-semibold text-accent">
+                  Generating AI Pedagogical Guidance...
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-ink-faint">
+                Evidence-Bound Socratic Engine
+              </span>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-line/60 rounded w-3/4" />
+              <div className="h-3 bg-line/40 rounded w-full" />
+              <div className="h-3 bg-line/30 rounded w-4/5" />
+            </div>
+          </div>
+        )}
+
+        {!isCorrect && !isTutorLoading && tutorResponse && (
+          <div
+            className="rounded-lg border border-accent/40 bg-abyss p-4 space-y-4 font-sans"
+            data-testid="inline-tutor-container"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
+              <div className="flex items-center gap-2">
+                <Badge variant="default" className="text-xs font-mono bg-accent/20 text-accent border border-accent/40">
+                  AI SOCRATIC GUIDANCE
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className={`text-[10px] font-mono flex items-center gap-1 ${
+                    tutorResponse.fallbackUsed
+                      ? 'text-caution border-caution/40 bg-caution/10'
+                      : 'text-accent border-accent/40 bg-accent/10'
+                  }`}
+                  data-testid="inline-tutor-badge"
+                >
+                  <ShieldCheck className="w-3 h-3" />
+                  {tutorResponse.fallbackUsed
+                    ? `Deterministic Fallback (${tutorResponse.model})`
+                    : `Live OpenRouter (${tutorResponse.model})`}
+                </Badge>
+                {learnerRole && (
+                  <Badge variant="outline" className="text-[10px] font-mono text-ink-dim border-line">
+                    {learnerRole === 'PHYSICS_TO_CODE' ? 'Formal Physics' : 'Intuitive CSE'}
+                  </Badge>
+                )}
+              </div>
+              <span className="text-[11px] font-mono text-ink-faint">
+                Intent: {tutorResponse.intent}
+              </span>
+            </div>
+
+            {/* Socratic Insight Summary */}
+            <div
+              data-testid="inline-tutor-summary"
+              className="rounded-lg border border-accent/30 bg-accent/10 p-3 text-xs md:text-sm text-ink space-y-1.5"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-accent uppercase tracking-wide">
+                <Lightbulb className="w-3.5 h-3.5 text-accent" />
+                <span>Pedagogical Analysis</span>
+              </div>
+              <p className="text-ink font-medium leading-relaxed">{tutorResponse.summary}</p>
+            </div>
+
+            {/* Trace Steps Breakdown */}
+            {tutorResponse.steps.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-ink font-mono flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-accent" />
+                  Grounded Trace Steps Breakdown
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {tutorResponse.steps.map((step, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg border border-line bg-raised/40 p-3 text-xs space-y-1"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-accent font-mono">{step.title}</span>
+                        <div className="flex gap-1">
+                          {step.evidenceKeys.map((key) => (
+                            <code
+                              key={key}
+                              className="text-[9px] font-mono text-ink-dim bg-abyss px-1.5 py-0.5 rounded border border-line"
+                            >
+                              {key}
+                            </code>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-ink-dim font-sans text-[11px] leading-normal">{step.body}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Simulator-Bound Numerical Claims */}
+            {tutorResponse.numericalClaims.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="text-xs font-bold text-ink font-mono flex items-center gap-1.5">
+                  <CheckCheck className="w-3.5 h-3.5 text-evidence" />
+                  Simulator-Bound Numerical Claims
+                </span>
+                <div className="rounded-lg border border-line bg-raised/30 overflow-hidden text-xs font-mono">
+                  <div className="grid grid-cols-2 p-2 bg-raised text-ink-dim font-bold border-b border-line text-[11px]">
+                    <span>Claimed Mathematical Value</span>
+                    <span>Grounded Evidence Key</span>
+                  </div>
+                  {tutorResponse.numericalClaims.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="grid grid-cols-2 p-2 border-b border-line last:border-0 items-center text-[11px]"
+                    >
+                      <span className="text-evidence font-bold">{item.claim}</span>
+                      <span className="text-ink-dim text-[10px]">{item.evidenceKey}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Safety Note */}
+            <div className="flex items-center gap-1.5 text-[10px] text-ink-faint pt-1 border-t border-line">
+              <AlertCircle className="w-3 h-3 text-accent shrink-0" />
+              <span>{tutorResponse.safetyNote}</span>
             </div>
           </div>
         )}

@@ -206,6 +206,7 @@ export const apiClient = {
             simulationRunId: payload.simulationRunId,
             createdAt: new Date().toISOString(),
           },
+          isCorrectPrediction: false,
         },
         meta: {
           requestId: `req_fb_${Date.now().toString(36)}`,
@@ -241,10 +242,15 @@ export const apiClient = {
         },
       };
     } catch {
+      const summary =
+        payload.learnerRole === 'PHYSICS_TO_CODE'
+          ? 'The Hadamard transformation H prepares product state (|00⟩+|10⟩)/√2; CNOT maps it to entangled Bell state |Φ+⟩=(|00⟩+|11⟩)/√2. Reduced subsystems are maximally mixed (purity 0.5), demonstrating non-separable state correlation.'
+          : DEMO_TUTOR_RESPONSE.summary;
       return {
         data: {
           tutorResponse: {
             ...DEMO_TUTOR_RESPONSE,
+            summary,
             fallbackUsed: true,
             model: 'DEMO_FALLBACK',
           },

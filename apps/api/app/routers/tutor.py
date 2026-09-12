@@ -128,6 +128,7 @@ class TutorExplainRequest(BaseModel):
     misconceptionSignalId: str
     intent: str
     learnerQuestion: Optional[str] = Field(default=None, max_length=500)
+    learnerRole: Optional[str] = None
 
 
 class TutorStep(BaseModel):
@@ -224,6 +225,10 @@ async def explain_divergence(request: TutorExplainRequest) -> TutorExplainRespon
         first_divergence_step = BELL_MISCONCEPTION_SIGNAL_FIXTURE["firstDivergenceStep"]
 
     # 6. Generate explanation with verified evidence validation and fallback protection
+    learner_role = request.learnerRole
+    if not learner_role and learner:
+        learner_role = getattr(learner, "role", None)
+
     try:
         explanation = await default_tutor_service.generate_explanation(
             state_trace=state_trace,
@@ -235,6 +240,7 @@ async def explain_divergence(request: TutorExplainRequest) -> TutorExplainRespon
             prediction=prediction,
             verified_behavior=verified_behavior,
             first_divergence_step=first_divergence_step,
+            learner_role=learner_role,
         )
     except (EvidenceKeyValidationError, FabricatedClaimError) as err:
         raise HTTPException(

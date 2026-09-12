@@ -155,6 +155,7 @@ class MisconceptionSignal(BaseModel):
     evidence: dict[str, Any] = Field(default_factory=dict)
     confidence: float = 1.0
     repairChallengeId: Optional[str] = None
+    isCorrectPrediction: bool = False
     schemaVersion: int = 1
     createdAt: str = Field(default_factory=utc_now_iso)
 

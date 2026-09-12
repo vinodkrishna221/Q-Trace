@@ -54,6 +54,7 @@ _REPLAY_HEADLINES: dict[tuple[str, int], str] = {
     ("GATE_ORDER", 0): "Hadamard gate creates superposition on qubit 0",
     ("GATE_ORDER", 1): "CNOT propagates qubit 0 branch to qubit 1",
     ("NO_SIGNAL", 0): "Superposition created",
+    ("NO_SIGNAL", 1): "Bell correlation confirmed",
 }
 
 _REPLAY_EVIDENCE_KEYS: dict[tuple[str, int], list[str]] = {
@@ -74,6 +75,7 @@ _REPLAY_EVIDENCE_KEYS: dict[tuple[str, int], list[str]] = {
     ],
     ("GATE_ORDER", 1): ["stateTrace.1.basisProbabilities"],
     ("NO_SIGNAL", 0): ["stateTrace.0.basisProbabilities"],
+    ("NO_SIGNAL", 1): ["stateTrace.1.basisProbabilities"],
 }
 
 
@@ -186,6 +188,8 @@ async def run_diagnosis(
     # Enrich evidence with verified behavior from Bell trace
     evidence["verifiedBehavior"] = BELL_VERIFIED_BEHAVIOR
 
+    is_correct = diagnosis.is_correct_prediction
+
     signal = MisconceptionSignal(
         id=signal_id,
         learnerProfileId=learner_profile_id,
@@ -195,6 +199,7 @@ async def run_diagnosis(
         evidence=evidence,
         confidence=diagnosis.confidence,
         repairChallengeId=diagnosis.repair_challenge_id or None,
+        isCorrectPrediction=is_correct,
         schemaVersion=1,
         createdAt=utc_now_iso(),
     )

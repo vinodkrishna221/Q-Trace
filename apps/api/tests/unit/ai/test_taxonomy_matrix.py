@@ -272,16 +272,19 @@ def test_no_signal_behavior() -> None:
     assert diag_correct.code == "NO_SIGNAL"
     assert diag_correct.first_divergence_step is None
     assert diag_correct.repair_challenge_id == "ch_no_signal_repair"
+    assert diag_correct.is_correct_prediction is True
 
     # None prediction
     diag_none = diagnose_with_taxonomy(None, BELL_STATE_TRACE, "PHYSICS_TO_CODE")
     assert diag_none.code == "NO_SIGNAL"
     assert diag_none.first_divergence_step is None
+    assert diag_none.is_correct_prediction is False
 
     # Garbage / unhandled prediction string
     diag_garbage = diagnose_with_taxonomy("RANDOM_NOISE_123", BELL_STATE_TRACE)
     assert diag_garbage.code == "NO_SIGNAL"
     assert diag_garbage.first_divergence_step is None
+    assert diag_garbage.is_correct_prediction is False
 
 
 # ---------------------------------------------------------------------------

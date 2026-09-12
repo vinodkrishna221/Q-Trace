@@ -69,7 +69,7 @@ describe('QA-5: Fallback state acceptance fixtures — offline demo safety', () 
     });
 
     it('each stateTrace step has stepIndex, label, basisProbabilities, reducedQubits', () => {
-      const trace = DEMO_SIMULATION_RUN.stateTrace as Array<Record<string, unknown>>;
+      const trace = (DEMO_SIMULATION_RUN.stateTrace as unknown) as Array<Record<string, unknown>>;
       for (const step of trace) {
         expect(typeof step.stepIndex).toBe('number');
         assertNonEmpty(step.label, `stateTrace[${step.stepIndex}].label`);
@@ -79,7 +79,7 @@ describe('QA-5: Fallback state acceptance fixtures — offline demo safety', () 
     });
 
     it('conformance has passed, epsilon, and adapter fields', () => {
-      const c = DEMO_SIMULATION_RUN.conformance as Record<string, unknown>;
+      const c = (DEMO_SIMULATION_RUN.conformance as unknown) as Record<string, unknown>;
       expect(c).toBeDefined();
       expect(typeof c.passed).toBe('boolean');
       expect(typeof c.epsilon).toBe('number');
@@ -99,7 +99,7 @@ describe('QA-5: Fallback state acceptance fixtures — offline demo safety', () 
 
   describe('FlightRecorder diagnosis fallback fixture', () => {
     it('misconceptionSignal has all required contract fields', () => {
-      const signal = DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal as Record<string, unknown>;
+      const signal = (DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal as unknown) as Record<string, unknown>;
       const required = ['id', 'learnerProfileId', 'simulationRunId', 'code',
                         'evidence', 'confidence', 'repairChallengeId', 'createdAt'];
       for (const field of required) {
@@ -113,7 +113,7 @@ describe('QA-5: Fallback state acceptance fixtures — offline demo safety', () 
     });
 
     it('evidence has prediction, verifiedBehavior, stateTraceStepIndexes', () => {
-      const ev = (DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal as {
+      const ev = ((DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal as unknown) as {
         evidence: Record<string, unknown>;
       }).evidence;
       expect(ev.prediction).toBeDefined();

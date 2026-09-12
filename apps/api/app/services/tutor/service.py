@@ -108,6 +108,7 @@ class TutorService:
         force_fallback: Optional[bool] = None,
         provider_override: Optional[BaseTutorProvider] = None,
         timeout_seconds: Optional[float] = None,
+        learner_role: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Main entrypoint for tutor explanations.
         
@@ -134,6 +135,7 @@ class TutorService:
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
+                learner_role=learner_role,
             )
             duration_ms = int((time.perf_counter() - start_time) * 1000)
             badge = compute_tutor_badge(
@@ -162,6 +164,7 @@ class TutorService:
 
         formatted_user_prompt = user_template.format(
             learner_profile_id=learner_profile_id,
+            learner_role=learner_role or "BEGINNER_CSE",
             module_id=module_id,
             intent=intent,
             learner_question=learner_question or "None provided",
@@ -195,6 +198,7 @@ class TutorService:
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
+                learner_role=learner_role,
             )
             badge = compute_tutor_badge(
                 fallback_used=True,
@@ -236,6 +240,7 @@ class TutorService:
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
+                learner_role=learner_role,
             )
             badge = compute_tutor_badge(
                 fallback_used=True,
@@ -271,6 +276,7 @@ class TutorService:
                 misconception_code=misconception_code,
                 module_id=module_id,
                 intent=intent,
+                learner_role=learner_role,
             )
             badge = compute_tutor_badge(
                 fallback_used=True,

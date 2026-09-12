@@ -39,6 +39,7 @@ def get_curated_bell_explanation(
     misconception_code: Optional[str] = "SUPERPOSITION_VS_ENTANGLEMENT",
     module_id: Optional[str] = "mod_bell",
     intent: str = "EXPLAIN_DIVERGENCE",
+    learner_role: Optional[str] = None,
 ) -> dict[str, Any]:
     """Produce the curated Bell state explanation payload grounded in state_trace."""
     repair_challenge_id = select_repair_challenge(misconception_code, module_id)
@@ -64,13 +65,22 @@ def get_curated_bell_explanation(
     # Validate all evidence keys and numerical claims before returning
     validate_tutor_response_evidence(steps, numerical_claims, state_trace)
 
+    if learner_role == "PHYSICS_TO_CODE":
+        summary = (
+            "The Hadamard transformation H prepares product state (|00⟩+|10⟩)/√2; CNOT maps it to "
+            "entangled Bell state |Φ+⟩=(|00⟩+|11⟩)/√2. Reduced subsystems are maximally mixed (purity 0.5), "
+            "demonstrating non-separable state correlation."
+        )
+    else:
+        summary = (
+            "The Hadamard gate made qubit 0 uncertain; the CNOT then tied qubit 1 "
+            "to that branch. Each shot is random, but the pair is correlated."
+        )
+
     return {
         "responseId": "tr_demo_001",
         "intent": intent,
-        "summary": (
-            "The Hadamard gate made qubit 0 uncertain; the CNOT then tied qubit 1 "
-            "to that branch. Each shot is random, but the pair is correlated."
-        ),
+        "summary": summary,
         "steps": steps,
         "numericalClaims": numerical_claims,
         "repairChallengeId": repair_challenge_id,
