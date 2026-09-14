@@ -148,21 +148,22 @@ describe('In-Situ Repair Workspace & Near-Future Bridge Challenge', () => {
   it('allows switching between Stage 2 Bridge Challenge and Remedial Repair in Step 6', () => {
     render(<BellStateLearnPage />);
 
-    // Initially for default Aarav misconception path, it renders Repair Challenge
-    expect(screen.getByTestId('challenge-title').textContent).toBe('Restore Bell Correlation');
-
-    // Switch to Stage 2 Bridge Challenge
-    fireEvent.click(screen.getByTestId('select-bridge-challenge-btn'));
-
-    // Title updates to Bridge Challenge
+    // Initially defaults to Stage 2 Bridge Challenge as primary forward journey
     expect(screen.getByTestId('challenge-title').textContent).toBe(
       'Teleportation Channel: Prepare Anti-Correlated Bell Pair'
     );
     expect(screen.getByTestId('teleportation-bridge-narrative')).toBeDefined();
 
-    // Switch back to Remedial Repair
+    // Switch to Remedial Repair
     fireEvent.click(screen.getByTestId('select-remedial-challenge-btn'));
     expect(screen.getByTestId('challenge-title').textContent).toBe('Restore Bell Correlation');
+    expect(screen.getByTestId('bell-repair-narrative')).toBeDefined();
+
+    // Switch back to Stage 2 Bridge Challenge
+    fireEvent.click(screen.getByTestId('select-bridge-challenge-btn'));
+    expect(screen.getByTestId('challenge-title').textContent).toBe(
+      'Teleportation Channel: Prepare Anti-Correlated Bell Pair'
+    );
   });
 
   it('invalidates stale simulation run when gates are modified after testing', async () => {

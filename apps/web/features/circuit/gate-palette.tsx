@@ -50,10 +50,10 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               onClick={resetToBellSeed}
               data-testid="reset-bell-circuit-btn"
               className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-ink hover:border-accent/40 focus-visible:ring-2 focus-visible:ring-accent"
-              title="Reset to seeded Bell State circuit (H + CNOT)"
+              title="Reset to seeded Bell State circuit (H + CNOT) or load reference template"
             >
               <RotateCcw className="w-3 h-3 mr-1 text-accent" />
-              Reset Bell Seed
+              Reset Bell Seed / Load Template
             </Button>
             <Button
               size="sm"

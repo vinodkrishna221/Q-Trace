@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Challenge, ChallengeAttempt, CircuitModel, SimulationRun } from '@/lib/contracts';
-import { DEMO_BRIDGE_STARTER_CIRCUIT, DEMO_STARTER_CIRCUIT } from '@/lib/fixtures';
+import { DEMO_BRIDGE_STARTER_CIRCUIT, DEMO_BROKEN_CIRCUIT } from '@/lib/fixtures';
 import { InSituRepairWorkspace } from './in-situ-repair-workspace';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +32,7 @@ export function RepairChallengeCard({
 }: RepairChallengeCardProps) {
   const isPassed = attempt?.passed ?? false;
   const isBridge = challenge.id === 'ch_bell_psi_plus';
-  const starterCircuit = circuit || (isBridge ? DEMO_BRIDGE_STARTER_CIRCUIT : DEMO_STARTER_CIRCUIT);
+  const starterCircuit = circuit || (isBridge ? DEMO_BRIDGE_STARTER_CIRCUIT : DEMO_BROKEN_CIRCUIT);
 
   return (
     <Card
@@ -66,8 +66,8 @@ export function RepairChallengeCard({
       </CardHeader>
 
       <CardContent className="p-4 md:p-6 space-y-4">
-        {/* Stage 2 Quantum Teleportation Bridge Narrative */}
-        {isBridge && (
+        {/* Stage 2 Quantum Teleportation Bridge Narrative / Remedial Repair Narrative */}
+        {isBridge ? (
           <div
             className="rounded-lg border border-accent/40 bg-accent/10 p-3.5 space-y-1 font-mono text-xs"
             data-testid="teleportation-bridge-narrative"
@@ -79,6 +79,20 @@ export function RepairChallengeCard({
             <p className="text-ink-dim text-[11px] leading-relaxed">
               In Stage 2, Alice and Bob distribute an anti-correlated EPR pair |Ψ+⟩ = (|01⟩ + |10⟩)/√2.
               By applying a Pauli-X gate to flip the second qubit from |Φ+⟩, you produce the exact entanglement channel required for teleportation.
+            </p>
+          </div>
+        ) : (
+          <div
+            className="rounded-lg border border-caution/40 bg-caution/10 p-3.5 space-y-1 font-mono text-xs"
+            data-testid="bell-repair-narrative"
+          >
+            <div className="flex items-center gap-2 text-caution font-semibold">
+              <Wrench className="w-4 h-4" />
+              <span>Remedial Repair: Restore Quantum Superposition</span>
+            </div>
+            <p className="text-ink-dim text-[11px] leading-relaxed">
+              The circuit is currently broken: CNOT acts on |00⟩ without superposition on q[0], collapsing the output to classical product state |00⟩.
+              Place a Hadamard (H) gate on q[0] at Col 0 to create superposition before the CNOT entangles the pair into |Φ+⟩ = (|00⟩ + |11⟩)/√2.
             </p>
           </div>
         )}

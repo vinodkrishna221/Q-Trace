@@ -219,6 +219,43 @@ export const DEMO_STARTER_CIRCUIT: CircuitModel = {
   updatedAt: '2026-08-23T05:27:00Z',
 };
 
+export const DEMO_BELL_BUILDER_STARTER: CircuitModel = {
+  id: 'cm_bell_builder_starter',
+  name: 'Bell State Builder (Workspace)',
+  qubitCount: 2,
+  classicalBitCount: 2,
+  operations: [
+    { opId: 'op_3', gate: 'MEASURE', targets: [0], controls: [], classicalTargets: [0], column: 2 },
+    { opId: 'op_4', gate: 'MEASURE', targets: [1], controls: [], classicalTargets: [1], column: 2 },
+  ],
+  source: 'BUILDER',
+  openQasm3:
+    'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[2] q;\nbit[2] c;\nc[0] = measure q[0];\nc[1] = measure q[1];\n',
+  modelVersion: 1,
+  ownerLearnerProfileId: null,
+  createdAt: '2026-08-23T05:27:00Z',
+  updatedAt: '2026-08-23T05:27:00Z',
+};
+
+export const DEMO_BROKEN_CIRCUIT: CircuitModel = {
+  id: 'cm_bell_broken',
+  name: 'Broken Bell State (Missing Superposition)',
+  qubitCount: 2,
+  classicalBitCount: 2,
+  operations: [
+    { opId: 'op_b_cnot', gate: 'CNOT', targets: [1], controls: [0], classicalTargets: [], column: 1 },
+    { opId: 'op_b_m0', gate: 'MEASURE', targets: [0], controls: [], classicalTargets: [0], column: 3 },
+    { opId: 'op_b_m1', gate: 'MEASURE', targets: [1], controls: [], classicalTargets: [1], column: 3 },
+  ],
+  source: 'SEED',
+  openQasm3:
+    'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[2] q;\nbit[2] c;\ncx q[0], q[1];\nc[0] = measure q[0];\nc[1] = measure q[1];\n',
+  modelVersion: 1,
+  ownerLearnerProfileId: null,
+  createdAt: '2026-08-23T05:27:00Z',
+  updatedAt: '2026-08-23T05:27:00Z',
+};
+
 export const DEMO_CHALLENGE: Challenge = {
   id: 'ch_bell_repair',
   moduleId: 'mod_bell',

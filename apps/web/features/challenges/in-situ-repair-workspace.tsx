@@ -40,9 +40,12 @@ export function InSituRepairWorkspace({
   const [isSimulating, setIsSimulating] = React.useState(false);
   const [lastSimRun, setLastSimRun] = React.useState<SimulationRun | null>(null);
 
+  const isBridge = challengeId === 'ch_bell_psi_plus';
+
   // Sync when initialCircuit changes
   React.useEffect(() => {
     setCircuit(initialCircuit);
+    setLastSimRun(null);
   }, [initialCircuit]);
 
   const updateCircuitOperations = (newOps: Operation[]) => {
@@ -69,11 +72,15 @@ export function InSituRepairWorkspace({
           (op.targets.includes(qubit) || op.controls.includes(qubit))
         )
     );
+    const controls =
+      gate === 'CNOT'
+        ? [qubit === 0 ? 1 : 0]
+        : [];
     const newOp: Operation = {
       opId: `op_insitu_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 5)}`,
       gate,
       targets: [qubit],
-      controls: [],
+      controls,
       classicalTargets: [],
       column,
     };
@@ -163,10 +170,10 @@ export function InSituRepairWorkspace({
         <div className="flex items-center gap-2">
           <Cpu className="w-4 h-4 text-accent" />
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-ink">
-            In-Situ Quantum Circuit Canvas
+            {isBridge ? 'In-Situ Bridge Circuit Canvas' : 'In-Situ Repair Circuit Canvas'}
           </span>
           <Badge variant="outline" className="text-[10px] font-mono border-accent/40 text-accent">
-            Interactive
+            {isBridge ? 'Bridge Stage 2' : 'Remedial Repair'}
           </Badge>
         </div>
         <div className="flex items-center gap-2">
@@ -175,7 +182,7 @@ export function InSituRepairWorkspace({
             size="sm"
             onClick={handleReset}
             disabled={readOnly}
-            className="h-7 px-2 text-xs font-mono text-ink-dim hover:text-ink gap-1"
+            className="h-7 px-2 text-xs font-mono text-ink-dim hover:text-ink gap-1 cursor-pointer"
             data-testid="reset-insitu-circuit-btn"
           >
             <RotateCcw className="w-3 h-3" />
@@ -188,28 +195,57 @@ export function InSituRepairWorkspace({
       <div className="flex flex-wrap items-center justify-between gap-3 bg-panel/60 p-2.5 rounded-lg border border-line/60">
         <div className="flex items-center gap-2 text-xs text-ink-dim font-mono">
           <span className="text-ink font-semibold">Available Gates:</span>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAddGate('X', 1, 2)}
-            disabled={readOnly}
-            className="h-7 px-2.5 text-xs font-mono border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent gap-1"
-            data-testid="place-x-gate-btn"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Place Pauli-X on q[1] (Col 2)</span>
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleAddGate('X', 0, 2)}
-            disabled={readOnly}
-            className="h-7 px-2.5 text-xs font-mono border-line text-ink-dim hover:text-ink gap-1"
-            data-testid="place-x-gate-q0-btn"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Place X on q[0]</span>
-          </Button>
+          {isBridge ? (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleAddGate('X', 1, 2)}
+                disabled={readOnly}
+                className="h-7 px-2.5 text-xs font-mono border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent gap-1 cursor-pointer"
+                data-testid="place-x-gate-btn"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Place Pauli-X on q[1] (Col 2)</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleAddGate('X', 0, 2)}
+                disabled={readOnly}
+                className="h-7 px-2.5 text-xs font-mono border-line text-ink-dim hover:text-ink gap-1 cursor-pointer"
+                data-testid="place-x-gate-q0-btn"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Place X on q[0]</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleAddGate('H', 0, 0)}
+                disabled={readOnly}
+                className="h-7 px-2.5 text-xs font-mono border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent gap-1 cursor-pointer"
+                data-testid="place-h-gate-q0-btn"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Place H on q[0] (Col 0)</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleAddGate('CNOT', 1, 1)}
+                disabled={readOnly}
+                className="h-7 px-2.5 text-xs font-mono border-line text-ink-dim hover:text-ink gap-1 cursor-pointer"
+                data-testid="place-cnot-gate-btn"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Place CNOT on q[1] (Col 1)</span>
+              </Button>
+            </>
+          )}
         </div>
         <span className="text-[11px] font-mono text-ink-faint">
           Target: {expectedStates.map((s) => `|${s}⟩`).join(' + ')}
@@ -240,9 +276,24 @@ export function InSituRepairWorkspace({
                       const op = getGateAt(wire, 0);
                       if (op?.gate === 'H') {
                         return (
-                          <span className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs">
-                            H
-                          </span>
+                          <div className="flex items-center gap-1 group">
+                            <span
+                              className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs"
+                              data-testid={`insitu-gate-h-q${wire}`}
+                            >
+                              H
+                            </span>
+                            {!readOnly && (
+                              <button
+                                onClick={() => handleRemoveGate(wire, 0)}
+                                className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                title="Remove H gate"
+                                data-testid={`remove-h-gate-q${wire}`}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
                         );
                       }
                       if (op?.gate === 'CNOT') {
@@ -259,6 +310,20 @@ export function InSituRepairWorkspace({
                           <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
                             X
                           </span>
+                        );
+                      }
+                      if (!isBridge && wire === 0) {
+                        return (
+                          <button
+                            onClick={() => handleAddGate('H', 0, 0)}
+                            disabled={readOnly}
+                            className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title="Click to place Hadamard (H) gate on q[0]"
+                            data-testid="empty-slot-q0-col0"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>+H</span>
+                          </button>
                         );
                       }
                       return (
@@ -330,17 +395,24 @@ export function InSituRepairWorkspace({
                           </div>
                         );
                       }
+                      if (isBridge) {
+                        return (
+                          <button
+                            onClick={() => handleAddGate('X', wire, 2)}
+                            disabled={readOnly}
+                            className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            title={`Click to place Pauli-X gate on q[${wire}]`}
+                            data-testid={`empty-slot-q${wire}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>+X</span>
+                          </button>
+                        );
+                      }
                       return (
-                        <button
-                          onClick={() => handleAddGate('X', wire, 2)}
-                          disabled={readOnly}
-                          className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                          title={`Click to place Pauli-X gate on q[${wire}]`}
-                          data-testid={`empty-slot-q${wire}`}
-                        >
-                          <Plus className="w-3 h-3" />
-                          <span>+X</span>
-                        </button>
+                        <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                          —
+                        </span>
                       );
                     })()}
                   </div>
@@ -366,7 +438,7 @@ export function InSituRepairWorkspace({
             disabled={isSimulating}
             size="sm"
             variant="outline"
-            className="h-8 text-xs font-mono font-semibold border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent gap-1.5"
+            className="h-8 text-xs font-mono font-semibold border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent gap-1.5 cursor-pointer"
             data-testid="test-insitu-circuit-btn"
           >
             {isSimulating ? (
@@ -390,7 +462,11 @@ export function InSituRepairWorkspace({
                   data-testid="insitu-target-achieved-badge"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Target State Prepared (|01⟩ + |10⟩)</span>
+                  <span>
+                    {isBridge
+                      ? 'Target State Prepared (|01⟩ + |10⟩)'
+                      : 'Target State Prepared (|00⟩ + |11⟩)'}
+                  </span>
                 </div>
               ) : (
                 <div
@@ -398,7 +474,11 @@ export function InSituRepairWorkspace({
                   data-testid="insitu-target-pending-badge"
                 >
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>Pending: Place X gate to transform into |Ψ+⟩</span>
+                  <span>
+                    {isBridge
+                      ? 'Pending: Place X gate to transform into |Ψ+⟩'
+                      : 'Pending: Place H on q[0] to restore Bell correlation (|00⟩ + |11⟩)'}
+                  </span>
                 </div>
               )}
             </div>

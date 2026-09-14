@@ -27,14 +27,19 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
     expect(screen.getByTestId('prediction-checkpoint-card')).toBeDefined();
     expect(screen.getByTestId('prediction-opt-INDEPENDENT_RANDOM')).toBeDefined();
 
-    // 3. Read-Only Circuit Workspace
+    // 3. Interactive Circuit Workspace & Builder Goal Banner
     expect(screen.getByTestId('circuit-workspace-readonly')).toBeDefined();
+    expect(screen.getByTestId('builder-goal-banner')).toBeDefined();
+    expect(screen.getByTestId('builder-goal-banner').textContent).toContain('🎯 Goal: Build the Bell State');
     expect(screen.getByTestId('qubit-wire-0')).toBeDefined();
     expect(screen.getByTestId('qubit-wire-1')).toBeDefined();
-    expect(screen.getByTestId('gate-op_1')).toBeDefined(); // H
-    expect(screen.getByTestId('gate-op_2')).toBeDefined(); // CNOT
     expect(screen.getByTestId('gate-op_3')).toBeDefined(); // Measure q[0]
     expect(screen.getByTestId('gate-op_4')).toBeDefined(); // Measure q[1]
+
+    // Load reference Bell template
+    fireEvent.click(screen.getByTestId('load-bell-template-btn'));
+    expect(screen.getByTestId('gate-op_1')).toBeDefined(); // H
+    expect(screen.getByTestId('gate-op_2')).toBeDefined(); // CNOT
 
     // 4. Synchronized Qiskit Code Panel
     expect(screen.getByTestId('qiskit-code-panel')).toBeDefined();
@@ -156,10 +161,12 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
   it('verifies Repair Challenge execution and Progress Record mastery update', async () => {
     render(<BellStateLearnPage />);
 
-    // Repair challenge card checks
-    expect(screen.getByTestId('challenge-title').textContent).toBe('Restore Bell Correlation');
+    // Primary forward journey is Stage 2 Bridge Challenge
+    expect(screen.getByTestId('challenge-title').textContent).toBe(
+      'Teleportation Channel: Prepare Anti-Correlated Bell Pair'
+    );
     expect(screen.getByTestId('challenge-prompt').textContent).toContain(
-      'Repair the circuit so only 00 and 11 have non-zero ideal probability.'
+      'Add a Pauli-X gate to produce an anti-correlated Bell pair'
     );
 
     // Initial attempt feedback starts unattempted per clean lifecycle
