@@ -272,6 +272,8 @@ export function ProbabilityHistogramView({
         reducedQubits={reducedQubits}
         stepLabel={latestTraceStep?.label || 'Final State'}
         disablePlotly={forceStaticFallback}
+        amplitudes={latestTraceStep?.amplitudes}
+        basisProbabilities={latestTraceStep?.basisProbabilities || probabilities}
       />
     </div>
   );

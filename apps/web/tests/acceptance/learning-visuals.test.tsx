@@ -161,4 +161,77 @@ describe('Learning Paths & Visual Evidence Suite (UX-6)', () => {
     expect(screen.getByTestId('measurement-preview-card')).toBeDefined();
     expect(screen.getByTestId('next-module-btn')).toBeDefined();
   });
+
+  it('renders dual 3D Bloch spheres and two-qubit Pauli correlation tensor for entangled Bell states', () => {
+    const bellReducedQubits = [
+      { qubit: 0, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
+      { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
+    ];
+    const bellAmplitudes = {
+      '00': { re: 0.70710678, im: 0 },
+      '01': { re: 0, im: 0 },
+      '10': { re: 0, im: 0 },
+      '11': { re: 0.70710678, im: 0 },
+    };
+
+    render(
+      <BlochSphereView
+        reducedQubits={bellReducedQubits}
+        amplitudes={bellAmplitudes}
+        stepLabel="After CNOT (Entangled Bell Pair)"
+      />
+    );
+
+    // 1. Dual 3D Bloch spheres rendered side-by-side
+    expect(screen.getByTestId('dual-3d-bloch-view')).toBeDefined();
+    expect(screen.getByTestId('bloch-3d-container-0')).toBeDefined();
+    expect(screen.getByTestId('bloch-3d-container-1')).toBeDefined();
+
+    // 2. Entanglement bridge and metrics
+    expect(screen.getByTestId('two-qubit-correlation-bridge')).toBeDefined();
+    expect(screen.getByTestId('entanglement-status-badge').textContent).toBe('ENTANGLEMENT LOCKED');
+    expect(screen.getByTestId('concurrence-value').textContent).toContain('C = 1.000');
+
+    // 3. Pauli Correlation Tensor matrix elements for Bell state: <XX>=+1, <YY>=-1, <ZZ>=+1
+    expect(screen.getByTestId('pauli-cell-XX').textContent).toContain('+1.00');
+    expect(screen.getByTestId('pauli-cell-YY').textContent).toContain('-1.00');
+    expect(screen.getByTestId('pauli-cell-ZZ').textContent).toContain('+1.00');
+
+    // 4. Vanishing vector explanation is present
+    expect(screen.getByText(/Why do individual Bloch vectors sit at \(0, 0, 0\)\?/i)).toBeDefined();
+  });
+
+  it('allows switching between Dual 3D, Single Wire Inspector, and 2-Qubit Q-Sphere view modes', () => {
+    const bellReducedQubits = [
+      { qubit: 0, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
+      { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
+    ];
+
+    render(
+      <BlochSphereView
+        reducedQubits={bellReducedQubits}
+        stepLabel="After CNOT"
+      />
+    );
+
+    // Initial mode is Dual 3D
+    expect(screen.getByTestId('dual-3d-bloch-view')).toBeDefined();
+
+    // Switch to Single Wire Inspector
+    const singleBtn = screen.getByTestId('view-mode-single-btn');
+    fireEvent.click(singleBtn);
+    expect(screen.getByText('Interactive 3D Bloch Inspection')).toBeDefined();
+
+    // Switch to 2-Qubit Q-Sphere
+    const qsphereBtn = screen.getByTestId('view-mode-qsphere-btn');
+    fireEvent.click(qsphereBtn);
+    expect(screen.getByTestId('qsphere-view-wrapper')).toBeDefined();
+    expect(screen.getByTestId('qsphere-container')).toBeDefined();
+    expect(screen.getByText('Q-Sphere Interpretation')).toBeDefined();
+
+    // Switch back to Dual 3D
+    const dualBtn = screen.getByTestId('view-mode-dual-btn');
+    fireEvent.click(dualBtn);
+    expect(screen.getByTestId('dual-3d-bloch-view')).toBeDefined();
+  });
 });
