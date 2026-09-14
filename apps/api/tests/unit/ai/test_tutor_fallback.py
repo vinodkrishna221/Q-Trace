@@ -184,6 +184,58 @@ def test_curated_bell_explanation_metadata_and_structure():
     assert "stateTrace.1.basisProbabilities.11" in claims
 
 
+def test_curated_bell_explanation_1_step_trace():
+    """Validates dynamic 1-step trace explanation for broken/custom circuits without H."""
+    single_step_trace = [
+        {
+            "stepIndex": 0,
+            "operationId": "op_cnot_1",
+            "label": "After CNOT",
+            "basisProbabilities": {"00": 1.0},
+            "amplitudes": {"00": {"re": 1.0, "im": 0.0}},
+            "reducedQubits": [
+                {"qubit": 0, "bloch": {"x": 0.0, "y": 0.0, "z": 1.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"},
+                {"qubit": 1, "bloch": {"x": 0.0, "y": 0.0, "z": 1.0}, "purity": 1.0, "label": "PURE_SUBSYSTEM"},
+            ],
+        }
+    ]
+    explanation = get_curated_bell_explanation(
+        state_trace=single_step_trace,
+        misconception_code="GATE_ORDER",
+        module_id="mod_bell",
+        intent="EXPLAIN_DIVERGENCE",
+    )
+    assert explanation["responseId"] == "tr_demo_001"
+    assert len(explanation["steps"]) == 1
+    assert explanation["steps"][0]["title"] == "After CNOT"
+    assert explanation["steps"][0]["evidenceKeys"] == ["stateTrace.0.basisProbabilities"]
+    assert len(explanation["numericalClaims"]) == 1
+    assert explanation["numericalClaims"][0]["claim"] == "P(00)=1.0"
+    assert explanation["fallbackUsed"] is True
+
+
+def test_curated_bell_explanation_empty_basis_probabilities():
+    """Validates that empty or missing basisProbabilities does not throw EvidenceKeyValidationError."""
+    single_step_trace = [
+        {
+            "stepIndex": 0,
+            "operationId": "op_empty",
+            "label": "Custom Init",
+            "basisProbabilities": {},
+        }
+    ]
+    explanation = get_curated_bell_explanation(
+        state_trace=single_step_trace,
+        misconception_code="GATE_ORDER",
+        module_id="mod_bell",
+        intent="EXPLAIN_DIVERGENCE",
+    )
+    assert explanation["responseId"] == "tr_demo_001"
+    assert len(explanation["steps"]) == 1
+    assert len(explanation["numericalClaims"]) == 0
+    assert explanation["fallbackUsed"] is True
+
+
 def test_deterministic_repair_challenge_selection():
     """Repair challenge selection is strictly deterministic based on misconception code."""
     assert select_repair_challenge("SUPERPOSITION_VS_ENTANGLEMENT", "mod_bell") == "ch_bell_repair"

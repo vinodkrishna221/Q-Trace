@@ -195,7 +195,7 @@ async def _execute_challenge_attempt(
     # 6. Prepare atomic updates
     completed_module_id = challenge.moduleId if passed else None
     updated_skills = None
-    if passed and challenge.id == "ch_bell_repair":
+    if passed and challenge.id in ("ch_bell_repair", "ch_bell_psi_plus"):
         updated_skills = [
             SkillState(skillId="skill_create_bell", status="MASTERED", score=100),
             SkillState(skillId="skill_explain_correlation", status="PRACTICING", score=70),

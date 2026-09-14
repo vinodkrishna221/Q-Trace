@@ -10,6 +10,8 @@ import {
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
   DEMO_TUTOR_RESPONSE,
   DEMO_CHALLENGE,
+  DEMO_BRIDGE_CHALLENGE,
+  DEMO_BRIDGE_STARTER_CIRCUIT,
   DEMO_CHALLENGE_ATTEMPT_RESPONSE,
   DEMO_REPAIRED_CIRCUIT,
 } from '@/lib/fixtures';
@@ -19,6 +21,7 @@ import {
   useTutorExplainMutation,
   useChallengeAttemptMutation,
 } from '@/lib/hooks/use-quantum-api';
+import { apiClient, simulateFallbackCircuit } from '@/lib/api-client';
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
@@ -51,6 +54,7 @@ import {
   Layers,
   Check,
   Zap,
+  RotateCcw,
 } from 'lucide-react';
 import {
   ChallengeAttempt,
@@ -80,9 +84,12 @@ export default function BellStateLearnPage() {
   const [simulationRun, setSimulationRun] = React.useState<SimulationRun | null>(DEMO_SIMULATION_RUN);
   const [diagnosis, setDiagnosis] = React.useState<DiagnoseResponse | null>(DEMO_FLIGHT_RECORDER_DIAGNOSIS);
   const [tutorResponse, setTutorResponse] = React.useState<TutorExplanation | null>(DEMO_TUTOR_RESPONSE);
-  const [repairAttempt, setRepairAttempt] = React.useState<ChallengeAttempt | null>(
-    DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt
-  );
+  const [repairAttempt, setRepairAttempt] = React.useState<ChallengeAttempt | null>(null);
+  const [bridgeAttempt, setBridgeAttempt] = React.useState<ChallengeAttempt | null>(null);
+  const [selectedChallengeId, setSelectedChallengeId] = React.useState<string | null>(null);
+  const [insituCircuit, setInsituCircuit] = React.useState<CircuitModel>(DEMO_BRIDGE_STARTER_CIRCUIT);
+  const [insituSimRun, setInsituSimRun] = React.useState<SimulationRun | null>(null);
+
   const [progressRecord, setProgressRecord] = React.useState<ProgressRecord | null>(
     DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord
   );
@@ -145,8 +152,10 @@ export default function BellStateLearnPage() {
         simulationRunId: simResult.data.id,
       });
 
-      // If offline fallback is active and learner predicted the correct answer, reflect it accurately in the diagnosis
-      if (diagResult.meta.isFallback && predictionAnswer === 'CORRELATED_00_11') {
+      // If offline fallback is active and learner predicted the correct answer, reflect it accurately in the diagnosis only if simulation actually produced Bell correlation
+      const probs = simResult.data.probabilities || {};
+      const isSimRunBell = (probs['00'] ?? 0) > 0.4 && (probs['11'] ?? 0) > 0.4;
+      if (diagResult.meta.isFallback && predictionAnswer === 'CORRELATED_00_11' && isSimRunBell) {
         diagResult.data = {
           ...diagResult.data,
           isCorrectPrediction: true,
@@ -155,6 +164,7 @@ export default function BellStateLearnPage() {
             code: 'NO_SIGNAL',
             firstDivergenceStep: null,
             isCorrectPrediction: true,
+            repairChallengeId: 'ch_bell_psi_plus',
             evidence: {
               ...diagResult.data.misconceptionSignal?.evidence,
               prediction: 'CORRELATED_00_11',
@@ -182,12 +192,12 @@ export default function BellStateLearnPage() {
       setDiagnosis(diagResult.data);
 
       const isCorrect = Boolean(
-        predictionAnswer === 'CORRELATED_00_11' ||
-          diagResult.data.isCorrectPrediction ||
+        diagResult.data.isCorrectPrediction ||
           diagResult.data.misconceptionSignal?.isCorrectPrediction ||
           (diagResult.data.misconceptionSignal?.evidence?.prediction &&
             diagResult.data.misconceptionSignal.evidence.prediction ===
-              diagResult.data.misconceptionSignal.evidence.verifiedBehavior)
+              diagResult.data.misconceptionSignal.evidence.verifiedBehavior &&
+            diagResult.data.misconceptionSignal.evidence.verifiedBehavior === 'CORRELATED_00_11')
       );
 
       if (isCorrect) {
@@ -248,25 +258,117 @@ export default function BellStateLearnPage() {
     }
   };
 
-  const handleSubmitRepair = async () => {
+  // Check if activeCircuit is modified from the baseline starter Bell seed
+  const isCircuitModified = React.useMemo(() => {
+    if (!activeCircuit) return false;
+    const starterOps = DEMO_STARTER_CIRCUIT.operations;
+    const currentOps = activeCircuit.operations;
+    if (starterOps.length !== currentOps.length) return true;
+    for (let i = 0; i < starterOps.length; i++) {
+      if (
+        starterOps[i].gate !== currentOps[i]?.gate ||
+        starterOps[i].column !== currentOps[i]?.column ||
+        starterOps[i].targets[0] !== currentOps[i]?.targets[0]
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }, [activeCircuit]);
+
+  const handleResetToBellSeed = () => {
+    useCircuitStore.getState().setCircuit(DEMO_STARTER_CIRCUIT);
+  };
+
+  const activeChallenge = React.useMemo(() => {
+    if (selectedChallengeId === 'ch_bell_psi_plus') return DEMO_BRIDGE_CHALLENGE;
+    if (selectedChallengeId === 'ch_bell_repair') return DEMO_CHALLENGE;
+    const isConfirmed = Boolean(
+      diagnosis?.isCorrectPrediction ||
+      diagnosis?.misconceptionSignal?.isCorrectPrediction ||
+      diagnosis?.misconceptionSignal?.repairChallengeId === 'ch_bell_psi_plus'
+    );
+    return isConfirmed ? DEMO_BRIDGE_CHALLENGE : DEMO_CHALLENGE;
+  }, [selectedChallengeId, diagnosis]);
+
+  const activeChallengeAttempt = activeChallenge.id === 'ch_bell_psi_plus' ? bridgeAttempt : repairAttempt;
+
+  const handleSubmitChallenge = async () => {
+    const isBridge = activeChallenge.id === 'ch_bell_psi_plus';
+    const submittedCircuit = isBridge ? insituCircuit : DEMO_REPAIRED_CIRCUIT;
+    let currentSimRun = isBridge ? insituSimRun : simulationRun;
+
+    // If submitting bridge challenge before running inline test, execute simulation on the fly
+    if (isBridge && !currentSimRun) {
+      try {
+        const simRes = await apiClient.runSimulation({
+          learnerProfileId,
+          moduleId: moduleData.id,
+          circuitModel: submittedCircuit,
+          predictionResponse: {
+            checkpointId: moduleData.predictionCheckpoint?.id || 'pc_bell_outcomes',
+            answer: 'CORRELATED_00_11',
+          },
+          primaryAdapter: 'QISKIT_AER',
+          shots: 1024,
+        });
+        currentSimRun = simRes.data;
+        setInsituSimRun(simRes.data);
+      } catch {
+        // Fallback simulation handled below
+      }
+    }
+
+    const simRunId = currentSimRun?.id || (isBridge ? 'sr_demo_bridge_001' : 'sr_demo_002');
+
     try {
       const result = await challengeAttemptMutation.mutateAsync({
-        challengeId: DEMO_CHALLENGE.id,
+        challengeId: activeChallenge.id,
         learnerProfileId,
         submittedAnswer: {
           type: 'CIRCUIT_MODEL',
-          circuitModelId: DEMO_REPAIRED_CIRCUIT.id,
+          circuitModelId: submittedCircuit.id,
         },
-        simulationRunId: simulationRun?.id || 'sr_demo_002',
+        simulationRunId: simRunId,
       });
 
-      setRepairAttempt(result.data.challengeAttempt);
+      if (isBridge) {
+        setBridgeAttempt(result.data.challengeAttempt);
+      } else {
+        setRepairAttempt(result.data.challengeAttempt);
+      }
       setProgressRecord(result.data.progressRecord);
       setLatestRequestId(result.meta.requestId);
       setIsFallbackActive(result.meta.isFallback);
     } catch {
-      setRepairAttempt(DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt);
-      setProgressRecord(DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord);
+      if (isBridge) {
+        const simProbs =
+          currentSimRun?.probabilities ||
+          simulateFallbackCircuit(submittedCircuit, 1024).probabilities;
+        const isPassed = (simProbs['01'] ?? 0) > 0.4 && (simProbs['10'] ?? 0) > 0.4;
+        const fbAttempt: ChallengeAttempt = {
+          id: `ca_bridge_${Date.now().toString(36)}`,
+          challengeId: 'ch_bell_psi_plus',
+          learnerProfileId,
+          submittedAnswer: { type: 'CIRCUIT_MODEL', circuitModelId: submittedCircuit.id },
+          passed: isPassed,
+          score: isPassed ? 100 : 0,
+          feedbackCode: isPassed ? 'BELL_SUPPORT_CORRECT' : 'SUPPORT_MISMATCH',
+          attemptNumber: 1,
+          createdAt: new Date().toISOString(),
+        };
+        setBridgeAttempt(fbAttempt);
+        if (isPassed && progressRecord) {
+          setProgressRecord({
+            ...progressRecord,
+            totalPoints: progressRecord.totalPoints + 100,
+            latestChallengeAttemptId: fbAttempt.id,
+          });
+        }
+      } else {
+        setRepairAttempt(DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt);
+        setProgressRecord(DEMO_CHALLENGE_ATTEMPT_RESPONSE.progressRecord);
+      }
     }
   };
 
@@ -641,6 +743,33 @@ export default function BellStateLearnPage() {
               </div>
             )}
 
+            {isCircuitModified && (
+              <div
+                className="rounded-lg bg-caution/10 border border-caution/40 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-ink"
+                data-testid="circuit-variation-alert"
+              >
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-caution shrink-0" />
+                  <div>
+                    <span className="font-semibold text-caution">Circuit Variation Detected:</span>{' '}
+                    <span className="text-ink-dim">
+                      You modified the baseline Bell seed. Flight Recorder will diagnose this custom configuration.
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetToBellSeed}
+                  className="h-7 px-2.5 text-xs font-mono border-caution/40 text-caution hover:bg-caution/20 gap-1 shrink-0"
+                  data-testid="reset-bell-seed-btn"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Reset Bell Seed</span>
+                </Button>
+              </div>
+            )}
+
             <InteractiveCircuitWorkspace
               initialCircuit={DEMO_STARTER_CIRCUIT}
               isSimulating={isExecutingPipeline}
@@ -834,24 +963,62 @@ export default function BellStateLearnPage() {
 
           {/* STEP 6: Repair Challenge Card */}
           <div className={viewMode === 'step-by-step' && activeStep !== 6 ? 'hidden' : 'space-y-6 pt-4 border-t border-line'}>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="font-mono text-accent border-accent/40">
                   STEP 06 OF 07
                 </Badge>
                 <h2 className="text-base font-display font-semibold text-ink">
-                  Quantum Repair Challenge
+                  {activeChallenge.id === 'ch_bell_psi_plus'
+                    ? 'Near-Future Bridge Challenge'
+                    : 'Quantum Repair Challenge'}
                 </h2>
               </div>
-              <span className="text-xs font-mono text-caution">Restore Correlation</span>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center rounded-lg border border-line bg-abyss p-0.5 text-[10px] font-mono">
+                  <button
+                    onClick={() => setSelectedChallengeId('ch_bell_psi_plus')}
+                    className={`px-2 py-1 rounded transition-colors cursor-pointer ${
+                      activeChallenge.id === 'ch_bell_psi_plus'
+                        ? 'bg-accent/20 text-accent font-semibold'
+                        : 'text-ink-faint hover:text-ink-dim'
+                    }`}
+                    data-testid="select-bridge-challenge-btn"
+                  >
+                    Stage 2 Bridge (|Ψ+⟩)
+                  </button>
+                  <button
+                    onClick={() => setSelectedChallengeId('ch_bell_repair')}
+                    className={`px-2 py-1 rounded transition-colors cursor-pointer ${
+                      activeChallenge.id === 'ch_bell_repair'
+                        ? 'bg-accent/20 text-accent font-semibold'
+                        : 'text-ink-faint hover:text-ink-dim'
+                    }`}
+                    data-testid="select-remedial-challenge-btn"
+                  >
+                    Remedial Repair (|Φ+⟩)
+                  </button>
+                </div>
+              </div>
             </div>
 
             {hasSimulated && (
               <RepairChallengeCard
-                challenge={DEMO_CHALLENGE}
-                attempt={repairAttempt}
+                challenge={activeChallenge}
+                attempt={activeChallengeAttempt}
                 isSubmitting={challengeAttemptMutation.isPending}
-                onSubmitAttempt={handleSubmitRepair}
+                onSubmitAttempt={handleSubmitChallenge}
+                circuit={activeChallenge.id === 'ch_bell_psi_plus' ? insituCircuit : DEMO_REPAIRED_CIRCUIT}
+                onCircuitChange={(c) => {
+                  if (activeChallenge.id === 'ch_bell_psi_plus') {
+                    setInsituCircuit(c);
+                  }
+                }}
+                onSimulationRun={(s) => {
+                  if (activeChallenge.id === 'ch_bell_psi_plus') {
+                    setInsituSimRun(s);
+                  }
+                }}
               />
             )}
 

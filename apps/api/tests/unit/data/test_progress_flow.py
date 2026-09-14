@@ -54,6 +54,52 @@ async def test_get_challenge(client: AsyncClient, test_repo: DataRepositoryProto
     err = res_404.json()["detail"]
     assert err["code"] == "CHALLENGE_NOT_FOUND"
 
+    # 3. Teleportation bridge challenge
+    res_psi = await client.get("/v1/challenges/ch_bell_psi_plus")
+    assert res_psi.status_code == 200
+    data_psi = res_psi.json()["challenge"]
+    assert data_psi["id"] == "ch_bell_psi_plus"
+    assert data_psi["acceptanceRule"]["states"] == ["01", "10"]
+
+
+@pytest.mark.asyncio
+async def test_post_passing_psi_plus_bridge_attempt(
+    client: AsyncClient, test_repo: DataRepositoryProtocol
+) -> None:
+    """Proves posting a passing attempt for ch_bell_psi_plus succeeds on support [01, 10]."""
+    sim_run = SimulationRun(
+        id="sr_psi_pass_001",
+        learnerProfileId="lp_meera",
+        moduleId="mod_bell",
+        circuitModelId="cm_bell_psi_seed",
+        status="SUCCEEDED",
+        probabilities={"01": 0.5, "10": 0.5},
+        counts={"01": 512, "10": 512},
+        stateTrace=[],
+        createdAt=utc_now_iso(),
+    )
+    await test_repo.create_simulation_run(sim_run)
+
+    payload = {
+        "challengeId": "ch_bell_psi_plus",
+        "learnerProfileId": "lp_meera",
+        "submittedAnswer": {
+            "type": "CIRCUIT_MODEL",
+            "circuitModelId": "cm_bell_psi_seed",
+        },
+        "simulationRunId": "sr_psi_pass_001",
+    }
+    res = await client.post("/v1/challenge-attempts", json=payload)
+    assert res.status_code == 201
+    data = res.json()
+    attempt = data["challengeAttempt"]
+    assert attempt["challengeId"] == "ch_bell_psi_plus"
+    assert attempt["passed"] is True
+    assert attempt["score"] == 100
+    assert attempt["feedbackCode"] == "BELL_SUPPORT_CORRECT"
+    assert "mod_bell" in data["progressRecord"]["completedModuleIds"]
+
+
 
 @pytest.mark.asyncio
 async def test_post_passing_bell_attempt_twice_idempotency_and_atomic_progress(

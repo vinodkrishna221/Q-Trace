@@ -1,17 +1,23 @@
 'use client';
 
 import * as React from 'react';
-import { Challenge, ChallengeAttempt } from '@/lib/contracts';
+import { Challenge, ChallengeAttempt, CircuitModel, SimulationRun } from '@/lib/contracts';
+import { DEMO_BRIDGE_STARTER_CIRCUIT, DEMO_STARTER_CIRCUIT } from '@/lib/fixtures';
+import { InSituRepairWorkspace } from './in-situ-repair-workspace';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Wrench, CheckCircle2, Award, RefreshCw, Sparkles } from 'lucide-react';
+import { Wrench, CheckCircle2, Award, RefreshCw, Sparkles, Radio } from 'lucide-react';
 
 interface RepairChallengeCardProps {
   challenge: Challenge;
   attempt?: ChallengeAttempt | null;
   isSubmitting?: boolean;
   onSubmitAttempt: () => void;
+  circuit?: CircuitModel;
+  onCircuitChange?: (circuit: CircuitModel) => void;
+  onSimulationRun?: (simRun: SimulationRun) => void;
+  readOnly?: boolean;
 }
 
 export function RepairChallengeCard({
@@ -19,8 +25,14 @@ export function RepairChallengeCard({
   attempt,
   isSubmitting = false,
   onSubmitAttempt,
+  circuit,
+  onCircuitChange,
+  onSimulationRun,
+  readOnly = false,
 }: RepairChallengeCardProps) {
   const isPassed = attempt?.passed ?? false;
+  const isBridge = challenge.id === 'ch_bell_psi_plus';
+  const starterCircuit = circuit || (isBridge ? DEMO_BRIDGE_STARTER_CIRCUIT : DEMO_STARTER_CIRCUIT);
 
   return (
     <Card
@@ -31,7 +43,7 @@ export function RepairChallengeCard({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Badge variant="default" className="text-xs font-mono">
-              STEP 6 · REPAIR CHALLENGE
+              {isBridge ? 'STEP 6 · BRIDGE CHALLENGE' : 'STEP 6 · REPAIR CHALLENGE'}
             </Badge>
             <span className="text-[11px] font-mono text-ink-dim">
               +{challenge.points} Points Available
@@ -41,7 +53,11 @@ export function RepairChallengeCard({
         </div>
 
         <CardTitle className="text-base text-ink flex items-center gap-2 mt-1" data-testid="challenge-title">
-          <Wrench className="w-4 h-4 text-caution" />
+          {isBridge ? (
+            <Sparkles className="w-4 h-4 text-accent" />
+          ) : (
+            <Wrench className="w-4 h-4 text-caution" />
+          )}
           <span>{challenge.title}</span>
         </CardTitle>
         <CardDescription className="text-xs text-ink-dim" data-testid="challenge-prompt">
@@ -50,6 +66,23 @@ export function RepairChallengeCard({
       </CardHeader>
 
       <CardContent className="p-4 md:p-6 space-y-4">
+        {/* Stage 2 Quantum Teleportation Bridge Narrative */}
+        {isBridge && (
+          <div
+            className="rounded-lg border border-accent/40 bg-accent/10 p-3.5 space-y-1 font-mono text-xs"
+            data-testid="teleportation-bridge-narrative"
+          >
+            <div className="flex items-center gap-2 text-accent font-semibold">
+              <Radio className="w-4 h-4" />
+              <span>Bridge to Stage 2: Quantum Teleportation Protocol</span>
+            </div>
+            <p className="text-ink-dim text-[11px] leading-relaxed">
+              In Stage 2, Alice and Bob distribute an anti-correlated EPR pair |Ψ+⟩ = (|01⟩ + |10⟩)/√2.
+              By applying a Pauli-X gate to flip the second qubit from |Φ+⟩, you produce the exact entanglement channel required for teleportation.
+            </p>
+          </div>
+        )}
+
         {/* Acceptance Criteria */}
         <div className="rounded-lg border border-line bg-abyss p-4 font-mono text-xs space-y-2">
           <div className="flex justify-between items-center text-ink-dim">
@@ -70,8 +103,18 @@ export function RepairChallengeCard({
           </div>
         </div>
 
+        {/* Dedicated In-Situ Circuit Canvas */}
+        <InSituRepairWorkspace
+          initialCircuit={starterCircuit}
+          challengeId={challenge.id}
+          expectedStates={challenge.acceptanceRule.states}
+          onCircuitChange={onCircuitChange}
+          onSimulationRun={onSimulationRun}
+          readOnly={readOnly}
+        />
+
         {/* Attempt Feedback Box */}
-        {attempt && (
+        {attempt ? (
           <div
             className={`rounded-lg border p-4 font-mono text-xs space-y-2 ${
               isPassed
@@ -97,13 +140,33 @@ export function RepairChallengeCard({
               </strong>
             </div>
           </div>
+        ) : (
+          <div
+            className="rounded-lg border border-line bg-abyss/60 p-3.5 font-mono text-xs space-y-1.5 text-ink-dim"
+            data-testid="repair-unattempted-state"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-bold text-ink">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <span data-testid="repair-status-badge">CHALLENGE UNATTEMPTED</span>
+              </div>
+              <Badge variant="outline" className="text-[11px] font-mono text-ink-faint">
+                0 / {challenge.points} Points
+              </Badge>
+            </div>
+            <p className="text-[11px] text-ink-faint">
+              Configure the quantum circuit above and click &quot;Submit Challenge Attempt&quot; below to grade against Qiskit Aer.
+            </p>
+          </div>
         )}
       </CardContent>
 
       <CardFooter className="bg-raised/40 p-4 border-t border-line flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 text-xs text-ink-dim">
           <Award className="w-3.5 h-3.5 text-caution" />
-          <span>Targets misconception: <strong className="text-ink font-mono">SUPERPOSITION_VS_ENTANGLEMENT</strong></span>
+          <span>
+            Targets: <strong className="text-ink font-mono">{challenge.targetsMisconceptionCodes.join(', ') || 'ENTANGLEMENT'}</strong>
+          </span>
         </div>
 
         <Button
@@ -126,7 +189,7 @@ export function RepairChallengeCard({
           ) : (
             <>
               <Sparkles className="w-4 h-4 mr-2" />
-              <span>Submit Repair Attempt</span>
+              <span>Submit Challenge Attempt</span>
             </>
           )}
         </Button>

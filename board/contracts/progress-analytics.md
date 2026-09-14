@@ -1,4 +1,4 @@
-# Contract: progress-analytics                    version: 1
+# Contract: progress-analytics                    version: 2
 
 > OWNER: data-analytics · CONSUMERS: learning-ux, ai-pedagogy, fixtures-qa, story-ship
 > DEPENDS ON: circuit-simulation v1, flight-recorder-tutor v1
@@ -6,7 +6,7 @@
 
 ## GET /v1/challenges/{challengeId}
 
-RESPONSE 200
+RESPONSE 200 (Remedial Repair Challenge)
 ```json
 {
   "challenge": {
@@ -17,6 +17,23 @@ RESPONSE 200
     "prompt": "Repair the circuit so only 00 and 11 have non-zero ideal probability.",
     "starterCircuitModelId": "cm_bell_broken",
     "acceptanceRule": {"version": 1, "kind": "PROBABILITY_SUPPORT_EQUALS", "states": ["00", "11"], "epsilon": 0.000001},
+    "targetsMisconceptionCodes": ["SUPERPOSITION_VS_ENTANGLEMENT", "GATE_ORDER"],
+    "points": 100
+  }
+}
+```
+
+RESPONSE 200 (Near-Future Teleportation Bridge Challenge)
+```json
+{
+  "challenge": {
+    "id": "ch_bell_psi_plus",
+    "moduleId": "mod_bell",
+    "type": "CIRCUIT_REPAIR",
+    "title": "Teleportation Channel: Prepare Anti-Correlated Bell Pair",
+    "prompt": "Add a Pauli-X gate to produce an anti-correlated Bell pair (|01⟩ and |10⟩) for Stage 2 Quantum Teleportation.",
+    "starterCircuitModelId": "cm_bell_psi_seed",
+    "acceptanceRule": {"version": 1, "kind": "PROBABILITY_SUPPORT_EQUALS", "states": ["01", "10"], "epsilon": 0.000001},
     "targetsMisconceptionCodes": ["SUPERPOSITION_VS_ENTANGLEMENT", "GATE_ORDER"],
     "points": 100
   }
@@ -112,3 +129,4 @@ type ProgressRecord = { id: string; learnerProfileId: string; completedModuleIds
 ## Changelog
 
 - v1 2026-08-23: initial Challenge, atomic Challenge Attempt/Progress Record and aggregate Instructor Insight contracts.
+- v2 2026-09-14: added near-future teleportation bridge challenge ch_bell_psi_plus for anti-correlated Bell pair preparation.

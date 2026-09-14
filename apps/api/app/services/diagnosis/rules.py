@@ -353,16 +353,34 @@ def apply_rules(
 
     # For correct predictions, there is no conceptual divergence.
     first_div = None if is_correct else rule.first_divergence_step
-    step_indexes = (
-        tuple(range(len(state_trace)))
-        if is_correct and len(state_trace) > 1
-        else rule.state_trace_step_indexes
-    )
-    evidence_keys = (
-        ("stateTrace.0.basisProbabilities", "stateTrace.1.basisProbabilities")
+    if first_div is not None and first_div >= len(state_trace):
+        first_div = 0
+    if len(state_trace) == 1 and not is_correct:
+        first_div = 0
+
+    # Bound step indexes to valid range within len(state_trace)
+    if is_correct:
+        step_indexes = tuple(range(len(state_trace)))
+    else:
+        bounded = tuple(idx for idx in rule.state_trace_step_indexes if idx < len(state_trace))
+        step_indexes = bounded if bounded else (0,)
+
+    # Bound evidence keys to only those referencing valid step indexes within len(state_trace)
+    raw_keys = (
+        tuple(f"stateTrace.{i}.basisProbabilities" for i in range(len(state_trace)))
         if is_correct
         else rule.evidence_keys
     )
+    valid_keys = []
+    for key in raw_keys:
+        parts = key.split(".")
+        if len(parts) >= 2 and parts[0] == "stateTrace" and parts[1].isdigit():
+            step_idx = int(parts[1])
+            if step_idx < len(state_trace):
+                valid_keys.append(key)
+    if not valid_keys:
+        valid_keys = ["stateTrace.0.basisProbabilities"]
+    evidence_keys = tuple(valid_keys)
 
     if is_correct:
         pred_desc = "Correctly predicted entangled Bell state correlation"

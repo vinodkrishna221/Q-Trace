@@ -27,13 +27,17 @@ import {
   ExportOpenQasm3Response,
   TutorChatRequest,
   TutorChatResponse,
+  StateTraceStep,
+  CircuitModel,
 } from './contracts';
 import { generateOpenQasm3 } from '@/features/circuit/circuit-qasm-exporter';
 import {
   DEMO_SIMULATION_RUN,
+  DEMO_STARTER_CIRCUIT,
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
   DEMO_TUTOR_RESPONSE,
   DEMO_CHALLENGE,
+  DEMO_BRIDGE_CHALLENGE,
   DEMO_CHALLENGE_ATTEMPT_RESPONSE,
   DEMO_PROGRESS_RECORDS,
   DEMO_INSTRUCTOR_INSIGHT,
@@ -137,6 +141,214 @@ async function requestJson<T>(
   }
 }
 
+interface ComplexNumber {
+  re: number;
+  im: number;
+}
+
+export const fallbackSimulationRuns = new Map<string, SimulationRun>();
+
+export function simulateFallbackCircuit(circuit: CircuitModel, shots: number = 1024): {
+  probabilities: Record<string, number>;
+  counts: Record<string, number>;
+  stateTrace: StateTraceStep[];
+} {
+  const ops = [...(circuit.operations || [])].sort((a, b) => a.column - b.column);
+
+  let state: Record<string, ComplexNumber> = {
+    '00': { re: 1.0, im: 0.0 },
+    '01': { re: 0.0, im: 0.0 },
+    '10': { re: 0.0, im: 0.0 },
+    '11': { re: 0.0, im: 0.0 },
+  };
+
+  const traceSteps: StateTraceStep[] = [];
+  let stepIndex = 0;
+
+  for (const op of ops) {
+    if (op.gate === 'MEASURE') continue;
+
+    const nextState: Record<string, ComplexNumber> = {
+      '00': { ...state['00'] },
+      '01': { ...state['01'] },
+      '10': { ...state['10'] },
+      '11': { ...state['11'] },
+    };
+
+    const target = op.targets[0] ?? 0;
+    const control = op.controls?.[0] ?? 0;
+
+    if (op.gate === 'H') {
+      if (target === 0) {
+        for (const b1 of ['0', '1']) {
+          const s0 = state['0' + b1];
+          const s1 = state['1' + b1];
+          nextState['0' + b1] = {
+            re: (s0.re + s1.re) / Math.SQRT2,
+            im: (s0.im + s1.im) / Math.SQRT2,
+          };
+          nextState['1' + b1] = {
+            re: (s0.re - s1.re) / Math.SQRT2,
+            im: (s0.im - s1.im) / Math.SQRT2,
+          };
+        }
+      } else if (target === 1) {
+        for (const b0 of ['0', '1']) {
+          const s0 = state[b0 + '0'];
+          const s1 = state[b0 + '1'];
+          nextState[b0 + '0'] = {
+            re: (s0.re + s1.re) / Math.SQRT2,
+            im: (s0.im + s1.im) / Math.SQRT2,
+          };
+          nextState[b0 + '1'] = {
+            re: (s0.re - s1.re) / Math.SQRT2,
+            im: (s0.im - s1.im) / Math.SQRT2,
+          };
+        }
+      }
+    } else if (op.gate === 'X') {
+      if (target === 0) {
+        for (const b1 of ['0', '1']) {
+          nextState['0' + b1] = state['1' + b1];
+          nextState['1' + b1] = state['0' + b1];
+        }
+      } else if (target === 1) {
+        for (const b0 of ['0', '1']) {
+          nextState[b0 + '0'] = state[b0 + '1'];
+          nextState[b0 + '1'] = state[b0 + '0'];
+        }
+      }
+    } else if (op.gate === 'Z') {
+      if (target === 0) {
+        for (const b1 of ['0', '1']) {
+          nextState['1' + b1] = { re: -state['1' + b1].re, im: -state['1' + b1].im };
+        }
+      } else if (target === 1) {
+        for (const b0 of ['0', '1']) {
+          nextState[b0 + '1'] = { re: -state[b0 + '1'].re, im: -state[b0 + '1'].im };
+        }
+      }
+    } else if (op.gate === 'CNOT') {
+      if (control === 0 && target === 1) {
+        nextState['10'] = state['11'];
+        nextState['11'] = state['10'];
+      } else if (control === 1 && target === 0) {
+        nextState['01'] = state['11'];
+        nextState['11'] = state['01'];
+      }
+    }
+
+    state = nextState;
+
+    const probs: Record<string, number> = {};
+    for (const key of ['00', '01', '10', '11']) {
+      const p = state[key].re ** 2 + state[key].im ** 2;
+      probs[key] = Math.round(p * 1000000) / 1000000;
+    }
+
+    const p0_0 = (probs['00'] || 0) + (probs['01'] || 0);
+    const p0_1 = (probs['10'] || 0) + (probs['11'] || 0);
+    const rho0_01_re =
+      state['00'].re * state['10'].re +
+      state['00'].im * state['10'].im +
+      state['01'].re * state['11'].re +
+      state['01'].im * state['11'].im;
+    const rho0_01_im =
+      state['00'].im * state['10'].re -
+      state['00'].re * state['10'].im +
+      state['01'].im * state['11'].re -
+      state['01'].re * state['11'].im;
+    const purity0 = p0_0 ** 2 + p0_1 ** 2 + 2 * (rho0_01_re ** 2 + rho0_01_im ** 2);
+    const bloch0 = {
+      x: Math.round(2 * rho0_01_re * 1000) / 1000,
+      y: Math.round(-2 * rho0_01_im * 1000) / 1000,
+      z: Math.round((p0_0 - p0_1) * 1000) / 1000,
+    };
+
+    const p1_0 = (probs['00'] || 0) + (probs['10'] || 0);
+    const p1_1 = (probs['01'] || 0) + (probs['11'] || 0);
+    const rho1_01_re =
+      state['00'].re * state['01'].re +
+      state['00'].im * state['01'].im +
+      state['10'].re * state['11'].re +
+      state['10'].im * state['11'].im;
+    const rho1_01_im =
+      state['00'].im * state['01'].re -
+      state['00'].re * state['01'].im +
+      state['10'].im * state['11'].re -
+      state['10'].re * state['11'].im;
+    const purity1 = p1_0 ** 2 + p1_1 ** 2 + 2 * (rho1_01_re ** 2 + rho1_01_im ** 2);
+    const bloch1 = {
+      x: Math.round(2 * rho1_01_re * 1000) / 1000,
+      y: Math.round(-2 * rho1_01_im * 1000) / 1000,
+      z: Math.round((p1_0 - p1_1) * 1000) / 1000,
+    };
+
+    traceSteps.push({
+      stepIndex,
+      operationId: op.opId,
+      label: `After ${op.gate}`,
+      basisProbabilities: { ...probs },
+      amplitudes: {
+        '00': { ...state['00'] },
+        '01': { ...state['01'] },
+        '10': { ...state['10'] },
+        '11': { ...state['11'] },
+      },
+      reducedQubits: [
+        {
+          qubit: 0,
+          bloch: bloch0,
+          purity: Math.round(purity0 * 1000) / 1000,
+          label: purity0 < 0.9 ? 'MIXED_SUBSYSTEM' : 'PURE_SUBSYSTEM',
+        },
+        {
+          qubit: 1,
+          bloch: bloch1,
+          purity: Math.round(purity1 * 1000) / 1000,
+          label: purity1 < 0.9 ? 'MIXED_SUBSYSTEM' : 'PURE_SUBSYSTEM',
+        },
+      ],
+    });
+    stepIndex++;
+  }
+
+  if (traceSteps.length === 0) {
+    traceSteps.push({
+      stepIndex: 0,
+      operationId: 'op_init',
+      label: 'Initial State',
+      basisProbabilities: { '00': 1.0, '01': 0.0, '10': 0.0, '11': 0.0 },
+      amplitudes: {
+        '00': { re: 1.0, im: 0.0 },
+        '01': { re: 0.0, im: 0.0 },
+        '10': { re: 0.0, im: 0.0 },
+        '11': { re: 0.0, im: 0.0 },
+      },
+      reducedQubits: [
+        { qubit: 0, bloch: { x: 0, y: 0, z: 1 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+        { qubit: 1, bloch: { x: 0, y: 0, z: 1 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+      ],
+    });
+  }
+
+  const finalProbs = traceSteps[traceSteps.length - 1].basisProbabilities;
+  const filteredProbs: Record<string, number> = {};
+  const counts: Record<string, number> = {};
+  for (const [k, v] of Object.entries(finalProbs)) {
+    if (v > 0) {
+      filteredProbs[k] = v;
+      counts[k] = Math.round(v * shots);
+    }
+  }
+
+  return {
+    probabilities: Object.keys(filteredProbs).length > 0 ? filteredProbs : { '00': 1.0 },
+    counts: Object.keys(counts).length > 0 ? counts : { '00': shots },
+    stateTrace: traceSteps,
+  };
+}
+
 export const apiClient = {
   /**
    * POST /v1/simulation-runs
@@ -154,6 +366,7 @@ export const apiClient = {
         },
         payload.learnerProfileId
       );
+      fallbackSimulationRuns.set(data.simulationRun.id, data.simulationRun);
       return {
         data: data.simulationRun,
         meta: {
@@ -165,21 +378,37 @@ export const apiClient = {
     } catch (err: unknown) {
       const errorObj = err as { message?: string; status?: number; code?: string };
       // Only treat explicit backend application simulation timeouts as engine timeouts.
-      // Infrastructure/proxy 504 Gateway Timeouts (e.g. Render container cold starts) fall back gracefully to DEMO_SIMULATION_RUN.
+      // Infrastructure/proxy 504 Gateway Timeouts (e.g. Render container cold starts) fall back gracefully.
       const isEngineTimeout = errorObj?.code === 'SIMULATION_TIMEOUT';
       if (isEngineTimeout) {
         throw err;
       }
 
-      // Offline / DEMO_LOCAL fallback path
+      // Offline / DEMO_LOCAL fallback path with accurate 2-qubit state evaluation
+      const simulated = simulateFallbackCircuit(payload.circuitModel, payload.shots || 1024);
+      const isStarterBell =
+        payload.circuitModel.id === DEMO_STARTER_CIRCUIT.id ||
+        payload.circuitModel.id === 'cm_bell_seed';
+      const fallbackRunId = isStarterBell
+        ? DEMO_SIMULATION_RUN.id
+        : `sr_fb_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
+
       const fallbackRun: SimulationRun = {
         ...DEMO_SIMULATION_RUN,
+        id: fallbackRunId,
         learnerProfileId: payload.learnerProfileId,
         moduleId: payload.moduleId,
         circuitModelId: payload.circuitModel.id,
         predictionResponse: payload.predictionResponse,
+        probabilities: simulated.probabilities,
+        counts: simulated.counts,
+        stateTrace: simulated.stateTrace,
         createdAt: new Date().toISOString(),
       };
+      fallbackSimulationRuns.set(fallbackRun.id, fallbackRun);
+      if (isStarterBell) {
+        fallbackSimulationRuns.set(DEMO_SIMULATION_RUN.id, fallbackRun);
+      }
       return {
         data: fallbackRun,
         meta: {
@@ -216,6 +445,34 @@ export const apiClient = {
         },
       };
     } catch {
+      const simRun = fallbackSimulationRuns.get(payload.simulationRunId);
+      const prediction = simRun?.predictionResponse?.answer || 'INDEPENDENT_RANDOM';
+      const probs = simRun?.probabilities || {};
+      const isProductState00 = (probs['00'] ?? 0) > 0.99;
+      const isBellPhiPlus = (probs['00'] ?? 0) > 0.4 && (probs['11'] ?? 0) > 0.4;
+      const isBellPsiPlus = (probs['01'] ?? 0) > 0.4 && (probs['10'] ?? 0) > 0.4;
+
+      const isCorrectPrediction = isBellPhiPlus && prediction === 'CORRELATED_00_11';
+      const traceLen = simRun?.stateTrace?.length ?? 2;
+      const divergenceStep = isCorrectPrediction ? null : Math.min(1, Math.max(0, traceLen - 1));
+      const stepIdx = traceLen === 1 ? 0 : 1;
+
+      const misconceptionCode = isCorrectPrediction
+        ? 'NO_SIGNAL'
+        : isProductState00
+        ? 'GATE_ORDER'
+        : DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal.code;
+
+      const repairChallengeId = isCorrectPrediction
+        ? 'ch_bell_psi_plus'
+        : 'ch_bell_repair';
+
+      const verifiedBehavior = isProductState00
+        ? 'INDEPENDENT_00_PRODUCT'
+        : isBellPsiPlus
+        ? 'ANTI_CORRELATED_01_10'
+        : 'CORRELATED_00_11';
+
       return {
         data: {
           ...DEMO_FLIGHT_RECORDER_DIAGNOSIS,
@@ -223,9 +480,29 @@ export const apiClient = {
             ...DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal,
             learnerProfileId: payload.learnerProfileId,
             simulationRunId: payload.simulationRunId,
+            code: misconceptionCode,
+            firstDivergenceStep: divergenceStep,
+            evidence: {
+              ...DEMO_FLIGHT_RECORDER_DIAGNOSIS.misconceptionSignal.evidence,
+              prediction,
+              verifiedBehavior,
+              stateTraceStepIndexes: [stepIdx],
+            },
+            repairChallengeId,
+            isCorrectPrediction,
             createdAt: new Date().toISOString(),
           },
-          isCorrectPrediction: false,
+          replay:
+            traceLen === 1
+              ? [
+                  {
+                    stepIndex: 0,
+                    headline: 'Superposition missing',
+                    evidenceKeys: ['stateTrace.0.basisProbabilities'],
+                  },
+                ]
+              : DEMO_FLIGHT_RECORDER_DIAGNOSIS.replay,
+          isCorrectPrediction,
         },
         meta: {
           requestId: `req_fb_${Date.now().toString(36)}`,
@@ -261,6 +538,42 @@ export const apiClient = {
         },
       };
     } catch {
+      const simRun = fallbackSimulationRuns.get(payload.simulationRunId);
+      const traceLen = simRun?.stateTrace?.length ?? 2;
+      const isSingleStep = traceLen === 1;
+
+      if (isSingleStep) {
+        return {
+          data: {
+            tutorResponse: {
+              responseId: `tr_fb_${Date.now().toString(36)}`,
+              intent: payload.intent,
+              summary:
+                'Without superposition on qubit 0, the CNOT operation acted on |00⟩ leaving the system in a deterministic product state.',
+              steps: [
+                {
+                  title: 'After CNOT',
+                  body: 'Without superposition on qubit 0, the system remained in product state |00⟩.',
+                  evidenceKeys: ['stateTrace.0.basisProbabilities'],
+                },
+              ],
+              numericalClaims: [
+                { claim: 'P(00)=1.0', evidenceKey: 'stateTrace.0.basisProbabilities.00' },
+              ],
+              repairChallengeId: 'ch_bell_repair',
+              fallbackUsed: true,
+              model: 'DEMO_FALLBACK',
+              safetyNote: 'Explanation is grounded in this Simulation Run; it is not a hardware claim.',
+            },
+          },
+          meta: {
+            requestId: `req_fb_${Date.now().toString(36)}`,
+            isFallback: true,
+            durationMs: Date.now() - startTime,
+          },
+        };
+      }
+
       const summary =
         payload.learnerRole === 'PHYSICS_TO_CODE'
           ? 'The Hadamard transformation H prepares product state (|00⟩+|10⟩)/√2; CNOT maps it to entangled Bell state |Φ+⟩=(|00⟩+|11⟩)/√2. Reduced subsystems are maximally mixed (purity 0.5), demonstrating non-separable state correlation.'
@@ -357,8 +670,12 @@ export const apiClient = {
         meta: { requestId, isFallback: false },
       };
     } catch {
+      const challenge =
+        challengeId === 'ch_bell_psi_plus'
+          ? DEMO_BRIDGE_CHALLENGE
+          : DEMO_CHALLENGE;
       return {
-        data: { challenge: DEMO_CHALLENGE },
+        data: { challenge },
         meta: { requestId: `req_fb_${Date.now().toString(36)}`, isFallback: true },
       };
     }
@@ -389,13 +706,48 @@ export const apiClient = {
         },
       };
     } catch {
+      const targetChallenge =
+        payload.challengeId === 'ch_bell_psi_plus'
+          ? DEMO_BRIDGE_CHALLENGE
+          : DEMO_CHALLENGE;
+      const simRun = payload.simulationRunId
+        ? fallbackSimulationRuns.get(payload.simulationRunId)
+        : undefined;
+      const targetStates = targetChallenge.acceptanceRule.states || ['00', '11'];
+
+      let passed = false;
+      let feedbackCode = 'SUPPORT_MISMATCH';
+
+      if (simRun?.probabilities) {
+        const nonzeroStates = Object.entries(simRun.probabilities)
+          .filter(([_, p]) => p > 0.001)
+          .map(([s]) => s)
+          .sort();
+        const expectedStates = [...targetStates].sort();
+        if (
+          nonzeroStates.length === expectedStates.length &&
+          nonzeroStates.every((s, i) => s === expectedStates[i])
+        ) {
+          passed = true;
+          feedbackCode = 'BELL_SUPPORT_CORRECT';
+        }
+      } else {
+        passed = true;
+        feedbackCode = 'BELL_SUPPORT_CORRECT';
+      }
+
       return {
         data: {
           challengeAttempt: {
             ...DEMO_CHALLENGE_ATTEMPT_RESPONSE.challengeAttempt,
+            id: `ca_fb_${Date.now().toString(36)}`,
             challengeId: payload.challengeId,
             learnerProfileId: payload.learnerProfileId,
             simulationRunId: payload.simulationRunId || 'sr_demo_002',
+            submittedAnswer: payload.submittedAnswer,
+            passed,
+            score: passed ? 100 : 0,
+            feedbackCode,
             createdAt: new Date().toISOString(),
           },
           progressRecord: {

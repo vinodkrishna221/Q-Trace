@@ -156,6 +156,22 @@ CORE_CIRCUIT_MODELS: list[CircuitModel] = [
         openQasm3=None,
         modelVersion=1,
     ),
+    CircuitModel(
+        id="cm_bell_psi_seed",
+        name="Teleportation Channel Seed (Psi+ Starter)",
+        qubitCount=2,
+        classicalBitCount=2,
+        operations=[
+            Operation(opId="op_psi_1", gate="H", targets=[0], controls=[], classicalTargets=[], column=0),
+            Operation(opId="op_psi_2", gate="CNOT", targets=[1], controls=[0], classicalTargets=[], column=1),
+            Operation(opId="op_psi_3", gate="MEASURE", targets=[0], controls=[], classicalTargets=[0], column=3),
+            Operation(opId="op_psi_4", gate="MEASURE", targets=[1], controls=[], classicalTargets=[1], column=3),
+        ],
+        source="SEED",
+        ownerLearnerProfileId=None,
+        openQasm3=None,
+        modelVersion=1,
+    ),
 ]
 
 
@@ -229,6 +245,23 @@ CORE_CHALLENGES: list[Challenge] = [
         points=100,
         schemaVersion=1,
     ),
+    Challenge(
+        id="ch_bell_psi_plus",
+        moduleId="mod_bell",
+        type="CIRCUIT_REPAIR",
+        title="Teleportation Channel: Prepare Anti-Correlated Bell Pair",
+        prompt="Add a Pauli-X gate to produce an anti-correlated Bell pair (|01⟩ and |10⟩) for Stage 2 Quantum Teleportation.",
+        starterCircuitModelId="cm_bell_psi_seed",
+        acceptanceRule={
+            "version": 1,
+            "kind": "PROBABILITY_SUPPORT_EQUALS",
+            "states": ["01", "10"],
+            "epsilon": 0.000001,
+        },
+        targetsMisconceptionCodes=["SUPERPOSITION_VS_ENTANGLEMENT", "GATE_ORDER"],
+        points=100,
+        schemaVersion=1,
+    ),
 ]
 
 
@@ -293,7 +326,7 @@ CORE_MODULES: list[Module] = [
         ],
         predictionCheckpointId="pc_bell_outcomes",
         starterCircuitModelId="cm_bell_seed",
-        challengeIds=["ch_bell_quiz", "ch_bell_repair"],
+        challengeIds=["ch_bell_quiz", "ch_bell_repair", "ch_bell_psi_plus"],
         schemaVersion=1,
     ),
 ]

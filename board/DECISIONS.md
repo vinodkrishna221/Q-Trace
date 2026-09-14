@@ -62,3 +62,9 @@ CHOSE: Redesign `/learn` into a sequential step-by-step learning progression wit
 BECAUSE: Learners need progressive mental-model construction (superposition → measurement → entanglement) without cognitive overload, and future algorithm placeholders clarify platform trajectory.
 AFFECTS: apps/web/app/(app)/learn/page.tsx, apps/web/features/learning/learn-sidebar.tsx, learn-layout.test.tsx.
 
+### 13 · Near-Future Bridge Challenge & In-Situ Repair Workspace   14 Sep 2026 · by Vinod + team
+CHOSE: Add near-future bridge challenge ch_bell_psi_plus (|Ψ+⟩ preparation for Stage 2 Teleportation) with in-situ circuit workspace in Step 6; bound diagnosis and fallback tutor to verified trace length.
+BECAUSE: Solves Step 2 / Step 6 circuit redundancy, eliminates false-positive prediction bypass, and prevents HTTP 422 errors when broken circuits are simulated.
+AFFECTS: board/contracts/progress-analytics.md (v2), apps/api (diagnosis, tutor, seeds, progress), apps/web (in-situ workspace, repair challenge, learn page).
+
+

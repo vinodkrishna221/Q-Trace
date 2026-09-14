@@ -30,8 +30,8 @@ async def test_seed_twice_idempotency_no_duplicates(repo: InMemoryRepository) ->
     assert counts1["instructor_profiles"] == 1
     assert counts1["learning_paths"] == 2
     assert counts1["prediction_checkpoints"] == 1
-    assert counts1["circuit_models"] == 2
-    assert counts1["challenges"] == 4
+    assert counts1["circuit_models"] == 3
+    assert counts1["challenges"] == 5
     assert counts1["modules"] == 3
     assert counts1["progress_records"] == 2
 
@@ -223,6 +223,12 @@ async def test_retrieval_of_circuit_models(repo: InMemoryRepository) -> None:
     assert broken_cm.operations[0].gate == "CNOT"
     assert broken_cm.operations[1].gate == "H"
 
+    # 3. Teleportation Channel Psi+ Starter Seed
+    psi_cm = await repo.get_circuit_model("cm_bell_psi_seed")
+    assert psi_cm is not None
+    assert psi_cm.id == "cm_bell_psi_seed"
+    assert psi_cm.qubitCount == 2
+
 
 @pytest.mark.asyncio
 async def test_retrieval_of_challenges(repo: InMemoryRepository) -> None:
@@ -242,12 +248,22 @@ async def test_retrieval_of_challenges(repo: InMemoryRepository) -> None:
     assert "SUPERPOSITION_VS_ENTANGLEMENT" in repair_ch.targetsMisconceptionCodes
     assert "GATE_ORDER" in repair_ch.targetsMisconceptionCodes
 
+    # Near-future Bridge Challenge
+    bridge_ch = await repo.get_challenge("ch_bell_psi_plus")
+    assert bridge_ch is not None
+    assert bridge_ch.id == "ch_bell_psi_plus"
+    assert bridge_ch.moduleId == "mod_bell"
+    assert bridge_ch.type == "CIRCUIT_REPAIR"
+    assert bridge_ch.starterCircuitModelId == "cm_bell_psi_seed"
+    assert bridge_ch.acceptanceRule["states"] == ["01", "10"]
+
     # Bell module challenge list
     bell_challenges = await repo.list_challenges_by_module("mod_bell")
-    assert len(bell_challenges) == 2
+    assert len(bell_challenges) == 3
     ch_ids = [c.id for c in bell_challenges]
     assert "ch_bell_quiz" in ch_ids
     assert "ch_bell_repair" in ch_ids
+    assert "ch_bell_psi_plus" in ch_ids
 
 
 @pytest.mark.asyncio

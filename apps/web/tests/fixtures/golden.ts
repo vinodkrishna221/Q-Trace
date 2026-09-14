@@ -23,6 +23,8 @@ export const GOLDEN_IDS = {
   misconceptionSignalId: "ms_demo_001",
   tutorResponseId: "tr_demo_001",
   challengeId: "ch_bell_repair",
+  bridgeChallengeId: "ch_bell_psi_plus",
+  bridgeCircuitModelId: "cm_bell_psi_seed",
   challengeAttemptId: "ca_demo_001",
   progressRecordId: "progress_lp_aarav",
   instructorId: "instructor_rao",
@@ -190,3 +192,24 @@ export const GOLDEN_UNSUPPORTED_GATE_ERROR = {
     },
   },
 } as const;
+
+// ─── Bridge Challenge Fixture ──────────────────────────────────────────────────
+
+export const GOLDEN_BRIDGE_CHALLENGE = {
+  id: "ch_bell_psi_plus",
+  moduleId: "mod_bell",
+  type: "CIRCUIT_REPAIR",
+  title: "Teleportation Channel: Prepare Anti-Correlated Bell Pair",
+  prompt: "Add a Pauli-X gate to produce an anti-correlated Bell pair (|01⟩ and |10⟩) for Stage 2 Quantum Teleportation.",
+  starterCircuitModelId: "cm_bell_psi_seed",
+  acceptanceRule: {
+    version: 1,
+    kind: "PROBABILITY_SUPPORT_EQUALS",
+    states: ["01", "10"],
+    epsilon: 0.000001,
+  },
+  targetsMisconceptionCodes: ["SUPERPOSITION_VS_ENTANGLEMENT", "GATE_ORDER"],
+  points: 100,
+  schemaVersion: 1,
+} as const;
+

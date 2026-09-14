@@ -14,7 +14,7 @@ import {
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
   DEMO_TUTOR_RESPONSE,
 } from '@/lib/fixtures';
-import { DiagnoseResponse } from '@/lib/contracts';
+import { DiagnoseResponse, TutorExplanation } from '@/lib/contracts';
 
 describe('Flight Recorder False-Positive Bug & Inline AI Tutor Integration', () => {
   const CORRECT_DIAGNOSIS: DiagnoseResponse = {

@@ -448,6 +448,24 @@ class TestGradingMath:
         )
         assert passed is True
 
+    def test_psi_plus_bridge_challenge_passes(self):
+        """Teleportation channel target states {01, 10} pass grading."""
+        passed, code = self._grade_circuit_repair(
+            {"01": 0.5, "10": 0.5},
+            required_states=["01", "10"],
+        )
+        assert passed is True
+        assert code == "BELL_SUPPORT_CORRECT"
+
+    def test_psi_plus_bridge_challenge_fails_on_standard_bell(self):
+        """Standard Bell pair {00, 11} fails psi+ challenge expecting {01, 10}."""
+        passed, code = self._grade_circuit_repair(
+            {"00": 0.5, "11": 0.5},
+            required_states=["01", "10"],
+        )
+        assert passed is False
+        assert code == "BELL_SUPPORT_INCORRECT"
+
     def test_extraneous_state_above_epsilon_fails(self):
         """Any state outside {00,11} with p > epsilon is a repair failure."""
         passed, code = self._grade_circuit_repair({"00": 0.4, "11": 0.4, "01": 0.2})

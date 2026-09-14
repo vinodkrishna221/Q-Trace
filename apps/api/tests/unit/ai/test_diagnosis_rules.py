@@ -306,3 +306,18 @@ def test_all_rules_have_repair_challenge_id() -> None:
         assert rule.repair_challenge_id, (
             f"Rule {rule.code!r} has empty repair_challenge_id"
         )
+
+
+# ---------------------------------------------------------------------------
+# 15. 1-step trace bounding: first_divergence_step is clamped to 0
+# ---------------------------------------------------------------------------
+
+def test_apply_rules_1_step_trace_bounds_indexes_and_keys() -> None:
+    """Proves 1-step traces clamp first_divergence_step to 0 and cite only step 0 keys."""
+    single_step_trace = [BELL_STATE_TRACE[0]]
+    result = apply_rules("INDEPENDENT_RANDOM", single_step_trace)
+    assert result.first_divergence_step == 0
+    assert result.state_trace_step_indexes == (0,)
+    assert all(k.startswith("stateTrace.0") for k in result.evidence_keys)
+    assert "stateTrace.0.basisProbabilities" in result.evidence_keys
+

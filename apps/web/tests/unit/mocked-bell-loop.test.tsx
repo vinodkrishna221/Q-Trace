@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { render } from '../test-utils';
 import BellStateLearnPage from '@/app/(app)/learn/bell-state/page';
 import { useRoleStore } from '@/lib/role-store';
@@ -153,7 +153,7 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
     );
   });
 
-  it('verifies Repair Challenge execution and Progress Record mastery update', () => {
+  it('verifies Repair Challenge execution and Progress Record mastery update', async () => {
     render(<BellStateLearnPage />);
 
     // Repair challenge card checks
@@ -162,8 +162,16 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
       'Repair the circuit so only 00 and 11 have non-zero ideal probability.'
     );
 
-    // Initial attempt feedback
-    expect(screen.getByTestId('repair-status-badge').textContent).toBe('REPAIR ATTEMPT PASSED');
+    // Initial attempt feedback starts unattempted per clean lifecycle
+    expect(screen.getByTestId('repair-status-badge').textContent).toBe('CHALLENGE UNATTEMPTED');
+
+    // Submit Repair Challenge execution
+    const submitRepairBtn = screen.getByTestId('submit-repair-btn');
+    fireEvent.click(submitRepairBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('repair-status-badge').textContent).toBe('REPAIR ATTEMPT PASSED');
+    });
     expect(screen.getByTestId('repair-feedback-code').textContent).toBe('BELL_SUPPORT_CORRECT');
 
     // Progress record checks
