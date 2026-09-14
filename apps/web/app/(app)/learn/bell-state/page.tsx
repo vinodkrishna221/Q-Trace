@@ -23,7 +23,8 @@ import {
   useTutorExplainMutation,
   useChallengeAttemptMutation,
 } from '@/lib/hooks/use-quantum-api';
-import { apiClient, simulateFallbackCircuit } from '@/lib/api-client';
+import { apiClient, simulateFallbackCircuit, fallbackSimulationRuns } from '@/lib/api-client';
+import { sortOperations } from '@/features/circuit/circuit-parser';
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
@@ -65,6 +66,7 @@ import {
   DiagnoseResponse,
   TutorExplanation,
   CircuitModel,
+  Operation,
 } from '@/lib/contracts';
 
 export default function BellStateLearnPage() {
@@ -129,10 +131,8 @@ export default function BellStateLearnPage() {
       const savedDraft = getPredictionDraft(learnerProfileId, moduleData.id);
       const predictionAnswer = savedDraft?.answer || 'INDEPENDENT_RANDOM';
       const rawTarget = circuitOverride || activeCircuit || DEMO_STARTER_CIRCUIT;
-      const isBlankBuilder =
-        rawTarget.id === DEMO_BELL_BUILDER_STARTER.id ||
-        (rawTarget.operations.length <= 2 &&
-          rawTarget.operations.every((op) => op.gate === 'MEASURE'));
+      const hasQuantumGates = rawTarget.operations.some((op) => op.gate !== 'MEASURE');
+      const isBlankBuilder = !hasQuantumGates;
       const targetCircuit = isBlankBuilder ? DEMO_STARTER_CIRCUIT : rawTarget;
 
       // 1. Run simulation via TanStack Query mutation
@@ -274,27 +274,24 @@ export default function BellStateLearnPage() {
     const builderOps = DEMO_BELL_BUILDER_STARTER.operations;
     const currentOps = activeCircuit.operations;
 
-    // Fresh builder state is valid initial state
-    const matchesBuilder =
-      builderOps.length === currentOps.length &&
-      builderOps.every(
+    const isEquivalentOps = (opsA: Operation[], opsB: Operation[]) => {
+      if (opsA.length !== opsB.length) return false;
+      const sortedA = sortOperations(opsA);
+      const sortedB = sortOperations(opsB);
+      return sortedA.every(
         (op, i) =>
-          op.gate === currentOps[i]?.gate &&
-          op.column === currentOps[i]?.column &&
-          op.targets[0] === currentOps[i]?.targets[0]
+          op.gate === sortedB[i]?.gate &&
+          op.column === sortedB[i]?.column &&
+          op.targets[0] === sortedB[i]?.targets[0] &&
+          (op.controls[0] ?? -1) === (sortedB[i]?.controls[0] ?? -1)
       );
-    if (matchesBuilder) return false;
+    };
+
+    // Fresh builder state is valid initial state
+    if (isEquivalentOps(currentOps, builderOps)) return false;
 
     // Seeded Bell state is reference target
-    const matchesStarter =
-      starterOps.length === currentOps.length &&
-      starterOps.every(
-        (op, i) =>
-          op.gate === currentOps[i]?.gate &&
-          op.column === currentOps[i]?.column &&
-          op.targets[0] === currentOps[i]?.targets[0]
-      );
-    if (matchesStarter) return false;
+    if (isEquivalentOps(currentOps, starterOps)) return false;
 
     return true;
   }, [activeCircuit]);
@@ -327,12 +324,8 @@ export default function BellStateLearnPage() {
     const submittedCircuit = insituCircuit;
     let currentSimRun = insituSimRun;
 
-    // If user placed gates and hasn't tested yet, simulate the updated circuit on the fly
-    const hasPlacedRepairGate = submittedCircuit.operations.some(
-      (op) => (isBridge && op.gate === 'X') || (!isBridge && op.gate === 'H')
-    );
-
-    if (!currentSimRun && hasPlacedRepairGate) {
+    // If user hasn't tested yet, simulate the submitted circuit on the fly
+    if (!currentSimRun) {
       try {
         const simRes = await apiClient.runSimulation({
           learnerProfileId,
@@ -348,7 +341,20 @@ export default function BellStateLearnPage() {
         currentSimRun = simRes.data;
         setInsituSimRun(simRes.data);
       } catch {
-        // Fallback simulation handled below
+        const simulated = simulateFallbackCircuit(submittedCircuit, 1024);
+        const runId = `sr_repair_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`;
+        const simRun: SimulationRun = {
+          ...DEMO_SIMULATION_RUN,
+          id: runId,
+          circuitModelId: submittedCircuit.id,
+          probabilities: simulated.probabilities,
+          counts: simulated.counts,
+          stateTrace: simulated.stateTrace,
+          createdAt: new Date().toISOString(),
+        };
+        fallbackSimulationRuns.set(runId, simRun);
+        currentSimRun = simRun;
+        setInsituSimRun(simRun);
       }
     }
 
@@ -380,11 +386,8 @@ export default function BellStateLearnPage() {
 
       if (isBridge) {
         const hasBridgeOutputs = (simProbs['01'] ?? 0) > 0.4 && (simProbs['10'] ?? 0) > 0.4;
-        const isPassed =
-          hasBridgeOutputs ||
-          !currentSimRun ||
-          submittedCircuit.operations.some((op) => op.gate === 'X' && op.targets.includes(1)) ||
-          true; // Resilient demo insurance fallback
+        const hasNoExtraOutputs = (simProbs['00'] ?? 0) < 0.1 && (simProbs['11'] ?? 0) < 0.1;
+        const isPassed = hasBridgeOutputs && hasNoExtraOutputs;
 
         const fbAttempt: ChallengeAttempt = {
           id: `ca_bridge_${Date.now().toString(36)}`,
@@ -407,11 +410,8 @@ export default function BellStateLearnPage() {
         }
       } else {
         const hasBellOutputs = (simProbs['00'] ?? 0) > 0.4 && (simProbs['11'] ?? 0) > 0.4;
-        const isPassed =
-          hasBellOutputs ||
-          !currentSimRun ||
-          submittedCircuit.id === 'cm_bell_repaired' ||
-          submittedCircuit.operations.some((op) => op.gate === 'H' && op.targets.includes(0));
+        const hasNoExtraOutputs = (simProbs['01'] ?? 0) < 0.1 && (simProbs['10'] ?? 0) < 0.1;
+        const isPassed = hasBellOutputs && hasNoExtraOutputs;
 
         const fbAttempt: ChallengeAttempt = {
           id: `ca_repair_${Date.now().toString(36)}`,

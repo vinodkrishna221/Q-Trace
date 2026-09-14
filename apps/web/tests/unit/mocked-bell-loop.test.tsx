@@ -172,6 +172,10 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
     // Initial attempt feedback starts unattempted per clean lifecycle
     expect(screen.getByTestId('repair-status-badge').textContent).toBe('CHALLENGE UNATTEMPTED');
 
+    // Place Pauli-X on q[1] to prepare anti-correlated Bell pair
+    fireEvent.click(screen.getByTestId('place-x-gate-btn'));
+    expect(screen.getByTestId('insitu-gate-q1')).toBeDefined();
+
     // Submit Repair Challenge execution
     const submitRepairBtn = screen.getByTestId('submit-repair-btn');
     fireEvent.click(submitRepairBtn);

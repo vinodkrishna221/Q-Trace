@@ -161,6 +161,7 @@ describe('Live Bell Journey & Contract Swapping (UX-4)', () => {
     expect(screen.getByTestId('tutor-fallback-badge').textContent).toContain('Live Model');
 
     // 7. Verify & Submit Repair Challenge
+    fireEvent.click(screen.getByTestId('place-x-gate-btn'));
     const submitRepairBtn = screen.getByTestId('submit-repair-btn');
     fireEvent.click(submitRepairBtn);
 
@@ -206,7 +207,8 @@ describe('Live Bell Journey & Contract Swapping (UX-4)', () => {
     expect(screen.getByTestId('tutor-card')).toBeDefined();
     expect(screen.getByTestId('tutor-fallback-badge').textContent).toContain('Fallback Active (DEMO_FALLBACK)');
 
-    // Repair challenge also passes via fallback
+    // Repair challenge also passes via fallback when target state is prepared
+    fireEvent.click(screen.getByTestId('place-x-gate-btn'));
     const submitRepairBtn = screen.getByTestId('submit-repair-btn');
     fireEvent.click(submitRepairBtn);
 

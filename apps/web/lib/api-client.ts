@@ -732,8 +732,8 @@ export const apiClient = {
           feedbackCode = 'BELL_SUPPORT_CORRECT';
         }
       } else {
-        passed = true;
-        feedbackCode = 'BELL_SUPPORT_CORRECT';
+        passed = false;
+        feedbackCode = 'SUPPORT_MISMATCH';
       }
 
       return {

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { CircuitModel, Operation, SimulationRun, GateName } from '@/lib/contracts';
-import { DEMO_BRIDGE_STARTER_CIRCUIT, DEMO_SIMULATION_RUN } from '@/lib/fixtures';
+import { DEMO_BRIDGE_STARTER_CIRCUIT, DEMO_BROKEN_CIRCUIT, DEMO_SIMULATION_RUN } from '@/lib/fixtures';
 import { apiClient, simulateFallbackCircuit, fallbackSimulationRuns } from '@/lib/api-client';
 import { generateOpenQasm3 } from '@/features/circuit/circuit-qasm-exporter';
 import { Badge } from '@/components/ui/badge';
@@ -36,17 +36,23 @@ export function InSituRepairWorkspace({
   onSimulationRun,
   readOnly = false,
 }: InSituRepairWorkspaceProps) {
+  const isBridge = challengeId === 'ch_bell_psi_plus';
+
+  const defaultStarter = React.useMemo(() => {
+    if (challengeId === 'ch_bell_repair') return DEMO_BROKEN_CIRCUIT;
+    if (challengeId === 'ch_bell_psi_plus') return DEMO_BRIDGE_STARTER_CIRCUIT;
+    return initialCircuit;
+  }, [challengeId, initialCircuit]);
+
   const [circuit, setCircuit] = React.useState<CircuitModel>(initialCircuit);
   const [isSimulating, setIsSimulating] = React.useState(false);
   const [lastSimRun, setLastSimRun] = React.useState<SimulationRun | null>(null);
 
-  const isBridge = challengeId === 'ch_bell_psi_plus';
-
-  // Sync when initialCircuit changes
+  // Sync when challengeId or starter circuit changes externally
   React.useEffect(() => {
     setCircuit(initialCircuit);
     setLastSimRun(null);
-  }, [initialCircuit]);
+  }, [challengeId, initialCircuit.id]);
 
   const updateCircuitOperations = (newOps: Operation[]) => {
     const updatedCircuit: CircuitModel = {
@@ -103,8 +109,8 @@ export function InSituRepairWorkspace({
   // Reset to starter circuit
   const handleReset = () => {
     if (readOnly) return;
-    setCircuit(initialCircuit);
-    onCircuitChange?.(initialCircuit);
+    setCircuit(defaultStarter);
+    onCircuitChange?.(defaultStarter);
     setLastSimRun(null);
   };
 
@@ -254,120 +260,147 @@ export function InSituRepairWorkspace({
 
       {/* 2-Wire Interactive Circuit Diagram */}
       <div
-        className="rounded-lg bg-abyss p-4 border border-line space-y-6 font-mono text-xs select-none"
+        className="rounded-lg bg-abyss p-4 border border-line space-y-6 font-mono text-xs select-none overflow-x-auto min-w-0"
         data-testid="insitu-circuit-grid"
       >
-        {[0, 1].map((wire) => {
-          const cnotOp = circuit.operations.find((op) => op.gate === 'CNOT');
+        <div className="min-w-[340px] space-y-6">
+          {[0, 1].map((wire) => {
+            const cnotOp = circuit.operations.find((op) => op.gate === 'CNOT');
 
-          return (
-            <div key={wire} className="flex items-center gap-3">
-              <span className="w-10 text-accent font-bold text-xs shrink-0">q[{wire}]</span>
+            return (
+              <div key={wire} className="flex items-center gap-3">
+                <span className="w-10 text-accent font-bold text-xs shrink-0">q[{wire}]</span>
 
-              <div className="relative flex-1 h-9 flex items-center">
-                {/* Horizontal wire background */}
-                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-line-bright" />
+                <div className="relative flex-1 h-9 flex items-center">
+                  {/* Horizontal wire background */}
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-line-bright" />
 
-                {/* 4 Columns (0: H/prep, 1: CNOT, 2: Slot for X gate, 3: Measure) */}
-                <div className="relative z-10 w-full grid grid-cols-4 items-center">
-                  {/* Column 0 */}
-                  <div className="flex justify-center">
-                    {(() => {
-                      const op = getGateAt(wire, 0);
-                      if (op?.gate === 'H') {
-                        return (
-                          <div className="flex items-center gap-1 group">
-                            <span
-                              className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs"
-                              data-testid={`insitu-gate-h-q${wire}`}
+                  {/* 4 Columns (0: H/prep, 1: CNOT, 2: Slot for X gate, 3: Measure) */}
+                  <div className="relative z-10 w-full grid grid-cols-4 items-center">
+                    {/* Column 0 */}
+                    <div className="flex justify-center">
+                      {(() => {
+                        const op = getGateAt(wire, 0);
+                        if (op?.gate === 'H') {
+                          return (
+                            <div className="flex items-center gap-1 group">
+                              <span
+                                className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs"
+                                data-testid={`insitu-gate-h-q${wire}`}
+                              >
+                                H
+                              </span>
+                              {!readOnly && (
+                                <button
+                                  onClick={() => handleRemoveGate(wire, 0)}
+                                  className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                  title="Remove H gate"
+                                  data-testid={`remove-h-gate-q${wire}`}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          );
+                        }
+                        if (op?.gate === 'CNOT') {
+                          return op.controls.includes(wire) ? (
+                            <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
+                          ) : (
+                            <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
+                              ⊕
+                            </div>
+                          );
+                        }
+                        if (op?.gate === 'X') {
+                          return (
+                            <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
+                              X
+                            </span>
+                          );
+                        }
+                        if (wire === 0) {
+                          return (
+                            <button
+                              onClick={() => handleAddGate('H', 0, 0)}
+                              disabled={readOnly}
+                              className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                              title="Click to place Hadamard (H) gate on q[0]"
+                              data-testid="empty-slot-q0-col0"
                             >
+                              <Plus className="w-3 h-3" />
+                              <span>+H</span>
+                            </button>
+                          );
+                        }
+                        return (
+                          <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                            —
+                          </span>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Column 1 (CNOT / Intermediate Gate) */}
+                    <div className="flex justify-center">
+                      {(() => {
+                        const op = getGateAt(wire, 1);
+                        if (op?.gate === 'CNOT') {
+                          return op.controls.includes(wire) ? (
+                            <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
+                          ) : (
+                            <div className="flex items-center gap-1 group">
+                              <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
+                                ⊕
+                              </div>
+                              {!readOnly && (
+                                <button
+                                  onClick={() => handleRemoveGate(wire, 1)}
+                                  className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                  title="Remove CNOT gate"
+                                  data-testid={`remove-cnot-gate-q${wire}`}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+                          );
+                        }
+                        if (op?.gate === 'H') {
+                          return (
+                            <span className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs">
                               H
                             </span>
-                            {!readOnly && (
-                              <button
-                                onClick={() => handleRemoveGate(wire, 0)}
-                                className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                                title="Remove H gate"
-                                data-testid={`remove-h-gate-q${wire}`}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        );
-                      }
-                      if (op?.gate === 'CNOT') {
-                        return op.controls.includes(wire) ? (
-                          <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
-                        ) : (
-                          <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
-                            ⊕
-                          </div>
-                        );
-                      }
-                      if (op?.gate === 'X') {
+                          );
+                        }
+                        if (op?.gate === 'X') {
+                          return (
+                            <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
+                              X
+                            </span>
+                          );
+                        }
+                        if (wire === 1) {
+                          return (
+                            <button
+                              onClick={() => handleAddGate('CNOT', 1, 1)}
+                              disabled={readOnly}
+                              className="h-7 w-12 rounded border border-dashed border-violet/60 bg-violet/5 hover:bg-violet/15 text-violet text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                              title="Click to place CNOT gate (control q[0], target q[1])"
+                              data-testid="empty-slot-q1-col1"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>+CX</span>
+                            </button>
+                          );
+                        }
                         return (
-                          <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
-                            X
+                          <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                            —
                           </span>
                         );
-                      }
-                      if (!isBridge && wire === 0) {
-                        return (
-                          <button
-                            onClick={() => handleAddGate('H', 0, 0)}
-                            disabled={readOnly}
-                            className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                            title="Click to place Hadamard (H) gate on q[0]"
-                            data-testid="empty-slot-q0-col0"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>+H</span>
-                          </button>
-                        );
-                      }
-                      return (
-                        <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
-                          —
-                        </span>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Column 1 (CNOT / Intermediate Gate) */}
-                  <div className="flex justify-center">
-                    {(() => {
-                      const op = getGateAt(wire, 1);
-                      if (op?.gate === 'CNOT') {
-                        return op.controls.includes(wire) ? (
-                          <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
-                        ) : (
-                          <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
-                            ⊕
-                          </div>
-                        );
-                      }
-                      if (op?.gate === 'H') {
-                        return (
-                          <span className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs">
-                            H
-                          </span>
-                        );
-                      }
-                      if (op?.gate === 'X') {
-                        return (
-                          <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
-                            X
-                          </span>
-                        );
-                      }
-                      return (
-                        <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
-                          —
-                        </span>
-                      );
-                    })()}
-                  </div>
+                      })()}
+                    </div>
 
                   {/* Column 2 (In-Situ Challenge Slot: Placement Area) */}
                   <div className="flex justify-center">
@@ -428,6 +461,7 @@ export function InSituRepairWorkspace({
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* Test Circuit Controls & Real-Time Probability Readout */}

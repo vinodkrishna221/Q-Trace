@@ -221,4 +221,93 @@ describe('In-Situ Repair Workspace & Near-Future Bridge Challenge', () => {
     });
     expect(screen.getByTestId('repair-feedback-code').textContent).toBe('BELL_SUPPORT_CORRECT');
   });
+
+  it('resets modified in-situ circuit cleanly when clicking Reset Seed', async () => {
+    render(<BellStateLearnPage />);
+
+    // In Bridge mode, place X on q[1]
+    fireEvent.click(screen.getByTestId('place-x-gate-btn'));
+    expect(screen.getByTestId('insitu-gate-q1')).toBeDefined();
+
+    // Click Reset Seed
+    fireEvent.click(screen.getByTestId('reset-insitu-circuit-btn'));
+
+    // The X gate should be cleanly removed and empty slot restored
+    expect(screen.queryByTestId('insitu-gate-q1')).toBeNull();
+    expect(screen.getByTestId('empty-slot-q1')).toBeDefined();
+  });
+
+  it('repairs broken circuit in remedial mode by placing H on q[0] and toggles CNOT', async () => {
+    render(<BellStateLearnPage />);
+
+    // Switch to Remedial Repair mode
+    fireEvent.click(screen.getByTestId('select-remedial-challenge-btn'));
+    expect(screen.getByTestId('challenge-title').textContent).toBe('Restore Bell Correlation');
+    expect(screen.getByTestId('empty-slot-q0-col0')).toBeDefined();
+
+    // Broken circuit starts without H on q[0]; place H on q[0]
+    fireEvent.click(screen.getByTestId('place-h-gate-q0-btn'));
+    expect(screen.getByTestId('insitu-gate-h-q0')).toBeDefined();
+
+    // Test circuit to confirm Bell correlation restored
+    fireEvent.click(screen.getByTestId('test-insitu-circuit-btn'));
+    await waitFor(() => {
+      expect(screen.getByTestId('insitu-target-achieved-badge')).toBeDefined();
+      expect(screen.getByTestId('insitu-target-achieved-badge').textContent).toContain(
+        'Target State Prepared (|00⟩ + |11⟩)'
+      );
+    });
+
+    // Remove CNOT gate via inline delete
+    expect(screen.getByTestId('remove-cnot-gate-q1')).toBeDefined();
+    fireEvent.click(screen.getByTestId('remove-cnot-gate-q1'));
+
+    // CNOT empty slot should appear
+    expect(screen.getByTestId('empty-slot-q1-col1')).toBeDefined();
+
+    // Reset back to broken circuit starter
+    fireEvent.click(screen.getByTestId('reset-insitu-circuit-btn'));
+    expect(screen.getByTestId('empty-slot-q0-col0')).toBeDefined();
+  });
+
+  it('fails challenge attempt when submitted without placing required gates', async () => {
+    render(<BellStateLearnPage />);
+
+    // Switch to remedial challenge with broken circuit (missing H)
+    fireEvent.click(screen.getByTestId('select-remedial-challenge-btn'));
+    expect(screen.getByTestId('repair-status-badge').textContent).toBe('CHALLENGE UNATTEMPTED');
+
+    // Submit without repairing the circuit
+    fireEvent.click(screen.getByTestId('submit-repair-btn'));
+
+    // Verify submission fails cleanly
+    await waitFor(() => {
+      expect(screen.getByTestId('repair-status-badge').textContent).toBe('REPAIR ATTEMPT FAILED');
+    });
+    expect(screen.getByTestId('repair-feedback-code').textContent).toBe('SUPPORT_MISMATCH');
+  });
+
+  it('allows building Bell circuit from blank builder and simulates accurately', async () => {
+    render(<BellStateLearnPage />);
+
+    // In Step 2, goal banner is present and initial state has only measurements
+    expect(screen.getByTestId('builder-goal-banner')).toBeDefined();
+    expect(screen.getByTestId('gate-op_3')).toBeDefined();
+    expect(screen.getByTestId('gate-op_4')).toBeDefined();
+    expect(screen.queryByTestId('gate-op_1')).toBeNull(); // No H initially
+
+    // Place Hadamard on q[0] at Col 0
+    act(() => {
+      useCircuitStore.getState().addGate('H', 0, 0);
+    });
+
+    // Place CNOT on q[1] at Col 1 (control q[0])
+    act(() => {
+      useCircuitStore.getState().addGate('CNOT', 1, 1, 0);
+    });
+
+    // Both gates are now present in the builder
+    expect(useCircuitStore.getState().circuit.operations.some((o) => o.gate === 'H')).toBe(true);
+    expect(useCircuitStore.getState().circuit.operations.some((o) => o.gate === 'CNOT')).toBe(true);
+  });
 });
