@@ -896,7 +896,7 @@ export default function BellStateLearnPage() {
                     size="sm"
                     onClick={() => handleRunSimulation()}
                     disabled={isExecutingPipeline}
-                    className="text-xs font-mono shrink-0 bg-caution hover:bg-caution/80 text-abyss font-bold"
+                    className="text-xs font-mono shrink-0 bg-amber-600 hover:bg-amber-700 text-white font-bold"
                     data-testid="retry-simulation-btn"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isExecutingPipeline ? 'animate-spin' : ''}`} />

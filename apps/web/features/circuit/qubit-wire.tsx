@@ -274,7 +274,7 @@ export function QubitWiresGrid({
                       {op && isControl && (
                         <div
                           data-testid="gate-cnot-control"
-                          className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-abyss font-bold shadow-lg cursor-pointer hover:scale-110 transition-transform"
+                          className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-white font-bold shadow-lg cursor-pointer hover:scale-110 transition-transform"
                           title={`CNOT Control on q[${qubitIndex}] -> q[${op.targets[0]}]`}
                           aria-label={`CNOT Control (targets q[${op.targets[0]}])`}
                         >
@@ -302,40 +302,40 @@ export function QubitWiresGrid({
                           aria-label={`Hadamard (H) gate on q[${qubitIndex}]`}
                         >
                           <span className="leading-tight">H</span>
-                          <span className="text-[8px] text-accent/80 font-normal">Hadamard</span>
+                          <span className="text-[8px] text-accent font-semibold">Hadamard</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'X' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-12 rounded-md bg-emerald-500/15 border-2 border-emerald-500 text-emerald-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
+                          className="w-12 h-12 rounded-md bg-emerald-500/15 border-2 border-emerald-600 dark:border-emerald-500 text-emerald-600 dark:text-emerald-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
                           aria-label={`Pauli-X (X) gate on q[${qubitIndex}]`}
                         >
                           <span className="leading-tight">X</span>
-                          <span className="text-[8px] text-emerald-400/80 font-normal">Pauli-X</span>
+                          <span className="text-[8px] text-emerald-700/90 dark:text-emerald-400/90 font-semibold">Pauli-X</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'Y' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-12 rounded-md bg-amber-500/15 border-2 border-amber-500 text-amber-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
+                          className="w-12 h-12 rounded-md bg-amber-500/15 border-2 border-amber-600 dark:border-amber-500 text-amber-700 dark:text-amber-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
                           aria-label={`Pauli-Y (Y) gate on q[${qubitIndex}]`}
                         >
                           <span className="leading-tight">Y</span>
-                          <span className="text-[8px] text-amber-400/80 font-normal">Pauli-Y</span>
+                          <span className="text-[8px] text-amber-800/90 dark:text-amber-400/90 font-semibold">Pauli-Y</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'Z' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-12 rounded-md bg-cyan-500/15 border-2 border-cyan-500 text-cyan-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
+                          className="w-12 h-12 rounded-md bg-cyan-500/15 border-2 border-cyan-600 dark:border-cyan-500 text-cyan-700 dark:text-cyan-400 flex flex-col items-center justify-center font-bold text-sm shadow cursor-pointer hover:scale-105 transition-transform"
                           aria-label={`Pauli-Z (Z) gate on q[${qubitIndex}]`}
                         >
                           <span className="leading-tight">Z</span>
-                          <span className="text-[8px] text-cyan-400/80 font-normal">Pauli-Z</span>
+                          <span className="text-[8px] text-cyan-800/90 dark:text-cyan-400/90 font-semibold">Pauli-Z</span>
                         </div>
                       )}
 
@@ -345,7 +345,7 @@ export function QubitWiresGrid({
                           className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow cursor-pointer hover:scale-105 transition-transform"
                           aria-label={`Measure gate on q[${qubitIndex}] into classical bit c[${op.classicalTargets[0] ?? qubitIndex}]`}
                         >
-                          <span className="text-caution">MEASURE</span>
+                          <span className="text-caution font-bold">MEASURE</span>
                           <span className="text-[9px] text-ink-dim font-normal">
                             → c[{op.classicalTargets[0] ?? qubitIndex}]
                           </span>

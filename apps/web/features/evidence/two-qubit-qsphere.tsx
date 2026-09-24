@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTheme } from 'next-themes';
 import { ComplexValue } from '@/lib/contracts';
 import { RotateCcw, Sparkles } from 'lucide-react';
 
@@ -16,6 +17,8 @@ export function TwoQubitQSphere({
   size = 280,
 }: TwoQubitQSphereProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === 'light';
   const [rotation, setRotation] = React.useState({ rotX: -0.35, rotY: 0.55 });
   const [isDragging, setIsDragging] = React.useState(false);
   const dragStartRef = React.useRef({ x: 0, y: 0, rotX: 0, rotY: 0 });
@@ -98,15 +101,21 @@ export function TwoQubitQSphere({
       cy,
       sphereR
     );
-    grad.addColorStop(0, 'rgba(17, 24, 39, 0.7)');
-    grad.addColorStop(1, 'rgba(6, 7, 13, 0.95)');
+    if (isLight) {
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      grad.addColorStop(0.6, 'rgba(241, 245, 249, 0.95)');
+      grad.addColorStop(1, 'rgba(226, 232, 240, 0.98)');
+    } else {
+      grad.addColorStop(0, 'rgba(17, 24, 39, 0.7)');
+      grad.addColorStop(1, 'rgba(6, 7, 13, 0.95)');
+    }
 
     ctx.beginPath();
     ctx.arc(cx, cy, sphereR, 0, Math.PI * 2);
     ctx.fillStyle = grad;
     ctx.fill();
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.18)' : '#1e293b';
     ctx.stroke();
 
     // 2. Wireframe circles
@@ -119,7 +128,7 @@ export function TwoQubitQSphere({
       if (i === 0) ctx.moveTo(p.x, p.y);
       else ctx.lineTo(p.x, p.y);
     }
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+    ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.45)' : 'rgba(56, 189, 248, 0.25)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -131,7 +140,7 @@ export function TwoQubitQSphere({
       if (i === 0) ctx.moveTo(p.x, p.y);
       else ctx.lineTo(p.x, p.y);
     }
-    ctx.strokeStyle = 'rgba(71, 85, 105, 0.2)';
+    ctx.strokeStyle = isLight ? 'rgba(100, 116, 139, 0.35)' : 'rgba(71, 85, 105, 0.2)';
     ctx.stroke();
 
     // 3. Central axis
@@ -140,7 +149,7 @@ export function TwoQubitQSphere({
     ctx.beginPath();
     ctx.moveTo(zNeg.x, zNeg.y);
     ctx.lineTo(zPos.x, zPos.y);
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+    ctx.strokeStyle = isLight ? 'rgba(71, 85, 105, 0.6)' : 'rgba(148, 163, 184, 0.4)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -166,7 +175,9 @@ export function TwoQubitQSphere({
       const origin = project(0, 0, 0);
       ctx.moveTo(origin.x, origin.y);
       ctx.lineTo(p.x, p.y);
-      ctx.strokeStyle = hasSupport ? 'rgba(56, 189, 248, 0.5)' : 'rgba(71, 85, 105, 0.15)';
+      ctx.strokeStyle = hasSupport
+        ? (isLight ? 'rgba(2, 132, 199, 0.6)' : 'rgba(56, 189, 248, 0.5)')
+        : (isLight ? 'rgba(148, 163, 184, 0.35)' : 'rgba(71, 85, 105, 0.15)');
       ctx.lineWidth = hasSupport ? 2 : 1;
       ctx.stroke();
 
@@ -175,24 +186,26 @@ export function TwoQubitQSphere({
 
       // Node color mapped from phase
       const hue = ((phase + Math.PI) / (Math.PI * 2)) * 360;
-      const nodeColor = hasSupport ? `hsl(${hue}, 85%, 60%)` : '#334155';
+      const nodeColor = hasSupport
+        ? `hsl(${hue}, 85%, ${isLight ? '45%' : '60%'})`
+        : (isLight ? '#94a3b8' : '#334155');
 
       ctx.beginPath();
       ctx.arc(p.x, p.y, nodeRadius, 0, Math.PI * 2);
       ctx.fillStyle = nodeColor;
-      if (hasSupport) {
+      if (hasSupport && !isLight) {
         ctx.shadowColor = nodeColor;
         ctx.shadowBlur = 12;
       }
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = hasSupport ? '#ffffff' : '#1e293b';
+      ctx.strokeStyle = hasSupport ? '#ffffff' : (isLight ? '#cbd5e1' : '#1e293b');
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // Label text
       ctx.font = 'bold 10px JetBrains Mono, monospace';
-      ctx.fillStyle = hasSupport ? '#f8fafc' : '#64748b';
+      ctx.fillStyle = hasSupport ? (isLight ? '#0f172a' : '#f8fafc') : (isLight ? '#475569' : '#64748b');
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
@@ -201,12 +214,12 @@ export function TwoQubitQSphere({
       ctx.fillText(state.label, p.x, labelY);
 
       if (hasSupport) {
-        ctx.font = '9px JetBrains Mono, monospace';
-        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 9px JetBrains Mono, monospace';
+        ctx.fillStyle = isLight ? '#0284c7' : '#38bdf8';
         ctx.fillText(`P=${(prob * 100).toFixed(0)}%`, p.x, labelY + (yw >= 0 ? -10 : 10));
       }
     });
-  }, [amps, basisProbabilities, rotation, size]);
+  }, [amps, basisProbabilities, rotation, size, isLight]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);

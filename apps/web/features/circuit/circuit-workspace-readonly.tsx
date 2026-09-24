@@ -96,7 +96,7 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-cnot-control"
-                    className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-abyss font-bold shadow-lg"
+                    className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-white font-bold shadow-lg"
                     title="CNOT Control (q[0])"
                     aria-label="CNOT Control on q[0] targeting q[1]"
                   >
@@ -112,7 +112,7 @@ export function CircuitWorkspaceReadonly({
                     className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
                     aria-label="Measure gate on q[0] into c[0]"
                   >
-                    <span className="text-caution">MEASURE</span>
+                    <span className="text-caution font-bold">MEASURE</span>
                     <span className="text-[9px] text-ink-dim font-normal">→ c[0]</span>
                   </div>
                 </div>
@@ -168,7 +168,7 @@ export function CircuitWorkspaceReadonly({
                     className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
                     aria-label="Measure gate on q[1] into c[1]"
                   >
-                    <span className="text-caution">MEASURE</span>
+                    <span className="text-caution font-bold">MEASURE</span>
                     <span className="text-[9px] text-ink-dim font-normal">→ c[1]</span>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export function CircuitWorkspaceReadonly({
             </>
           ) : (
             <>
-              <Play className="w-4 h-4 mr-2 text-abyss fill-abyss" />
+              <Play className="w-4 h-4 mr-2 text-white fill-white" />
               <span>Run Simulation (Qiskit Aer)</span>
             </>
           )}

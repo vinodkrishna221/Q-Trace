@@ -273,7 +273,7 @@ export function FlightRecorderView({
                       <span
                         className={`text-xs px-2 py-0.5 rounded font-bold ${
                           isSelected
-                            ? 'bg-accent text-abyss font-bold'
+                            ? 'bg-accent text-white font-bold'
                             : 'bg-raised text-ink-dim'
                         }`}
                       >

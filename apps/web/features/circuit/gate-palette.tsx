@@ -13,6 +13,15 @@ interface GatePaletteProps {
   onDragStart?: (gate: GateName) => void;
 }
 
+const GATE_HOVER_CLASSES: Record<GateName, string> = {
+  H: 'group-hover:border-accent group-hover:text-accent group-hover:bg-accent/10',
+  X: 'group-hover:border-emerald-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-500/10',
+  Y: 'group-hover:border-amber-500 group-hover:text-amber-700 dark:group-hover:text-amber-400 group-hover:bg-amber-500/10',
+  Z: 'group-hover:border-cyan-500 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 group-hover:bg-cyan-500/10',
+  CNOT: 'group-hover:border-violet group-hover:text-violet group-hover:bg-violet/10',
+  MEASURE: 'group-hover:border-line-bright group-hover:text-caution group-hover:bg-raised',
+};
+
 export function GatePalette({ onDragStart }: GatePaletteProps) {
   const {
     selectedGateToPlace,
@@ -106,8 +115,10 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               >
                 {/* Gate Badge */}
                 <div
-                  className={`w-10 h-10 rounded-md border-2 flex items-center justify-center font-mono font-bold text-sm mb-1.5 transition-transform group-hover:scale-105 ${
-                    def.colorClass
+                  className={`w-10 h-10 rounded-md border-2 flex items-center justify-center font-mono font-bold text-sm mb-1.5 transition-all duration-150 group-hover:scale-105 ${
+                    isSelected
+                      ? def.colorClass
+                      : `border-line-bright text-ink bg-raised/40 ${GATE_HOVER_CLASSES[gateKey]}`
                   }`}
                 >
                   {def.gate === 'CNOT' ? '⊕' : def.gate === 'MEASURE' ? 'M' : def.symbol}
@@ -124,7 +135,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                 {isSelected && (
                   <span
                     data-testid="armed-badge"
-                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent text-abyss flex items-center justify-center text-[9px] font-bold shadow"
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent text-white flex items-center justify-center text-[9px] font-bold shadow"
                   >
                     ✓
                   </span>

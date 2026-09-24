@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTheme } from 'next-themes';
 import { RotateCcw, Play, Pause, ZoomIn, ZoomOut, Sparkles } from 'lucide-react';
 
 export interface Bloch3DSphereProps {
@@ -25,6 +26,8 @@ export function Bloch3DSphere({
   interactive = true,
 }: Bloch3DSphereProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === 'light';
 
   // Internal camera rotation state if not controlled externally
   const [internalRotation, setInternalRotation] = React.useState({ rotX: -0.35, rotY: 0.55 });
@@ -139,16 +142,22 @@ export function Bloch3DSphere({
       cy,
       sphereR
     );
-    sphereGrad.addColorStop(0, 'rgba(17, 24, 39, 0.7)');
-    sphereGrad.addColorStop(0.7, 'rgba(10, 14, 26, 0.85)');
-    sphereGrad.addColorStop(1, 'rgba(6, 7, 13, 0.95)');
+    if (isLight) {
+      sphereGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      sphereGrad.addColorStop(0.6, 'rgba(241, 245, 249, 0.95)');
+      sphereGrad.addColorStop(1, 'rgba(226, 232, 240, 0.98)');
+    } else {
+      sphereGrad.addColorStop(0, 'rgba(17, 24, 39, 0.7)');
+      sphereGrad.addColorStop(0.7, 'rgba(10, 14, 26, 0.85)');
+      sphereGrad.addColorStop(1, 'rgba(6, 7, 13, 0.95)');
+    }
 
     ctx.beginPath();
     ctx.arc(cx, cy, sphereR, 0, Math.PI * 2);
     ctx.fillStyle = sphereGrad;
     ctx.fill();
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.18)' : '#1e293b';
     ctx.stroke();
 
     // --- 2. Draw 3D Latitude and Longitude Wireframe Rings ---
@@ -180,7 +189,7 @@ export function Bloch3DSphere({
       const theta = (i / segments) * Math.PI * 2;
       equatorPts.push({ xw: Math.cos(theta), yw: 0, zw: Math.sin(theta) });
     }
-    drawRing(equatorPts, 'rgba(56, 189, 248, 0.25)'); // Cyan equator
+    drawRing(equatorPts, isLight ? 'rgba(2, 132, 199, 0.45)' : 'rgba(56, 189, 248, 0.25)');
 
     // Latitudes (+45 deg and -45 deg)
     const lat45Y = Math.sin(Math.PI / 4);
@@ -192,8 +201,9 @@ export function Bloch3DSphere({
       latNorthPts.push({ xw: Math.cos(theta) * lat45R, yw: lat45Y, zw: Math.sin(theta) * lat45R });
       latSouthPts.push({ xw: Math.cos(theta) * lat45R, yw: -lat45Y, zw: Math.sin(theta) * lat45R });
     }
-    drawRing(latNorthPts, 'rgba(71, 85, 105, 0.25)', [3, 3]);
-    drawRing(latSouthPts, 'rgba(71, 85, 105, 0.25)', [3, 3]);
+    const ringColor = isLight ? 'rgba(100, 116, 139, 0.35)' : 'rgba(71, 85, 105, 0.25)';
+    drawRing(latNorthPts, ringColor, [3, 3]);
+    drawRing(latSouthPts, ringColor, [3, 3]);
 
     // Longitude Meridians (Prime meridian & orthogonal)
     const meridianXPts: { xw: number; yw: number; zw: number }[] = [];
@@ -203,15 +213,15 @@ export function Bloch3DSphere({
       meridianXPts.push({ xw: 0, yw: Math.sin(theta), zw: Math.cos(theta) });
       meridianYPts.push({ xw: Math.cos(theta), yw: Math.sin(theta), zw: 0 });
     }
-    drawRing(meridianXPts, 'rgba(71, 85, 105, 0.25)', [3, 3]);
-    drawRing(meridianYPts, 'rgba(71, 85, 105, 0.25)', [3, 3]);
+    drawRing(meridianXPts, ringColor, [3, 3]);
+    drawRing(meridianYPts, ringColor, [3, 3]);
 
     // --- 3. Draw 3D Axes ---
     // Z axis (Vertical: -Z to +Z)
     const zPos = project(0, 1.2, 0);
     const zNeg = project(0, -1.2, 0);
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.7)';
+    ctx.strokeStyle = isLight ? 'rgba(51, 65, 85, 0.7)' : 'rgba(148, 163, 184, 0.7)';
     ctx.lineWidth = 1.5;
     ctx.moveTo(zNeg.x, zNeg.y);
     ctx.lineTo(zPos.x, zPos.y);
@@ -221,7 +231,7 @@ export function Bloch3DSphere({
     const xPos = project(0, 0, 1.2);
     const xNeg = project(0, 0, -1.2);
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(100, 116, 139, 0.6)';
+    ctx.strokeStyle = isLight ? 'rgba(71, 85, 105, 0.6)' : 'rgba(100, 116, 139, 0.6)';
     ctx.lineWidth = 1.2;
     ctx.moveTo(xNeg.x, xNeg.y);
     ctx.lineTo(xPos.x, xPos.y);
@@ -231,7 +241,7 @@ export function Bloch3DSphere({
     const yPos = project(1.2, 0, 0);
     const yNeg = project(-1.2, 0, 0);
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(100, 116, 139, 0.6)';
+    ctx.strokeStyle = isLight ? 'rgba(71, 85, 105, 0.6)' : 'rgba(100, 116, 139, 0.6)';
     ctx.lineWidth = 1.2;
     ctx.moveTo(yNeg.x, yNeg.y);
     ctx.lineTo(yPos.x, yPos.y);
@@ -243,20 +253,20 @@ export function Bloch3DSphere({
     ctx.textBaseline = 'middle';
 
     // +Z = |0> (North Pole)
-    ctx.fillStyle = '#38bdf8';
+    ctx.fillStyle = isLight ? '#0284c7' : '#38bdf8';
     ctx.fillText('|0⟩ (+Z)', zPos.x, zPos.y - 10);
 
     // -Z = |1> (South Pole)
-    ctx.fillStyle = '#94a3b8';
+    ctx.fillStyle = isLight ? '#475569' : '#94a3b8';
     ctx.fillText('|1⟩ (-Z)', zNeg.x, zNeg.y + 10);
 
     // +X = |+> (Front)
-    ctx.fillStyle = '#cbd5e1';
+    ctx.fillStyle = isLight ? '#1e293b' : '#cbd5e1';
     ctx.font = 'bold 10px JetBrains Mono, monospace';
     ctx.fillText('|+⟩ (+X)', xPos.x + 8, xPos.y + 6);
 
     // +Y = |+i> (Right)
-    ctx.fillStyle = '#cbd5e1';
+    ctx.fillStyle = isLight ? '#1e293b' : '#cbd5e1';
     ctx.fillText('|+i⟩ (+Y)', yPos.x + 10, yPos.y - 6);
 
     // --- 4. Render State Vector OR Entangled Mixed Core ---
@@ -266,10 +276,17 @@ export function Bloch3DSphere({
       // --- Special Case: Bell State Maximally Mixed Subsystem at Origin (r = 0) ---
       // 1. Concentric pulsing mixed state halo
       const coreGrad = ctx.createRadialGradient(origin.x, origin.y, 2, origin.x, origin.y, 24);
-      coreGrad.addColorStop(0, 'rgba(192, 132, 252, 1)'); // Bright violet center
-      coreGrad.addColorStop(0.35, 'rgba(167, 139, 250, 0.7)');
-      coreGrad.addColorStop(0.7, 'rgba(139, 92, 246, 0.25)');
-      coreGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      if (isLight) {
+        coreGrad.addColorStop(0, 'rgba(124, 58, 237, 0.9)');
+        coreGrad.addColorStop(0.35, 'rgba(139, 92, 246, 0.6)');
+        coreGrad.addColorStop(0.7, 'rgba(167, 139, 250, 0.25)');
+        coreGrad.addColorStop(1, 'rgba(167, 139, 250, 0)');
+      } else {
+        coreGrad.addColorStop(0, 'rgba(192, 132, 252, 1)');
+        coreGrad.addColorStop(0.35, 'rgba(167, 139, 250, 0.7)');
+        coreGrad.addColorStop(0.7, 'rgba(139, 92, 246, 0.25)');
+        coreGrad.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      }
 
       ctx.beginPath();
       ctx.arc(origin.x, origin.y, 24, 0, Math.PI * 2);
@@ -279,9 +296,11 @@ export function Bloch3DSphere({
       // 2. Central singularity node
       ctx.beginPath();
       ctx.arc(origin.x, origin.y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#c084fc';
-      ctx.shadowColor = '#a78bfa';
-      ctx.shadowBlur = 10;
+      ctx.fillStyle = isLight ? '#7c3aed' : '#c084fc';
+      if (!isLight) {
+        ctx.shadowColor = '#a78bfa';
+        ctx.shadowBlur = 10;
+      }
       ctx.fill();
       ctx.shadowBlur = 0;
       ctx.strokeStyle = '#ffffff';
@@ -290,21 +309,19 @@ export function Bloch3DSphere({
 
       // 3. Label highlighting maximally mixed origin
       ctx.font = 'bold 9px JetBrains Mono, monospace';
-      ctx.fillStyle = '#e9d5ff';
+      ctx.fillStyle = isLight ? '#581c87' : '#e9d5ff';
       ctx.fillText('r = 0.000', origin.x, origin.y + 16);
-      ctx.fillStyle = '#a78bfa';
+      ctx.fillStyle = isLight ? '#7c3aed' : '#a78bfa';
       ctx.fillText('(MIXED CORE)', origin.x, origin.y + 26);
     } else {
       // --- Pure or Partially Mixed State Vector ---
-      // Map quantum (bloch.x, bloch.y, bloch.z) to world (xw, yw, zw)
-      // xw = bloch.y, yw = bloch.z, zw = bloch.x
       const target = project(bloch.y, bloch.z, bloch.x);
 
       // If partially mixed (0 < r < 1), draw dashed inner radius boundary shell
       if (isMixed && radius > 0.05) {
         ctx.beginPath();
         ctx.arc(origin.x, origin.y, sphereR * radius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(167, 139, 250, 0.35)';
+        ctx.strokeStyle = isLight ? 'rgba(124, 58, 237, 0.45)' : 'rgba(167, 139, 250, 0.35)';
         ctx.setLineDash([3, 3]);
         ctx.stroke();
         ctx.setLineDash([]);
@@ -313,7 +330,7 @@ export function Bloch3DSphere({
       // Projection drop lines onto equator (X-Z in world, Y_w=0)
       const equatorProj = project(bloch.y, 0, bloch.x);
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+      ctx.strokeStyle = isLight ? 'rgba(100, 116, 139, 0.4)' : 'rgba(148, 163, 184, 0.3)';
       ctx.setLineDash([2, 2]);
       ctx.moveTo(target.x, target.y);
       ctx.lineTo(equatorProj.x, equatorProj.y);
@@ -321,16 +338,20 @@ export function Bloch3DSphere({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Vector arrow line
-      const vectorColor = isMixed ? '#c084fc' : '#22d3ee'; // Violet if mixed, cyan if pure
+      // Vector arrow line: deep cobalt in light mode (>6:1), cyan in dark mode
+      const vectorColor = isLight
+        ? (isMixed ? '#7c3aed' : '#1d4ed8')
+        : (isMixed ? '#c084fc' : '#22d3ee');
       ctx.beginPath();
       ctx.moveTo(origin.x, origin.y);
       ctx.lineTo(target.x, target.y);
       ctx.strokeStyle = vectorColor;
       ctx.lineWidth = 3;
       ctx.lineCap = 'round';
-      ctx.shadowColor = vectorColor;
-      ctx.shadowBlur = 8;
+      if (!isLight) {
+        ctx.shadowColor = vectorColor;
+        ctx.shadowBlur = 8;
+      }
       ctx.stroke();
       ctx.shadowBlur = 0;
 
@@ -338,21 +359,23 @@ export function Bloch3DSphere({
       ctx.beginPath();
       ctx.arc(target.x, target.y, 6, 0, Math.PI * 2);
       ctx.fillStyle = vectorColor;
-      ctx.shadowColor = vectorColor;
-      ctx.shadowBlur = 10;
+      if (!isLight) {
+        ctx.shadowColor = vectorColor;
+        ctx.shadowBlur = 10;
+      }
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#0f172a';
+      ctx.strokeStyle = isLight ? '#ffffff' : '#0f172a';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Origin anchor
       ctx.beginPath();
       ctx.arc(origin.x, origin.y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = isLight ? '#475569' : '#94a3b8';
       ctx.fill();
     }
-  }, [bloch, purity, label, activeRotation, zoom, size, isAtOrigin, isMixed, radius]);
+  }, [bloch, purity, label, activeRotation, zoom, size, isAtOrigin, isMixed, radius, isLight]);
 
   // Drag interaction handlers
   const handleMouseDown = (e: React.MouseEvent) => {

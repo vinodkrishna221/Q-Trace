@@ -134,7 +134,7 @@ export function CircuitSharePanel({ onClose, onImportSuccess }: CircuitSharePane
       <CardHeader className="pb-3 border-b border-line bg-raised/50">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-[10px] font-mono tracking-wide bg-accent text-abyss">
+            <Badge variant="default" className="text-[10px] font-mono tracking-wide bg-accent text-white">
               LOCAL ARTIFACT SHARING
             </Badge>
             <Badge variant="outline" className="text-[10px] font-mono text-ink-dim border-line">
@@ -233,7 +233,7 @@ export function CircuitSharePanel({ onClose, onImportSuccess }: CircuitSharePane
                     className="flex-1 text-xs font-medium"
                     data-testid="download-qasm-btn"
                   >
-                    <Download className="w-3.5 h-3.5 mr-1 text-abyss" />
+                    <Download className="w-3.5 h-3.5 mr-1 text-white" />
                     <span>Download .qasm</span>
                   </Button>
                 </div>
@@ -289,7 +289,7 @@ export function CircuitSharePanel({ onClose, onImportSuccess }: CircuitSharePane
                     className="flex-1 text-xs font-medium"
                     data-testid="download-json-btn"
                   >
-                    <Download className="w-3.5 h-3.5 mr-1 text-abyss" />
+                    <Download className="w-3.5 h-3.5 mr-1 text-white" />
                     <span>Download .json</span>
                   </Button>
                 </div>
@@ -376,7 +376,7 @@ export function CircuitSharePanel({ onClose, onImportSuccess }: CircuitSharePane
                   className="font-medium text-xs"
                   data-testid="import-circuit-btn"
                 >
-                  <Upload className="w-3.5 h-3.5 mr-1 text-abyss" />
+                  <Upload className="w-3.5 h-3.5 mr-1 text-white" />
                   <span>Import &amp; Load into Workspace</span>
                 </Button>
               </div>

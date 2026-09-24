@@ -110,7 +110,7 @@ export function PredictionCheckpoint({
               <div className="flex items-center gap-3">
                 <div
                   className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
-                    isSelected ? 'border-accent bg-accent text-abyss font-bold' : 'border-line-bright bg-panel'
+                    isSelected ? 'border-accent bg-accent text-white font-bold' : 'border-line-bright bg-panel'
                   }`}
                   aria-hidden="true"
                 >
