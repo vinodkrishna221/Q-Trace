@@ -1,120 +1,146 @@
-# Q-Trace Design System — "Observatory Dark"
+# Q-Trace Design System — "Linear Precision Quantum Instrument"
 
-> Screen-level contract for everything the judges see. Derived artifacts (tokens, components,
+> Screen-level contract for everything the judges and learners see. Derived artifacts (tokens, components,
 > pages) MUST trace back to this file. Changes go through the same review path as API contracts.
 > Complements `.agents/rules/stack/quantum-ui.md` (interaction mechanics) — this file owns
-> *appearance, layout, and copy*.
+> *appearance, layout, themes, and presentation copy*.
 
-## 1. Design intent
+## 1. Design Intent & Aesthetic Philosophy
 
-Q-Trace is a **measurement instrument**, not a generic SaaS dashboard. The visual metaphor is a
-physics observatory / flight recorder: a dark instrument panel where quantum evidence glows.
-Every screen should feel like it was *machined*, not assembled — one accent, disciplined type,
-generous darkness, and light used only to mean something.
+Q-Trace is a **high-precision scientific instrument**, crafted to the standard of Linear (`linear.app`) and modern developer workspaces. The visual metaphor is a refined quantum measurement console: disciplined typography, hairline translucent borders, subtle surface elevations, and surgical luminescence where light and color represent verified quantum evidence.
 
-Judges should remember it as "the quantum flight recorder product," not "another dark-mode app."
+The interface prioritizes **extreme cognitive clarity**:
+- Progressive disclosure over 4,000px monolithic vertical scrolling.
+- Human-centered quantum terminology over developer debug strings.
+- Monochromatic sophistication over decorative neon glows and saturated gradients.
+- Seamless **Dark & Light Mode** support, defaulting to the user's system preference.
 
-## 2. Tokens (single source: `apps/web/app/globals.css`)
+Judges should experience Q-Trace as a peer to Linear, Raycast, or Figma — an unmistakably premium software instrument.
 
-### Palette
+---
 
-| Token | Value | Meaning |
-|---|---|---|
-| `--bg-abyss` | `#06070d` | Page background — deepest layer |
-| `--bg-panel` | `#0b0d17` | Card / panel surface |
-| `--bg-raised` | `#111425` | Raised elements (hover, wells) |
-| `--line` | `#1c2138` | Default border |
-| `--line-bright` | `#2b3355` | Emphasized border / dividers |
-| `--ink` | `#e8ecf8` | Primary text |
-| `--ink-dim` | `#8b93b0` | Secondary text |
-| `--ink-faint` | `#565d78` | Captions, metadata |
-| `--accent` | `#22d3ee` | Cyan — *quantum energy*: primary actions, active states, the H gate, brand |
-| `--accent-deep` | `#0e7490` | Accent pressed / gradient anchor |
-| `--evidence` | `#34d399` | Emerald — verified evidence, pass states, mastery |
-| `--caution` | `#fbbf24` | Amber — prediction checkpoints, misconceptions, warnings |
-| `--danger` | `#fb7185` | Rose — errors, divergence, destructive |
-| `--violet` | `#a78bfa` | Violet — entanglement / CNOT target / second-qubit accent (sparingly) |
+## 2. Tokens & Dual-Theme Color System
+
+Single source of truth: `apps/web/app/globals.css`.  
+Supported via `next-themes` with automatic system preference detection.
+
+### 2.1 Surface & Border Palette
+
+| Token | Light Mode (`:root`) | Dark Mode (`.dark`) | Semantic Role |
+|---|---|---|---|
+| `--bg-canvas` | `#ffffff` | `#08090a` | Deepest viewport background |
+| `--bg-surface` | `#f9fafb` | `#121316` | Standard card and container surface |
+| `--bg-surface-raised` | `#f3f4f6` | `#18191c` | Hover states, active tabs, recessed wells |
+| `--bg-surface-active` | `#e5e7eb` | `#222429` | Pressed buttons, selected list rows |
+| `--border-subtle` | `rgba(0, 0, 0, 0.06)` | `rgba(255, 255, 255, 0.05)` | Hairline dividers, card outlines |
+| `--border-default` | `rgba(0, 0, 0, 0.10)` | `rgba(255, 255, 255, 0.08)` | Standard component borders, inputs |
+| `--border-strong` | `rgba(0, 0, 0, 0.18)` | `rgba(255, 255, 255, 0.15)` | Emphasized cards, focused elements |
+
+### 2.2 Text & Typography Palette
+
+| Token | Light Mode (`:root`) | Dark Mode (`.dark`) | Semantic Role |
+|---|---|---|---|
+| `--text-primary` | `#0f172a` | `#f7f8f8` | Primary headings, prominent values, active titles |
+| `--text-secondary` | `#475569` | `#8a8f98` | Body text, section explanations, descriptions |
+| `--text-muted` | `#94a3b8` | `#575a61` | Micro-labels, disabled text, secondary metadata |
+| `--text-faint` | `#cbd5e1` | `#34373d` | Hairline watermarks, placeholder tracks |
+
+### 2.3 Semantic Accents & Quantum State Indicators
+
+Color is **never decorative**; it is surgical state telemetry.
+
+| Semantic Token | Light Mode | Dark Mode | Usage Rule |
+|---|---|---|---|
+| `--accent` | `#0284c7` (Sky 600) | `#38bdf8` (Sky 400) | Primary actions, H-gate, active wire focus. Never glowing neon. |
+| `--accent-subtle` | `#f0f9ff` | `rgba(56, 189, 248, 0.10)` | Active button backgrounds, soft selection pills. |
+| `--success` | `#059669` (Emerald 600) | `#34d399` (Emerald 400) | Verified evidence, passed repair challenge, pure state (purity = 1.0). |
+| `--success-subtle` | `#ecfdf5` | `rgba(52, 211, 153, 0.10)` | Success pill backgrounds. |
+| `--warning` | `#d97706` (Amber 600) | `#fbbf24` (Amber 400) | Prediction divergence, checkpoint prompt, stale circuit warning. |
+| `--warning-subtle` | `#fffbeb` | `rgba(251, 191, 36, 0.10)` | Warning notification wells. |
+| `--danger` | `#dc2626` (Rose 600) | `#f87171` (Rose 400) | Syntax parse errors, simulation timeouts, broken circuit alerts. |
+| `--violet` | `#7c3aed` (Violet 600) | `#a78bfa` (Violet 400) | Entanglement, CNOT target, Bell correlation (|00⟩+|11⟩). |
 
 Rules:
-- **One accent.** Cyan does all primary work. Violet appears ONLY for second-qubit /
-  entanglement semantics (CNOT target, |11⟩ correlation). Never decorative violet.
-- Color is never the only signal (quantum-ui.md) — pair with icon + label.
-- No raw palette classes (`cyan-950/70`, `zinc-850`, `amber-400`) in page files. Pages consume
-  semantic utilities: `bg-panel`, `text-ink-dim`, `border-line`, `text-evidence`, etc.
+- **No raw Tailwind color utilities**: Never write `bg-zinc-900`, `text-cyan-400`, or `border-neutral-800` in JSX. All components consume semantic CSS variables (`bg-surface`, `text-primary`, `border-subtle`).
+- **No glowing drop-shadows**: Banned `shadow-glow: 0 0 24px ...`. Replaced with subtle 1px border contrast and refined inset highlights:
+  `box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.2);`
+- **Subtle background depth**: The harsh 48px grid texture is completely removed. In Dark Mode, a soft radial falloff `radial-gradient(ellipse 60% 40% at 50% -10%, rgba(56, 189, 248, 0.04), transparent)` sits over `--bg-canvas`.
 
-### Typography
+---
 
-Loaded once in `app/layout.tsx` via Google Fonts `<link>` (NOT `next/font` — demo must render
-offline with `scripts/demo-local.sh`; the link degrades gracefully to system stack).
+## 3. Typography & Micro-Hierarchy
 
-| Role | Font | Usage |
-|---|---|---|
-| Display | **Space Grotesk** (500/700) | Page titles, hero, big numbers, brand wordmark |
-| Body | **Inter** (400/500/600) | Paragraphs, UI labels, card body |
-| Mono | **JetBrains Mono** (400/600) | Circuit ops, contract IDs, code, metrics, timestamps |
+- **Primary Font**: **Inter** (loaded locally or system fallback). Clean, neutral, highly legible at small sizes.
+  - Headings: `font-sans font-semibold tracking-[-0.015em]`
+  - Body: `font-sans font-normal text-sm leading-relaxed`
+  - Meta/Badges: `font-sans font-medium text-[11px] uppercase tracking-wider`
+- **Monospace Font**: **JetBrains Mono** strictly reserved for:
+  - Qiskit Python editor lines
+  - Quantum Dirac notation (e.g., `|00⟩`, `|Φ⁺⟩`)
+  - Precision numerical percentages and mathematical formulas
+- **Monospace is BANNED for general UI copy, badges, titles, and button labels.**
 
-Scale (Tailwind classes): hero `text-5xl md:text-6xl font-display` → page title `text-3xl
-font-display` → section `text-lg font-display` → body `text-sm` → meta `text-xs font-mono`.
-Never more than 3 sizes above the fold.
+---
 
-### Rhythm & shape
+## 4. Layout Archetypes (Closed List)
 
-- Spacing on an 8px grid: section gaps `space-y-8`, card padding `p-6`, inline gaps `gap-2|3|4`.
-- Radius: `rounded-xl` cards, `rounded-lg` wells, `rounded-md` controls, `rounded-full` badges.
-- Every primary panel carries a **1px border** (`border-line`) and sits on `bg-panel`. Nesting
-  goes one level darker (`bg-abyss` wells inside `bg-panel` cards).
-- Glow is evidence, not decoration: `shadow-glow` (cyan) only on the primary action and on
-  active/verified elements. Max one glowing element per viewport region.
+Every routed screen conforms to one of these structured archetypes:
 
-## 3. Layout archetypes (closed list — pick one per screen)
+| Archetype | Grid & Viewport Model | Used By | Description |
+|---|---|---|---|
+| `studio-workbench` | 3-Stage Sequential Studio (`max-w-7xl`) | `/lab` | Stage 1 (Construct & Code) ➔ Stage 2 (Visual Evidence) ➔ Stage 3 (Flight Recorder). Single run trigger; no duplicate buttons; wire grid & code side-by-side on desktop. |
+| `stepper-canvas` | Single-Column Focused Canvas (`max-w-4xl`) | `/learn/[slug]` | 7-step guided progression without the distracting sidebar. Completed steps collapse to 1-line checkmark summaries; only the active step is expanded. |
+| `catalog-grid` | Header + Categorized Module Grid (`max-w-6xl`) | `/learn` | Algorithm directory (Grover, QFT, VQE) and progress tracker. Breadcrumb navigation leads back here from individual lessons. |
+| `compact-dashboard` | KPI Strip ➔ 3 Clean Metric Panels (`max-w-5xl`) | `/progress`, `/instructor` | Summary statistics, skill competencies, and cohort charts with accessible table fallbacks. |
 
-| Archetype | Grid | Used by |
-|---|---|---|
-| `hero-observatory` | Centered hero (max-w-4xl) → 3-up persona cards → strip | `/` |
-| `module-lesson` | `lg:grid-cols-3`: content col-span-2 + context rail | `/learn/[slug]` |
-| `lab-bench` | `lg:grid-cols-12`: gate palette 3 · wire grid 6 · inspector 3 | `/lab` |
-| `card-index` | Header + responsive card grid | `/learn` |
-| `dashboard` | Stat strip → 3 metric panels → disclosure footer | `/instructor`, `/progress` |
+---
 
-All pages share the **PageHeader** block (see §4). Max content width is owned by the archetype
-(`max-w-7xl` for lab, `max-w-5xl` for lesson/dashboard), never re-declared ad hoc per page.
+## 5. Purging Developer Telemetry & Human Presentation Rules
 
-## 4. Shared components (in `components/ui/` / `components/layout/`)
+Q-Trace is built for learners and judges, not backend debugging. All internal identifiers MUST be sanitized before rendering in the UI:
 
-- `PageHeader` — eyebrow badges · display title · one-line purpose · right-side context slot.
-  Every routed page uses it. No hand-rolled `border-b` headers.
-- `AppShell` / `AppHeader` — sticky instrument-bar header: brand mark, nav with active glow,
-  role switcher. Footer carries the mandatory disclaimer (§5).
-- `Card`, `Badge`, `Button`, `Tabs`, `Skeleton` — token-driven variants only.
-- Evidence states: pass = `evidence` + check icon; caution/prediction = `caution`;
-  error/divergence = `danger`. Labels always accompany color.
+1. **Request & Session IDs**: Banned from visible cards (`req_live_...`, `req_demo_...`, `progress_lp_...`). Logged to the browser developer console only.
+2. **Raw JSON State Paths**: Banned from card text (`stateTrace.0.basisProbabilities`). Replaced with human labels (e.g., "Hadamard Basis Superposition").
+3. **Raw Enum Constants**: Banned from headers and badges. Translated via UI presenters:
+   - `PROBABILITY_SUPPORT_EQUALS` ➔ "Target State Match"
+   - `CORRELATED_00_11` ➔ "Entangled Pair (|00⟩ & |11⟩)"
+   - `NO_SIGNAL` ➔ "Mental Model Verified"
+   - `MIXED_SUBSYSTEM` ➔ "Entangled Subsystem"
+4. **Floating Point Precision**: Banned unrounded floats (`2.220446049250313e-16`). All coordinates and probabilities MUST be formatted to 2 or 3 decimal places (e.g., `(x: 1.00, y: 0.00, z: 0.00)`).
+5. **Raw Tolerances**: Banned from card text (`tolerance ε = 0.000001`). Backend validates tolerances silently.
 
-## 5. Mandatory copy (never paraphrase)
+---
 
-- Footer, every page: **"Mathematical representation, not physical trajectory."**
-- Mixed-subsystem Bloch views: label `MIXED_SUBSYSTEM` (quantum-ui.md).
-- Loading routes render seeded skeletons; empty states carry explicit copy from the screen
-  spec's copy table. No blank canvas, no lorem, no TODO.
+## 6. Shared Components & Ergonomics
 
-## 6. Copy discipline
+- **`AppHeader` (`h-14`)**:
+  - Sticky glass header with `border-b border-border-subtle backdrop-blur-md`.
+  - Brand wordmark + minimal subtitle.
+  - Active navigation links with clean indicator pills.
+  - Compact **Role Switcher Dropdown** (`Aarav (Beginner CSE) ▾`): opens a menu to switch personas without wrapping bio paragraphs in the navbar.
+  - **Theme Toggle**: Linear-style 3-way toggle (Light / Dark / System).
+- **`PageHeader`**: Clean title, 1-line purpose, and optional breadcrumbs. No cluttered developer request ID badges.
+- **`Card`**: 1px translucent border (`border-subtle`), subtle surface elevation (`bg-surface`), `rounded-xl`, padding disciplined to 16px–24px.
+- **`Button`**: Compact heights (`h-8` for small, `h-9` for standard). Clean micro-transitions. Exactly one primary action per viewport.
 
-All user-visible strings live in the owning screen spec's **copy table**
-(`board/screen-specs/*.md`). Page code imports or matches those strings. A PR that introduces a
-user-facing string not present in the spec fails Warden review. Persona names (Aarav, Meera,
-Dr. Rao) appear only where the spec's role-framing section allows them.
+---
 
-## 7. Banned patterns
+## 7. Mandatory Copy & Scientific Honesty
 
-- Per-page ad-hoc colors, one-off gradients, or a second accent.
-- Centered walls of body text; paragraphs wider than ~70ch.
-- Emoji as UI icons (Lucide only).
-- Hardcoded hex/opacity values in page files (tokens only).
-- New layout archetypes without a design-system edit in the same PR.
-- Animating qubits/photons as physical objects (quantum-ui.md, restated).
+- **Footer Disclaimer (Mandatory on every screen)**:  
+  *"Mathematical representation, not physical trajectory."*
+- **Entangled Bloch Spheres**: Reduced subsystems with purity `< 1.0` must carry the label:  
+  *"Entangled Subsystem · Purity Tr(ρ²): 0.50"* (accompanied by note: *"Represents reduced single-qubit density matrix, not the entangled whole."*).
 
-## 8. Accessibility & demo floor
+---
 
-- Contrast: `ink` on `bg-panel` ≥ 12:1; `ink-dim` reserved for ≥14px text.
-- Focus rings visible on all interactive elements (`focus-visible:ring-2 ring-accent`).
-- Rehearse at 1366×768 (quantum-ui.md): primary evidence readable without hover, no horizontal
-  scroll, hero fits above the fold.
+## 8. Banned Patterns (Enforced in Reviews)
+
+- Hardcoded palette classes (`bg-zinc-950`, `text-cyan-400`, `border-line-bright`).
+- Glowing neon drop shadows or oversaturated colored box shadows.
+- Multi-line user bio text crammed into the navigation header.
+- Two identical "Run Simulation" buttons on the same page.
+- Exposing raw contract keys (`stateTrace.x.y`, `req_...`, `ch_...`, `PROBABILITY_...`) in UI copy.
+- Unrounded floating point values.
+- Centered walls of text or paragraphs wider than 70ch.
+- Distracting multi-stage curriculum sidebars inside active individual learning steps.

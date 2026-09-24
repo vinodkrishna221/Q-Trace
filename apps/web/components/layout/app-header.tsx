@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen, Cpu, BarChart3, Users } from 'lucide-react';
 import { RoleSwitcher } from '@/components/ui/role-switcher';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useRoleStore } from '@/lib/role-store';
 
 export function AppHeader() {
@@ -19,27 +20,28 @@ export function AppHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-line bg-abyss/85 backdrop-blur-md">
-      <div className="container mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between px-4 py-3 gap-3">
-        <div className="flex items-center gap-8 w-full md:w-auto justify-between md:justify-start">
-          {/* Brand mark: flight-recorder trace motif */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-accent/50 bg-accent/10 shadow-glow">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-accent" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-                <circle cx="12" cy="12" r="8.5" strokeOpacity="0.5" />
-                <path d="M3.5 12h4l2-4.5 3 9 2-4.5h6" strokeLinecap="round" strokeLinejoin="round" />
+    <header className="sticky top-0 z-40 w-full border-b border-border-subtle bg-surface-canvas/90 backdrop-blur-md">
+      <div className="container mx-auto max-w-7xl flex items-center justify-between px-4 h-14 gap-4">
+        <div className="flex items-center gap-6">
+          {/* Brand mark */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border-medium bg-surface text-accent shadow-xs group-hover:border-accent transition-colors">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <circle cx="12" cy="12" r="8" strokeOpacity="0.4" />
+                <path d="M4 12h3.5l2-4 3 8 2-4h5.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-lg font-display font-bold tracking-widest text-ink group-hover:text-accent transition-colors">
+            <div className="flex items-baseline gap-1.5 leading-none">
+              <span className="text-sm font-semibold tracking-wider text-text-primary group-hover:text-accent transition-colors">
                 Q-TRACE
               </span>
-              <span className="text-[10px] font-mono text-ink-faint tracking-wider">
-                QUANTUM FLIGHT RECORDER
+              <span className="text-[10px] font-mono text-text-tertiary hidden sm:inline">
+                FLIGHT RECORDER
               </span>
             </div>
           </Link>
 
+          {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
             {navItems.map((item) => {
               if (item.hideFor && activeRole.roleType === item.hideFor) return null;
@@ -50,25 +52,24 @@ export function AppHeader() {
                   key={item.href}
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     isActive
-                      ? 'text-accent'
-                      : 'text-ink-dim hover:text-ink hover:bg-raised'
+                      ? 'text-text-primary bg-surface-raised/70'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-surface-raised/40'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
                   <span>{item.label}</span>
-                  {isActive && (
-                    <span className="absolute inset-x-3 -bottom-[13px] h-px bg-accent shadow-glow" aria-hidden />
-                  )}
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        <div className="w-full md:w-auto">
+        {/* Right side controls: Role Switcher & Theme Toggle */}
+        <div className="flex items-center gap-2">
           <RoleSwitcher />
+          <ThemeToggle />
         </div>
       </div>
     </header>

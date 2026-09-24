@@ -126,7 +126,15 @@ type SkillState = { skillId: string; status: SkillStatus; score: number };
 type ProgressRecord = { id: string; learnerProfileId: string; completedModuleIds: string[]; skillStates: SkillState[]; latestChallengeAttemptId: string | null; misconceptionSummary: { code: string; count: number; latestAt: string }[]; totalPoints: number; updatedAt: string };
 ```
 
+## Presentation Layer Mapping
+
+> **Presentation Boundary**: Schema identifiers (`challengeId`, `learnerProfileId`, `progressRecordId`) and acceptance rule internals are transport metadata.
+> 1. Raw internal IDs (`ch_...`, `lp_...`, `progress_lp_...`) MUST NOT appear in user-facing card text.
+> 2. `acceptanceRule` payload (`"kind": "PROBABILITY_SUPPORT_EQUALS"`, `"epsilon": 0.000001`) MUST NOT be printed raw. Present human goal: `"Target: Produce 50% |00⟩ and 50% |11⟩"`.
+> 3. Progress points and completion badges must use compact, clean Linear-style pill badges.
+
 ## Changelog
 
-- v1 2026-08-23: initial Challenge, atomic Challenge Attempt/Progress Record and aggregate Instructor Insight contracts.
+- v2.1 2026-09-24: added presentation layer mapping contract to ban raw rule enums, epsilon tolerances, and ID leaks from challenge cards (ADR-14).
 - v2 2026-09-14: added near-future teleportation bridge challenge ch_bell_psi_plus for anti-correlated Bell pair preparation.
+- v1 2026-08-23: initial Challenge, atomic Challenge Attempt/Progress Record and aggregate Instructor Insight contracts.

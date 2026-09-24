@@ -133,3 +133,30 @@ TEST: `pnpm --dir apps/web test:e2e -- accessibility-projector` passes keyboard-
 DEPENDS: UX-7,QA-6          UNBLOCKS: —
 DEMO: The learner demo remains readable and operable on the judging projector.
 PERSONA: Nova           STATUS: [x] done
+
+## P4 · Linear Design System & Visual Refinement — due 24 Sep 2026
+
+### UX-10 · Initial step progression and module catalog layout           [timebox: 2h]
+CONTEXT: Learners required progressive mental-model construction without cognitive overload. Load learning-content.md and quantum-ui.md.
+DELIVERABLE: Upgrade `/learn` and `/learn/bell-state` with 7-step interactive progression, one-by-one mode, and algorithm navigation.
+TEST: `pnpm --dir apps/web test -- learn-layout` passes; 140/140 tests green.
+DEPENDS: UX-9          UNBLOCKS: UX-11
+DEMO: Learner steps through prediction, circuit, and diagnostics one by one.
+PERSONA: Nova           STATUS: [x] done
+
+### UX-11 · Implement dual-theme engine and Linear UI component tokens   [timebox: 3h]
+CONTEXT: SHIP-9 established the Linear design tokens. Load nextjs.md, globals.css, and DESIGN-SYSTEM.md.
+DELIVERABLE: Integrate `next-themes` (system default), replace `apps/web/app/globals.css` with dual-theme porcelain/carbon variables, refactor Button, Badge, Card, and AppHeader (with sleek role dropdown & theme toggle), and remove neon cyan drop shadows and harsh 48px grid lines.
+TEST: `pnpm --dir apps/web test` and Next.js build passes cleanly in both light and dark classes.
+DEPENDS: SHIP-9, UX-10  UNBLOCKS: UX-12
+DEMO: The app seamlessly switches between Linear-grade dark and light themes with pristine micro-borders.
+PERSONA: Nova           STATUS: [x] done
+
+### UX-12 · Restructure Circuit Lab into 3-Stage Studio and purge UI telemetry [timebox: 3h]
+CONTEXT: Lab page is currently a 4,000px doom-scroll with duplicate run buttons; Learn page has sidebar clutter. Load DESIGN-SYSTEM.md and quantum-ui.md.
+DELIVERABLE: Convert `/lab` into 3-Stage Studio ([1. Construct & Code], [2. Visual Evidence], [3. Flight Recorder]); purge raw IDs (req_..., ch_..., lp_...), raw enums, and format floats to 2 decimal places; remove LearnSidebar from `/learn/bell-state` to keep active step distraction-free.
+TEST: `pnpm --dir apps/web test -- lab-page` and `learn-layout.test.tsx` pass without regressions.
+DEPENDS: UX-11          UNBLOCKS: —
+DEMO: Judges experience zero cognitive overload with clean 3-stage flow and human-readable quantum metrics.
+PERSONA: Nova           STATUS: [x] done
+

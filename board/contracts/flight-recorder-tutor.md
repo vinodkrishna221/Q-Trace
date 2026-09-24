@@ -133,8 +133,17 @@ type TutorStep = { title: string; body: string; evidenceKeys: string[] };
 type NumericalClaim = { claim: string; evidenceKey: string };
 ```
 
+## Presentation Layer Mapping
+
+> **Presentation Boundary**: Schema identifiers (`evidenceKeys`, `misconceptionSignalId`, `repairChallengeId`) and raw enum codes are transport protocols.
+> 1. `evidenceKeys` (`stateTrace.0.basisProbabilities`) MUST NOT be printed raw in UI cards; UI presenters must map them to human concepts (e.g. "Hadamard Basis Superposition", "Entangled Correlation").
+> 2. `NO_SIGNAL` MUST be presented as `"Status: Mental Model Verified"` with a clean status dot.
+> 3. Raw enums (`CORRELATED_00_11`, `INDEPENDENT_RANDOM`) must render as human descriptions (e.g. `"Entangled Pair (|00⟩ & |11⟩)"`).
+> 4. Internal IDs (`ms_...`, `sr_...`, `ch_...`) are banned from visible UI text.
+
 ## Changelog
 
-- v1 2026-08-23: initial deterministic diagnosis, evidence-bound Tutor and circuit-health contracts.
-- v1.1 2026-09-11: added isCorrectPrediction to MisconceptionSignal and DiagnoseResponse; added learnerRole to ExplainRequest.
+- v1.3 2026-09-24: added presentation layer mapping contract to purge raw evidence keys and enum strings from UI cards (ADR-14).
 - v1.2 2026-09-11: added predictionDescription and verifiedBehaviorDescription to MisconceptionEvidence.
+- v1.1 2026-09-11: added isCorrectPrediction to MisconceptionSignal and DiagnoseResponse; added learnerRole to ExplainRequest.
+- v1 2026-08-23: initial deterministic diagnosis, evidence-bound Tutor and circuit-health contracts.

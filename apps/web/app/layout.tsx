@@ -13,18 +13,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Observatory Dark type system — Google Fonts link (not next/font) so the
-            offline demo-local mode degrades gracefully to the system stack. */}
+        {/* Precision typography stack — Google Fonts link with fallback to system stack */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="bg-abyss text-ink font-sans antialiased">
+      <body className="bg-surface-canvas text-text-primary font-sans antialiased min-h-screen">
         <Providers>
           {children}
         </Providers>
@@ -32,4 +31,3 @@ export default function RootLayout({
     </html>
   );
 }
-

@@ -45,28 +45,28 @@ export function InteractiveCircuitWorkspace({
   return (
     <div className="space-y-6" data-testid="interactive-circuit-workspace">
       <Card
-        className="border-line bg-panel shadow-xl overflow-hidden"
+        className="border-border-subtle bg-surface shadow-xs overflow-hidden"
         data-testid="circuit-workspace-readonly"
       >
-        <CardHeader className="pb-3 border-b border-line bg-raised/40">
+        <CardHeader className="pb-3 border-b border-border-subtle bg-surface-raised/40">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Badge variant="default" className="text-xs font-mono">
                 {readOnly
-                  ? 'STEP 2 · CIRCUIT WORKSPACE (READ-ONLY)'
+                  ? 'STAGE 1 · CIRCUIT WORKSPACE (READ-ONLY)'
                   : isSimulating
-                  ? 'STEP 2 · SIMULATION IN PROGRESS (LOCKED)'
-                  : 'STEP 2 · INTERACTIVE CIRCUIT WORKSPACE'}
+                  ? 'STAGE 1 · SIMULATING (LOCKED)'
+                  : 'STAGE 1 · CONSTRUCT & CODE'}
               </Badge>
-              <span className="text-xs font-mono text-ink-dim" data-testid="circuit-name-badge">
+              <span className="text-xs font-mono text-text-secondary" data-testid="circuit-name-badge">
                 {circuit.name}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono text-ink-faint">
+              <span className="text-[11px] font-mono text-text-tertiary">
                 {circuit.qubitCount} Qubits · {circuit.classicalBitCount} Classical Bits · {circuit.operations.length} Gates
               </span>
-              <Badge variant="outline" className="text-[10px] font-mono text-ink-dim">
+              <Badge variant="outline" className="text-[10px] font-mono text-text-secondary">
                 v{circuit.modelVersion}
               </Badge>
               <Button
@@ -83,12 +83,12 @@ export function InteractiveCircuitWorkspace({
               </Button>
             </div>
           </div>
-          <CardTitle className="text-base text-ink flex items-center gap-2 mt-1">
+          <CardTitle className="text-base text-text-primary flex items-center gap-2 mt-1">
             <Cpu className="w-4 h-4 text-accent" />
             <span>Synchronized Quantum Circuit Builder</span>
           </CardTitle>
-          <CardDescription className="text-xs text-ink-dim">
-            Drag gates from the palette onto qubit wires, or select cells with keyboard shortcuts. The Circuit Model is the single editable truth.
+          <CardDescription className="text-xs text-text-secondary">
+            Drag gates onto qubit wires or edit code directly. The Circuit Model is the single synchronized source of truth.
           </CardDescription>
         </CardHeader>
 
@@ -96,15 +96,22 @@ export function InteractiveCircuitWorkspace({
           {/* Gate Palette */}
           {!isLocked && <GatePalette />}
 
-          {/* Interactive Wires Grid */}
-          <QubitWiresGrid readOnly={isLocked} />
+          {/* Side-by-Side Instrument: Wires Grid (7 cols) + Qiskit Code Editor (5 cols) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-7 space-y-4">
+              <QubitWiresGrid readOnly={isLocked} />
+            </div>
+            <div className="lg:col-span-5 space-y-4">
+              <QiskitCodeEditor isReadOnly={isLocked} />
+            </div>
+          </div>
         </CardContent>
 
-        <CardFooter className="bg-raised/40 p-4 border-t border-line flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-ink-dim">
+        <CardFooter className="bg-surface-raised/40 p-3 md:p-4 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-text-secondary">
             <Zap className="w-3.5 h-3.5 text-caution" />
             <span>
-              Execution Target: <strong className="text-ink font-mono">Qiskit Aer 0.17 (1024 shots)</strong>
+              Execution Target: <strong className="text-text-primary font-mono">Qiskit Aer (1024 shots)</strong>
             </span>
           </div>
 
@@ -113,21 +120,21 @@ export function InteractiveCircuitWorkspace({
             disabled={isLocked}
             data-testid="run-simulation-btn"
             variant={hasExecuted ? 'outline' : 'default'}
-            className="font-semibold"
+            className="font-medium text-xs gap-1.5"
           >
             {isSimulating ? (
               <>
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" />
                 <span>Simulating on Aer...</span>
               </>
             ) : hasExecuted ? (
               <>
-                <CheckCircle2 className="w-4 h-4 mr-2 text-evidence" />
-                <span>Re-run Simulation (Qiskit Aer)</span>
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-success" />
+                <span>Re-run Simulation</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 mr-2 text-abyss fill-abyss" />
+                <Play className="w-3.5 h-3.5 mr-1 fill-white text-white" />
                 <span>Run Simulation (Qiskit Aer)</span>
               </>
             )}
@@ -142,9 +149,6 @@ export function InteractiveCircuitWorkspace({
           onImportSuccess={() => setShowSharePanel(false)}
         />
       )}
-
-      {/* Synchronized Qiskit Code Panel & Editor */}
-      <QiskitCodeEditor isReadOnly={isLocked} />
     </div>
   );
 }

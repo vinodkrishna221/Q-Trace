@@ -1,4 +1,4 @@
-# ⚔️ STATUS — Q-Trace · updated 10 Sep 2026 10:15 IST by Patch
+# ⚔️ STATUS — Q-Trace · updated 24 Sep 2026 14:15 IST by Vinod & Venu
 
 > The single glance-source. Every session reads this first, appends one line at end.
 > The internal presentation time on 29 August remains unconfirmed; conservative readiness gates are earlier.
@@ -13,12 +13,13 @@
 
 | Track | Done | In flight | Next |
 |---|---|---|---|
-| learning-ux | plan + Venu mission + UX-1..UX-9 | UX-9 merged to main | — (Track complete) |
+| learning-ux | plan + Venu mission + UX-1..UX-12 | UX-11 & UX-12 done | — (Track complete) |
 | simulation-api | plan + Uday mission + SIM-1..SIM-9 | SIM-9 merged to main | — (Track complete) |
 | ai-pedagogy | plan + Rajeswari mission + AI-1..AI-8 | AI-8 merged to main | — (Track complete) |
 | data-analytics | plan + Rani mission + DATA-1..DATA-8 | PR review (DATA-8) | — |
 | fixtures-qa | plan + Sohail mission + QA-1..QA-8 | QA-8 merged to main | — (Track complete) |
-| story-ship | plan + Vinod mission + SHIP-1..SHIP-4 | SHIP-4 merged to main | SHIP-5 |
+| story-ship | plan + Vinod mission + SHIP-1..SHIP-5, SHIP-9 | SHIP-9 done | SHIP-6 |
+
 
 ## Blockers
 
@@ -127,4 +128,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 10 Sep 10:15 Patch: QA-7 merged to main (PR #41) — release gate runner scripts/release-gate.sh, contract diff scan (4 contracts present, zero drift, 35/35 Pydantic contract tests pass), 7-scenario forced-offline fallback resilience drill (100% parity verified), local ephemeral stack smoke, and Warden release verdict generator board/WARDEN-RELEASE-VERDICT.md integrated; full API unit suite (465/465) and web test suite (136/136) verified green; fixtures-qa track complete.
 
 - 10 Sep 11:15 Venu: UX-10 green — /learn catalogue and /learn/bell-state lesson journey upgraded with 12-column responsive layout, LearnSidebar (Bell correlation benchmark + 6-algorithm roadmap), initial prediction directive prompt, and 7-step interactive one-by-one progression with Prev/Next stepper controls and full view toggle; 140/140 web tests passed, Next.js build clean.
+- 24 Sep 14:15 Vinod: SHIP-9 green — Linear Precision Design System overhaul specification and contracts presentation layer established in docs/DESIGN-SYSTEM.md, .agents/rules/stack/quantum-ui.md, report.md, and board/contracts/ (circuit-simulation, flight-recorder-tutor, progress-analytics); telemetry purge and dual-theme tokens defined; unblocks UX-11.
+- 24 Sep 15:25 Venu: UX-11 & UX-12 green — Dual-theme porcelain/carbon engine, ThemeToggle, hairline borders, compact AppHeader/RoleSwitcher implemented; /lab restructured into 3-Stage Studio (Construct & Code, Visual Evidence, Flight Recorder) with side-by-side wires grid and Qiskit editor; /learn/bell-state converted to focused single-column layout; UI telemetry purged and float formatting clamped to 2 decimal places; 178/178 web tests green, Next.js build (11/11 static routes) clean.
 

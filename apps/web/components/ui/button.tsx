@@ -8,21 +8,27 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center rounded-md text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-abyss disabled:pointer-events-none disabled:opacity-50 select-none';
+    const baseStyles =
+      'inline-flex items-center justify-center rounded-md text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer';
 
     const variants = {
-      default: 'bg-accent text-abyss hover:bg-accent/90 shadow-glow hover:shadow-glow-soft font-display tracking-wide',
-      outline: 'border border-line-bright bg-panel text-ink hover:bg-raised hover:border-accent/50 hover:text-accent',
-      secondary: 'bg-raised text-ink hover:bg-line border border-line',
-      ghost: 'text-ink-dim hover:bg-raised hover:text-ink',
-      destructive: 'bg-danger/90 text-abyss hover:bg-danger',
+      default:
+        'bg-accent text-white hover:bg-accent-hover active:scale-[0.99] shadow-xs border border-accent/20',
+      outline:
+        'border border-border-subtle bg-surface text-text-primary hover:bg-surface-raised hover:border-border-medium active:bg-surface-active shadow-xs',
+      secondary:
+        'bg-surface-raised text-text-primary hover:bg-surface-active border border-border-subtle active:scale-[0.99]',
+      ghost:
+        'text-text-secondary hover:text-text-primary hover:bg-surface-raised active:bg-surface-active',
+      destructive:
+        'bg-danger/10 text-danger hover:bg-danger/20 border border-danger/30 active:scale-[0.99]',
     };
 
     const sizes = {
-      default: 'h-9 px-4 py-2',
-      sm: 'h-8 rounded-md px-3 text-xs',
-      lg: 'h-11 rounded-md px-8 text-base',
-      icon: 'h-9 w-9 p-0',
+      default: 'h-8 px-3.5 py-1.5 text-xs',
+      sm: 'h-7 rounded-md px-2.5 text-[11px]',
+      lg: 'h-10 rounded-md px-6 text-sm font-semibold',
+      icon: 'h-8 w-8 p-0',
     };
 
     return (
