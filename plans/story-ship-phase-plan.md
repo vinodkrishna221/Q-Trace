@@ -125,3 +125,14 @@ TEST: `bash scripts/final-package.sh --verify` reproduces the submission ZIP and
 DEPENDS: SHIP-7,QA-8          UNBLOCKS: —
 DEMO: The team has one authoritative presentation, demo and technical-answer package.
 PERSONA: Herald + Patch           STATUS: [ ] todo
+
+## P4 · Linear Design System & Visual Refinement — due 24 Sep 2026
+
+### SHIP-9 · Author the Linear design system and contract presentation standard        [timebox: 2h]
+CONTEXT: Judges' feedback revealed severe cognitive overload and unstyled developer telemetry leakage. Load report.md, docs/DESIGN-SYSTEM.md, quantum-ui.md, and all four board contracts.
+DELIVERABLE: Upgrade docs/DESIGN-SYSTEM.md with Linear-grade specification (dual-theme porcelain/carbon tokens, Inter typography, 3-stage studio workbench, distraction-free stepper, telemetry purge law); update .agents/rules/stack/quantum-ui.md to enforce theme neutrality and clean rounding; update board/contracts/*.md with Presentation Layer Boundaries; record ADR-14 in board/DECISIONS.md.
+TEST: `bash scripts/contract-check.sh` passes, docs match report.md specification, zero broken contract schemas.
+DEPENDS: SHIP-5          UNBLOCKS: UX-11, UX-12
+DEMO: Clear, unified design contracts and Linear tokens established across engineering tracks.
+PERSONA: Patch           STATUS: [x] done
+

@@ -181,8 +181,14 @@ type Operation = { opId: string; gate: GateName; targets: number[]; controls: nu
 type CircuitModel = { id: string; name: string; qubitCount: number; classicalBitCount: number; operations: Operation[]; source: "BUILDER" | "SUPPORTED_QISKIT" | "SEED"; modelVersion: 1 };
 type ReducedQubit = { qubit: number; bloch: { x: number; y: number; z: number }; purity: number; label: "PURE_SUBSYSTEM" | "MIXED_SUBSYSTEM" };
 type StateTraceStep = { stepIndex: number; operationId: string; label: string; basisProbabilities: Record<string, number>; amplitudes: Record<string, ComplexValue>; reducedQubits: ReducedQubit[] };
-```
+## Presentation Layer Mapping
+
+> **Presentation Boundary**: Schema identifiers (`operationId`, `id`, `circuitModelId`, `requestId`) are transport and repository identifiers.
+> 1. Frontend cards MUST NOT display raw database/request IDs in user-visible text.
+> 2. `MIXED_SUBSYSTEM` must be presented as `"Entangled Subsystem · Purity Tr(ρ²): <purity>"`.
+> 3. Float coordinates (`bloch.x`, `bloch.y`, `bloch.z`) and probabilities MUST be formatted to 2–3 decimal places (`toFixed(2)`), never raw machine floats.
 
 ## Changelog
 
+- v1.1 2026-09-24: added presentation layer mapping contract to ban raw ID leaks and enforce Linear precision formatting (ADR-14).
 - v1 2026-08-23: initial Circuit Model, safe Qiskit parse, OpenQASM export and Simulation Run contract.

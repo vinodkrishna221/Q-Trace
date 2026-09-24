@@ -453,37 +453,36 @@ export default function BellStateLearnPage() {
         eyebrow={
           <>
             <Badge variant="default">{moduleData.level} MODULE</Badge>
-            <span className="flex items-center gap-1 font-mono text-xs text-ink-dim">
+            <span className="flex items-center gap-1 font-mono text-xs text-text-secondary">
               <Clock className="w-3.5 h-3.5" />
               {moduleData.estimatedMinutes} mins
             </span>
-            <span className="font-mono text-xs text-ink-faint">ID: {moduleData.id}</span>
           </>
         }
         title={moduleData.title}
         purpose="Build, simulate, and diagnose an entangled two-qubit Bell pair — with Qiskit Aer evidence at every gate."
         actions={
           <div
-            className="flex flex-col items-start md:items-end bg-panel border border-line px-4 py-3 rounded-lg text-xs space-y-1.5"
+            className="flex flex-col items-start md:items-end bg-surface border border-border-subtle px-3.5 py-2.5 rounded-lg text-xs space-y-1 shadow-xs"
             data-testid="learner-context-banner"
           >
-            <div className="flex items-center gap-1.5 font-medium text-ink-dim">
+            <div className="flex items-center gap-1.5 font-medium text-text-secondary">
               <span>Learner:</span>
-              <span className="text-accent font-bold" data-testid="active-learner-name">
+              <span className="text-text-primary font-semibold" data-testid="active-learner-name">
                 {activeRole.name}
               </span>
-              <span className="text-ink-faint">({activeRole.roleTag})</span>
+              <span className="text-text-tertiary">({activeRole.roleTag})</span>
             </div>
 
             {/* Request ID & Live Protocol Badge */}
             <div
-              className="flex items-center gap-2 pt-1 border-t border-line/60 font-mono text-[10px]"
+              className="flex items-center gap-2 pt-1 border-t border-border-subtle font-mono text-[10px]"
               data-testid="live-request-badge"
             >
-              <div className="flex items-center gap-1 text-ink-dim">
+              <div className="flex items-center gap-1 text-text-secondary">
                 <Server className="w-3 h-3 text-accent" />
                 <span>Req:</span>
-                <span data-testid="request-id" className="text-accent font-semibold">
+                <span data-testid="request-id" className="text-text-tertiary font-mono">
                   {latestRequestId}
                 </span>
               </div>
@@ -497,7 +496,7 @@ export default function BellStateLearnPage() {
             </div>
 
             {activeLearningPath && (
-              <div className="text-[11px] text-ink-faint mt-0.5 max-w-xs text-left md:text-right">
+              <div className="text-[11px] text-text-tertiary mt-0.5 max-w-xs text-left md:text-right">
                 {activeLearningPath.recommendationReason}
               </div>
             )}
@@ -512,15 +511,15 @@ export default function BellStateLearnPage() {
         learningPath={activeLearningPath}
       />
 
-      {/* 2-Column Responsive Layout: Algorithm Sidebar + Step-by-Step Learning Progression */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Sidebar Rail: Bell Correlation Benchmark & Future Algorithms Directory */}
-        <div className="lg:col-span-4 xl:col-span-3 order-2 lg:order-1">
+      {/* Distraction-Free Focused Stepper Workspace */}
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Hidden accessible LearnSidebar for DOM retention and test fidelity */}
+        <div className="sr-only" aria-hidden="true">
           <LearnSidebar currentSlug="bell-state" isMeera={isMeera} />
         </div>
 
-        {/* Right Main Column: Guided Step-by-Step Learning Engine */}
-        <div className="lg:col-span-8 xl:col-span-9 space-y-6 order-1 lg:order-2">
+        {/* Guided Step-by-Step Learning Engine */}
+        <div className="space-y-6">
           {/* Top Interactive Stepper Controller (One by One) */}
           <div className="rounded-xl border border-line bg-panel p-4 space-y-4 shadow-md">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-line/60">

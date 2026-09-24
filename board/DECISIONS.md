@@ -67,4 +67,10 @@ CHOSE: Add near-future bridge challenge ch_bell_psi_plus (|Ψ+⟩ preparation fo
 BECAUSE: Solves Step 2 / Step 6 circuit redundancy, eliminates false-positive prediction bypass, and prevents HTTP 422 errors when broken circuits are simulated.
 AFFECTS: board/contracts/progress-analytics.md (v2), apps/api (diagnosis, tutor, seeds, progress), apps/web (in-situ workspace, repair challenge, learn page).
 
+### 14 · Linear-Grade Design System, Dual Themes & Presentation Layer Sanitization   24 Sep 2026 · by Vinod + team
+CHOSE: Complete design overhaul to Linear.app aesthetic standard: porcelain light mode and carbon dark mode defaulting to system preference (`next-themes`), hairline translucent borders, Inter typography scale, removal of harsh 48px grid and neon cyan glows, 3-Stage Studio workflow for `/lab`, single-column progressive stepper for `/learn/[slug]`, and strict UI sanitization purging developer request IDs (`req_...`), contract IDs (`ch_...`), and raw enums from user-facing cards.
+BECAUSE: Judges' feedback highlighted acute cognitive overload and unstyled developer telemetry that degraded the product's perceived maturity; the new architecture delivers world-class craftsmanship and progressive disclosure without breaking underlying backend schemas.
+AFFECTS: docs/DESIGN-SYSTEM.md, .agents/rules/stack/quantum-ui.md, board/contracts/*.md, apps/web/app/globals.css, apps/web/components/layout/app-header.tsx, apps/web/features/circuit/, apps/web/features/learning/, apps/web/features/flight-recorder/.
+
+
 

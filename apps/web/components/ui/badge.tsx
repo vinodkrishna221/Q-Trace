@@ -11,18 +11,18 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variants = {
-    default: 'bg-accent/10 text-accent border border-accent/40',
-    secondary: 'bg-raised text-ink-dim border border-line',
-    outline: 'text-ink-dim border-line-bright border',
-    success: 'bg-evidence/10 text-evidence border border-evidence/40',
-    warning: 'bg-caution/10 text-caution border border-caution/40',
-    destructive: 'bg-danger/10 text-danger border border-danger/40',
+    default: 'bg-accent-muted text-accent border border-accent/25',
+    secondary: 'bg-surface-raised text-text-secondary border border-border-subtle',
+    outline: 'text-text-secondary border border-border-medium bg-transparent',
+    success: 'bg-success/10 text-success border border-success/25',
+    warning: 'bg-caution/10 text-caution border border-caution/25',
+    destructive: 'bg-danger/10 text-danger border border-danger/25',
   };
 
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-accent',
+        'inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium font-mono tracking-tight transition-colors focus:outline-none focus:ring-1 focus:ring-accent',
         variants[variant],
         className
       )}

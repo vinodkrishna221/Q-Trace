@@ -38,6 +38,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | SHIP-6 | `feat/story-ship/ship-6-run-merge-trains-and-pre` | card TEST + fresh Warden verdict + contract check |
 | SHIP-7 | `feat/story-ship/ship-7-rehearse-twice-and-record-the` | card TEST + fresh Warden verdict + contract check |
 | SHIP-8 | `feat/story-ship/ship-8-freeze-the-final-submission-and` | card TEST + fresh Warden verdict + contract check |
+| SHIP-9 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
+
 
 ## Your cards — verbatim from `plans/story-ship-phase-plan.md`
 
@@ -120,6 +122,17 @@ DEMO: The team has one authoritative presentation, demo and technical-answer pac
 PERSONA: Herald + Patch           STATUS: [ ] todo
 BRANCH: `feat/story-ship/ship-8-freeze-the-final-submission-and`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### SHIP-9 · Author the Linear design system and contract presentation standard        [timebox: 2h]
+CONTEXT: Judges' feedback revealed severe cognitive overload and unstyled developer telemetry leakage. Load report.md, docs/DESIGN-SYSTEM.md, quantum-ui.md, and all four board contracts.
+DELIVERABLE: Upgrade docs/DESIGN-SYSTEM.md with Linear-grade specification (dual-theme porcelain/carbon tokens, Inter typography, 3-stage studio workbench, distraction-free stepper, telemetry purge law); update .agents/rules/stack/quantum-ui.md to enforce theme neutrality and clean rounding; update board/contracts/*.md with Presentation Layer Boundaries; record ADR-14 in board/DECISIONS.md.
+TEST: `bash scripts/contract-check.sh` passes, docs match report.md specification, zero broken contract schemas.
+DEPENDS: SHIP-5          UNBLOCKS: UX-11, UX-12
+DEMO: Clear, unified design contracts and Linear tokens established across engineering tracks.
+PERSONA: Patch           STATUS: [x] done
+BRANCH: `feat/learning-ux/ux-linear-design-system-and-contracts`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 
 ## Contracts
 
