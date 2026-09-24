@@ -27,8 +27,8 @@ export const GATE_DEFINITIONS: Record<GateName, GateDefinition> = {
     symbol: 'X',
     description: 'Bit flip / NOT gate (|0⟩ ↔ |1⟩)',
     shortcutKey: 'x',
-    colorClass: 'border-emerald-500 text-emerald-400 bg-emerald-500/15',
-    badgeClass: 'border-emerald-500/60 bg-emerald-500/10 text-emerald-400',
+    colorClass: 'border-emerald-600 dark:border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/15',
+    badgeClass: 'border-emerald-600/50 dark:border-emerald-500/60 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
   },
   Y: {
     gate: 'Y',
@@ -36,8 +36,8 @@ export const GATE_DEFINITIONS: Record<GateName, GateDefinition> = {
     symbol: 'Y',
     description: 'Bit & phase flip (|0⟩ → i|1⟩, |1⟩ → -i|0⟩)',
     shortcutKey: 'y',
-    colorClass: 'border-amber-500 text-amber-400 bg-amber-500/15',
-    badgeClass: 'border-amber-500/60 bg-amber-500/10 text-amber-400',
+    colorClass: 'border-amber-600 dark:border-amber-500 text-amber-700 dark:text-amber-400 bg-amber-500/15',
+    badgeClass: 'border-amber-600/50 dark:border-amber-500/60 bg-amber-500/10 text-amber-700 dark:text-amber-400',
   },
   Z: {
     gate: 'Z',
@@ -45,8 +45,8 @@ export const GATE_DEFINITIONS: Record<GateName, GateDefinition> = {
     symbol: 'Z',
     description: 'Phase flip (|0⟩ → |0⟩, |1⟩ → -|1⟩)',
     shortcutKey: 'z',
-    colorClass: 'border-cyan-500 text-cyan-400 bg-cyan-500/15',
-    badgeClass: 'border-cyan-500/60 bg-cyan-500/10 text-cyan-400',
+    colorClass: 'border-cyan-600 dark:border-cyan-500 text-cyan-700 dark:text-cyan-400 bg-cyan-500/15',
+    badgeClass: 'border-cyan-600/50 dark:border-cyan-500/60 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400',
   },
   CNOT: {
     gate: 'CNOT',

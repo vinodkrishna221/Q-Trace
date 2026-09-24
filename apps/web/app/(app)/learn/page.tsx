@@ -237,7 +237,7 @@ export default function LearnIndexPage() {
                     <div
                       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${
                         isActive
-                          ? 'bg-accent text-abyss shadow-glow'
+                          ? 'bg-accent text-white shadow-glow'
                           : isPassed
                           ? 'bg-evidence/20 border border-evidence/50 text-evidence'
                           : 'border border-line-bright bg-raised text-ink-faint'

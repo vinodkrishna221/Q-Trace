@@ -20,6 +20,74 @@ interface QiskitCodeEditorProps {
   isReadOnly?: boolean;
 }
 
+function renderHighlightedQiskitCode(code: string) {
+  const lines = code.split('\n');
+  return lines.map((line, lineIdx) => {
+    const commentIdx = line.indexOf('#');
+    const codePart = commentIdx >= 0 ? line.slice(0, commentIdx) : line;
+    const commentPart = commentIdx >= 0 ? line.slice(commentIdx) : null;
+
+    const tokens: React.ReactNode[] = [];
+    const tokenRegex =
+      /(\b(?:from|import|def|return|as|with)\b)|(\bQuantumCircuit\b)|(\.(?:h|x|y|z|cx|measure)\b)|(\b\d+\b)|("[^"]*"|'[^']*')|([a-zA-Z_]\w*)|([^\s\w]+|\s+)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = tokenRegex.exec(codePart)) !== null) {
+      const [full, kw, cls, method, num, str, ident] = match;
+      if (kw) {
+        tokens.push(
+          <span key={`kw-${lineIdx}-${tokens.length}`} className="text-violet-600 dark:text-violet-400 font-semibold">
+            {kw}
+          </span>
+        );
+      } else if (cls) {
+        tokens.push(
+          <span key={`cls-${lineIdx}-${tokens.length}`} className="text-sky-600 dark:text-sky-400 font-semibold">
+            {cls}
+          </span>
+        );
+      } else if (method) {
+        tokens.push(
+          <span key={`meth-${lineIdx}-${tokens.length}`} className="text-emerald-600 dark:text-emerald-400 font-semibold">
+            {method}
+          </span>
+        );
+      } else if (num) {
+        tokens.push(
+          <span key={`num-${lineIdx}-${tokens.length}`} className="text-amber-700 dark:text-amber-400 font-medium">
+            {num}
+          </span>
+        );
+      } else if (str) {
+        tokens.push(
+          <span key={`str-${lineIdx}-${tokens.length}`} className="text-teal-600 dark:text-teal-400">
+            {str}
+          </span>
+        );
+      } else if (ident) {
+        tokens.push(
+          <span key={`id-${lineIdx}-${tokens.length}`} className="text-ink">
+            {ident}
+          </span>
+        );
+      } else {
+        tokens.push(full);
+      }
+    }
+
+    return (
+      <div key={`line-${lineIdx}`} className="leading-relaxed">
+        {tokens}
+        {commentPart && (
+          <span className="text-slate-400 dark:text-slate-500 italic">
+            {commentPart}
+          </span>
+        )}
+      </div>
+    );
+  });
+}
+
 export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) {
   const {
     code,
@@ -128,13 +196,13 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
         {parseError && (
           <div
             data-testid="code-parse-error"
-            className="p-3 bg-red-950/40 border-b border-red-800/60 text-red-300 text-xs font-mono flex items-start gap-2.5 animate-in fade-in duration-200"
+            className="p-3 bg-red-500/10 dark:bg-red-950/40 border-b border-red-500/30 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs font-mono flex items-start gap-2.5 animate-in fade-in duration-200"
           >
-            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <div className="font-bold text-red-200">Parse & Validation Error</div>
-              <div className="text-[11px] text-red-300/90">{parseError}</div>
-              <div className="text-[10px] text-red-400/80 mt-1">
+              <div className="font-bold text-red-900 dark:text-red-200">Parse &amp; Validation Error</div>
+              <div className="text-[11px] text-red-700 dark:text-red-300/90">{parseError}</div>
+              <div className="text-[10px] text-red-600 dark:text-red-400/80 mt-1">
                 Note: The visual Circuit Model was preserved without changes. Fix the unsupported statement to synchronize.
               </div>
             </div>
@@ -145,9 +213,9 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
         {parseSuccess && !parseError && !isCodeModified && (
           <div
             data-testid="code-parse-success"
-            className="py-1.5 px-3 bg-emerald-950/30 border-b border-emerald-800/40 text-emerald-300 text-[11px] font-mono flex items-center gap-2"
+            className="py-1.5 px-3 bg-emerald-500/10 dark:bg-emerald-950/30 border-b border-emerald-500/30 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300 text-[11px] font-mono flex items-center gap-2"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>Code successfully parsed and synchronized with Circuit Model.</span>
           </div>
         )}
@@ -155,9 +223,9 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
         {/* Editor text area / display */}
         <div className="relative bg-abyss">
           {isReadOnly ? (
-            <div className="p-4 font-mono text-xs text-ink-dim overflow-x-auto leading-relaxed border-b border-line">
-              <pre data-testid="qiskit-code-content" className="text-accent/90">
-                <code>{localInput}</code>
+            <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed border-b border-line bg-surface">
+              <pre data-testid="qiskit-code-content" className="font-mono">
+                <code>{renderHighlightedQiskitCode(localInput)}</code>
               </pre>
             </div>
           ) : (
@@ -168,7 +236,7 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
                 onChange={handleChange}
                 spellCheck={false}
                 rows={Math.max(8, localInput.split('\n').length + 1)}
-                className="w-full p-4 bg-abyss text-accent font-mono text-xs leading-relaxed border-b border-line focus:outline-none focus:ring-1 focus:ring-accent resize-y selection:bg-accent/20"
+                className="w-full p-4 bg-abyss text-ink font-mono text-xs leading-relaxed border-b border-line focus:outline-none focus:ring-1 focus:ring-accent resize-y selection:bg-accent/20"
                 placeholder="Write Qiskit Python code..."
                 aria-label="Qiskit Python Code Editor"
               />
@@ -207,7 +275,7 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
                 onClick={handleApply}
                 disabled={!isCodeModified}
                 data-testid="apply-code-btn"
-                className="h-7 px-3 text-xs font-mono font-semibold bg-accent text-abyss hover:bg-accent/90"
+                className="h-7 px-3 text-xs font-mono font-semibold bg-accent text-white hover:bg-accent-hover"
               >
                 <Sparkles className="w-3 h-3 mr-1.5" />
                 Sync to Circuit Model
