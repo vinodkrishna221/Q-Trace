@@ -43,6 +43,8 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 24 Sep 17:15 Vinod & Venu: UX palette & contrast calibration green (feat/learning-ux/palette-contrast-and-adaptive-canvas) — implemented Interactive Dynamic Reveal for gate palette (monochrome rest + vivid family hover/active reveal), adaptive dual-luminance 3D canvases (Bloch sphere & Q-Sphere frosted porcelain in light mode + cobalt vector >6:1, obsidian in dark mode), eliminated all text-abyss token inversion defects across 13 files, calibrated projector-safe border tokens (0.12–0.18 alpha, 1.5px lines), and added multi-token Qiskit syntax highlighting; 178/178 tests pass, static build 11/11 routes green, 7/7 golden fixtures valid.
+
 - 09 Sep 18:40 Patch: SHIP-4 merged to main — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) verified; smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); unblocks SIM-8, AI-6, SHIP-6.
 
 - 09 Sep 18:30 Vinod: SHIP-4 green — Vercel web and Railway API configs (vercel.json, apps/web/vercel.json, railway.toml), production environment template (.env.production.example), deploy runbook documentation, and deployed smoke runner (scripts/smoke-live.sh) established; bash scripts/smoke-live.sh passed 5/5 checks (web shells, /health, /ready, seeded Bell Module, zero key/ObjectId leaks); PR ready for Warden review. Unblocks SHIP-6.
