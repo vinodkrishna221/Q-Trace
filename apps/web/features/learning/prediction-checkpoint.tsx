@@ -110,7 +110,7 @@ export function PredictionCheckpoint({
               <div className="flex items-center gap-3">
                 <div
                   className={`detent-pip w-4 h-4 rounded-full border flex items-center justify-center text-[10px] shrink-0 ${
-                    isSelected ? 'border-gate-cnot bg-gate-cnot text-white font-bold' : 'border-border-strong bg-surface-sunken'
+                    isSelected ? 'border-gate-cnot bg-gate-cnot text-white dark:text-canvas font-bold' : 'border-border-strong bg-surface-sunken'
                   }`}
                   aria-hidden="true"
                 >

@@ -70,14 +70,14 @@ export function CircuitWorkspaceReadonly({
               data-testid="qubit-wire-0"
             >
               <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink font-bold">
-                <span className="px-1.5 py-0.5 rounded bg-raised border border-line-bright text-accent">
+                <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-medium text-accent">
                   q[0]
                 </span>
                 <span className="text-[10px] text-ink-faint font-normal">|0⟩</span>
               </div>
 
               {/* Wire line */}
-              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-line-bright z-0" />
+              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[1.5px] bg-border-medium z-0" />
 
               {/* Gates on Wire 0 */}
               <div className="grid grid-cols-12 gap-2 w-full pl-2 z-10">
@@ -85,10 +85,10 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-3 flex justify-center">
                   <div
                     data-testid="gate-op_1"
-                    className="w-12 h-12 rounded-md bg-accent/15 border-2 border-accent text-accent flex flex-col items-center justify-center font-bold text-sm shadow-glow"
+                    className="w-12 h-9 rounded-full bg-gate-h/15 border-2 border-gate-h text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs"
                   >
-                    <span>H</span>
-                    <span className="text-[9px] text-accent/80 font-normal">Hadamard</span>
+                    <span className="leading-tight text-xs font-bold text-ink">H</span>
+                    <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Hadamard</span>
                   </div>
                 </div>
 
@@ -96,7 +96,7 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-cnot-control"
-                    className="w-6 h-6 rounded-full bg-violet border-2 border-violet ring-2 ring-violet/40 flex flex-col items-center justify-center text-[10px] text-white font-bold shadow-lg"
+                    className="w-6 h-6 rounded-full bg-gate-cnot border-2 border-gate-cnot ring-2 ring-gate-cnot/40 flex flex-col items-center justify-center text-[10px] text-white dark:text-canvas font-bold shadow-xs"
                     title="CNOT Control (q[0])"
                     aria-label="CNOT Control on q[0] targeting q[1]"
                   >
@@ -109,11 +109,11 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-5 flex justify-center">
                   <div
                     data-testid="gate-op_3"
-                    className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
+                    className="w-12 h-9 rounded-full bg-surface-raised border-2 border-border-strong text-ink flex flex-col items-center justify-center text-xs font-bold shadow-xs"
                     aria-label="Measure gate on q[0] into c[0]"
                   >
-                    <span className="text-caution font-bold">MEASURE</span>
-                    <span className="text-[9px] text-ink-dim font-normal">→ c[0]</span>
+                    <span className="text-[10px] font-mono font-bold text-caution leading-tight">MEASURE</span>
+                    <span className="text-[8px] font-mono text-ink-dim font-normal leading-none">→ c[0]</span>
                   </div>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export function CircuitWorkspaceReadonly({
 
             {/* CNOT Vertical Connection Line */}
             <div
-              className="absolute left-[calc(16px+25%+14%)] top-6 bottom-6 w-[2px] bg-violet pointer-events-none z-0 border-l border-r border-violet/50"
+              className="absolute left-[calc(16px+25%+14%)] top-6 bottom-6 w-[2px] bg-gate-cnot pointer-events-none z-0 border-l border-r border-gate-cnot/50 shadow-xs"
               style={{ left: '46%' }}
               aria-hidden="true"
             />
@@ -132,14 +132,14 @@ export function CircuitWorkspaceReadonly({
               data-testid="qubit-wire-1"
             >
               <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink font-bold">
-                <span className="px-1.5 py-0.5 rounded bg-raised border border-line-bright text-accent">
+                <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-medium text-accent">
                   q[1]
                 </span>
                 <span className="text-[10px] text-ink-faint font-normal">|0⟩</span>
               </div>
 
               {/* Wire line */}
-              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-line-bright z-0" />
+              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[1.5px] bg-border-medium z-0" />
 
               {/* Gates on Wire 1 */}
               <div className="grid grid-cols-12 gap-2 w-full pl-2 z-10">
@@ -152,12 +152,12 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-op_2"
-                    className="w-11 h-11 rounded-full bg-violet/20 border-2 border-violet text-violet flex flex-col items-center justify-center font-bold text-sm shadow-lg"
+                    className="w-11 h-11 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot flex flex-col items-center justify-center font-bold text-sm shadow-xs"
                     title="CNOT Target (q[1])"
                     aria-label="CNOT Target on q[1] controlled by q[0]"
                   >
                     <span className="text-base leading-none">⊕</span>
-                    <span className="text-[8px] font-mono text-violet tracking-tighter">CX</span>
+                    <span className="text-[8px] font-mono text-gate-cnot tracking-tighter">CX</span>
                   </div>
                 </div>
 
@@ -165,25 +165,25 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-5 flex justify-center">
                   <div
                     data-testid="gate-op_4"
-                    className="w-12 h-12 rounded-md bg-raised border-2 border-line-bright text-ink flex flex-col items-center justify-center text-xs font-bold shadow"
+                    className="w-12 h-9 rounded-full bg-surface-raised border-2 border-border-strong text-ink flex flex-col items-center justify-center text-xs font-bold shadow-xs"
                     aria-label="Measure gate on q[1] into c[1]"
                   >
-                    <span className="text-caution font-bold">MEASURE</span>
-                    <span className="text-[9px] text-ink-dim font-normal">→ c[1]</span>
+                    <span className="text-[10px] font-mono font-bold text-caution leading-tight">MEASURE</span>
+                    <span className="text-[8px] font-mono text-ink-dim font-normal leading-none">→ c[1]</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Classical Register Wire c[2] */}
-            <div className="flex items-center gap-4 relative pt-2 border-t border-line min-w-[480px]">
+            <div className="flex items-center gap-4 relative pt-2 border-t border-border-subtle min-w-[480px]">
               <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink-dim font-bold">
-                <span className="px-1.5 py-0.5 rounded bg-raised border border-line text-ink">
+                <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-subtle text-ink">
                   c[2]
                 </span>
                 <span className="text-[10px] text-ink-faint font-normal">/2</span>
               </div>
-              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[3px] border-b-2 border-line-bright border-double z-0" />
+              <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[3px] border-b-2 border-border-medium border-double z-0" />
               <div className="w-full text-right pr-4 text-[10px] text-ink-faint">
                 Classical register (2 bits)
               </div>
@@ -192,7 +192,7 @@ export function CircuitWorkspaceReadonly({
         </div>
       </CardContent>
 
-      <CardFooter className="bg-raised/40 p-4 border-t border-line flex flex-wrap items-center justify-between gap-3">
+      <CardFooter className="bg-surface-raised/40 p-4 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-ink-dim">
           <Zap className="w-3.5 h-3.5 text-caution" />
           <span>Execution Target: <strong className="text-ink font-mono">Qiskit Aer 0.17 (1024 shots)</strong></span>
@@ -217,7 +217,7 @@ export function CircuitWorkspaceReadonly({
             </>
           ) : (
             <>
-              <Play className="w-4 h-4 mr-2 text-white fill-white" />
+              <Play className="w-4 h-4 mr-2 text-current fill-current" />
               <span>Run Simulation (Qiskit Aer)</span>
             </>
           )}

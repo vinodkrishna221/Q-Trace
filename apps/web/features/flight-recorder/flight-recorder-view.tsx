@@ -125,7 +125,7 @@ export function FlightRecorderView({
                 </span>
                 <span
                   data-testid="hypothesis-confirmed-badge"
-                  className="text-xs font-mono font-bold text-evidence px-2 py-0.5 rounded bg-abyss border border-evidence/40"
+                  className="text-xs font-mono font-bold text-evidence px-2.5 py-0.5 rounded-full bg-canvas border border-evidence/40"
                 >
                   NO MISCONCEPTION DETECTED
                 </span>
@@ -182,7 +182,7 @@ export function FlightRecorderView({
                 </span>
                 <span
                   data-testid="misconception-code"
-                  className="text-xs font-mono font-bold text-caution px-2 py-0.5 rounded bg-abyss border border-caution/40"
+                  className="text-xs font-mono font-bold text-caution px-2.5 py-0.5 rounded-full bg-canvas border border-caution/40"
                 >
                   {misconceptionSignal.code}
                 </span>
@@ -271,10 +271,10 @@ export function FlightRecorderView({
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-xs px-2 py-0.5 rounded font-bold ${
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${
                           isSelected
-                            ? 'bg-accent text-white font-bold'
-                            : 'bg-raised text-ink-dim'
+                            ? 'bg-accent text-white dark:text-canvas font-bold shadow-xs'
+                            : 'bg-surface-raised text-text-secondary'
                         }`}
                       >
                         Step {step.stepIndex}
@@ -283,11 +283,11 @@ export function FlightRecorderView({
                     </div>
 
                     {isCorrect ? (
-                      <span className="text-[10px] font-mono text-evidence px-1.5 py-0.5 rounded bg-evidence/15 border border-evidence/40">
+                      <span className="text-[10px] font-mono text-evidence px-2.5 py-0.5 rounded-full bg-evidence/15 border border-evidence/40">
                         VERIFIED
                       </span>
                     ) : isDivergence ? (
-                      <span className="text-[10px] font-mono text-caution px-1.5 py-0.5 rounded bg-caution/15 border border-caution/40">
+                      <span className="text-[10px] font-mono text-caution px-2.5 py-0.5 rounded-full bg-caution/15 border border-caution/40">
                         DIVERGENCE
                       </span>
                     ) : null}
@@ -326,7 +326,7 @@ export function FlightRecorderView({
                 {currentReplay?.evidenceKeys.map((key) => (
                   <code
                     key={key}
-                    className="px-1.5 py-0.5 rounded bg-raised border border-line text-accent"
+                    className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-subtle text-accent"
                   >
                     {key}
                   </code>
@@ -347,7 +347,7 @@ export function FlightRecorderView({
                   return (
                     <div
                       key={rq.qubit}
-                      className={`p-3 rounded-lg border ${
+                      className={`p-3 rounded-xl border ${
                         isMixed
                           ? 'border-violet/40 bg-violet/10 text-violet'
                           : 'border-accent/40 bg-accent/10 text-accent'
@@ -357,7 +357,7 @@ export function FlightRecorderView({
                         <span className="font-bold text-ink">Qubit q[{rq.qubit}] Subsystem</span>
                         <span
                           data-testid={`subsystem-label-${rq.qubit}`}
-                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                             isMixed
                               ? 'bg-violet/20 text-violet border border-violet/50'
                               : 'bg-accent/20 text-accent border border-accent/50'

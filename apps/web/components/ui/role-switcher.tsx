@@ -10,7 +10,7 @@ export function RoleSwitcher() {
 
   return (
     <div
-      className="flex items-center rounded-md border border-border-subtle bg-surface-raised/60 p-0.5"
+      className="flex items-center rounded-full border border-border-subtle bg-surface-raised/60 p-0.5"
       role="group"
       aria-label="Demo role selector"
     >
@@ -24,7 +24,7 @@ export function RoleSwitcher() {
             aria-pressed={isSelected}
             aria-label={`Switch demo role to ${role.name} (${role.roleTag})`}
             onClick={() => setRole(role.id)}
-            className={`px-2.5 py-1 rounded text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               isSelected
                 ? 'bg-surface text-text-primary shadow-xs font-semibold'
                 : 'text-text-secondary hover:text-text-primary'

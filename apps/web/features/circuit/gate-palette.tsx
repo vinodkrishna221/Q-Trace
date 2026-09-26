@@ -135,7 +135,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                 {isSelected && (
                   <span
                     data-testid="armed-badge"
-                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent text-white flex items-center justify-center text-[9px] font-bold shadow"
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent text-white dark:text-canvas flex items-center justify-center text-[9px] font-bold shadow-xs"
                   >
                     ✓
                   </span>

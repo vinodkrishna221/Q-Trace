@@ -144,12 +144,12 @@ export function Bloch3DSphere({
     );
     if (isLight) {
       sphereGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-      sphereGrad.addColorStop(0.6, 'rgba(241, 245, 249, 0.95)');
-      sphereGrad.addColorStop(1, 'rgba(226, 232, 240, 0.98)');
+      sphereGrad.addColorStop(0.6, 'rgba(240, 242, 247, 0.95)');
+      sphereGrad.addColorStop(1, 'rgba(233, 237, 244, 0.98)');
     } else {
-      sphereGrad.addColorStop(0, 'rgba(17, 24, 39, 0.7)');
-      sphereGrad.addColorStop(0.7, 'rgba(10, 14, 26, 0.85)');
-      sphereGrad.addColorStop(1, 'rgba(6, 7, 13, 0.95)');
+      sphereGrad.addColorStop(0, 'rgba(10, 10, 12, 0.7)');
+      sphereGrad.addColorStop(0.7, 'rgba(4, 4, 5, 0.85)');
+      sphereGrad.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
     }
 
     ctx.beginPath();
@@ -157,7 +157,7 @@ export function Bloch3DSphere({
     ctx.fillStyle = sphereGrad;
     ctx.fill();
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.18)' : '#1e293b';
+    ctx.strokeStyle = isLight ? 'rgba(11, 10, 67, 0.16)' : 'rgba(255, 255, 255, 0.12)';
     ctx.stroke();
 
     // --- 2. Draw 3D Latitude and Longitude Wireframe Rings ---
@@ -189,7 +189,7 @@ export function Bloch3DSphere({
       const theta = (i / segments) * Math.PI * 2;
       equatorPts.push({ xw: Math.cos(theta), yw: 0, zw: Math.sin(theta) });
     }
-    drawRing(equatorPts, isLight ? 'rgba(2, 132, 199, 0.45)' : 'rgba(56, 189, 248, 0.25)');
+    drawRing(equatorPts, isLight ? 'rgba(42, 40, 130, 0.40)' : 'rgba(144, 164, 253, 0.35)');
 
     // Latitudes (+45 deg and -45 deg)
     const lat45Y = Math.sin(Math.PI / 4);
@@ -201,7 +201,7 @@ export function Bloch3DSphere({
       latNorthPts.push({ xw: Math.cos(theta) * lat45R, yw: lat45Y, zw: Math.sin(theta) * lat45R });
       latSouthPts.push({ xw: Math.cos(theta) * lat45R, yw: -lat45Y, zw: Math.sin(theta) * lat45R });
     }
-    const ringColor = isLight ? 'rgba(100, 116, 139, 0.35)' : 'rgba(71, 85, 105, 0.25)';
+    const ringColor = isLight ? 'rgba(11, 10, 67, 0.14)' : 'rgba(255, 255, 255, 0.09)';
     drawRing(latNorthPts, ringColor, [3, 3]);
     drawRing(latSouthPts, ringColor, [3, 3]);
 
@@ -221,7 +221,7 @@ export function Bloch3DSphere({
     const zPos = project(0, 1.2, 0);
     const zNeg = project(0, -1.2, 0);
     ctx.beginPath();
-    ctx.strokeStyle = isLight ? 'rgba(51, 65, 85, 0.7)' : 'rgba(148, 163, 184, 0.7)';
+    ctx.strokeStyle = isLight ? 'rgba(11, 10, 67, 0.50)' : 'rgba(249, 250, 251, 0.45)';
     ctx.lineWidth = 1.5;
     ctx.moveTo(zNeg.x, zNeg.y);
     ctx.lineTo(zPos.x, zPos.y);
@@ -231,7 +231,7 @@ export function Bloch3DSphere({
     const xPos = project(0, 0, 1.2);
     const xNeg = project(0, 0, -1.2);
     ctx.beginPath();
-    ctx.strokeStyle = isLight ? 'rgba(71, 85, 105, 0.6)' : 'rgba(100, 116, 139, 0.6)';
+    ctx.strokeStyle = isLight ? 'rgba(11, 10, 67, 0.35)' : 'rgba(249, 250, 251, 0.30)';
     ctx.lineWidth = 1.2;
     ctx.moveTo(xNeg.x, xNeg.y);
     ctx.lineTo(xPos.x, xPos.y);
@@ -241,7 +241,7 @@ export function Bloch3DSphere({
     const yPos = project(1.2, 0, 0);
     const yNeg = project(-1.2, 0, 0);
     ctx.beginPath();
-    ctx.strokeStyle = isLight ? 'rgba(71, 85, 105, 0.6)' : 'rgba(100, 116, 139, 0.6)';
+    ctx.strokeStyle = isLight ? 'rgba(11, 10, 67, 0.35)' : 'rgba(249, 250, 251, 0.30)';
     ctx.lineWidth = 1.2;
     ctx.moveTo(yNeg.x, yNeg.y);
     ctx.lineTo(yPos.x, yPos.y);
@@ -253,20 +253,20 @@ export function Bloch3DSphere({
     ctx.textBaseline = 'middle';
 
     // +Z = |0> (North Pole)
-    ctx.fillStyle = isLight ? '#0284c7' : '#38bdf8';
+    ctx.fillStyle = isLight ? '#2a2882' : '#90a4fd';
     ctx.fillText('|0⟩ (+Z)', zPos.x, zPos.y - 10);
 
     // -Z = |1> (South Pole)
-    ctx.fillStyle = isLight ? '#475569' : '#94a3b8';
+    ctx.fillStyle = isLight ? '#31306b' : '#9ca3af';
     ctx.fillText('|1⟩ (-Z)', zNeg.x, zNeg.y + 10);
 
     // +X = |+> (Front)
-    ctx.fillStyle = isLight ? '#1e293b' : '#cbd5e1';
+    ctx.fillStyle = isLight ? '#0b0a43' : '#f9fafb';
     ctx.font = 'bold 10px JetBrains Mono, monospace';
     ctx.fillText('|+⟩ (+X)', xPos.x + 8, xPos.y + 6);
 
     // +Y = |+i> (Right)
-    ctx.fillStyle = isLight ? '#1e293b' : '#cbd5e1';
+    ctx.fillStyle = isLight ? '#0b0a43' : '#f9fafb';
     ctx.fillText('|+i⟩ (+Y)', yPos.x + 10, yPos.y - 6);
 
     // --- 4. Render State Vector OR Entangled Mixed Core ---
@@ -438,12 +438,12 @@ export function Bloch3DSphere({
         />
 
         {/* 3D Floating Control Pills */}
-        <div className="absolute top-2 right-2 flex items-center gap-1 bg-abyss/85 border border-line rounded-md p-1 shadow-md opacity-80 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-surface-overlay/85 border border-border-subtle rounded-full p-1 shadow-md opacity-80 group-hover:opacity-100 transition-opacity">
           <button
             type="button"
             title="Reset 3D Orientation"
             onClick={resetCamera}
-            className="p-1 text-ink-dim hover:text-accent rounded hover:bg-raised transition-colors"
+            className="p-1 text-ink-dim hover:text-accent rounded-full hover:bg-surface-raised transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -451,7 +451,7 @@ export function Bloch3DSphere({
             type="button"
             title={isAutoRotating ? 'Pause Auto-Rotation' : 'Start Auto-Rotation'}
             onClick={() => setIsAutoRotating(!isAutoRotating)}
-            className="p-1 text-ink-dim hover:text-accent rounded hover:bg-raised transition-colors"
+            className="p-1 text-ink-dim hover:text-accent rounded-full hover:bg-surface-raised transition-colors cursor-pointer"
           >
             {isAutoRotating ? <Pause className="w-3.5 h-3.5 text-accent" /> : <Play className="w-3.5 h-3.5" />}
           </button>
@@ -459,7 +459,7 @@ export function Bloch3DSphere({
             type="button"
             title="Zoom In"
             onClick={() => setZoom((z) => Math.min(1.4, z + 0.1))}
-            className="p-1 text-ink-dim hover:text-accent rounded hover:bg-raised transition-colors"
+            className="p-1 text-ink-dim hover:text-accent rounded-full hover:bg-surface-raised transition-colors cursor-pointer"
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
@@ -467,7 +467,7 @@ export function Bloch3DSphere({
             type="button"
             title="Zoom Out"
             onClick={() => setZoom((z) => Math.max(0.7, z - 0.1))}
-            className="p-1 text-ink-dim hover:text-accent rounded hover:bg-raised transition-colors"
+            className="p-1 text-ink-dim hover:text-accent rounded-full hover:bg-surface-raised transition-colors cursor-pointer"
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
@@ -475,7 +475,7 @@ export function Bloch3DSphere({
 
         {/* Drag Hint Overlay */}
         <div className="absolute bottom-2 left-2 pointer-events-none">
-          <span className="text-[9px] font-mono text-ink-faint bg-abyss/80 px-1.5 py-0.5 rounded border border-line/60 flex items-center gap-1">
+          <span className="text-[9px] font-mono text-ink-faint bg-canvas/80 px-2 py-0.5 rounded-full border border-border-subtle flex items-center gap-1">
             <Sparkles className="w-2.5 h-2.5 text-accent" />
             <span>Drag to rotate 3D</span>
           </span>

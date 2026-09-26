@@ -10,11 +10,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
     // Master Pill Geometry (rounded-full)
     const baseStyles =
-      'inline-flex items-center justify-center rounded-full text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer';
+      'inline-flex items-center justify-center rounded-full text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer';
 
     const variants = {
       default:
-        'bg-accent text-white hover:bg-accent-hover active:scale-[0.98] shadow-sm border border-accent/20',
+        'bg-accent text-white dark:text-canvas hover:bg-accent-hover active:scale-[0.98] shadow-sm border border-accent/20',
       outline:
         'border border-border-subtle bg-surface text-text-primary hover:bg-surface-raised hover:border-border-medium active:bg-surface-active shadow-xs',
       secondary:

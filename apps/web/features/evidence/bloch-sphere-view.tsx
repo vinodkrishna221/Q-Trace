@@ -83,14 +83,14 @@ export function BlochSphereView({
           <div className="flex items-center gap-2">
             {/* View Mode Pills (Only in dynamic render mode) */}
             {!forceStaticFallback && hasTwoQubits && (
-              <div className="flex items-center rounded-lg border border-line bg-raised/70 p-0.5 text-[11px] font-mono">
+              <div className="flex items-center rounded-full border border-border-subtle bg-surface-raised/70 p-0.5 text-[11px] font-mono">
                 <button
                   type="button"
                   data-testid="view-mode-dual-btn"
                   onClick={() => setViewMode('DUAL_3D')}
-                  className={`px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 cursor-pointer ${
                     viewMode === 'DUAL_3D'
-                      ? 'bg-accent/20 text-accent font-bold shadow-sm'
+                      ? 'bg-accent/20 text-accent font-bold shadow-xs'
                       : 'text-ink-dim hover:text-ink'
                   }`}
                 >
@@ -101,9 +101,9 @@ export function BlochSphereView({
                   type="button"
                   data-testid="view-mode-single-btn"
                   onClick={() => setViewMode('SINGLE_3D')}
-                  className={`px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 cursor-pointer ${
                     viewMode === 'SINGLE_3D'
-                      ? 'bg-accent/20 text-accent font-bold shadow-sm'
+                      ? 'bg-accent/20 text-accent font-bold shadow-xs'
                       : 'text-ink-dim hover:text-ink'
                   }`}
                 >
@@ -114,9 +114,9 @@ export function BlochSphereView({
                   type="button"
                   data-testid="view-mode-qsphere-btn"
                   onClick={() => setViewMode('Q_SPHERE')}
-                  className={`px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 cursor-pointer ${
+                  className={`px-3 py-1 rounded-full transition-colors flex items-center gap-1 cursor-pointer ${
                     viewMode === 'Q_SPHERE'
-                      ? 'bg-accent/20 text-accent font-bold shadow-sm'
+                      ? 'bg-accent/20 text-accent font-bold shadow-xs'
                       : 'text-ink-dim hover:text-ink'
                   }`}
                 >
@@ -132,7 +132,7 @@ export function BlochSphereView({
               data-testid="toggle-plotly-fallback"
               aria-pressed={forceStaticFallback}
               onClick={() => setForceStaticFallback(!forceStaticFallback)}
-              className="flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-1 rounded bg-raised border border-line hover:border-line-bright text-ink-dim hover:text-ink transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex items-center gap-1.5 text-[11px] font-mono px-3 py-1 rounded-full bg-surface-raised border border-border-subtle hover:border-border-medium text-ink-dim hover:text-ink transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {forceStaticFallback ? (
                 <>
@@ -163,7 +163,7 @@ export function BlochSphereView({
         {/* Qubit Selector Tabs (Available in Single Inspector mode and fallback mode) */}
         {(viewMode === 'SINGLE_3D' || forceStaticFallback || !hasTwoQubits) && (
           <div
-            className="flex items-center gap-2 border-b border-line pb-3"
+            className="flex items-center gap-2 border-b border-border-subtle pb-3"
             role="tablist"
             aria-label="Qubit Wire Subsystem Selector"
           >
@@ -177,15 +177,15 @@ export function BlochSphereView({
                 aria-controls="bloch-visual-container"
                 data-testid={`qubit-tab-${rq.qubit}`}
                 onClick={() => setSelectedQubitIndex(idx)}
-                className={`px-3 py-1 text-xs font-mono rounded-md border transition-all cursor-pointer flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                className={`px-3 py-1 text-xs font-mono rounded-full border transition-all cursor-pointer flex items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   selectedQubitIndex === idx
-                    ? 'border-accent bg-accent/15 text-accent font-bold shadow-glow'
-                    : 'border-line bg-raised/50 text-ink-dim hover:text-ink hover:border-line-bright'
+                    ? 'border-accent bg-accent/15 text-accent font-bold shadow-xs'
+                    : 'border-border-subtle bg-surface-raised/50 text-ink-dim hover:text-ink hover:border-border-medium'
                 }`}
               >
                 <span>q[{rq.qubit}]</span>
                 <span
-                  className={`text-[10px] px-1 rounded ${
+                  className={`text-[10px] px-2 py-0.5 rounded-full ${
                     rq.label === 'MIXED_SUBSYSTEM'
                       ? 'bg-violet/20 text-violet font-semibold'
                       : 'bg-accent/20 text-accent font-semibold'

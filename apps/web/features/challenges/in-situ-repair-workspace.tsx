@@ -433,7 +433,7 @@ export function InSituRepairWorkspace({
                           <button
                             onClick={() => handleAddGate('X', wire, 2)}
                             disabled={readOnly}
-                            className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                            className="h-7 px-3 rounded-full border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
                             title={`Click to place Pauli-X gate on q[${wire}]`}
                             data-testid={`empty-slot-q${wire}`}
                           >
@@ -443,7 +443,7 @@ export function InSituRepairWorkspace({
                         );
                       }
                       return (
-                        <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                        <span className="w-8 h-8 rounded-full border border-dashed border-border-subtle/40 flex items-center justify-center text-[10px] text-ink-faint">
                           —
                         </span>
                       );
@@ -452,7 +452,7 @@ export function InSituRepairWorkspace({
 
                   {/* Column 3 (Measurement) */}
                   <div className="flex justify-center">
-                    <span className="px-2 py-0.5 bg-raised border border-line-bright text-ink-dim rounded text-xs">
+                    <span className="px-2.5 py-0.5 bg-surface-raised border border-border-medium text-ink-dim rounded-full text-xs">
                       M
                     </span>
                   </div>
@@ -465,7 +465,7 @@ export function InSituRepairWorkspace({
       </div>
 
       {/* Test Circuit Controls & Real-Time Probability Readout */}
-      <div className="pt-2 border-t border-line/60 space-y-3">
+      <div className="pt-2 border-t border-border-subtle/60 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Button
             onClick={handleTestCircuit}
@@ -492,7 +492,7 @@ export function InSituRepairWorkspace({
             <div className="flex items-center gap-2">
               {isTargetAchieved ? (
                 <div
-                  className="flex items-center gap-1.5 text-xs font-mono text-evidence bg-evidence/10 px-2.5 py-1 rounded border border-evidence/40"
+                  className="flex items-center gap-1.5 text-xs font-mono text-evidence bg-evidence/10 px-3 py-1 rounded-full border border-evidence/40"
                   data-testid="insitu-target-achieved-badge"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -504,7 +504,7 @@ export function InSituRepairWorkspace({
                 </div>
               ) : (
                 <div
-                  className="flex items-center gap-1.5 text-xs font-mono text-caution bg-caution/10 px-2.5 py-1 rounded border border-caution/40"
+                  className="flex items-center gap-1.5 text-xs font-mono text-caution bg-caution/10 px-3 py-1 rounded-full border border-caution/40"
                   data-testid="insitu-target-pending-badge"
                 >
                   <AlertTriangle className="w-3.5 h-3.5" />
