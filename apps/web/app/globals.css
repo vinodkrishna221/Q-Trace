@@ -12,11 +12,11 @@
 /* 1. Theme 4 Master CSS Custom Properties */
 :root {
   /* Surface System (Light Mode: Archival Mineral Lithograph) */
-  --bg-canvas: #f8f9fc;       /* oklch(0.980 0.005 270) Heavy acid-free alabaster */
+  --bg-canvas: #faf6f0;       /* oklch(0.980 0.005 270) Heavy acid-free alabaster */
   --bg-surface: #ffffff;      /* oklch(1.000 0.000 0) Pure bleached kaolin */
-  --bg-surface-raised: #f0f2f7;/* oklch(0.955 0.007 270) Pressed ivory tile */
-  --bg-surface-sunken: #e9edf4;/* oklch(0.930 0.010 270) Optical mineral trench */
-  --bg-surface-active: #dde3ed;/* oklch(0.900 0.012 270) Active pill state */
+  --bg-surface-raised: #f3eee6;/* oklch(0.955 0.007 270) Pressed ivory tile */
+  --bg-surface-sunken: #ece6dc;/* oklch(0.930 0.010 270) Optical mineral trench */
+  --bg-surface-active: #e5dfd4;/* oklch(0.900 0.012 270) Active pill state */
   --bg-surface-overlay: #ffffff;
 
   /* Legacy surface aliases */
@@ -635,4 +635,5 @@ body {
   animation-duration: 180ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 
