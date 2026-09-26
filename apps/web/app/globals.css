@@ -248,9 +248,9 @@
   --gradient-prob-fill: var(--prob-fill);
   --gradient-phase: var(--phase-gradient);
 
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-display: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), inset 0 1px 0 0 var(--bevel-specular);
@@ -635,5 +635,6 @@ body {
   animation-duration: 180ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 
 
