@@ -217,9 +217,9 @@ export function FlightRecorderView({
             </div>
 
             {misconceptionSignal.firstDivergenceStep !== null && misconceptionSignal.firstDivergenceStep !== undefined && (
-              <div className="flex items-center justify-between text-xs text-caution pt-1">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-caution animate-ping" />
+              <div className="divergence-sonar-ribbon mt-2">
+                <span className="divergence-sonar-pip shrink-0" aria-hidden="true" />
+                <span className="flex items-center gap-1.5 text-xs text-caution flex-wrap">
                   <span>First Conceptual Divergence Point:</span>
                   <strong data-testid="first-divergence-step" className="font-mono underline decoration-caution">
                     Step {misconceptionSignal.firstDivergenceStep}{' '}

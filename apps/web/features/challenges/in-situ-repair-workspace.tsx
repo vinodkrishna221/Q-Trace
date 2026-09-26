@@ -273,7 +273,7 @@ export function InSituRepairWorkspace({
 
                 <div className="relative flex-1 h-9 flex items-center">
                   {/* Horizontal wire background */}
-                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-line-bright" />
+                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[1.5px] bg-border-medium" />
 
                   {/* 4 Columns (0: H/prep, 1: CNOT, 2: Slot for X gate, 3: Measure) */}
                   <div className="relative z-10 w-full grid grid-cols-4 items-center">
@@ -285,7 +285,7 @@ export function InSituRepairWorkspace({
                           return (
                             <div className="flex items-center gap-1 group">
                               <span
-                                className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs"
+                                className="px-3 py-1 bg-gate-h/20 border border-gate-h text-gate-h rounded-full font-bold shadow-xs text-xs"
                                 data-testid={`insitu-gate-h-q${wire}`}
                               >
                                 H
@@ -293,7 +293,7 @@ export function InSituRepairWorkspace({
                               {!readOnly && (
                                 <button
                                   onClick={() => handleRemoveGate(wire, 0)}
-                                  className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                  className="p-0.5 rounded-full hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                                   title="Remove H gate"
                                   data-testid={`remove-h-gate-q${wire}`}
                                 >
@@ -305,16 +305,16 @@ export function InSituRepairWorkspace({
                         }
                         if (op?.gate === 'CNOT') {
                           return op.controls.includes(wire) ? (
-                            <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
+                            <div className="h-4 w-4 rounded-full bg-gate-cnot border-2 border-gate-cnot shadow-xs flex items-center justify-center" />
                           ) : (
-                            <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
+                            <div className="h-7 w-7 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot font-bold flex items-center justify-center text-sm shadow-xs">
                               ⊕
                             </div>
                           );
                         }
                         if (op?.gate === 'X') {
                           return (
-                            <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
+                            <span className="px-3 py-1 bg-gate-pauli-x/20 border border-gate-pauli-x text-gate-pauli-x rounded-full font-bold shadow-xs text-xs">
                               X
                             </span>
                           );
@@ -324,7 +324,7 @@ export function InSituRepairWorkspace({
                             <button
                               onClick={() => handleAddGate('H', 0, 0)}
                               disabled={readOnly}
-                              className="h-7 w-12 rounded border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                              className="h-7 px-3 rounded-full border border-dashed border-accent/60 bg-accent/5 hover:bg-accent/15 text-accent text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
                               title="Click to place Hadamard (H) gate on q[0]"
                               data-testid="empty-slot-q0-col0"
                             >
@@ -334,7 +334,7 @@ export function InSituRepairWorkspace({
                           );
                         }
                         return (
-                          <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                          <span className="w-8 h-8 rounded-full border border-dashed border-border-subtle/40 flex items-center justify-center text-[10px] text-ink-faint">
                             —
                           </span>
                         );
@@ -347,16 +347,16 @@ export function InSituRepairWorkspace({
                         const op = getGateAt(wire, 1);
                         if (op?.gate === 'CNOT') {
                           return op.controls.includes(wire) ? (
-                            <div className="h-4 w-4 rounded-full bg-accent border-2 border-accent shadow-glow flex items-center justify-center" />
+                            <div className="h-4 w-4 rounded-full bg-gate-cnot border-2 border-gate-cnot shadow-xs flex items-center justify-center" />
                           ) : (
                             <div className="flex items-center gap-1 group">
-                              <div className="h-7 w-7 rounded-full bg-violet/20 border-2 border-violet text-violet font-bold flex items-center justify-center text-sm shadow-glow">
+                              <div className="h-7 w-7 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot font-bold flex items-center justify-center text-sm shadow-xs">
                                 ⊕
                               </div>
                               {!readOnly && (
                                 <button
                                   onClick={() => handleRemoveGate(wire, 1)}
-                                  className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                  className="p-0.5 rounded-full hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                                   title="Remove CNOT gate"
                                   data-testid={`remove-cnot-gate-q${wire}`}
                                 >
@@ -368,14 +368,14 @@ export function InSituRepairWorkspace({
                         }
                         if (op?.gate === 'H') {
                           return (
-                            <span className="px-2.5 py-1 bg-accent/20 border border-accent text-accent rounded font-bold shadow-glow text-xs">
+                            <span className="px-3 py-1 bg-gate-h/20 border border-gate-h text-gate-h rounded-full font-bold shadow-xs text-xs">
                               H
                             </span>
                           );
                         }
                         if (op?.gate === 'X') {
                           return (
-                            <span className="px-2.5 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs">
+                            <span className="px-3 py-1 bg-gate-pauli-x/20 border border-gate-pauli-x text-gate-pauli-x rounded-full font-bold shadow-xs text-xs">
                               X
                             </span>
                           );
@@ -385,7 +385,7 @@ export function InSituRepairWorkspace({
                             <button
                               onClick={() => handleAddGate('CNOT', 1, 1)}
                               disabled={readOnly}
-                              className="h-7 w-12 rounded border border-dashed border-violet/60 bg-violet/5 hover:bg-violet/15 text-violet text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                              className="h-7 px-3 rounded-full border border-dashed border-gate-cnot/60 bg-gate-cnot/5 hover:bg-gate-cnot/15 text-gate-cnot text-[11px] font-mono flex items-center justify-center gap-1 transition-colors cursor-pointer"
                               title="Click to place CNOT gate (control q[0], target q[1])"
                               data-testid="empty-slot-q1-col1"
                             >
@@ -395,7 +395,7 @@ export function InSituRepairWorkspace({
                           );
                         }
                         return (
-                          <span className="w-8 h-8 rounded border border-dashed border-line/40 flex items-center justify-center text-[10px] text-ink-faint">
+                          <span className="w-8 h-8 rounded-full border border-dashed border-border-subtle/40 flex items-center justify-center text-[10px] text-ink-faint">
                             —
                           </span>
                         );
@@ -410,7 +410,7 @@ export function InSituRepairWorkspace({
                         return (
                           <div className="flex items-center gap-1 group">
                             <span
-                              className="px-3 py-1 bg-caution/20 border border-caution text-caution rounded font-bold shadow-glow text-xs"
+                              className="px-3.5 py-1 bg-gate-pauli-x/20 border border-gate-pauli-x text-gate-pauli-x rounded-full font-bold shadow-xs text-xs"
                               data-testid={`insitu-gate-q${wire}`}
                             >
                               {op.gate}
@@ -418,7 +418,7 @@ export function InSituRepairWorkspace({
                             {!readOnly && (
                               <button
                                 onClick={() => handleRemoveGate(wire, 2)}
-                                className="p-0.5 rounded hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                className="p-0.5 rounded-full hover:bg-danger/20 text-danger opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                                 title="Remove gate"
                                 data-testid={`remove-gate-q${wire}`}
                               >

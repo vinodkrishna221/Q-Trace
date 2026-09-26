@@ -2,105 +2,219 @@
 @import "katex/dist/katex.min.css";
 
 /*
- * Q-Trace Design System — Linear Precision Quantum Instrument
- * Dual-Theme System (Porcelain Light & Carbon Obsidian Dark).
- * Defaulting to system preference, toggleable at runtime.
- * See docs/DESIGN-SYSTEM.md.
+ * Q-Trace Design System — Theme 4: True Black OLED & Mineral Lithograph
+ * Symmetrical Dual-Classic: True Black Photonic Vacuum Console (Dark) / Archival Mineral Lithograph (Light)
+ * Color Science: OKLCH Perceptual Space · Emissive True Black OLED (0.000 nits, #000000, oklch(0 0 0)) · Display P3 Wide-Gamut
+ * Form Factor: Continuous Pill-Capsule Switchgear (border-radius: 9999px / rounded-full) & Laser Graticules
+ * See docs/THEME-4-TRUE-BLACK-PILL.md
  */
 
+/* 1. Theme 4 Master CSS Custom Properties */
 :root {
-  /* Light Mode (Linear Porcelain) */
-  --bg-abyss: #fbfbfc;
-  --bg-panel: #ffffff;
-  --bg-raised: #f4f5f8;
-  --bg-overlay: rgba(255, 255, 255, 0.85);
+  /* Surface System (Light Mode: Archival Mineral Lithograph) */
+  --bg-canvas: #f8f9fc;       /* oklch(0.980 0.005 270) Heavy acid-free alabaster */
+  --bg-surface: #ffffff;      /* oklch(1.000 0.000 0) Pure bleached kaolin */
+  --bg-surface-raised: #f0f2f7;/* oklch(0.955 0.007 270) Pressed ivory tile */
+  --bg-surface-sunken: #e9edf4;/* oklch(0.930 0.010 270) Optical mineral trench */
+  --bg-surface-active: #dde3ed;/* oklch(0.900 0.012 270) Active pill state */
+  --bg-surface-overlay: #ffffff;
 
-  --surface-canvas: #fbfbfc;
-  --surface: #ffffff;
-  --surface-raised: #f4f5f8;
-  --surface-active: #eceef2;
+  /* Legacy surface aliases */
+  --bg-abyss: var(--bg-canvas);
+  --bg-panel: var(--bg-surface);
+  --bg-raised: var(--bg-surface-raised);
+  --bg-overlay: rgba(255, 255, 255, 0.88);
+  --surface-canvas: var(--bg-canvas);
+  --surface: var(--bg-surface);
+  --surface-raised: var(--bg-surface-raised);
+  --surface-active: var(--bg-surface-active);
 
-  --line: rgba(15, 23, 42, 0.12);
-  --line-bright: rgba(15, 23, 42, 0.18);
-  --border-subtle: rgba(15, 23, 42, 0.12);
-  --border-medium: rgba(15, 23, 42, 0.18);
-  --border-strong: rgba(15, 23, 42, 0.32);
+  /* Borders & Specular Bevels */
+  --border-subtle: rgba(11, 10, 67, 0.08);  /* oklch(0.20 0.102 273 / 0.08) */
+  --border-medium: rgba(11, 10, 67, 0.16);  /* oklch(0.20 0.102 273 / 0.16) */
+  --border-strong: rgba(11, 10, 67, 0.28);  /* oklch(0.20 0.102 273 / 0.28) */
+  --border-focus: #4a02b1;                  /* oklch(0.390 0.222 288) */
+  --bevel-specular: rgba(255, 255, 255, 0.90);/* Pure white crest */
 
-  --ink: #0f172a;
-  --ink-dim: #475569;
-  --ink-faint: #64748b;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
+  /* Legacy border aliases */
+  --line: var(--border-subtle);
+  --line-bright: var(--border-medium);
 
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-muted: rgba(79, 70, 229, 0.08);
-  --accent-deep: #3730a3;
-  --evidence: #0284c7;
-  --success: #059669;
+  /* Typography & Mineral Inks (Base OKLCH Mappings) */
+  --text-primary: #0b0a43;    /* oklch(0.20 0.102 273) Midnight Indigo */
+  --text-secondary: #31306b;  /* oklch(0.35 0.080 273) */
+  --text-muted: #5a5895;      /* oklch(0.50 0.070 273) */
+  --text-faint: #9594be;      /* oklch(0.70 0.045 273) */
+  --text-tertiary: var(--text-muted);
+
+  /* Legacy ink aliases */
+  --ink: var(--text-primary);
+  --ink-dim: var(--text-secondary);
+  --ink-faint: var(--text-muted);
+
+  /* Quantum Gate Families (Mineral Formulations) */
+  --gate-h: #2a2882;          /* oklch(0.36 0.140 273) Deep Indigo */
+  --gate-pauli-x: #7c1213;    /* oklch(0.38 0.140 27) Warm Garnet Crimson */
+  --gate-pauli-y: #b45309;    /* oklch(0.546 0.157 58) */
+  --gate-pauli-z: #0369a1;    /* oklch(0.518 0.145 242) */
+  --gate-cnot: #4a02b1;       /* oklch(0.39 0.222 288) Royal Amethyst Violet */
+  --gate-phase: #be185d;      /* oklch(0.482 0.215 352) */
+  --gate-measure: #31306b;    /* oklch(0.35 0.080 273) */
+
+  /* Diagnostic Telemetry */
+  --evidence-success: #033c00;/* oklch(0.31 0.104 142) Deep Pine Emerald */
+  --evidence-diverge: #9a3412;/* oklch(0.48 0.180 45) */
+  --evidence-error: #991b1b;  /* oklch(0.44 0.200 27) */
+
+  /* Semantic State Aliases */
+  --accent: #2a2882;
+  --accent-hover: #3730a3;
+  --accent-muted: rgba(42, 40, 130, 0.08);
+  --accent-deep: #1e1b4b;
+  --evidence: #0369a1;
+  --success: #033c00;
   --caution: #b45309;
-  --danger: #dc2626;
-  --violet: #7c3aed;
+  --danger: #7c1213;
+  --violet: #4a02b1;
+
+  /* Gradients */
+  --prob-fill: linear-gradient(90deg, #2a2882, #4a02b1);
+  --phase-gradient: linear-gradient(90deg, #2a2882 0%, #033c00 25%, #b45309 50%, #7c1213 75%, #2a2882 100%);
 
   color-scheme: light;
 }
 
 .dark {
-  /* Dark Mode (Linear Carbon Obsidian) */
-  --bg-abyss: #08090a;
-  --bg-panel: #0f1012;
-  --bg-raised: #18191c;
-  --bg-overlay: rgba(15, 16, 18, 0.85);
+  /* Surface System (Dark Mode: Photonic Vacuum on True Black) */
+  --bg-canvas: #000000;       /* oklch(0 0 0) Pure OLED Emissive Black (0.000 nits) */
+  --bg-surface: #0a0a0c;      /* oklch(0.100 0.004 270) Obsidian Plate */
+  --bg-surface-raised: #141418;/* oklch(0.160 0.008 270) Machined Carbon Plate */
+  --bg-surface-sunken: #040405;/* oklch(0.050 0.002 270) Vacuum Socket Bore */
+  --bg-surface-active: #1e1e24;/* oklch(0.220 0.012 270) Pressed State */
+  --bg-surface-overlay: #121216;/* oklch(0.140 0.006 270) Floating Plate */
 
-  --surface-canvas: #08090a;
-  --surface: #0f1012;
-  --surface-raised: #18191c;
-  --surface-active: #222327;
+  /* Legacy surface aliases */
+  --bg-abyss: var(--bg-canvas);
+  --bg-panel: var(--bg-surface);
+  --bg-raised: var(--bg-surface-raised);
+  --bg-overlay: rgba(10, 10, 12, 0.88);
+  --surface-canvas: var(--bg-canvas);
+  --surface: var(--bg-surface);
+  --surface-raised: var(--bg-surface-raised);
+  --surface-active: var(--bg-surface-active);
 
-  --line: rgba(255, 255, 255, 0.12);
-  --line-bright: rgba(255, 255, 255, 0.20);
-  --border-subtle: rgba(255, 255, 255, 0.12);
-  --border-medium: rgba(255, 255, 255, 0.20);
-  --border-strong: rgba(255, 255, 255, 0.35);
+  /* Borders & Specular Bevels */
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-medium: rgba(255, 255, 255, 0.18);
+  --border-strong: rgba(255, 255, 255, 0.32);
+  --border-focus: #90a4fd;
+  --bevel-specular: rgba(255, 255, 255, 0.12);
 
-  --ink: #f8fafc;
-  --ink-dim: #94a3b8;
-  --ink-faint: #64748b;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
+  /* Legacy border aliases */
+  --line: var(--border-subtle);
+  --line-bright: var(--border-medium);
 
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-muted: rgba(99, 102, 241, 0.15);
-  --accent-deep: #4338ca;
+  /* Typography & Luminescent Inks */
+  --text-primary: #f9fafb;    /* oklch(0.985 0.002 270) */
+  --text-secondary: #9ca3af;  /* oklch(0.720 0.020 270) */
+  --text-muted: #6b7280;      /* oklch(0.550 0.025 270) */
+  --text-faint: #374151;      /* oklch(0.380 0.025 270) */
+  --text-tertiary: var(--text-muted);
+
+  /* Legacy ink aliases */
+  --ink: var(--text-primary);
+  --ink-dim: var(--text-secondary);
+  --ink-faint: var(--text-muted);
+
+  /* Quantum Gate Families (P3-Elevated High-Contrast Counterparts) */
+  --gate-h: #90a4fd;          /* oklch(0.740 0.130 273) Luminous Periwinkle */
+  --gate-pauli-x: #f47c70;    /* oklch(0.720 0.150 27) Coral Rose Counterpart */
+  --gate-pauli-y: #fbbf24;    /* oklch(0.835 0.160 84) */
+  --gate-pauli-z: #38bdf8;    /* oklch(0.750 0.140 232) */
+  --gate-cnot: #a48fff;       /* oklch(0.730 0.190 288) Radiant Iris Counterpart */
+  --gate-phase: #f472b6;      /* oklch(0.725 0.175 350) */
+  --gate-measure: #9ca3af;    /* oklch(0.720 0.020 270) */
+
+  /* Diagnostic Telemetry */
+  --evidence-success: #7ccf73;/* oklch(0.780 0.150 142) Spring Emerald Counterpart */
+  --evidence-diverge: #fb923c;/* oklch(0.750 0.170 55) */
+  --evidence-error: #f87171;  /* oklch(0.710 0.165 22) */
+
+  /* Semantic State Aliases */
+  --accent: #90a4fd;
+  --accent-hover: #a48fff;
+  --accent-muted: rgba(144, 164, 253, 0.15);
+  --accent-deep: #6366f1;
   --evidence: #38bdf8;
-  --success: #10b981;
-  --caution: #f59e0b;
-  --danger: #f43f5e;
-  --violet: #a78bfa;
+  --success: #7ccf73;
+  --caution: #fbbf24;
+  --danger: #f47c70;
+  --violet: #a48fff;
+
+  /* Gradients */
+  --prob-fill: linear-gradient(90deg, #90a4fd, #a48fff);
+  --phase-gradient: linear-gradient(90deg, #90a4fd 0%, #7ccf73 25%, #fbbf24 50%, #f47c70 75%, #90a4fd 100%);
 
   color-scheme: dark;
 }
 
+/* 2. Display P3 Wide-Gamut Hardware Layer (Mathematically Derived via CIE XYZ D65) */
+@supports (color: color(display-p3 1 1 1)) {
+  .dark {
+    --gate-h: color(display-p3 0.580 0.642 0.965);
+    --gate-pauli-x: color(display-p3 0.896 0.510 0.459);
+    --gate-pauli-y: color(display-p3 0.943 0.756 0.312);
+    --gate-pauli-z: color(display-p3 0.375 0.728 0.946);
+    --gate-cnot: color(display-p3 0.631 0.564 1.000);
+    --gate-phase: color(display-p3 0.893 0.476 0.702);
+    --evidence-diverge: color(display-p3 0.935 0.571 0.269);
+    --evidence-success: color(display-p3 0.563 0.804 0.491);
+    --evidence-error: color(display-p3 0.904 0.475 0.461);
+  }
+  :root {
+    --text-primary: color(display-p3 0.042 0.039 0.251);
+    --gate-h: color(display-p3 0.164 0.188 0.501);
+    --gate-pauli-x: color(display-p3 0.446 0.116 0.098);
+    --gate-pauli-y: color(display-p3 0.646 0.342 0.000);
+    --gate-pauli-z: color(display-p3 0.107 0.426 0.682);
+    --gate-cnot: color(display-p3 0.264 0.038 0.666);
+    --gate-phase: color(display-p3 0.621 0.060 0.409);
+    --evidence-diverge: color(display-p3 0.609 0.203 0.000);
+    --evidence-success: color(display-p3 0.092 0.232 0.043);
+    --evidence-error: color(display-p3 0.591 0.013 0.051);
+  }
+}
+
+/* 3. Tailwind v4 Inline Theme Bridge */
 @theme inline {
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-surface-raised: var(--bg-surface-raised);
+  --color-surface-sunken: var(--bg-surface-sunken);
+  --color-surface-active: var(--bg-surface-active);
+  --color-surface-overlay: var(--bg-surface-overlay);
+
+  /* Legacy surface aliases */
   --color-abyss: var(--bg-abyss);
   --color-panel: var(--bg-panel);
   --color-raised: var(--bg-raised);
   --color-overlay: var(--bg-overlay);
-
   --color-surface-canvas: var(--surface-canvas);
-  --color-surface: var(--surface);
-  --color-surface-raised: var(--surface-raised);
-  --color-surface-active: var(--surface-active);
 
-  --color-line: var(--line);
-  --color-line-bright: var(--line-bright);
   --color-border-subtle: var(--border-subtle);
   --color-border-medium: var(--border-medium);
   --color-border-strong: var(--border-strong);
+  --color-border-focus: var(--border-focus);
+  --color-bevel: var(--bevel-specular);
+  --color-line: var(--line);
+  --color-line-bright: var(--line-bright);
 
+  --color-ink-primary: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-ink-faint: var(--text-faint);
+
+  /* Legacy ink aliases */
   --color-ink: var(--ink);
   --color-ink-dim: var(--ink-dim);
   --color-ink-faint: var(--ink-faint);
@@ -108,6 +222,19 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-tertiary: var(--text-tertiary);
 
+  --color-gate-h: var(--gate-h);
+  --color-gate-pauli-x: var(--gate-pauli-x);
+  --color-gate-pauli-y: var(--gate-pauli-y);
+  --color-gate-pauli-z: var(--gate-pauli-z);
+  --color-gate-cnot: var(--gate-cnot);
+  --color-gate-phase: var(--gate-phase);
+  --color-gate-measure: var(--gate-measure);
+
+  --color-evidence-success: var(--evidence-success);
+  --color-evidence-diverge: var(--evidence-diverge);
+  --color-evidence-error: var(--evidence-error);
+
+  /* Legacy semantic color aliases */
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-muted: var(--accent-muted);
@@ -118,17 +245,22 @@
   --color-danger: var(--danger);
   --color-violet: var(--violet);
 
+  --gradient-prob-fill: var(--prob-fill);
+  --gradient-phase: var(--phase-gradient);
+
   --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), inset 0 1px 0 0 var(--bevel-specular);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 0 12px -2px var(--gate-h);
+  --shadow-glow-soft: 0 0 8px -1px var(--gate-cnot);
 }
 
 body {
-  background-color: var(--surface-canvas);
+  background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans);
   margin: 0;
@@ -151,7 +283,7 @@ body {
 
 /* Linear accessible focus ring */
 *:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--border-focus);
   outline-offset: 1px;
 }
 
@@ -190,4 +322,282 @@ body {
   .shadow-glow-soft {
     box-shadow: none !important;
   }
+}
+
+/* ==========================================================================
+   Theme 4: True Black OLED & Mineral Lithograph Component Anatomy
+   ========================================================================== */
+
+/* True Black Instrument Card Chassis */
+.true-black-card {
+  position: relative;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 1px 0 0 var(--bevel-specular),
+    0 2px 8px 0 rgba(0, 0, 0, 0.50);
+  overflow: hidden;
+}
+
+.dark .true-black-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 35% at 50% 0%, rgba(144, 164, 253, 0.04), transparent 60%);
+}
+
+/* Master Pill Button Base */
+.theme-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 9999px; /* Continuous capsule geometry */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background-color 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 140ms ease,
+    transform 100ms ease,
+    box-shadow 140ms ease;
+  outline: none;
+}
+
+/* Size Matrix: Balanced height-to-padding ratios prevent pill elongation */
+.theme-pill-btn-sm {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.theme-pill-btn-default {
+  height: 34px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+
+.theme-pill-btn-lg {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 14px;
+}
+
+.theme-pill-btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 9999px;
+}
+
+/* Primary Pill Button */
+.theme-pill-btn-primary {
+  background-color: var(--text-primary);
+  color: var(--bg-canvas);
+  border: 1px solid transparent;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+    0 1px 3px 0 rgba(0, 0, 0, 0.40);
+}
+
+.theme-pill-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.35),
+    0 3px 6px 0 rgba(0, 0, 0, 0.50);
+}
+
+.theme-pill-btn-primary:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Secondary / Raised Pill Button */
+.theme-pill-btn-secondary {
+  background-color: var(--bg-surface-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  box-shadow:
+    inset 0 1px 0 0 var(--bevel-specular),
+    0 1px 2px 0 rgba(0, 0, 0, 0.20);
+}
+
+.theme-pill-btn-secondary:hover {
+  background-color: var(--bg-surface-active);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+/* Destructive Pill Button */
+.theme-pill-btn-destructive {
+  background-color: color-mix(in oklch, var(--evidence-error) 15%, transparent);
+  color: var(--evidence-error);
+  border: 1px solid color-mix(in oklch, var(--evidence-error) 40%, transparent);
+}
+
+.theme-pill-btn-destructive:hover {
+  background-color: color-mix(in oklch, var(--evidence-error) 25%, transparent);
+  border-color: var(--evidence-error);
+  transform: translateY(-1px);
+}
+
+/* Ghost Pill Button */
+.theme-pill-btn-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.theme-pill-btn-ghost:hover {
+  background-color: var(--bg-surface-raised);
+  color: var(--text-primary);
+}
+
+.theme-pill-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Pill-Capsule Gate Cartridge */
+.pill-gate-chip {
+  width: 48px;
+  height: 38px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: color-mix(in oklch, var(--gate-token, var(--gate-h)) 12%, var(--bg-surface));
+  border: 1.5px solid var(--gate-token, var(--gate-h));
+  box-shadow:
+    inset 0 1px 0 0 var(--bevel-specular),
+    0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: grab;
+  user-select: none;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease;
+}
+
+.pill-gate-chip:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: color-mix(in oklch, var(--gate-token, var(--gate-h)) 20%, var(--bg-surface));
+  box-shadow:
+    inset 0 1px 0 0 var(--bevel-specular),
+    0 4px 8px 0 rgba(0, 0, 0, 0.50);
+}
+
+.pill-gate-chip[data-dragging="true"] {
+  transform: scale(1.08);
+  opacity: 0.95;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.70);
+  cursor: grabbing;
+}
+
+/* Prediction Checkpoint Option Card */
+.pill-detent-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.pill-detent-card:hover {
+  background-color: var(--bg-surface-raised);
+  border-color: var(--border-strong);
+  transform: translateX(2px);
+}
+
+.pill-detent-card[aria-checked="true"] {
+  background-color: var(--bg-surface-raised);
+  border-color: var(--gate-cnot);
+  box-shadow:
+    inset 0 1px 0 0 var(--bevel-specular),
+    0 0 0 1px var(--gate-cnot);
+}
+
+/* Mechanical Detent Ring */
+.pill-detent-card .detent-pip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background-color: var(--bg-surface-sunken);
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+}
+
+.pill-detent-card[aria-checked="true"] .detent-pip {
+  border-color: var(--gate-cnot);
+  background-color: var(--gate-cnot);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Flight Recorder Divergence Sonar Ribbon */
+.divergence-sonar-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--evidence-diverge) 10%, var(--bg-surface-sunken));
+  border: 1px solid var(--evidence-diverge);
+  box-shadow: inset 0 1px 0 0 var(--bevel-specular);
+}
+
+.divergence-sonar-pip {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--evidence-diverge);
+}
+
+.divergence-sonar-pip::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--evidence-diverge);
+  animation: radar-sonar 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes radar-sonar {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  60% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Probability Histogram Pill Troughs & Amplitude Fills */
+.prob-pill-trough {
+  width: 100%;
+  height: 18px;
+  border-radius: 9999px;
+  background-color: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.prob-pill-bar {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--prob-fill);
+  transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
 }

@@ -14,12 +14,12 @@ interface GatePaletteProps {
 }
 
 const GATE_HOVER_CLASSES: Record<GateName, string> = {
-  H: 'group-hover:border-accent group-hover:text-accent group-hover:bg-accent/10',
-  X: 'group-hover:border-emerald-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-500/10',
-  Y: 'group-hover:border-amber-500 group-hover:text-amber-700 dark:group-hover:text-amber-400 group-hover:bg-amber-500/10',
-  Z: 'group-hover:border-cyan-500 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 group-hover:bg-cyan-500/10',
-  CNOT: 'group-hover:border-violet group-hover:text-violet group-hover:bg-violet/10',
-  MEASURE: 'group-hover:border-line-bright group-hover:text-caution group-hover:bg-raised',
+  H: 'group-hover:border-gate-h group-hover:text-gate-h group-hover:bg-gate-h/10',
+  X: 'group-hover:border-gate-pauli-x group-hover:text-gate-pauli-x group-hover:bg-gate-pauli-x/10',
+  Y: 'group-hover:border-gate-pauli-y group-hover:text-gate-pauli-y group-hover:bg-gate-pauli-y/10',
+  Z: 'group-hover:border-gate-pauli-z group-hover:text-gate-pauli-z group-hover:bg-gate-pauli-z/10',
+  CNOT: 'group-hover:border-gate-cnot group-hover:text-gate-cnot group-hover:bg-gate-cnot/10',
+  MEASURE: 'group-hover:border-border-strong group-hover:text-ink-primary group-hover:bg-surface-raised',
 };
 
 export function GatePalette({ onDragStart }: GatePaletteProps) {
@@ -43,8 +43,8 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
   }, [selectedGateToPlace, selectGateToPlace]);
 
   return (
-    <Card className="border-line bg-panel shadow-sm" data-testid="gate-palette-card">
-      <CardHeader className="py-3 px-4 bg-raised/40 border-b border-line">
+    <Card className="border-border-subtle bg-surface shadow-sm" data-testid="gate-palette-card">
+      <CardHeader className="py-3 px-4 bg-surface-raised/40 border-b border-border-subtle">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-accent" />
@@ -58,7 +58,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               variant="outline"
               onClick={resetToBellSeed}
               data-testid="reset-bell-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-ink hover:border-accent/40 focus-visible:ring-2 focus-visible:ring-accent"
+              className="h-7 px-2 text-[11px] font-mono border-border-subtle text-ink-dim hover:text-ink hover:border-accent/40 focus-visible:ring-2 focus-visible:ring-accent"
               title="Reset to seeded Bell State circuit (H + CNOT) or load reference template"
             >
               <RotateCcw className="w-3 h-3 mr-1 text-accent" />
@@ -69,7 +69,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               variant="outline"
               onClick={clearCircuit}
               data-testid="clear-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-line text-ink-dim hover:text-caution hover:border-caution/40 focus-visible:ring-2 focus-visible:ring-accent"
+              className="h-7 px-2 text-[11px] font-mono border-border-subtle text-ink-dim hover:text-caution hover:border-caution/40 focus-visible:ring-2 focus-visible:ring-accent"
               title="Clear all gates from circuit wires"
             >
               <Trash2 className="w-3 h-3 mr-1" />
@@ -105,20 +105,20 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                 onClick={() => {
                   selectGateToPlace(isSelected ? null : gateKey);
                 }}
-                className={`flex flex-col items-center justify-center p-2 rounded-lg border text-center transition-all duration-150 relative cursor-pointer select-none group outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-abyss ${
+                className={`flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all duration-150 relative cursor-pointer select-none group outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-canvas ${
                   isSelected
                     ? 'ring-2 ring-accent border-accent bg-accent/20 shadow-glow'
-                    : 'border-line bg-abyss hover:border-line-bright hover:bg-raised/60'
+                    : 'border-border-subtle bg-canvas hover:border-border-medium hover:bg-surface-raised/60'
                 }`}
                 aria-pressed={isSelected}
                 aria-label={`${def.name} gate (shortcut: ${def.shortcutKey.toUpperCase()})`}
               >
                 {/* Gate Badge */}
                 <div
-                  className={`w-10 h-10 rounded-md border-2 flex items-center justify-center font-mono font-bold text-sm mb-1.5 transition-all duration-150 group-hover:scale-105 ${
+                  className={`w-11 h-9 rounded-full border-2 flex items-center justify-center font-mono font-bold text-sm mb-1.5 transition-all duration-150 group-hover:scale-105 ${
                     isSelected
                       ? def.colorClass
-                      : `border-line-bright text-ink bg-raised/40 ${GATE_HOVER_CLASSES[gateKey]}`
+                      : `border-border-medium text-ink bg-surface-raised/40 ${GATE_HOVER_CLASSES[gateKey]}`
                   }`}
                 >
                   {def.gate === 'CNOT' ? '⊕' : def.gate === 'MEASURE' ? 'M' : def.symbol}
@@ -129,7 +129,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                   {def.name}
                 </span>
                 <span className="text-[10px] font-mono text-ink-faint mt-0.5 flex items-center gap-1">
-                  key: <kbd className="px-1 py-0.2 rounded bg-raised border border-line text-ink-dim font-bold">{def.shortcutKey}</kbd>
+                  key: <kbd className="px-1 py-0.2 rounded-full bg-surface-raised border border-border-subtle text-ink-dim font-bold">{def.shortcutKey}</kbd>
                 </span>
 
                 {isSelected && (
@@ -148,7 +148,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
         {selectedGateToPlace && (
           <div
             data-testid="click-to-place-banner"
-            className="mt-3 p-2 rounded bg-accent/10 border border-accent/30 text-xs font-mono text-accent flex items-center justify-between"
+            className="mt-3 p-2 rounded-full bg-accent/10 border border-accent/30 text-xs font-mono text-accent flex items-center justify-between px-3"
           >
             <span className="flex items-center gap-1.5">
               <MousePointerClick className="w-3.5 h-3.5 animate-pulse" />
@@ -158,7 +158,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               size="sm"
               variant="ghost"
               onClick={() => selectGateToPlace(null)}
-              className="h-5 px-1.5 text-[10px] text-accent hover:bg-accent/20"
+              className="h-5 px-2 text-[10px] text-accent hover:bg-accent/20"
             >
               Cancel (Esc)
             </Button>

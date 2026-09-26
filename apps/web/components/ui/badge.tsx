@@ -22,7 +22,7 @@ export function Badge({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium font-mono tracking-tight transition-colors focus:outline-none focus:ring-1 focus:ring-accent',
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium font-mono tracking-tight transition-colors focus:outline-none focus:ring-1 focus:ring-accent',
         variants[variant],
         className
       )}

@@ -61,7 +61,7 @@ export function PredictionCheckpoint({
             </Badge>
             {selectedAnswer && (
               <span
-                className="text-[11px] font-mono text-evidence flex items-center gap-1 bg-evidence/10 border border-evidence/40 px-2 py-0.5 rounded"
+                className="text-[11px] font-mono text-evidence flex items-center gap-1 bg-evidence/10 border border-evidence/40 px-2 py-0.5 rounded-full"
                 data-testid="prediction-saved-indicator"
               >
                 <Save className="w-3 h-3" />
@@ -101,16 +101,16 @@ export function PredictionCheckpoint({
                   handleSelectOption(opt);
                 }
               }}
-              className={`w-full text-left p-3.5 rounded-lg text-xs font-mono transition-all flex items-center justify-between border cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`pill-detent-card w-full text-left p-3.5 rounded-full text-xs font-mono transition-all flex items-center justify-between border cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isSelected
-                  ? 'border-accent bg-accent/10 text-ink ring-1 ring-accent shadow-glow'
-                  : 'border-line bg-abyss text-ink-dim hover:text-ink hover:border-line-bright'
+                  ? 'border-gate-cnot bg-surface-raised text-ink ring-1 ring-gate-cnot shadow-sm'
+                  : 'border-border-medium bg-surface text-ink-dim hover:text-ink hover:border-border-strong hover:bg-surface-raised'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-4 h-4 rounded-full border flex items-center justify-center text-[10px] ${
-                    isSelected ? 'border-accent bg-accent text-white font-bold' : 'border-line-bright bg-panel'
+                  className={`detent-pip w-4 h-4 rounded-full border flex items-center justify-center text-[10px] shrink-0 ${
+                    isSelected ? 'border-gate-cnot bg-gate-cnot text-white font-bold' : 'border-border-strong bg-surface-sunken'
                   }`}
                   aria-hidden="true"
                 >
@@ -132,13 +132,13 @@ export function PredictionCheckpoint({
                 </div>
               </div>
 
-              {isSelected && <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />}
+              {isSelected && <CheckCircle2 className="w-4 h-4 text-gate-cnot shrink-0" />}
             </button>
           );
         })}
       </CardContent>
 
-      <CardFooter className="pt-3 flex flex-wrap justify-between items-center gap-3 text-xs border-t border-line">
+      <CardFooter className="pt-3 flex flex-wrap justify-between items-center gap-3 text-xs border-t border-border-subtle">
         <div className="flex items-center gap-2">
           <span data-testid="selected-prediction-label" className="text-ink-dim">
             {selectedAnswer ? `Selected: ${selectedAnswer}` : 'No prediction recorded yet'}

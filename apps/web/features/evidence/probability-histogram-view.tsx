@@ -127,10 +127,10 @@ export function ProbabilityHistogramView({
                           {percent}% (P = {prob.toFixed(3)})
                         </span>
                       </div>
-                      <div className="w-full h-4 bg-raised rounded overflow-hidden border border-line">
+                      <div className="prob-pill-trough w-full h-4.5 bg-surface-sunken rounded-full overflow-hidden border border-border-subtle">
                         <div
-                          className={`h-full rounded transition-all duration-500 ${
-                            isPresent ? 'bg-accent shadow-glow' : 'bg-line-bright'
+                          className={`prob-pill-bar h-full rounded-full transition-all duration-500 ${
+                            isPresent ? 'bg-[var(--prob-fill)] shadow-xs' : 'bg-line-bright'
                           }`}
                           style={{ width: `${Math.max(prob * 100, 0)}%` }}
                         />
@@ -142,8 +142,8 @@ export function ProbabilityHistogramView({
             </div>
 
             {/* Panel 2: Sampled Measurement Counts */}
-            <div className="rounded-lg border border-line bg-abyss p-4 space-y-4 font-mono">
-              <div className="flex items-center justify-between border-b border-line pb-2">
+            <div className="rounded-xl border border-border-subtle bg-canvas p-4 space-y-4 font-mono">
+              <div className="flex items-center justify-between border-b border-border-subtle pb-2">
                 <span className="text-xs font-bold text-ink flex items-center gap-1.5">
                   <BarChart3 className="w-3.5 h-3.5 text-evidence" />
                   Sampled Measurement Histogram
@@ -171,10 +171,10 @@ export function ProbabilityHistogramView({
                           {count} counts ({percent}%)
                         </span>
                       </div>
-                      <div className="w-full h-4 bg-raised rounded overflow-hidden border border-line">
+                      <div className="prob-pill-trough w-full h-4.5 bg-surface-sunken rounded-full overflow-hidden border border-border-subtle">
                         <div
-                          className={`h-full rounded transition-all duration-500 ${
-                            isPresent ? 'bg-evidence shadow-glow' : 'bg-line-bright'
+                          className={`prob-pill-bar h-full rounded-full transition-all duration-500 ${
+                            isPresent ? 'bg-[var(--evidence-success)] shadow-xs' : 'bg-line-bright'
                           }`}
                           style={{ width: `${Math.max(shots > 0 ? (count / shots) * 100 : 0, 0)}%` }}
                         />
