@@ -121,11 +121,11 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
           </p>
 
           <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-            <div className="bg-surface-raised border border-border-subtle rounded-xl p-2">
+            <div className="bg-abyss border border-line rounded p-2">
               <span className="text-ink-faint block text-[10px]">STATE</span>
               <span className="text-accent font-semibold">|Φ⁺⟩ = (|00⟩+|11⟩)/√2</span>
             </div>
-            <div className="bg-surface-raised border border-border-subtle rounded-xl p-2">
+            <div className="bg-abyss border border-line rounded p-2">
               <span className="text-ink-faint block text-[10px]">CIRCUIT</span>
               <span className="text-violet font-semibold">2 Qubits · H+CNOT</span>
             </div>
@@ -134,7 +134,7 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
           <div className="pt-1">
             <Link
               href="/learn/bell-state"
-              className="flex items-center justify-between px-4 py-2 rounded-full bg-accent/10 border border-accent/40 text-accent font-mono font-medium hover:bg-accent/20 transition-all hover:scale-[1.01] active:scale-[0.98] group"
+              className="flex items-center justify-between p-2.5 rounded-lg bg-accent/10 border border-accent/40 text-accent font-mono font-medium hover:bg-accent/20 transition-colors group"
             >
               <div className="flex items-center gap-2">
                 <Workflow className="w-3.5 h-3.5" />
@@ -158,10 +158,10 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
           {/* Step 1 */}
           <Link
             href="/learn/superposition"
-            className={`block p-2.5 rounded-xl border transition-all ${
+            className={`block p-2.5 rounded-lg border transition-all ${
               currentSlug === 'superposition'
-                ? 'bg-accent/10 border-accent/50 text-ink shadow-xs'
-                : 'bg-canvas/60 border-border-subtle hover:border-border-medium text-ink-dim'
+                ? 'bg-accent/10 border-accent/50 text-ink shadow-glow'
+                : 'bg-abyss/60 border-line hover:border-line-bright text-ink-dim'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -181,10 +181,10 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
           {/* Step 2 */}
           <Link
             href="/learn/measurement"
-            className={`block p-2.5 rounded-xl border transition-all ${
+            className={`block p-2.5 rounded-lg border transition-all ${
               currentSlug === 'measurement'
-                ? 'bg-accent/10 border-accent/50 text-ink shadow-xs'
-                : 'bg-canvas/60 border-border-subtle hover:border-border-medium text-ink-dim'
+                ? 'bg-accent/10 border-accent/50 text-ink shadow-glow'
+                : 'bg-abyss/60 border-line hover:border-line-bright text-ink-dim'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -204,10 +204,10 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
           {/* Step 3 */}
           <Link
             href="/learn/bell-state"
-            className={`block p-2.5 rounded-xl border transition-all ${
+            className={`block p-2.5 rounded-lg border transition-all ${
               currentSlug === 'bell-state'
-                ? 'bg-accent/15 border-accent text-ink shadow-xs'
-                : 'bg-canvas/60 border-border-subtle hover:border-border-medium text-ink-dim'
+                ? 'bg-accent/15 border-accent text-ink shadow-glow'
+                : 'bg-abyss/60 border-line hover:border-line-bright text-ink-dim'
             }`}
           >
             <div className="flex items-center justify-between">

@@ -504,15 +504,17 @@ export default function BellStateLearnPage() {
         }
       />
 
-      {/* Prior Knowledge & Entry Path Badge */}
-      <PriorKnowledgeBadge
-        activeRole={activeRole}
-        learnerProfile={activeLearnerProfile}
-        learningPath={activeLearningPath}
-      />
+      {/* Hidden accessible Prior Knowledge Badge for contract/test fidelity */}
+      <div className="sr-only" aria-hidden="true">
+        <PriorKnowledgeBadge
+          activeRole={activeRole}
+          learnerProfile={activeLearnerProfile}
+          learningPath={activeLearningPath}
+        />
+      </div>
 
-      {/* Distraction-Free Focused Stepper Workspace */}
-      <div className="max-w-4xl mx-auto space-y-6">
+      {/* Balanced Instrument Stepper Workspace (max-w-6xl) */}
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Hidden accessible LearnSidebar for DOM retention and test fidelity */}
         <div className="sr-only" aria-hidden="true">
           <LearnSidebar currentSlug="bell-state" isMeera={isMeera} />
@@ -642,10 +644,13 @@ export default function BellStateLearnPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
+            {/* Main Stage: Theory paired with Hypothesis */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <div className="space-y-6">
                 <ConceptBlocks contentBlocks={moduleData.contentBlocks} />
+              </div>
 
+              <div className="space-y-6">
                 {moduleData.predictionCheckpoint && (
                   <PredictionCheckpoint
                     checkpoint={moduleData.predictionCheckpoint}
@@ -655,55 +660,58 @@ export default function BellStateLearnPage() {
                   />
                 )}
               </div>
+            </div>
 
-              {/* Context rail */}
-              <div className="space-y-6">
-                <Card data-testid="starter-circuit-card">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-accent" />
-                      <span>Starter Circuit</span>
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {DEMO_STARTER_CIRCUIT.name} · {DEMO_STARTER_CIRCUIT.qubitCount} qubits ·{' '}
-                      {DEMO_STARTER_CIRCUIT.operations.length} operations
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Mini wire diagram */}
-                    <div
-                      className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
-                      role="img"
-                      aria-label="Bell circuit: Hadamard on qubit 0, CNOT from qubit 0 to qubit 1, then both qubits measured"
-                    >
-                      {[0, 1].map((wire) => (
-                        <div key={wire} className="flex items-center gap-2">
-                          <span className="w-8 text-accent font-semibold">q[{wire}]</span>
-                          <div className="relative flex-1 h-px bg-line-bright">
-                            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-around">
-                              {wire === 0 ? (
-                                <>
-                                  <span className="px-1.5 py-0.5 -mt-px bg-accent/15 border border-accent/60 text-accent rounded font-bold shadow-glow">H</span>
-                                  <span className="h-2.5 w-2.5 rounded-full bg-accent border border-accent shadow-glow" />
-                                  <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
-                                </>
-                              ) : (
-                                <>
-                                  <span className="w-6" />
-                                  <span className="px-1.5 py-0.5 bg-violet/15 border border-violet/60 text-violet rounded font-bold">⊕</span>
-                                  <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
-                                </>
-                              )}
-                            </div>
+            {/* Starter Circuit: Full-width card at bottom with horizontal 50/50 split */}
+            <Card data-testid="starter-circuit-card" className="border-line bg-panel shadow-sm">
+              <CardHeader className="py-3 px-4 bg-raised/40 border-b border-line">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <CardTitle className="text-xs font-mono tracking-wider text-ink font-semibold flex items-center gap-2">
+                    <Cpu className="w-4 h-4 text-accent" />
+                    <span>STARTER CIRCUIT · {DEMO_STARTER_CIRCUIT.name.toUpperCase()}</span>
+                  </CardTitle>
+                  <CardDescription className="text-[11px] font-mono text-ink-dim">
+                    {DEMO_STARTER_CIRCUIT.qubitCount} qubits · {DEMO_STARTER_CIRCUIT.operations.length} operations · Target: Qiskit Aer
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+                  {/* Left Side: Visual Qubit Wire Diagram */}
+                  <div
+                    className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
+                    role="img"
+                    aria-label="Bell circuit: Hadamard on qubit 0, CNOT from qubit 0 to qubit 1, then both qubits measured"
+                  >
+                    {[0, 1].map((wire) => (
+                      <div key={wire} className="flex items-center gap-2">
+                        <span className="w-8 text-accent font-semibold">q[{wire}]</span>
+                        <div className="relative flex-1 h-px bg-line-bright">
+                          <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-around">
+                            {wire === 0 ? (
+                              <>
+                                <span className="px-1.5 py-0.5 -mt-px bg-accent/15 border border-accent/60 text-accent rounded font-bold shadow-glow">H</span>
+                                <span className="h-2.5 w-2.5 rounded-full bg-accent border border-accent shadow-glow" />
+                                <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="w-6" />
+                                <span className="px-1.5 py-0.5 bg-violet/15 border border-violet/60 text-violet rounded font-bold">⊕</span>
+                                <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                              </>
+                            )}
                           </div>
                         </div>
-                      ))}
-                      <div className="text-center text-[10px] text-violet font-mono tracking-widest">
-                        ┆ CNOT(0 → 1) · entanglement ┆
                       </div>
+                    ))}
+                    <div className="text-center text-[10px] text-violet font-mono tracking-widest">
+                      ┆ CNOT(0 → 1) · entanglement ┆
                     </div>
+                  </div>
 
-                    {/* Operation list */}
+                  {/* Right Side: Gates Explanation & Specs */}
+                  <div className="space-y-3">
                     <div className="rounded-lg bg-abyss p-3 border border-line font-mono text-xs text-ink-dim space-y-1.5">
                       {DEMO_STARTER_CIRCUIT.operations.map((op) => (
                         <div key={op.opId} className="flex justify-between items-center bg-panel/60 p-1.5 rounded border border-line/60">
@@ -718,47 +726,17 @@ export default function BellStateLearnPage() {
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[11px] text-ink-dim font-mono bg-abyss p-2 rounded border border-line">
-                      <ShieldCheck className="w-3.5 h-3.5 text-evidence" />
-                      <span>Target: Qiskit Aer · 1024 shots</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-accent/30" data-testid="demo-path-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-semibold text-ink flex items-center gap-1.5">
-                      <Radio className="w-3.5 h-3.5 text-accent" />
-                      <span>Flight Recorder Path</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-xs space-y-2.5">
-                    {[
-                      'Predict the measurement pattern',
-                      'Simulate on Aer (TanStack Mutation)',
-                      'Flight Recorder diagnosis (Deterministic Rule)',
-                      'Evidence-based repair & Progress record',
-                    ].map((step, i) => (
-                      <div
-                        key={step}
-                        className={`flex items-center gap-2.5 ${i === 0 ? 'text-accent font-medium' : 'text-ink-faint'}`}
-                      >
-                        <div
-                          className={`flex h-5 w-5 items-center justify-center rounded-full border font-mono text-[10px] ${
-                            i === 0
-                              ? 'border-accent bg-accent/15 text-accent shadow-glow'
-                              : 'border-line-bright bg-raised'
-                          }`}
-                        >
-                          {i + 1}
-                        </div>
-                        <span>{step}</span>
+                    <div className="flex items-center justify-between text-[11px] text-ink-dim font-mono bg-abyss p-2 rounded border border-line">
+                      <div className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-evidence" />
+                        <span>Target: Qiskit Aer · 1024 shots</span>
                       </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                      <span className="text-ink-faint">Ideal Statevector</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {viewMode === 'step-by-step' && (
               <div className="flex justify-end pt-4 border-t border-line">

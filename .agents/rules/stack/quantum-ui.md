@@ -18,7 +18,8 @@ Compatibility baseline: Next.js 15 line · React 19 · TypeScript strict · Tail
 
 ## Linear UI & Presentation Standards (The Anti-Clutter Law)
 
-- **Theme Neutrality**: All UI components consume semantic CSS variables (`bg-surface`, `text-primary`, `border-subtle`, `accent`) supporting both Light and Dark modes. Hardcoded dark classes (`bg-zinc-950`, `text-cyan-400`) are banned.
+- **Theme Neutrality**: The application is locked to **Light Mode** for consistency and visual clarity. All UI components still consume semantic CSS variables (`bg-surface`, `text-primary`, `border-subtle`, `accent`) but dark-mode overrides and theme toggles are banned. Hardcoded dark classes (`bg-zinc-950`, `text-cyan-400`) are banned.
+- **Header Aesthetics**: The main app header is a scroll-triggered floating pill with centered navigation, removing clutter like sub-brand text ("FLIGHT RECORDER") and theme toggles.
 - **Developer Telemetry Boundary**: Contracts provide IDs for network traceability, but UI components MUST sanitize them:
   - Banned from UI copy: raw request IDs (`req_...`), internal contract IDs (`ch_...`, `progress_lp_...`), and raw JSON paths (`stateTrace.0.basisProbabilities`).
   - Banned from UI copy: raw enum constants (`PROBABILITY_SUPPORT_EQUALS`, `CORRELATED_00_11`, `NO_SIGNAL`). Translate to human-readable strings via presenter mappers.

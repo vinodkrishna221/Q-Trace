@@ -138,13 +138,13 @@ export function TwoQubitCorrelationBridge({
   return (
     <div className="space-y-4" data-testid="two-qubit-correlation-bridge">
       {/* 1. Visual Entanglement Bridge Channel between the two qubits */}
-      <div className="p-3.5 rounded-xl border border-border-subtle bg-surface/90 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-3 rounded-lg border border-line bg-abyss/90 flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${
               isEntangled
                 ? 'bg-violet/20 border-violet text-violet shadow-glow'
-                : 'bg-surface-raised border-border-subtle text-ink-dim'
+                : 'bg-raised border-line text-ink-dim'
             }`}
           >
             <Zap className={`w-4 h-4 ${isEntangled ? 'animate-pulse' : ''}`} />
@@ -170,7 +170,7 @@ export function TwoQubitCorrelationBridge({
 
         {/* Quantified Entanglement Gauges */}
         <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="px-3 py-1 rounded-full bg-surface-raised border border-border-subtle text-center">
+          <div className="px-2.5 py-1 rounded bg-raised border border-line text-center">
             <div className="text-[9px] text-ink-faint">Concurrence</div>
             <div
               className={`font-bold ${isEntangled ? 'text-violet' : 'text-evidence'}`}
@@ -179,7 +179,7 @@ export function TwoQubitCorrelationBridge({
               C = {concurrence.toFixed(3)}
             </div>
           </div>
-          <div className="px-3 py-1 rounded-full bg-surface-raised border border-border-subtle text-center">
+          <div className="px-2.5 py-1 rounded bg-raised border border-line text-center">
             <div className="text-[9px] text-ink-faint">Mutual Info</div>
             <div className="font-bold text-ink">
               {mutualInfo.toFixed(2)} bits
@@ -189,7 +189,7 @@ export function TwoQubitCorrelationBridge({
       </div>
 
       {/* 2. Two-Qubit Pauli Correlation Tensor Matrix: E_ij = <sigma_i (x) sigma_j> */}
-      <div className="p-4 rounded-xl border border-border-subtle bg-surface space-y-3 font-mono">
+      <div className="p-4 rounded-lg border border-line bg-abyss space-y-3 font-mono">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
             <Activity className="w-3.5 h-3.5 text-accent" />

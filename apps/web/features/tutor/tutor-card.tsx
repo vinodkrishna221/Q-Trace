@@ -163,14 +163,14 @@ function SocraticQAPanel({
           onChange={(e) => setQuestionInput(e.target.value)}
           disabled={chatMutation.isPending}
           placeholder={placeholder}
-          className="flex-1 px-4 py-2 rounded-full border border-border-subtle bg-surface-sunken text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-border-focus disabled:opacity-60"
+          className="flex-1 px-3 py-2 rounded-lg border border-line bg-abyss text-xs font-mono text-ink placeholder:text-ink-faint focus:outline-none focus:border-accent disabled:opacity-60"
         />
         <Button
           type="submit"
           size="sm"
           variant="default"
           disabled={chatMutation.isPending || !questionInput.trim()}
-          className="gap-1 font-mono text-xs px-4"
+          className="gap-1 font-mono text-xs"
         >
           {chatMutation.isPending ? (
             <Loader2 className="w-3 h-3 animate-spin" />
@@ -183,7 +183,7 @@ function SocraticQAPanel({
 
       {/* Real-time Thinking Indicator */}
       {chatMutation.isPending && (
-        <div className="flex items-center gap-2 p-3 rounded-full border border-accent/40 bg-accent/10 text-xs font-mono text-accent animate-pulse px-4">
+        <div className="flex items-center gap-2 p-3 rounded-lg border border-accent/40 bg-accent/10 text-xs font-mono text-accent animate-pulse">
           <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0 text-accent" />
           <span>Tutor is analyzing your circuit trace via OpenRouter...</span>
         </div>
@@ -195,7 +195,7 @@ function SocraticQAPanel({
           {qaHistory.map((item, idx) => (
             <div
               key={idx}
-              className="rounded-xl border border-border-subtle bg-surface-raised/40 p-3 text-xs space-y-1.5 shadow-xs"
+              className="rounded-lg border border-line bg-abyss p-3 text-xs space-y-1.5 shadow-sm"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="font-semibold text-accent font-mono flex items-center gap-1.5">
@@ -375,7 +375,7 @@ export function TutorCard({
               <div
                 key={idx}
                 data-testid={`tutor-step-${idx}`}
-                className="rounded-xl border border-border-subtle bg-surface-raised/40 p-3.5 text-xs space-y-1.5"
+                className="rounded-lg border border-line bg-abyss p-3.5 text-xs space-y-1.5"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-accent font-mono">{step.title}</span>
@@ -383,7 +383,7 @@ export function TutorCard({
                     {step.evidenceKeys.map((key) => (
                       <code
                         key={key}
-                        className="text-[10px] font-mono text-ink-dim bg-surface-raised px-2 py-0.5 rounded-full border border-border-subtle"
+                        className="text-[10px] font-mono text-ink-dim bg-raised px-1.5 py-0.5 rounded border border-line"
                       >
                         {key}
                       </code>
@@ -405,16 +405,16 @@ export function TutorCard({
 
           <div
             data-testid="numerical-claims-table"
-            className="rounded-xl border border-border-subtle bg-surface overflow-hidden text-xs font-mono"
+            className="rounded-lg border border-line bg-abyss overflow-hidden text-xs font-mono"
           >
-            <div className="grid grid-cols-2 p-2.5 bg-surface-raised text-ink-dim font-bold border-b border-border-subtle">
+            <div className="grid grid-cols-2 p-2.5 bg-raised text-ink-dim font-bold border-b border-line">
               <span>Claimed Mathematical Value</span>
               <span>Grounded Simulator Evidence Key</span>
             </div>
             {numericalClaims.map((item, idx) => (
               <div
                 key={idx}
-                className="grid grid-cols-2 p-2.5 border-b border-border-subtle last:border-0 items-center"
+                className="grid grid-cols-2 p-2.5 border-b border-line last:border-0 items-center"
               >
                 <span className="text-evidence font-bold">{renderMathText(item.claim)}</span>
                 <span className="text-ink-dim text-[11px]">{item.evidenceKey}</span>

@@ -74,3 +74,8 @@ AFFECTS: docs/DESIGN-SYSTEM.md, .agents/rules/stack/quantum-ui.md, board/contrac
 
 
 
+
+### 15 · Floating Pill Navbar and Simplified Header Design       26 Sep 2026 · by Vinod + team
+CHOSE: Update the app header to a sticky, floating pill design that triggers on scroll, center the navigation items, remove the "FLIGHT RECORDER" sub-brand text, and permanently remove the light/dark mode toggle (locking to light mode).
+BECAUSE: The header felt cluttered and occupied too much vertical space; a scroll-triggered pill layout reduces cognitive load, creates a more modern spatial aesthetic, and aligns with the decision to standardize strictly on the light-mode theme for consistency.
+AFFECTS: apps/web/components/layout/app-header.tsx, .agents/rules/stack/quantum-ui.md.

@@ -5,12 +5,21 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BookOpen, Cpu, BarChart3, Users } from 'lucide-react';
 import { RoleSwitcher } from '@/components/ui/role-switcher';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useRoleStore } from '@/lib/role-store';
 
 export function AppHeader() {
   const pathname = usePathname();
   const { activeRole } = useRoleStore();
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
     { href: '/learn/bell-state', label: 'Learn', icon: BookOpen, activePrefix: '/learn' },
@@ -20,9 +29,15 @@ export function AppHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border-subtle bg-surface-canvas/90 backdrop-blur-md">
-      <div className="container mx-auto max-w-7xl flex items-center justify-between px-4 h-14 gap-4">
-        <div className="flex items-center gap-6">
+    <header className="sticky top-0 z-40 w-full flex justify-center pt-2 pb-2 pointer-events-none">
+      <div 
+        className={`pointer-events-auto flex items-center justify-between transition-all duration-300 ease-in-out ${
+          isScrolled 
+            ? 'w-[95%] max-w-4xl h-12 px-6 rounded-full border border-border-medium bg-surface/80 shadow-md backdrop-blur-md' 
+            : 'w-full max-w-7xl h-14 px-4 border-b-transparent bg-surface-canvas/90 backdrop-blur-md'
+        }`}
+      >
+        <div className="flex-1 flex justify-start">
           {/* Brand mark */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="flex h-7 w-7 items-center justify-center rounded-full border border-border-medium bg-surface text-accent shadow-xs group-hover:border-accent transition-colors">
@@ -35,13 +50,12 @@ export function AppHeader() {
               <span className="text-sm font-semibold tracking-wider text-text-primary group-hover:text-accent transition-colors">
                 Q-TRACE
               </span>
-              <span className="text-[10px] font-mono text-text-tertiary hidden sm:inline">
-                FLIGHT RECORDER
-              </span>
             </div>
           </Link>
+        </div>
 
-          {/* Navigation Links */}
+        {/* Navigation Links - Centered */}
+        <div className="shrink-0">
           <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
             {navItems.map((item) => {
               if (item.hideFor && activeRole.roleType === item.hideFor) return null;
@@ -66,10 +80,9 @@ export function AppHeader() {
           </nav>
         </div>
 
-        {/* Right side controls: Role Switcher & Theme Toggle */}
-        <div className="flex items-center gap-2">
+        {/* Right side controls: Role Switcher */}
+        <div className="flex-1 flex items-center justify-end">
           <RoleSwitcher />
-          <ThemeToggle />
         </div>
       </div>
     </header>

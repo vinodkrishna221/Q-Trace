@@ -98,8 +98,8 @@ export function ProbabilityHistogramView({
         <CardContent className="p-4 md:p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Panel 1: Ideal State Probabilities */}
-            <div className="rounded-xl border border-border-subtle bg-canvas p-4 space-y-4 font-mono">
-              <div className="flex items-center justify-between border-b border-border-subtle pb-2">
+            <div className="rounded-lg border border-line bg-abyss p-4 space-y-4 font-mono">
+              <div className="flex items-center justify-between border-b border-line pb-2">
                 <span className="text-xs font-bold text-ink flex items-center gap-1.5">
                   <Activity className="w-3.5 h-3.5 text-accent" />
                   Ideal Basis Probabilities P(|ψ⟩)
@@ -189,10 +189,10 @@ export function ProbabilityHistogramView({
           {/* Static Table Fallback View (Rendered when forceStaticFallback is active or as complementary data) */}
           {forceStaticFallback && (
             <div
-              className="rounded-xl border border-border-subtle bg-canvas/90 p-4 space-y-3 font-mono text-xs"
+              className="rounded-lg border border-line bg-abyss/90 p-4 space-y-3 font-mono text-xs"
               data-testid="static-evidence-table"
             >
-              <div className="flex items-center justify-between border-b border-border-subtle pb-2">
+              <div className="flex items-center justify-between border-b border-line pb-2">
                 <span className="font-bold text-ink flex items-center gap-1.5">
                   <TableIcon className="w-3.5 h-3.5 text-accent" />
                   <span>State Evidence Data Table (Static Fallback)</span>
