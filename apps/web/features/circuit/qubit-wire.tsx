@@ -219,11 +219,10 @@ export function QubitWiresGrid({
               data-testid={`qubit-wire-${qubitIndex}`}
             >
               {/* Qubit Label */}
-              <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink font-bold z-10">
-                <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-medium text-accent">
-                  q[{qubitIndex}]
+              <div className="w-16 shrink-0 flex items-center gap-1.5 z-10">
+                <span className="h-6 px-2 flex items-center justify-center bg-surface-sunken border border-border-subtle rounded-sm font-mono text-[11px] font-bold text-text-primary">
+                  q[{qubitIndex}] |0⟩
                 </span>
-                <span className="text-[10px] text-ink-faint font-normal">|0⟩</span>
               </div>
 
               {/* Wire horizontal line */}
@@ -283,7 +282,7 @@ export function QubitWiresGrid({
                       {op && isTarget && op.gate === 'CNOT' && (
                         <div
                           data-testid={op.opId ? `gate-${op.opId}` : 'gate-cnot-target'}
-                          className="w-11 h-11 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-11 h-11 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
                           title={`CNOT Target on q[${qubitIndex}] (control q[${op.controls[0]}])`}
                           aria-label={`CNOT Target (controlled by q[${op.controls[0]}])`}
                         >
@@ -295,57 +294,57 @@ export function QubitWiresGrid({
                       {op && isTarget && op.gate === 'H' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-9 rounded-full bg-gate-h/15 border-2 border-gate-h text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
                           aria-label={`Hadamard (H) gate on q[${qubitIndex}]`}
                         >
-                          <span className="leading-tight text-xs font-bold text-ink">H</span>
-                          <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Hadamard</span>
+                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">H</span>
+                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Hadamard</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'X' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-9 rounded-full bg-gate-pauli-x/15 border-2 border-gate-pauli-x text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
                           aria-label={`Pauli-X (X) gate on q[${qubitIndex}]`}
                         >
-                          <span className="leading-tight text-xs font-bold text-ink">X</span>
-                          <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Pauli-X</span>
+                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">X</span>
+                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-X</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'Y' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-9 rounded-full bg-gate-pauli-y/15 border-2 border-gate-pauli-y text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
                           aria-label={`Pauli-Y (Y) gate on q[${qubitIndex}]`}
                         >
-                          <span className="leading-tight text-xs font-bold text-ink">Y</span>
-                          <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Pauli-Y</span>
+                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">Y</span>
+                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-Y</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'Z' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-9 rounded-full bg-gate-pauli-z/15 border-2 border-gate-pauli-z text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
                           aria-label={`Pauli-Z (Z) gate on q[${qubitIndex}]`}
                         >
-                          <span className="leading-tight text-xs font-bold text-ink">Z</span>
-                          <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Pauli-Z</span>
+                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">Z</span>
+                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-Z</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'MEASURE' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="w-12 h-9 rounded-full bg-surface-raised border-2 border-border-strong text-ink flex flex-col items-center justify-center text-xs font-bold shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
                           aria-label={`Measure gate on q[${qubitIndex}] into classical bit c[${op.classicalTargets[0] ?? qubitIndex}]`}
                         >
-                          <span className="text-[10px] font-mono font-bold text-caution leading-tight">MEASURE</span>
-                          <span className="text-[8px] font-mono text-ink-dim font-normal leading-none">
-                            → c[{op.classicalTargets[0] ?? qubitIndex}]
-                          </span>
+                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">M</span>
+                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Measure</span>
+                          {/* A downward right-angle tap line connects the measurement gate to c[i] */}
+                          <div className="absolute top-[44px] left-1/2 w-[1px] bg-text-muted h-[40px] -translate-x-1/2 pointer-events-none" />
                         </div>
                       )}
 
@@ -385,13 +384,12 @@ export function QubitWiresGrid({
           className="flex items-center gap-4 relative pt-2 border-t border-border-subtle"
           data-testid="classical-wire"
         >
-          <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink-dim font-bold">
-            <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-subtle text-ink">
+          <div className="w-16 shrink-0 flex items-center gap-1.5 z-10">
+            <span className="h-6 px-2 flex items-center justify-center bg-surface-sunken border border-border-subtle rounded-sm font-mono text-[11px] font-bold text-text-primary">
               c[{classicalCount}]
             </span>
-            <span className="text-[10px] text-ink-faint font-normal">/{classicalCount}</span>
           </div>
-          <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[3px] border-b-2 border-border-medium border-double z-0" />
+          <div className="absolute left-16 right-0 top-1/2 -translate-y-1/2 h-[4px] border-y border-text-muted opacity-50 z-0" />
           <div className="w-full text-right pr-4 text-[10px] text-ink-faint">
             Classical register ({classicalCount} bits)
           </div>

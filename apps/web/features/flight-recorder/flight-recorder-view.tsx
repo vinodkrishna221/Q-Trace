@@ -171,23 +171,22 @@ export function FlightRecorderView({
           </div>
         ) : (
           <div
-            className="rounded-lg border border-caution/50 bg-caution/10 p-4 space-y-3"
+            className="rounded-lg border border-[#f59e0b] bg-[rgba(245,158,11,0.08)] p-4 space-y-3"
             data-testid="misconception-signal-card"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-caution/20 pb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f59e0b]/20 pb-2">
               <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-caution" />
-                <span className="text-xs font-bold text-caution uppercase tracking-wider">
-                  Misconception Signal:
+                <span className="text-xs font-bold text-[#f59e0b] uppercase tracking-wider flex items-center gap-1">
+                  Δ Diagnostic Evidence Comparison
                 </span>
                 <span
                   data-testid="misconception-code"
-                  className="text-xs font-mono font-bold text-caution px-2 py-0.5 rounded bg-abyss border border-caution/40"
+                  className="text-xs font-mono font-bold text-[#f59e0b] px-2 py-0.5 rounded bg-surface-sunken border border-[#f59e0b]/40"
                 >
                   {misconceptionSignal.code}
                 </span>
               </div>
-              <Badge variant="outline" className="text-[10px] font-mono text-caution border-caution/40">
+              <Badge variant="outline" className="text-[10px] font-mono text-[#f59e0b] border-[#f59e0b]/40">
                 Confidence: {(misconceptionSignal.confidence * 100).toFixed(0)}% (Deterministic Rule)
               </Badge>
             </div>
@@ -217,12 +216,11 @@ export function FlightRecorderView({
             </div>
 
             {misconceptionSignal.firstDivergenceStep !== null && misconceptionSignal.firstDivergenceStep !== undefined && (
-              <div className="divergence-sonar-ribbon mt-2">
-                <span className="divergence-sonar-pip shrink-0" aria-hidden="true" />
-                <span className="flex items-center gap-1.5 text-xs text-caution flex-wrap">
-                  <span>First Conceptual Divergence Point:</span>
-                  <strong data-testid="first-divergence-step" className="font-mono underline decoration-caution">
-                    Step {misconceptionSignal.firstDivergenceStep}{' '}
+              <div className="mt-2 flex items-center gap-2 p-2 rounded-md bg-[rgba(245,158,11,0.1)] border border-[#f59e0b]/30">
+                <div className="w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse shrink-0" aria-hidden="true" />
+                <span className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-mono flex-wrap">
+                  <strong data-testid="first-divergence-step">
+                    Δ MISMATCH AT STEP {misconceptionSignal.firstDivergenceStep}{' '}
                     {(() => {
                       const divStep = stateTrace.find(
                         (s) => s.stepIndex === misconceptionSignal.firstDivergenceStep
@@ -230,6 +228,7 @@ export function FlightRecorderView({
                       return divStep?.label ? `(${divStep.label})` : '';
                     })()}
                   </strong>
+                  <span className="font-sans text-[11px] opacity-90">— First divergence detected here</span>
                 </span>
               </div>
             )}
@@ -248,7 +247,7 @@ export function FlightRecorderView({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-2 px-1 snap-x">
             {stateTrace.map((step) => {
               const isSelected = activeStepIndex === step.stepIndex;
               const isDivergence = !isCorrect && step.stepIndex === misconceptionSignal.firstDivergenceStep;
@@ -262,44 +261,44 @@ export function FlightRecorderView({
                   aria-current={isSelected ? 'step' : undefined}
                   aria-label={`Step ${step.stepIndex}: ${step.label}${isDivergence ? ' (First Conceptual Divergence)' : ''}`}
                   onClick={() => handleStepClick(step.stepIndex)}
-                  className={`p-3.5 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                  className={`relative min-w-[220px] p-4 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none snap-start focus-visible:ring-2 focus-visible:ring-accent ${
                     isSelected
-                      ? 'border-accent bg-accent/10 ring-1 ring-accent text-ink shadow-glow'
-                      : 'border-line bg-abyss text-ink-dim hover:border-line-bright hover:text-ink'
+                      ? 'border-border-strong bg-surface-raised shadow-md'
+                      : 'border-border-subtle bg-surface text-ink-dim hover:border-border-medium hover:bg-surface-raised'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          isSelected
-                            ? 'bg-accent text-white font-bold'
-                            : 'bg-raised text-ink-dim'
-                        }`}
-                      >
-                        Step {step.stepIndex}
+                  {/* Active notch */}
+                  {isSelected && (
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-accent rounded-t-lg" />
+                  )}
+                  {/* Divergent pip */}
+                  {isDivergence && (
+                    <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-[rgba(245,158,11,1)] border-2 border-surface rounded-full shadow-[0_0_0_rgba(245,158,11,0.6)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_2_forwards]" />
+                  )}
+                  
+                  <div className="flex items-center justify-between mb-2 mt-1">
+                    <span className={`text-xs font-bold ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`}>
+                      Step {step.stepIndex}
+                    </span>
+                    {isDivergence && (
+                      <span className="text-[10px] font-mono text-[rgba(245,158,11,1)] px-1.5 py-0.5 rounded border border-[rgba(245,158,11,0.4)] bg-[rgba(245,158,11,0.08)]">
+                        Δ MISMATCH
                       </span>
-                      <span className="text-xs font-semibold text-ink">{step.label}</span>
-                    </div>
-
-                    {isCorrect ? (
-                      <span className="text-[10px] font-mono text-evidence px-1.5 py-0.5 rounded bg-evidence/15 border border-evidence/40">
+                    )}
+                    {isCorrect && isSelected && (
+                      <span className="text-[10px] font-mono text-evidence px-1.5 py-0.5 rounded border border-evidence/40 bg-evidence/10">
                         VERIFIED
                       </span>
-                    ) : isDivergence ? (
-                      <span className="text-[10px] font-mono text-caution px-1.5 py-0.5 rounded bg-caution/15 border border-caution/40">
-                        DIVERGENCE
-                      </span>
-                    ) : null}
+                    )}
                   </div>
 
-                  <div className="text-xs text-ink-dim font-sans font-medium mb-2">
-                    {stepReplay?.headline}
+                  <div className="text-xs text-text-primary font-sans font-semibold mb-2 leading-snug">
+                    {step.label}
                   </div>
 
-                  <div className="text-[11px] text-ink-faint space-y-0.5 border-t border-line pt-1.5">
+                  <div className="text-[11px] text-text-secondary space-y-0.5 border-t border-border-subtle pt-2">
                     <div>
-                      Basis: {Object.entries(step.basisProbabilities)
+                      {Object.entries(step.basisProbabilities)
                         .map(([basis, p]) => `${basis}: ${(p * 100).toFixed(0)}%`)
                         .join(', ')}
                     </div>

@@ -101,38 +101,33 @@ export function PredictionCheckpoint({
                   handleSelectOption(opt);
                 }
               }}
-              className={`pill-detent-card w-full text-left p-3.5 rounded-full text-xs font-mono transition-all flex items-center justify-between border cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`w-full text-left p-3 rounded-md transition-all flex items-start gap-3 outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isSelected
-                  ? 'border-gate-cnot bg-surface-raised text-ink ring-1 ring-gate-cnot shadow-sm'
-                  : 'border-border-medium bg-surface text-ink-dim hover:text-ink hover:border-border-strong hover:bg-surface-raised'
+                  ? 'bg-surface-raised border border-border-strong shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]'
+                  : 'bg-surface border border-border-subtle hover:bg-surface-raised'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`detent-pip w-4 h-4 rounded-full border flex items-center justify-center text-[10px] shrink-0 ${
-                    isSelected ? 'border-gate-cnot bg-gate-cnot text-white dark:text-canvas font-bold' : 'border-border-strong bg-surface-sunken'
-                  }`}
-                  aria-hidden="true"
-                >
-                  {isSelected && '✓'}
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-ink">{opt}</span>
-                  {isCommonMisconception && (
-                    <span className="text-[10px] text-caution/80 font-sans flex items-center gap-1 mt-0.5">
-                      <AlertTriangle className="w-2.5 h-2.5" />
-                      Assumes qubits remain independent after CNOT
-                    </span>
-                  )}
-                  {opt === 'CORRELATED_00_11' && (
-                    <span className="text-[10px] text-accent/80 font-sans mt-0.5">
-                      Entangled state: 50% |00⟩ + 50% |11⟩
-                    </span>
-                  )}
-                </div>
+              <div
+                className={`mt-0.5 w-[14px] h-[14px] rounded-full shrink-0 flex items-center justify-center ${
+                  isSelected
+                    ? 'bg-accent ring-2 ring-accent/30 border-none'
+                    : 'bg-surface-sunken border border-border-medium'
+                }`}
+                aria-hidden="true"
+              >
+                {/* Active Center Node */}
+                {isSelected && <div className="w-[6px] h-[6px] rounded-full bg-surface" />}
               </div>
-
-              {isSelected && <CheckCircle2 className="w-4 h-4 text-gate-cnot shrink-0" />}
+              <div className="flex flex-col">
+                <span className="font-mono text-xs font-semibold text-text-primary">{opt}</span>
+                <span className="font-sans text-[11px] text-text-secondary leading-relaxed mt-1">
+                  {isCommonMisconception
+                    ? 'Qubit 1 collapses to 50% |0⟩ or |1⟩ independently of Qubit 0'
+                    : opt === 'CORRELATED_00_11'
+                    ? 'Entangled state: outcomes are deterministic and correlated on every measurement'
+                    : 'Assumes non-entangled independent state.'}
+                </span>
+              </div>
             </button>
           );
         })}
@@ -161,6 +156,7 @@ export function PredictionCheckpoint({
           data-testid="confirm-prediction-btn"
           disabled={!selectedAnswer}
           onClick={handleConfirm}
+          className="active:scale-[0.985] transition-transform"
         >
           <Play className="w-3.5 h-3.5 mr-1.5" />
           {confirmed ? 'Prediction Locked · Ready to Run' : 'Confirm & Advance to Workspace'}

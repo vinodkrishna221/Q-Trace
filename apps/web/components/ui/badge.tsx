@@ -3,11 +3,13 @@ import { cn } from '@/lib/utils';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
+  pip?: 'success' | 'muted' | 'amber';
 }
 
 export function Badge({
   className,
   variant = 'default',
+  pip,
   ...props
 }: BadgeProps) {
   const variants = {
@@ -22,11 +24,24 @@ export function Badge({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium font-mono tracking-tight transition-colors focus:outline-none focus:ring-1 focus:ring-accent',
+        'inline-flex items-center rounded-full h-[22px] px-2.5 text-[11px] font-medium font-mono tracking-tight transition-colors focus:outline-none focus:ring-1 focus:ring-accent',
         variants[variant],
         className
       )}
       {...props}
-    />
+    >
+      {pip && (
+        <span
+          className={cn(
+            "w-[6px] h-[6px] rounded-full mr-1.5 shrink-0",
+            pip === 'success' && "bg-evidence animate-pulse",
+            pip === 'muted' && "bg-text-muted",
+            pip === 'amber' && "bg-[#f59e0b]"
+          )}
+          aria-hidden="true"
+        />
+      )}
+      {props.children}
+    </div>
   );
 }

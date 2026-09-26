@@ -115,21 +115,21 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
               >
                 {/* Gate Badge */}
                 <div
-                  className={`w-11 h-9 rounded-full border-2 flex items-center justify-center font-mono font-bold text-sm mb-1.5 transition-all duration-150 group-hover:scale-105 ${
+                  className={`w-[44px] h-[44px] rounded-md border flex items-center justify-center font-mono font-bold text-[14px] mb-1.5 transition-all duration-150 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] group-hover:-translate-y-[1px] ${
                     isSelected
-                      ? def.colorClass
-                      : `border-border-medium text-ink bg-surface-raised/40 ${GATE_HOVER_CLASSES[gateKey]}`
+                      ? 'border-border-strong bg-surface text-text-primary'
+                      : 'border-border-subtle bg-surface text-text-primary group-hover:border-border-strong'
                   }`}
                 >
                   {def.gate === 'CNOT' ? '⊕' : def.gate === 'MEASURE' ? 'M' : def.symbol}
                 </div>
 
                 {/* Gate Name & Shortcut */}
-                <span className="text-xs font-semibold text-ink leading-tight">
+                <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary leading-tight">
                   {def.name}
                 </span>
                 <span className="text-[10px] font-mono text-ink-faint mt-0.5 flex items-center gap-1">
-                  key: <kbd className="px-1 py-0.2 rounded-full bg-surface-raised border border-border-subtle text-ink-dim font-bold">{def.shortcutKey}</kbd>
+                  key: <kbd className="px-1 py-0.5 rounded-sm bg-surface-sunken border border-border-subtle text-text-primary font-bold">{def.shortcutKey}</kbd>
                 </span>
 
                 {isSelected && (
