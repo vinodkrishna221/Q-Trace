@@ -13,16 +13,16 @@ The interface prioritizes **extreme cognitive clarity**:
 - Progressive disclosure over 4,000px monolithic vertical scrolling.
 - Human-centered quantum terminology over developer debug strings.
 - Monochromatic sophistication over decorative neon glows and saturated gradients.
-- Seamless **Dark & Light Mode** support, defaulting to the user's system preference.
+- Strict **Light Mode** constraint, permanently locking the UI to a clean porcelain aesthetic.
 
 Judges should experience Q-Trace as a peer to Linear, Raycast, or Figma — an unmistakably premium software instrument.
 
 ---
 
-## 2. Tokens & Dual-Theme Color System
+## 2. Tokens & Theme Color System
 
 Single source of truth: `apps/web/app/globals.css`.  
-Supported via `next-themes` with automatic system preference detection.
+The application is permanently locked to Light Mode for consistency. Dark Mode token columns are retained in CSS variables strictly for semantic architecture, but are deactivated.
 
 ### 2.1 Surface & Border Palette
 
@@ -113,12 +113,12 @@ Q-Trace is built for learners and judges, not backend debugging. All internal id
 
 ## 6. Shared Components & Ergonomics
 
-- **`AppHeader` (`h-14`)**:
-  - Sticky glass header with `border-b border-border-subtle backdrop-blur-md`.
-  - Brand wordmark + minimal subtitle.
-  - Active navigation links with clean indicator pills.
+- **`AppHeader`**:
+  - Scroll-triggered sticky floating pill design (expands to full width when at the top, contracts to a centered pill when scrolled).
+  - Clean Brand wordmark (with sub-brand copy explicitly removed).
+  - Centered navigation links with clear active indicator pills.
   - Compact **Role Switcher Dropdown** (`Aarav (Beginner CSE) ▾`): opens a menu to switch personas without wrapping bio paragraphs in the navbar.
-  - **Theme Toggle**: Linear-style 3-way toggle (Light / Dark / System).
+  - Theme toggles are explicitly banned.
 - **`PageHeader`**: Clean title, 1-line purpose, and optional breadcrumbs. No cluttered developer request ID badges.
 - **`Card`**: 1px translucent border (`border-subtle`), subtle surface elevation (`bg-surface`), `rounded-xl`, padding disciplined to 16px–24px.
 - **`Button`**: Compact heights (`h-8` for small, `h-9` for standard). Clean micro-transitions. Exactly one primary action per viewport.
