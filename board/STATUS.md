@@ -155,3 +155,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 27 Sep 15:45 Vinod: DUO-5 green - Coherence Shield & Joules Store with Decoherence Penalty implemented in apps/web/lib/gamification-store.ts (Zustand store with coherenceJoules, coherenceShield 0-100%, streakDays, lastActiveDate, awardXP, applyDecoherencePenalty -20%, restoreShield +15%, streak tracking, and localStorage persistence); 16/16 unit tests green in tests/unit/gamification-store.test.ts, Next.js production build clean (17/17 routes); PR ready for Warden review. Unblocks DUO-6.
 
 
+- 27 Sep 16:10 Rajeswari: DUO-7 green — curriculum registry and stage data engine for Units 1.1 to 1.3 created in apps/web/lib/curriculum/units-1-to-3.ts and types.ts; 9 stages fully typed with 5-beat pedagogical fields, mutually exclusive prediction checkpoints, normalization constraint evaluation, and hands-on collapse lab; pnpm test:web tests/unit/curriculum-units-1-to-3.test.ts passed (8/8 green), full web test suite (203/203) green, Next.js production build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-8, DUO-11.
+
+
