@@ -178,7 +178,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/serpentine-path.tsx` 
 TEST: `pnpm test:web tests/unit/serpentine-path.test.ts` verifying SVG path coordinate calculations produce correct x-offsets at 390px and 1440px viewport widths, dual-rail path generation, and stroke-dashoffset animation class presence.
 DEPENDS: —          UNBLOCKS: DUO-2, DUO-11
 DEMO: The winding quantum coherence bus spine appears on `/learn`, connecting all ChamberNodes in a sinusoidal serpentine pattern with animated voltage pulses flowing along the completed path segments.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-1-serpentine-canvas-spline`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

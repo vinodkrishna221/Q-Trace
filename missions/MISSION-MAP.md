@@ -77,7 +77,7 @@ Note: DUO-1 and DUO-3 run IN PARALLEL (no dependency between them). Both feed DU
 
 ### Discord Acceptance Lines — DUO Phase
 
-- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-1 — feat/duolingo-path/duo-1-serpentine-canvas-spline` — STATUS: [ ] ready
+- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-1 — feat/duolingo-path/duo-1-serpentine-canvas-spline` — STATUS: [x] done
 - `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-2 — feat/duolingo-path/duo-2-unit-banners-guidebook` — STATUS: [ ] ready
 - `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-3 — feat/duolingo-path/duo-3-chamber-node-archetypes` — STATUS: [ ] ready
 - `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-4 — feat/duolingo-path/duo-4-anchored-node-popover` — STATUS: [ ] ready
