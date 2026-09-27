@@ -77,15 +77,15 @@ Note: DUO-1 and DUO-3 run IN PARALLEL (no dependency between them). Both feed DU
 
 ### Discord Acceptance Lines — DUO Phase
 
-- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-1 — feat/duolingo-path/duo-1-serpentine-canvas-spline` — STATUS: [x] done
-- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-2 — feat/duolingo-path/duo-2-unit-banners-guidebook` — STATUS: [ ] ready
-- `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-3 — feat/duolingo-path/duo-3-chamber-node-archetypes` — STATUS: [ ] ready
-- `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-4 — feat/duolingo-path/duo-4-anchored-node-popover` — STATUS: [ ] ready
-- `Vinod Krishna: ACCEPTED — DUO Duolingo Path Phase — starting DUO-5 — feat/duolingo-path/duo-5-coherence-shield-store` — STATUS: [ ] ready
-- `Vinod Krishna: ACCEPTED — DUO Duolingo Path Phase — starting DUO-6 — feat/duolingo-path/duo-6-telemetry-hud-profile` — STATUS: [ ] ready
-- `Rajeswari: ACCEPTED — DUO Duolingo Path Phase — starting DUO-7 — feat/duolingo-curriculum/duo-7-foundations-units-1-3` — STATUS: [ ] ready
-- `Rajeswari: ACCEPTED — DUO Duolingo Path Phase — starting DUO-8 — feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng` — STATUS: [ ] ready
-- `Venu Gopal: ACCEPTED — DUO Duolingo Path Phase — starting DUO-9 — feat/duolingo-curriculum/duo-9-cnot-bell-correlation` — STATUS: [ ] ready
-- `Venu Gopal: ACCEPTED — DUO Duolingo Path Phase — starting DUO-10 — feat/duolingo-curriculum/duo-10-teleportation-capstone` — STATUS: [ ] ready
-- `Sohail: ACCEPTED — DUO Duolingo Path Phase — starting DUO-11 — feat/duolingo-ui/duo-11-desktop-assembly-inspector` — STATUS: [ ] ready
+- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-1 — feat/duolingo-path/duo-1-serpentine-canvas-spline` — STATUS: [x] merged
+- `Uday Rohit: ACCEPTED — DUO Duolingo Path Phase — starting DUO-2 — feat/duolingo-path/duo-2-unit-banners-guidebook` — STATUS: [x] merged
+- `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-3 — feat/duolingo-path/duo-3-chamber-node-archetypes` — STATUS: [x] merged
+- `Rani: ACCEPTED — DUO Duolingo Path Phase — starting DUO-4 — feat/duolingo-path/duo-4-anchored-node-popover` — STATUS: [x] merged
+- `Vinod Krishna: ACCEPTED — DUO Duolingo Path Phase — starting DUO-5 — feat/duolingo-path/duo-5-coherence-shield-store` — STATUS: [x] merged
+- `Vinod Krishna: ACCEPTED — DUO Duolingo Path Phase — starting DUO-6 — feat/duolingo-path/duo-6-telemetry-hud-profile` — STATUS: [x] merged
+- `Rajeswari: ACCEPTED — DUO Duolingo Path Phase — starting DUO-7 — feat/duolingo-curriculum/duo-7-foundations-units-1-3` — STATUS: [x] merged
+- `Rajeswari: ACCEPTED — DUO Duolingo Path Phase — starting DUO-8 — feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng` — STATUS: [x] merged
+- `Venu Gopal: ACCEPTED — DUO Duolingo Path Phase — starting DUO-9 — feat/duolingo-curriculum/duo-9-cnot-bell-correlation` — STATUS: [x] merged
+- `Venu Gopal: ACCEPTED — DUO Duolingo Path Phase — starting DUO-10 — feat/duolingo-curriculum/duo-10-teleportation-capstone` — STATUS: [x] merged
+- `Sohail: ACCEPTED — DUO Duolingo Path Phase — starting DUO-11 — feat/duolingo-ui/duo-11-desktop-assembly-inspector` — STATUS: [x] merged
 - `Sohail: ACCEPTED — DUO Duolingo Path Phase — starting DUO-12 — feat/duolingo-ui/duo-12-mobile-sheet-acceptance` — STATUS: [ ] ready
