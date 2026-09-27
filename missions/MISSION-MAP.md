@@ -61,16 +61,18 @@ Exact 29 Aug presentation time is unknown. Conservative readiness gates in STATU
 ```
 DUO-1 (canvas math) ──► DUO-2 (banners use canvas)
 DUO-1 ──────────────────────────────────────────────────────────► DUO-11 (assembly)
+DUO-2 ──────────────────────────────────────────────────────────► DUO-11
 DUO-3 (nodes) ──────► DUO-4 (popovers anchor to nodes)
 DUO-3 ──────────────────────────────────────────────────────────► DUO-11
+DUO-4 ──────────────────────────────────────────────────────────► DUO-11
 DUO-5 (store) ──────► DUO-6 (HUD reads from store)
 DUO-6 ──────────────────────────────────────────────────────────► DUO-11
 DUO-7 (units 1-3) ──► DUO-8 (units 4-5) ──► DUO-9 (units 6-7) ──► DUO-10 (units 8-10)
 DUO-7 ──────────────────────────────────────────────────────────► DUO-11
-DUO-2 ──────────────────────────────────────────────────────────► DUO-11
-DUO-4 ──────────────────────────────────────────────────────────► DUO-11
 DUO-10 ─────────────────────────────────────────────────────────► DUO-11
 DUO-11 (desktop assembly) ──────────────────────────────────────► DUO-12 (mobile)
+
+Note: DUO-1 and DUO-3 run IN PARALLEL (no dependency between them). Both feed DUO-11.
 ```
 
 ### Discord Acceptance Lines — DUO Phase
