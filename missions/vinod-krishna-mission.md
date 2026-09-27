@@ -183,7 +183,7 @@ DELIVERABLE: Create `apps/web/lib/gamification-store.ts` — a Zustand store wit
 TEST: `pnpm test:web tests/unit/gamification-store.test.ts` verifying initial state is correct (100% shield, 0 joules, 0 streak), `applyDecoherencePenalty` reduces shield by correct amount, `awardXP` increments joules correctly, shield cannot go below 0% or above 100%, and localStorage persistence round-trips correctly.
 DEPENDS: —          UNBLOCKS: DUO-6
 DEMO: After Aarav makes an incorrect Prediction Checkpoint, the `🛡️ 100%` in the top HUD drops to `🛡️ 80%` with an amber flash. Completing a calibration practice restores it. XP ticks upward after each completed stage.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-5-coherence-shield-store`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
@@ -193,7 +193,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/learning-hud.tsx` —
 TEST: `pnpm test:web tests/unit/learning-hud.test.tsx` verifying HUD renders all 5 items from store state, shield display changes color/class when below 50%, streak pill renders correct day count, profile dropdown opens and closes, and HUD is aria-labeled for accessibility.
 DEPENDS: DUO-5          UNBLOCKS: DUO-11
 DEMO: The top bar of `/learn` shows live `🔥 4`, `⚡ 850`, `🛡️ 80%` values that update in real-time as the judge completes stages and makes predictions — the shield visibly drops to amber tint after a wrong answer.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-6-telemetry-hud-profile`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
