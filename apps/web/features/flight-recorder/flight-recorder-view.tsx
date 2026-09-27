@@ -26,6 +26,7 @@ interface FlightRecorderViewProps {
   tutorResponse?: TutorExplanation | null;
   isTutorLoading?: boolean;
   learnerRole?: string;
+  hideHypothesisBanner?: boolean;
 }
 
 export function FlightRecorderView({
@@ -35,6 +36,7 @@ export function FlightRecorderView({
   tutorResponse,
   isTutorLoading,
   learnerRole,
+  hideHypothesisBanner = false,
 }: FlightRecorderViewProps) {
   const { misconceptionSignal, replay } = diagnosis;
 
@@ -75,25 +77,29 @@ export function FlightRecorderView({
       <CardHeader className="pb-3 border-b border-line bg-raised/40">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-xs font-mono">
-              STEP 4 · QUANTUM FLIGHT RECORDER
-            </Badge>
-            {isCorrect ? (
-              <Badge
-                variant="outline"
-                className="text-xs font-mono text-evidence border-evidence/40 bg-evidence/10 flex items-center gap-1"
-              >
-                <CheckCircle2 className="w-3 h-3 text-evidence" />
-                Hypothesis Confirmed
+            {!hideHypothesisBanner && (
+              <Badge variant="default" className="text-xs font-mono">
+                STEP 4 · QUANTUM FLIGHT RECORDER
               </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="text-xs font-mono text-caution border-caution/40 bg-caution/10 flex items-center gap-1"
-              >
-                <AlertOctagon className="w-3 h-3" />
-                Divergence Detected
-              </Badge>
+            )}
+            {!hideHypothesisBanner && (
+              isCorrect ? (
+                <Badge
+                  variant="outline"
+                  className="text-xs font-mono text-evidence border-evidence/40 bg-evidence/10 flex items-center gap-1"
+                >
+                  <CheckCircle2 className="w-3 h-3 text-evidence" />
+                  Hypothesis Confirmed
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-xs font-mono text-caution border-caution/40 bg-caution/10 flex items-center gap-1"
+                >
+                  <AlertOctagon className="w-3 h-3" />
+                  Divergence Detected
+                </Badge>
+              )
             )}
           </div>
           <span className="text-[11px] font-mono text-ink-faint">ID: {misconceptionSignal.id}</span>
@@ -101,139 +107,143 @@ export function FlightRecorderView({
 
         <CardTitle className="text-base text-ink flex items-center gap-2 mt-1">
           <Radio className="w-4 h-4 text-accent animate-pulse" />
-          <span>State Trace Replay & Misconception Diagnosis</span>
+          <span>{hideHypothesisBanner ? 'Gate-by-Gate State Trace Replay' : 'State Trace Replay & Misconception Diagnosis'}</span>
         </CardTitle>
         <CardDescription className="text-xs text-ink-dim">
-          {isCorrect
-            ? 'Replaying simulator-verified state evolution gate by gate. Your prediction aligns with verified quantum behavior.'
-            : 'Replaying simulator-verified state evolution gate by gate to isolate where learner intuition diverged.'}
+          {hideHypothesisBanner 
+            ? 'Replaying simulator-verified state evolution gate by gate.'
+            : isCorrect
+              ? 'Replaying simulator-verified state evolution gate by gate. Your prediction aligns with verified quantum behavior.'
+              : 'Replaying simulator-verified state evolution gate by gate to isolate where learner intuition diverged.'}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-4 md:p-6 space-y-6">
         {/* Misconception Signal or Confirmed Hypothesis Banner */}
-        {isCorrect ? (
-          <div
-            className="rounded-lg border border-emerald-500 bg-emerald-500/10 p-4 space-y-3 shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-shadow duration-500"
-            data-testid="misconception-signal-card"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-evidence/20 pb-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
-                <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider relative overflow-hidden group">
-                  <span className="relative z-10 group-hover:animate-shimmer">Hypothesis Confirmed:</span>
-                </span>
-                <span
-                  data-testid="hypothesis-confirmed-badge"
-                  className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-abyss border border-emerald-500/40 relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-white/20 -translate-x-full animate-shimmer" />
-                  NO MISCONCEPTION DETECTED
-                </span>
-              </div>
-              <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 border-emerald-500/40">
-                Confidence: 100% (Deterministic Match)
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-                <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
-                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                  ✓ {misconceptionSignal.evidence?.prediction ?? 'CORRELATED_00_11'}
-                </span>
-                <span className="text-[10px] text-ink-dim block font-sans">
-                  {misconceptionSignal.evidence?.predictionDescription ??
-                    'Correctly predicted entangled Bell state correlation'}
-                </span>
+        {!hideHypothesisBanner && (
+          isCorrect ? (
+            <div
+              className="rounded-lg border border-emerald-500 bg-emerald-500/10 p-4 space-y-3 shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-shadow duration-500"
+              data-testid="misconception-signal-card"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-evidence/20 pb-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+                  <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider relative overflow-hidden group">
+                    <span className="relative z-10 group-hover:animate-shimmer">Hypothesis Confirmed:</span>
+                  </span>
+                  <span
+                    data-testid="hypothesis-confirmed-badge"
+                    className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-abyss border border-emerald-500/40 relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-white/20 -translate-x-full animate-shimmer" />
+                    NO MISCONCEPTION DETECTED
+                  </span>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 border-emerald-500/40">
+                  Confidence: 100% (Deterministic Match)
+                </Badge>
               </div>
 
-              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-                <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
-                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                  ✓ {misconceptionSignal.evidence?.verifiedBehavior ?? 'CORRELATED_00_11'}
-                </span>
-                <span className="text-[10px] text-ink-dim block font-sans">
-                  {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
-                    'Non-local correlation: outcomes match on 100% of shots'}
-                </span>
-              </div>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                  <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    ✓ {misconceptionSignal.evidence?.prediction ?? 'CORRELATED_00_11'}
+                  </span>
+                  <span className="text-[10px] text-ink-dim block font-sans">
+                    {misconceptionSignal.evidence?.predictionDescription ??
+                      'Correctly predicted entangled Bell state correlation'}
+                  </span>
+                </div>
 
-            <div className="flex items-center justify-between text-xs text-emerald-500 pt-1">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span>Status:</span>
-                <strong data-testid="no-divergence-status" className="font-mono text-emerald-400 animate-pulse">
-                  ✓ Hypothesis Confirmed — No Misconception Detected
-                </strong>
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="rounded-lg border border-[#f59e0b] bg-[rgba(245,158,11,0.08)] p-4 space-y-3"
-            data-testid="misconception-signal-card"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f59e0b]/20 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#f59e0b] uppercase tracking-wider flex items-center gap-1">
-                  Δ Diagnostic Evidence Comparison
-                </span>
-                <span
-                  data-testid="misconception-code"
-                  className="text-xs font-mono font-bold text-[#f59e0b] px-2 py-0.5 rounded bg-surface-sunken border border-[#f59e0b]/40"
-                >
-                  {misconceptionSignal.code}
-                </span>
-              </div>
-              <Badge variant="outline" className="text-[10px] font-mono text-[#f59e0b] border-[#f59e0b]/40">
-                Confidence: {(misconceptionSignal.confidence * 100).toFixed(0)}% (Deterministic Rule)
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-                <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
-                <span className="text-danger font-bold flex items-center gap-1.5">
-                  ✕ {misconceptionSignal.evidence.prediction}
-                </span>
-                <span className="text-[10px] text-ink-dim block font-sans">
-                  {misconceptionSignal.evidence?.predictionDescription ??
-                    (tutorResponse?.summary ? 'Analyzed by Socratic Tutor' : misconceptionSignal.code)}
-                </span>
+                <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                  <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    ✓ {misconceptionSignal.evidence?.verifiedBehavior ?? 'CORRELATED_00_11'}
+                  </span>
+                  <span className="text-[10px] text-ink-dim block font-sans">
+                    {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
+                      'Non-local correlation: outcomes match on 100% of shots'}
+                  </span>
+                </div>
               </div>
 
-              <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
-                <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
-                <span className="text-evidence font-bold flex items-center gap-1.5">
-                  ✓ {misconceptionSignal.evidence.verifiedBehavior}
-                </span>
-                <span className="text-[10px] text-ink-dim block font-sans">
-                  {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
-                    'Non-local correlation: outcomes match on 100% of shots'}
-                </span>
-              </div>
-            </div>
-
-            {misconceptionSignal.firstDivergenceStep !== null && misconceptionSignal.firstDivergenceStep !== undefined && (
-              <div className="mt-2 flex items-center gap-2 p-2 rounded-md bg-[rgba(245,158,11,0.1)] border border-[#f59e0b]/30">
-                <div className="w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse shrink-0" aria-hidden="true" />
-                <span className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-mono flex-wrap">
-                  <strong data-testid="first-divergence-step">
-                    Δ MISMATCH AT Step {misconceptionSignal.firstDivergenceStep}{' '}
-                    {(() => {
-                      const divStep = stateTrace.find(
-                        (s) => s.stepIndex === misconceptionSignal.firstDivergenceStep
-                      );
-                      return divStep?.label ? `(${divStep.label})` : '';
-                    })()}
+              <div className="flex items-center justify-between text-xs text-emerald-500 pt-1">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  <span>Status:</span>
+                  <strong data-testid="no-divergence-status" className="font-mono text-emerald-400 animate-pulse">
+                    ✓ Hypothesis Confirmed — No Misconception Detected
                   </strong>
-                  <span className="font-sans text-[11px] opacity-90">— First divergence detected here</span>
                 </span>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div
+              className="rounded-lg border border-[#f59e0b] bg-[rgba(245,158,11,0.08)] p-4 space-y-3"
+              data-testid="misconception-signal-card"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f59e0b]/20 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#f59e0b] uppercase tracking-wider flex items-center gap-1">
+                    Δ Diagnostic Evidence Comparison
+                  </span>
+                  <span
+                    data-testid="misconception-code"
+                    className="text-xs font-mono font-bold text-[#f59e0b] px-2 py-0.5 rounded bg-surface-sunken border border-[#f59e0b]/40"
+                  >
+                    {misconceptionSignal.code}
+                  </span>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono text-[#f59e0b] border-[#f59e0b]/40">
+                  Confidence: {(misconceptionSignal.confidence * 100).toFixed(0)}% (Deterministic Rule)
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                  <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
+                  <span className="text-danger font-bold flex items-center gap-1.5">
+                    ✕ {misconceptionSignal.evidence.prediction}
+                  </span>
+                  <span className="text-[10px] text-ink-dim block font-sans">
+                    {misconceptionSignal.evidence?.predictionDescription ??
+                      (tutorResponse?.summary ? 'Analyzed by Socratic Tutor' : misconceptionSignal.code)}
+                  </span>
+                </div>
+
+                <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
+                  <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
+                  <span className="text-evidence font-bold flex items-center gap-1.5">
+                    ✓ {misconceptionSignal.evidence.verifiedBehavior}
+                  </span>
+                  <span className="text-[10px] text-ink-dim block font-sans">
+                    {misconceptionSignal.evidence?.verifiedBehaviorDescription ??
+                      'Non-local correlation: outcomes match on 100% of shots'}
+                  </span>
+                </div>
+              </div>
+
+              {misconceptionSignal.firstDivergenceStep !== null && misconceptionSignal.firstDivergenceStep !== undefined && (
+                <div className="mt-2 flex items-center gap-2 p-2 rounded-md bg-[rgba(245,158,11,0.1)] border border-[#f59e0b]/30">
+                  <div className="w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse shrink-0" aria-hidden="true" />
+                  <span className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-mono flex-wrap">
+                    <strong data-testid="first-divergence-step">
+                      Δ MISMATCH AT Step {misconceptionSignal.firstDivergenceStep}{' '}
+                      {(() => {
+                        const divStep = stateTrace.find(
+                          (s) => s.stepIndex === misconceptionSignal.firstDivergenceStep
+                        );
+                        return divStep?.label ? `(${divStep.label})` : '';
+                      })()}
+                    </strong>
+                    <span className="font-sans text-[11px] opacity-90">— First divergence detected here</span>
+                  </span>
+                </div>
+              )}
+            </div>
+          )
         )}
 
         {/* Replay Controls & Steps Scrubber */}

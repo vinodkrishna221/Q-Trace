@@ -10,11 +10,13 @@ import { BlochSphereView } from './bloch-sphere-view';
 interface ProbabilityHistogramViewProps {
   simulationRun: SimulationRun;
   disablePlotly?: boolean;
+  hideStepHeader?: boolean;
 }
 
 export function ProbabilityHistogramView({
   simulationRun,
   disablePlotly = false,
+  hideStepHeader = false,
 }: ProbabilityHistogramViewProps) {
   const { probabilities, counts, shots, adapter, conformance, durationMs, stateTrace } = simulationRun;
   const [forceStaticFallback, setForceStaticFallback] = React.useState<boolean>(disablePlotly);
@@ -47,17 +49,21 @@ export function ProbabilityHistogramView({
         <CardHeader className="pb-3 border-b border-line bg-raised/40">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Badge variant="default" className="text-xs font-mono">
-                STEP 3 · VISUAL EVIDENCE
-              </Badge>
-              <Badge
-                variant="outline"
-                data-testid="simulation-status-badge"
-                className="text-xs font-mono text-evidence border-evidence/40 bg-evidence/10 flex items-center gap-1"
-              >
-                <CheckCircle2 className="w-3 h-3" />
-                {simulationRun.status} ({adapter})
-              </Badge>
+              {!hideStepHeader && (
+                <>
+                  <Badge variant="default" className="text-xs font-mono">
+                    STEP 3 · VISUAL EVIDENCE
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    data-testid="simulation-status-badge"
+                    className="text-xs font-mono text-evidence border-evidence/40 bg-evidence/10 flex items-center gap-1"
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    {simulationRun.status} ({adapter})
+                  </Badge>
+                </>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[11px] font-mono text-ink-faint">

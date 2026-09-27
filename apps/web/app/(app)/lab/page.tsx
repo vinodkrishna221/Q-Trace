@@ -617,7 +617,7 @@ export default function LabPage() {
             </div>
             <span className="text-xs font-mono text-success">Qiskit Aer · 1024 Shots</span>
           </div>
-          <ProbabilityHistogramView simulationRun={simulationRun} />
+          <ProbabilityHistogramView simulationRun={simulationRun} hideStepHeader={true} />
         </div>
       )}
 
@@ -630,7 +630,7 @@ export default function LabPage() {
                 STAGE 3 · FLIGHT RECORDER
               </Badge>
               <h2 className="text-sm font-semibold text-text-primary">
-                Quantum Flight Recorder Diagnosis
+                Quantum Flight Recorder
               </h2>
             </div>
             <span className="text-xs font-mono text-accent">Gate-by-Gate State Trace</span>
@@ -642,6 +642,7 @@ export default function LabPage() {
               activeLearnerProfile?.role ||
               (activeRole.id === 'role_meera' ? 'PHYSICS_TO_CODE' : 'BEGINNER_CSE')
             }
+            hideHypothesisBanner={true}
           />
         </div>
       )}
