@@ -234,4 +234,34 @@ describe('Learning Paths & Visual Evidence Suite (UX-6)', () => {
     fireEvent.click(dualBtn);
     expect(screen.getByTestId('dual-3d-bloch-view')).toBeDefined();
   });
+
+  it('verifies mobile bottom sheet opens on node tap, drag handle is accessible, ENTER CHAMBER fires stage navigation, and canonical routes remain intact', () => {
+    useRoleStore.getState().setRole('role_aarav');
+    render(<LearnIndexPage />);
+
+    // 1. Existing canonical routes cards are intact
+    expect(screen.getByTestId('launch-module-superposition')).toBeDefined();
+    expect(screen.getByTestId('launch-module-measurement')).toBeDefined();
+    expect(screen.getByTestId('launch-module-bell-state')).toBeDefined();
+
+    // 2. Tap a ChamberNode on the serpentine path
+    const node = screen.getByTestId('chamber-node-stage_1_3_hadamard');
+    expect(node).toBeDefined();
+    fireEvent.click(node);
+
+    // 3. Mobile bottom sheet opens
+    const bottomSheet = screen.getByTestId('stage-bottom-sheet');
+    expect(bottomSheet).toBeDefined();
+    expect(bottomSheet.className).toContain('h-[75vh]');
+
+    // 4. Drag handle is accessible
+    const dragHandle = screen.getByTestId('sheet-drag-handle');
+    expect(dragHandle).toBeDefined();
+
+    // 5. ENTER CHAMBER button is present and fires stage navigation link
+    const enterBtn = screen.getByTestId('mobile-enter-chamber-btn');
+    expect(enterBtn).toBeDefined();
+    expect(enterBtn.textContent).toContain('ENTER CHAMBER');
+    expect(enterBtn.closest('a')?.getAttribute('href')).toContain('/learn');
+  });
 });

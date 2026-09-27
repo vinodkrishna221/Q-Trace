@@ -175,15 +175,26 @@ export function SerpentineCanvas({
             const isDiverged = stage.archetype === 'NODE_DEBUG';
             const isLocked = index > 3 && !isActive && !isDiverged;
 
-            // Sinusoidal horizontal offset (-56px to +56px)
-            const offsets = [0, 48, -48, 56, -32, 40, -56, 0];
-            const xOffset = offsets[index % offsets.length];
+            // Sinusoidal horizontal offset:
+            // Mobile (<640px): 44px arc per UI Spec Section 4
+            // Desktop (%640px): 56px arc
+            const desktopOffsets = [0, 48, -48, 56, -32, 40, -56, 0];
+            const mobileOffsets = [0, 36, -36, 44, -28, 32, -44, 0];
+            const desktopX = desktopOffsets[index % desktopOffsets.length];
+            const mobileX = mobileOffsets[index % mobileOffsets.length];
 
             return (
               <div
                 key={stage.id}
-                className="flex flex-col items-center transition-transform duration-300"
-                style={{ transform: `translateX(${xOffset}px)` }}
+                className="flex flex-col items-center transition-transform duration-300 translate-x-[var(--x-mobile)] sm:translate-x-[var(--x-desktop)]"
+                style={{
+                  '--x-mobile': `${mobileX}px`,
+                  '--x-desktop': `${desktopX}px`,
+                  transform: `translateX(${desktopX}px)`,
+                } as React.CSSProperties}
+                data-testid={`serpentine-node-slot-${stage.id}`}
+                data-mobile-offset={mobileX}
+                data-desktop-offset={desktopX}
               >
                 {/* Active Popover Preview (if selected) */}
                 {isSelected && (
@@ -206,13 +217,13 @@ export function SerpentineCanvas({
                         size="sm"
                         className="w-full h-6 text-[10px] font-mono bg-accent hover:bg-accent-hover text-white py-0 px-2"
                       >
-                        ⚡ START
+                        ✦ START
                       </Button>
                     </Link>
                   </div>
                 )}
 
-                {/* Tactile ChamberNode Button */}
+                {/* Tactile ChamberNode Button (52px on mobile per UI Spec Section 4) */}
                 <button
                   type="button"
                   onClick={() => onSelectStage(stage)}
@@ -220,7 +231,7 @@ export function SerpentineCanvas({
                   data-stage-id={stage.id}
                   data-node-state={isCompleted ? 'COMPLETED' : isActive ? 'ACTIVE' : isDiverged ? 'DIVERGED' : 'LOCKED'}
                   aria-label={`${stage.title} (${stage.archetype})`}
-                  className={`relative group w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
+                  className={`relative group w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
                     isSelected
                       ? 'ring-4 ring-accent/30 scale-105'
                       : 'hover:scale-105 active:scale-95'

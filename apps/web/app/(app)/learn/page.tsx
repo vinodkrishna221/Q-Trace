@@ -23,6 +23,8 @@ import { CurriculumStage } from '@/lib/curriculum/types';
 import { LeftQuestRail } from '@/features/learning/components/left-quest-rail';
 import { RightStageInspector } from '@/features/learning/components/right-stage-inspector';
 import { SerpentineCanvas } from '@/features/learning/components/serpentine-canvas';
+import { StageBottomSheet } from '@/features/learning/components/stage-bottom-sheet';
+import { MobileBottomNav } from '@/features/learning/components/mobile-bottom-nav';
 
 export default function LearnIndexPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
@@ -43,6 +45,9 @@ export default function LearnIndexPage() {
 
   // Active step index for legacy stepper suite
   const [activeStepIndex, setActiveStepIndex] = React.useState(0);
+
+  // Mobile Bottom Sheet state for touch/mobile deep inspection
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = React.useState(false);
 
   // Selected stage for the Right Stage Inspector drawer
   // Defaults to the Bell State hero lab or first stage
@@ -76,7 +81,7 @@ export default function LearnIndexPage() {
 
   return (
     <div
-      className="min-h-screen bg-surface-canvas text-text-primary antialiased selection:bg-accent/20"
+      className="min-h-screen bg-surface-canvas text-text-primary antialiased selection:bg-accent/20 pb-20 lg:pb-8"
       data-testid="learn-catalogue-page"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
@@ -141,7 +146,10 @@ export default function LearnIndexPage() {
             <SerpentineCanvas
               stages={allCurriculumStages}
               selectedStageId={selectedStage?.id || 'bell-state'}
-              onSelectStage={(stage) => setSelectedStage(stage)}
+              onSelectStage={(stage) => {
+                setSelectedStage(stage);
+                setIsBottomSheetOpen(true);
+              }}
               activeStepIndex={activeStepIndex}
               setActiveStepIndex={setActiveStepIndex}
             />
@@ -285,6 +293,16 @@ export default function LearnIndexPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Spring Bottom Sheet Modal (75vh) */}
+      <StageBottomSheet
+        stage={selectedStage}
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+      />
+
+      {/* Fixed Mobile Bottom 4-Tab Navigation Bar */}
+      <MobileBottomNav />
     </div>
   );
 }

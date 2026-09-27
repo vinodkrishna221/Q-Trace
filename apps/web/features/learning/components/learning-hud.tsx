@@ -114,7 +114,7 @@ export function LearningHUD({ className = '' }: LearningHUDProps) {
     <header
       role="banner"
       aria-label="Learning Telemetry HUD"
-      className={`sticky top-0 z-40 w-full flex justify-center py-2 px-3 sm:px-6 bg-surface-canvas/90 backdrop-blur-md border-b border-border-subtle select-none transition-all ${className}`}
+      className={`sticky top-0 z-40 w-full flex justify-center items-center h-12 sm:h-14 px-3 sm:px-6 bg-surface-canvas/90 backdrop-blur-md border-b border-border-subtle select-none transition-all ${className}`}
     >
       <div className="w-full max-w-7xl flex items-center justify-between gap-2 sm:gap-4">
         {/* Item 1: Brand Wordmark & Route Breadcrumb */}

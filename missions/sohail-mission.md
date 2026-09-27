@@ -188,7 +188,7 @@ DELIVERABLE: Implement the responsive mobile layout adaptations on `/learn`: (1)
 TEST: `pnpm test:web` — full suite must pass with 195+ tests green. Additionally: `pnpm test:web tests/acceptance/learning-visuals.test.tsx tests/acceptance/bell-live.test.tsx` verifying mobile bottom sheet opens on node tap, drag handle is accessible, `▶ ENTER CHAMBER` fires stage navigation, and existing canonical slug routes (`/learn/superposition`, `/learn/measurement`, `/learn/bell-state`) remain intact.
 DEPENDS: DUO-11          UNBLOCKS: —
 DEMO: On mobile (390px), the judge taps the active Hadamard node — the In-Situ Popover appears briefly, then a spring-animated sheet glides up from the bottom (75vh) revealing full stage details, prediction checkpoint, and the large `▶ ENTER CHAMBER` button. The bottom 4-tab bar stays fixed throughout.
-PERSONA: Warden           STATUS: [ ] ready
+PERSONA: Warden           STATUS: [x] green
 BRANCH: `feat/duolingo-ui/duo-12-mobile-sheet-acceptance`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

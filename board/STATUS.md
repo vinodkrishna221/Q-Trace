@@ -157,3 +157,5 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 27 Sep 17:05 Patch & Warden: DUO-1 through DUO-11 Merge Train COMPLETE on main — all 11 feature branches integrated in DAG order; resolved types.ts interface union and STATUS log merges; full web test suite (29 test files, 325 tests) verified 100% green; zero broken contracts; unblocks DUO-12.
 
+
+- 27 Sep 17:20 Sohail: DUO-12 green (feat/duolingo-ui/duo-12-mobile-sheet-acceptance) — implemented responsive mobile layout adaptations on /learn (sticky compact HUD at h-12 with icon+number layout below 640px, single-column path with +/-44px sinusoidal swing on mobile viewport and 52px node diameter, spring-animated bottom sheet component at apps/web/features/learning/components/stage-bottom-sheet.tsx with 75vh height, drag handle pill, deep stage telemetry, prediction checkpoint radio options, and 48px ENTER CHAMBER CTA, fixed bottom 4-tab navigation bar); full web test suite (31 test files, 338 tests) verified 100% green, Next.js production build clean (17/17 routes); PR ready for Warden review. Duolingo UI track complete.
