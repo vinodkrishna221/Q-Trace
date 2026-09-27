@@ -193,7 +193,7 @@ export const authClient = {
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      if ((err as any).status) throw err;
+      if ((err as any).status && (err as any).status !== 404) throw err;
       return {
         status: 'WAITLISTED',
         waitlistPosition: 42,

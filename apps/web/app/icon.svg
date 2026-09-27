@@ -1,0 +1,15 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Q-Trace Brand Favicon -->
+  <rect width="48" height="48" rx="12" fill="#0a0a0c"/>
+  <!-- Q Superposition Orbit -->
+  <circle cx="22" cy="22" r="14" stroke="#90a4fd" stroke-width="3" stroke-linecap="round"/>
+  <!-- Inner Coherence Ring -->
+  <circle cx="22" cy="22" r="8" stroke="#90a4fd" stroke-width="1.2" stroke-dasharray="2.5 2" opacity="0.6"/>
+  <!-- Ground State Core Nucleus -->
+  <circle cx="22" cy="22" r="3" fill="#7ccf73"/>
+  <!-- Dirac Ket Facet -->
+  <path d="M33 18 L37 22 L33 26" stroke="#a48fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Flight Trace Descender -->
+  <path d="M28 28 L39 39" stroke="#a48fff" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="39" cy="39" r="2.5" fill="#a48fff"/>
+</svg>

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Link from 'next/link';
+import { QTraceLogo } from '@/components/ui/q-trace-logo';
 
 export default function AuthLayout({
   children,
@@ -11,15 +12,7 @@ export default function AuthLayout({
       {/* Top Brand Bar */}
       <header className="w-full flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full border border-border-medium bg-surface text-accent shadow-xs group-hover:border-accent transition-colors">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <circle cx="12" cy="12" r="8" strokeOpacity="0.4" />
-              <path d="M4 12h3.5l2-4 3 8 2-4h5.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <span className="text-sm font-semibold tracking-wider text-text-primary group-hover:text-accent transition-colors">
-            Q-TRACE
-          </span>
+          <QTraceLogo variant="full" size="sm" showSubtext={false} />
         </Link>
       </header>
 

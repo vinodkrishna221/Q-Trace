@@ -8,6 +8,8 @@ import { useRoleStore } from '@/lib/role-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { Badge } from '@/components/ui/badge';
 
+import { QTraceLogo } from '@/components/ui/q-trace-logo';
+
 export function AppHeader() {
   const pathname = usePathname();
   const { activeRole } = useRoleStore();
@@ -53,17 +55,7 @@ export function AppHeader() {
         <div className="flex-1 flex justify-start">
           {/* Brand mark */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full border border-border-medium bg-surface text-accent shadow-xs group-hover:border-accent transition-colors">
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                <circle cx="12" cy="12" r="8" strokeOpacity="0.4" />
-                <path d="M4 12h3.5l2-4 3 8 2-4h5.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-sm font-semibold tracking-wider text-text-primary group-hover:text-accent transition-colors">
-                Q-TRACE
-              </span>
-            </div>
+            <QTraceLogo variant="full" size="sm" showSubtext={false} />
           </Link>
         </div>
 

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Trace — Logo & Atomic Cursor Design Laboratory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Theme 4: True Black OLED & Mineral Lithograph Master Tokens */
+    :root {
+      --bg-canvas: #faf6f0;
+      --bg-surface: #ffffff;
+      --bg-surface-raised: #f3eee6;
+      --bg-surface-sunken: #ece6dc;
+      --border-subtle: rgba(11, 10, 67, 0.08);
+      --border-medium: rgba(11, 10, 67, 0.16);
+      --border-strong: rgba(11, 10, 67, 0.28);
+      --text-primary: #0b0a43;
+      --text-secondary: #31306b;
+      --text-muted: #5a5895;
+      --accent: #2a2882;
+      --accent-hover: #3730a3;
+      --accent-muted: rgba(42, 40, 130, 0.08);
+      --gate-h: #2a2882;
+      --gate-x: #7c1213;
+      --gate-cnot: #4a02b1;
+      --evidence-success: #033c00;
+      --cursor-glow: rgba(42, 40, 130, 0.18);
+      --cursor-ring: rgba(42, 40, 130, 0.35);
+      --cursor-electron: #2a2882;
+      --cursor-nucleus: #4a02b1;
+    }
+
+    body.dark {
+      --bg-canvas: #000000;
+      --bg-surface: #0a0a0c;
+      --bg-surface-raised: #141418;
+      --bg-surface-sunken: #040405;
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-medium: rgba(255, 255, 255, 0.18);
+      --border-strong: rgba(255, 255, 255, 0.32);
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent: #90a4fd;
+      --accent-hover: #a48fff;
+      --accent-muted: rgba(144, 164, 253, 0.15);
+      --gate-h: #90a4fd;
+      --gate-x: #f47c70;
+      --gate-cnot: #a48fff;
+      --evidence-success: #7ccf73;
+      --cursor-glow: rgba(144, 164, 253, 0.25);
+      --cursor-ring: rgba(144, 164, 253, 0.45);
+      --cursor-electron: #90a4fd;
+      --cursor-nucleus: #a48fff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-x: hidden;
+      cursor: none; /* Replaced by custom atomic cursor */
+    }
+
+    /* Force all clickable things to hide native cursor */
+    a, button, input, [role="button"], label, select {
+      cursor: none;
+    }
+
+    /* ==========================================================================
+       ATOMIC CUSTOM CURSOR STYLES
+       ========================================================================== */
+    #atomic-cursor-root {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99999;
+      overflow: visible;
+    }
+
+    /* Center Nucleus Dot (Zero lag layer) */
+    .cursor-nucleus {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      margin-left: -3px;
+      margin-top: -3px;
+      border-radius: 50%;
+      background-color: var(--cursor-nucleus);
+      box-shadow: 0 0 10px var(--cursor-glow), 0 0 2px var(--cursor-nucleus);
+      pointer-events: none;
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s, width 0.2s, height 0.2s, margin 0.2s;
+      z-index: 2;
+    }
+
+    /* Concentric Nucleus Core Ring */
+    .cursor-nucleus-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      margin-left: -6px;
+      margin-top: -6px;
+      border: 1px solid var(--cursor-ring);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: nucleus-pulse 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes nucleus-pulse {
+      0% { transform: scale(0.9); opacity: 0.3; }
+      100% { transform: scale(1.3); opacity: 0.8; }
+    }
+
+    /* Tri-Orbital Shell System (Follower layer) */
+    .cursor-orbital-system {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 44px;
+      height: 44px;
+      margin-left: -22px;
+      margin-top: -22px;
+      pointer-events: none;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  margin 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.2s ease;
+      z-index: 1;
+    }
+
+    /* Orbital Track Ellipse SVG */
+    .orbital-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .orbital-path {
+      fill: none;
+      stroke: var(--cursor-ring);
+      stroke-width: 1;
+      stroke-dasharray: 2 1.5;
+      opacity: 0.55;
+      transition: stroke 0.25s, stroke-width 0.2s;
+    }
+
+    /* Rotating Planes */
+    .orbital-plane {
+      transform-origin: center;
+      transition: transform 0.3s ease;
+    }
+
+    .orbital-plane-1 { transform: rotate(0deg); }
+    .orbital-plane-2 { transform: rotate(60deg); }
+    .orbital-plane-3 { transform: rotate(120deg); }
+
+    /* Revolving Electrons */
+    .electron {
+      fill: var(--cursor-electron);
+      filter: drop-shadow(0 0 3px var(--cursor-electron));
+      transition: fill 0.25s;
+    }
+
+    /* Micro-Animation: Excited State on Interactive Elements */
+    body.cursor-excited .cursor-orbital-system {
+      width: 62px;
+      height: 62px;
+      margin-left: -31px;
+      margin-top: -31px;
+    }
+
+    body.cursor-excited .cursor-nucleus {
+      transform: scale(1.4);
+      background-color: var(--gate-cnot);
+      box-shadow: 0 0 16px var(--gate-cnot), 0 0 4px var(--gate-cnot);
+    }
+
+    body.cursor-excited .orbital-path {
+      stroke: var(--gate-cnot);
+      stroke-width: 1.25;
+      opacity: 0.85;
+      stroke-dasharray: none;
+    }
+
+    body.cursor-excited .electron {
+      fill: var(--gate-cnot);
+      filter: drop-shadow(0 0 6px var(--gate-cnot));
+    }
+
+    /* Micro-Animation: Wavefunction Collapse (Click/MouseDown) */
+    .cursor-shockwave {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
+      margin-top: -5px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.5);
+      animation: shockwave-burst 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes shockwave-burst {
+      0% {
+        transform: scale(0.6);
+        opacity: 0.95;
+        border-color: var(--gate-cnot);
+      }
+      100% {
+        transform: scale(4.8);
+        opacity: 0;
+        border-color: var(--accent);
+      }
+    }
+
+    body.cursor-down .cursor-orbital-system {
+      width: 16px;
+      height: 16px;
+      margin-left: -8px;
+      margin-top: -8px;
+      opacity: 0.3;
+    }
+
+    body.cursor-down .cursor-nucleus {
+      transform: scale(0.7);
+    }
+
+    /* Micro-Animation: Collimated Focus for Text Inputs */
+    body.cursor-collimated .cursor-orbital-system {
+      width: 18px;
+      height: 38px;
+      margin-left: -9px;
+      margin-top: -19px;
+    }
+
+    body.cursor-collimated .orbital-plane-2,
+    body.cursor-collimated .orbital-plane-3 {
+      opacity: 0.2;
+    }
+
+    /* ==========================================================================
+       CONTAINER & PRESENTATION LAYOUT
+       ========================================================================== */
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    header.top-deck {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 40px;
+    }
+
+    .theme-toggle-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-pill:hover {
+      border-color: var(--accent);
+      background: var(--bg-surface-raised);
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent-muted);
+      color: var(--accent);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .hero-section {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    h1.hero-title {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 16px 0 12px;
+      line-height: 1.15;
+    }
+
+    p.hero-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Section Cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border-medium);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* Logo Showcase Grid */
+    .logo-spec-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--bg-surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+
+    .logo-render-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--bg-surface);
+      border-radius: 12px;
+      border: 1px dashed var(--border-medium);
+      min-height: 120px;
+    }
+
+    /* Interactive Test Playground */
+    .playground-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .quantum-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      transition: all 0.18s ease;
+    }
+
+    .quantum-btn.primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    body.dark .quantum-btn.primary {
+      background: var(--accent);
+      color: #000000;
+    }
+
+    .quantum-btn.primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .quantum-btn:hover {
+      border-color: var(--accent);
+      background: var(--bg-surface-raised);
+    }
+
+    /* Quantum Gate Chips */
+    .gate-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .gate-chip {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-family: 'Geist Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gate-chip:hover {
+      transform: scale(1.1) translateY(-2px);
+      box-shadow: 0 4px 12px var(--cursor-glow);
+    }
+
+    .gate-chip.h { color: var(--gate-h); border-color: var(--gate-h); }
+    .gate-chip.x { color: var(--gate-x); border-color: var(--gate-x); }
+    .gate-chip.cnot { color: var(--gate-cnot); border-color: var(--gate-cnot); }
+
+    .test-input {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      font-family: 'Geist Mono', monospace;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .test-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-muted);
+    }
+
+    /* Code block */
+    pre.code-card {
+      background: var(--bg-surface-sunken);
+      padding: 16px;
+      border-radius: 12px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .hud-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="dark">
+
+  <!-- ========================================================================
+       LIVE ATOMIC CUSTOM CURSOR SYSTEM
+       ======================================================================== -->
+  <div id="atomic-cursor-root">
+    <!-- Center Nucleus Dot (0-lag cursor point) -->
+    <div class="cursor-nucleus" id="cursor-nucleus">
+      <div class="cursor-nucleus-ring"></div>
+    </div>
+
+    <!-- Tri-Orbital Shell System (Fluid lerp follower) -->
+    <div class="cursor-orbital-system" id="cursor-orbital">
+      <svg class="orbital-svg" viewBox="-30 -30 60 60">
+        <!-- Orbit 1: Equatorial (0 deg) -->
+        <g class="orbital-plane orbital-plane-1">
+          <ellipse cx="0" cy="0" rx="24" ry="8" class="orbital-path" />
+          <circle cx="0" cy="0" r="2.2" class="electron" id="e1" />
+        </g>
+
+        <!-- Orbit 2: Ascending (60 deg) -->
+        <g class="orbital-plane orbital-plane-2">
+          <ellipse cx="0" cy="0" rx="24" ry="8" class="orbital-path" />
+          <circle cx="0" cy="0" r="2.2" class="electron" id="e2" />
+        </g>
+
+        <!-- Orbit 3: Descending (120 deg) -->
+        <g class="orbital-plane orbital-plane-3">
+          <ellipse cx="0" cy="0" rx="24" ry="8" class="orbital-path" />
+          <circle cx="0" cy="0" r="2.2" class="electron" id="e3" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       APPLICATION CONTAINER & TEST LABORATORY
+       ======================================================================== -->
+  <div class="app-container">
+
+    <!-- Top Navigation Deck -->
+    <header class="top-deck">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="badge-pill">DESIGN LABORATORY</span>
+        <span style="font-size: 13px; color: var(--text-muted);">Q-Trace Brand & Atomic Cursor Protocol</span>
+      </div>
+
+      <button class="theme-toggle-pill" id="theme-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <span id="theme-label">Switch to Mineral Light</span>
+      </button>
+    </header>
+
+    <!-- Hero Title -->
+    <div class="hero-section">
+      <div class="badge-pill">INTERACTIVE PROTOTYPE</div>
+      <h1 class="hero-title">Experience the Quantum Atom Cursor<br>& Brand Identity System</h1>
+      <p class="hero-sub">
+        Move your mouse to feel the zero-latency nucleus and tri-orbital electron dynamics. Hover over buttons and quantum gates to activate the excited-state acceleration. Click anywhere to trigger the wavefunction measurement collapse.
+      </p>
+    </div>
+
+    <!-- Playground Test Deck -->
+    <div class="card" style="margin-bottom: 40px; border-color: var(--accent);">
+      <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span>Interactive Micro-Animation Testing Deck</span>
+      </div>
+      <p class="card-desc">
+        Try hovering over the different button types, clicking to trigger wavefunction collapse, and focusing on the Dirac input.
+      </p>
+
+      <div class="playground-bar">
+        <button class="quantum-btn primary">
+          <span>Run Aer Simulation</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <button class="quantum-btn">
+          <span>Bell State |Φ⁺⟩</span>
+        </button>
+        <button class="quantum-btn">
+          <span>Diagnose Divergence</span>
+        </button>
+        <button class="quantum-btn">
+          <span>Flight Recorder</span>
+        </button>
+      </div>
+
+      <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 10px;">
+        Quantum Gate Hover Dynamics
+      </div>
+      <div class="gate-row">
+        <div class="gate-chip h" title="Hadamard Gate (Superposition)">H</div>
+        <div class="gate-chip x" title="Pauli-X (Bit-flip)">X</div>
+        <div class="gate-chip" style="color: #0369a1; border-color: #0369a1;" title="Pauli-Z (Phase-flip)">Z</div>
+        <div class="gate-chip cnot" title="Controlled-NOT (Entanglement)">CX</div>
+        <div class="gate-chip" style="color: #be185d; border-color: #be185d;" title="Phase Gate">S</div>
+        <span style="font-size: 13px; color: var(--text-secondary); margin-left: 8px;">
+          ← Hover each gate to observe the excited orbital dilation
+        </span>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <input type="text" class="test-input" placeholder="Dirac State Collimation Test: |ψ⟩ = α|0⟩ + β|1⟩ (hover & click to test text mode)" />
+      </div>
+    </div>
+
+    <!-- 3 Logo Concepts Showcase -->
+    <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.01em;">
+      Proposed Brand Logo System
+    </h2>
+
+    <div class="card-grid">
+
+      <!-- Logo Option A -->
+      <div class="card" style="border: 2px solid var(--accent);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div class="card-title">Option A: The Statevector Trace</div>
+          <span class="badge-pill" style="background: var(--accent); color: #fff;">RECOMMENDED</span>
+        </div>
+        <p class="card-desc">
+          Continuous geometric Q formed by a superposition orbital loop with a Dirac ket facet (`|⟩`), intersected by a flight-recorder trajectory descender and inner coherence nucleus.
+        </p>
+
+        <!-- Live SVG Render Box -->
+        <div class="logo-render-box">
+          <svg width="220" height="64" viewBox="0 0 220 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Mark Group -->
+            <g transform="translate(10, 8)">
+              <!-- Outer Quantum Ring / Q -->
+              <circle cx="24" cy="24" r="18" stroke="var(--gate-h)" stroke-width="2.5" stroke-linecap="round" />
+              <!-- Inner Concentric Orbit -->
+              <circle cx="24" cy="24" r="10" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.6" />
+              <!-- Coherence Center Nucleus -->
+              <circle cx="24" cy="24" r="3" fill="var(--evidence-success)" />
+              <!-- Dirac Ket Angle Accent -->
+              <path d="M37 19 L41 24 L37 29" stroke="var(--gate-cnot)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Flight Recorder Telemetry Descender -->
+              <path d="M31 31 L44 44" stroke="var(--gate-cnot)" stroke-width="3" stroke-linecap="round" />
+              <circle cx="44" cy="44" r="2.5" fill="var(--gate-cnot)" />
+            </g>
+            <!-- Wordmark Typography -->
+            <text x="68" y="34" font-family="'Geist', sans-serif" font-size="20" font-weight="700" letter-spacing="0.1em" fill="var(--text-primary)">
+              Q-TRACE
+            </text>
+            <text x="68" y="47" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="0.18em" fill="var(--accent)" opacity="0.9">
+              FLIGHT RECORDER
+            </text>
+          </svg>
+        </div>
+
+        <div class="logo-spec-row">
+          <div class="hud-stat">
+            <span style="color: var(--text-muted);">Icon-Only Glyphs:</span>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <!-- 24px version -->
+              <svg width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <circle cx="22" cy="22" r="16" stroke="var(--gate-h)" stroke-width="3.5" />
+                <circle cx="22" cy="22" r="3" fill="var(--evidence-success)" />
+                <path d="M28 28 L40 40" stroke="var(--gate-cnot)" stroke-width="4" stroke-linecap="round" />
+              </svg>
+              <!-- 32px version -->
+              <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                <circle cx="22" cy="22" r="16" stroke="var(--gate-h)" stroke-width="3.5" />
+                <circle cx="22" cy="22" r="8" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 2" opacity="0.6"/>
+                <circle cx="22" cy="22" r="3" fill="var(--evidence-success)" />
+                <path d="M28 28 L40 40" stroke="var(--gate-cnot)" stroke-width="4" stroke-linecap="round" />
+              </svg>
+            </div>
+          </div>
+          <div class="hud-stat">
+            <span style="color: var(--text-muted);">Symbolism:</span>
+            <span style="color: var(--text-primary);">Q-Superposition + Flight Vector</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo Option B -->
+      <div class="card">
+        <div class="card-title">Option B: Entangled Dual-Core</div>
+        <p class="card-desc">
+          Twin intersecting quantum orbital lemniscates forming a stylized 'Q', joined by a quantum coherence entanglement bridge.
+        </p>
+
+        <!-- Live SVG Render Box -->
+        <div class="logo-render-box">
+          <svg width="220" height="64" viewBox="0 0 220 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(10, 8)">
+              <!-- Left Ellipse (Qubit 0) -->
+              <ellipse cx="20" cy="24" rx="14" ry="17" stroke="var(--gate-h)" stroke-width="2.2" transform="rotate(-15 20 24)" />
+              <!-- Right Ellipse (Qubit 1) -->
+              <ellipse cx="28" cy="24" rx="14" ry="17" stroke="var(--gate-cnot)" stroke-width="2.2" transform="rotate(15 28 24)" />
+              <!-- Coherence Bridge -->
+              <line x1="16" y1="24" x2="32" y2="24" stroke="var(--evidence-success)" stroke-width="2" stroke-dasharray="2 1.5" />
+              <circle cx="16" cy="24" r="2.5" fill="var(--gate-h)" />
+              <circle cx="32" cy="24" r="2.5" fill="var(--gate-cnot)" />
+              <!-- Descender Tail -->
+              <path d="M34 32 L44 42" stroke="var(--gate-cnot)" stroke-width="3" stroke-linecap="round" />
+            </g>
+            <text x="68" y="34" font-family="'Geist', sans-serif" font-size="20" font-weight="700" letter-spacing="0.1em" fill="var(--text-primary)">
+              Q-TRACE
+            </text>
+            <text x="68" y="47" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="0.18em" fill="var(--accent)" opacity="0.9">
+              QUANTUM VERIFIED
+            </text>
+          </svg>
+        </div>
+
+        <div class="logo-spec-row">
+          <div class="hud-stat">
+            <span style="color: var(--text-muted);">Primary Metaphor:</span>
+            <span style="color: var(--text-primary);">Bell State Pair (|00⟩ + |11⟩)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo Option C -->
+      <div class="card">
+        <div class="card-title">Option C: Telemetry Monogram</div>
+        <p class="card-desc">
+          High-contrast avionics monogram combining a square Dirac operator graticule with a quantum orbital descender.
+        </p>
+
+        <!-- Live SVG Render Box -->
+        <div class="logo-render-box">
+          <svg width="220" height="64" viewBox="0 0 220 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(10, 8)">
+              <!-- Outer Rounded Square Frame -->
+              <rect x="6" y="6" width="34" height="34" rx="10" stroke="var(--border-strong)" stroke-width="2" />
+              <!-- Laser Crosshairs -->
+              <line x1="23" y1="6" x2="23" y2="40" stroke="var(--border-medium)" stroke-width="1" stroke-dasharray="2 2" />
+              <line x1="6" y1="23" x2="40" y2="23" stroke="var(--border-medium)" stroke-width="1" stroke-dasharray="2 2" />
+              <!-- Inner Q Orbit -->
+              <circle cx="23" cy="23" r="11" stroke="var(--gate-h)" stroke-width="2.5" />
+              <!-- Monogram Descender -->
+              <path d="M29 29 L42 42" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" />
+            </g>
+            <text x="68" y="34" font-family="'Geist', sans-serif" font-size="20" font-weight="700" letter-spacing="0.1em" fill="var(--text-primary)">
+              Q-TRACE
+            </text>
+            <text x="68" y="47" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="0.18em" fill="var(--accent)" opacity="0.9">
+              INSTRUMENT DECK
+            </text>
+          </svg>
+        </div>
+
+        <div class="logo-spec-row">
+          <div class="hud-stat">
+            <span style="color: var(--text-muted);">Primary Metaphor:</span>
+            <span style="color: var(--text-primary);">Avionics & Console Calibration</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Implementation Architecture Summary -->
+    <div class="card" style="margin-top: 24px;">
+      <div class="card-title">Technical Architecture & Integration Specifications</div>
+      <p class="card-desc">
+        Engineered for zero layout shift, 120 FPS frame rate, and native touch accessibility.
+      </p>
+
+      <pre class="code-card">
+// apps/web/components/ui/atomic-cursor.tsx
+// Core Architecture: Dual-layer pointer tracking
+// Layer 1: Hardware-synced nucleus dot (0ms latency clientX/clientY)
+// Layer 2: 3D Tri-orbital electron cloud (requestAnimationFrame spring interpolation k=0.22)
+// State machine:
+// - idle:          32px orbital shell, 1.0x revolution speed
+// - button hover:  48px dilated shell, 2.2x excited frequency, glowing iris
+// - mousedown:     wavefunction collapse to 0px in 90ms + expanding shockwave ring
+// - text input:    collimated vertical orientation
+// - touch screen:  auto-deactivated (@media (pointer: coarse))
+// - reduced motion: stationary probability cloud</pre>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================
+       JAVASCRIPT LOGIC FOR ATOMIC CURSOR & THEME TOGGLE
+       ======================================================================== -->
+  <script>
+    (function () {
+      const nucleus = document.getElementById('cursor-nucleus');
+      const orbital = document.getElementById('cursor-orbital');
+      const root = document.getElementById('atomic-cursor-root');
+      const e1 = document.getElementById('e1');
+      const e2 = document.getElementById('e2');
+      const e3 = document.getElementById('e3');
+
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let orbitalX = mouseX;
+      let orbitalY = mouseY;
+
+      // Revolution angles and speeds (rad/frame)
+      let t1 = 0;
+      let t2 = 1.2;
+      let t3 = 2.4;
+      let speedMultiplier = 1.0;
+      let targetSpeedMultiplier = 1.0;
+
+      // Track mouse position directly
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        // Zero-lag nucleus positioning
+        nucleus.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+      });
+
+      // Mousedown: Wavefunction Collapse & Shockwave
+      window.addEventListener('mousedown', (e) => {
+        document.body.classList.add('cursor-down');
+
+        // Create expanding quantum shockwave ring
+        const wave = document.createElement('div');
+        wave.className = 'cursor-shockwave';
+        wave.style.left = `${e.clientX}px`;
+        wave.style.top = `${e.clientY}px`;
+        root.appendChild(wave);
+
+        setTimeout(() => {
+          wave.remove();
+        }, 600);
+      });
+
+      window.addEventListener('mouseup', () => {
+        document.body.classList.remove('cursor-down');
+      });
+
+      // Interactive hover states (Buttons, Links, Inputs, Gate chips)
+      function setupHoverListeners() {
+        const interactiveElements = document.querySelectorAll('button, a, .gate-chip, [role="button"], .theme-toggle-pill');
+        interactiveElements.forEach((el) => {
+          el.addEventListener('mouseenter', () => {
+            document.body.classList.add('cursor-excited');
+            targetSpeedMultiplier = 2.4;
+          });
+          el.addEventListener('mouseleave', () => {
+            document.body.classList.remove('cursor-excited');
+            targetSpeedMultiplier = 1.0;
+          });
+        });
+
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach((el) => {
+          el.addEventListener('mouseenter', () => {
+            document.body.classList.add('cursor-collimated');
+          });
+          el.addEventListener('mouseleave', () => {
+            document.body.classList.remove('cursor-collimated');
+          });
+        });
+      }
+
+      setupHoverListeners();
+
+      // Orbital simulation loop (requestAnimationFrame)
+      function animate() {
+        // Fluid spring lerp for orbital cloud follower
+        const lerpFactor = 0.22;
+        orbitalX += (mouseX - orbitalX) * lerpFactor;
+        orbitalY += (mouseY - orbitalY) * lerpFactor;
+        orbital.style.transform = `translate3d(${orbitalX}px, ${orbitalY}px, 0)`;
+
+        // Smooth speed transition
+        speedMultiplier += (targetSpeedMultiplier - speedMultiplier) * 0.1;
+
+        // Advance electron orbits along ellipse (rx=24, ry=8)
+        t1 += 0.032 * speedMultiplier;
+        t2 += 0.041 * speedMultiplier;
+        t3 += 0.027 * speedMultiplier;
+
+        const rx = 24;
+        const ry = 8;
+
+        // Position electrons on elliptical trajectories
+        e1.setAttribute('cx', (rx * Math.cos(t1)).toFixed(2));
+        e1.setAttribute('cy', (ry * Math.sin(t1)).toFixed(2));
+
+        e2.setAttribute('cx', (rx * Math.cos(t2)).toFixed(2));
+        e2.setAttribute('cy', (ry * Math.sin(t2)).toFixed(2));
+
+        e3.setAttribute('cx', (rx * Math.cos(t3)).toFixed(2));
+        e3.setAttribute('cy', (ry * Math.sin(t3)).toFixed(2));
+
+        requestAnimationFrame(animate);
+      }
+
+      requestAnimationFrame(animate);
+
+      // Theme toggle functionality
+      const themeBtn = document.getElementById('theme-btn');
+      const themeLabel = document.getElementById('theme-label');
+      themeBtn.addEventListener('click', () => {
+        if (document.body.classList.contains('dark')) {
+          document.body.classList.remove('dark');
+          themeLabel.textContent = 'Switch to True Black OLED';
+        } else {
+          document.body.classList.add('dark');
+          themeLabel.textContent = 'Switch to Mineral Light';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

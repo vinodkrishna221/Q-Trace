@@ -636,6 +636,217 @@ body {
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================================================
+   Atomic Custom Cursor & Quantum Interaction Mechanics
+   ========================================================================== */
+body.custom-cursor-active,
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active input,
+body.custom-cursor-active textarea,
+body.custom-cursor-active select,
+body.custom-cursor-active [role="button"],
+body.custom-cursor-active .cursor-pointer,
+body.custom-cursor-active [data-interactive] {
+  cursor: none !important;
+}
+
+#atomic-cursor-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 999999;
+  overflow: visible;
+  transition: opacity 0.2s ease;
+}
+
+.atomic-cursor-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.atomic-cursor-svg {
+  overflow: visible;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+}
+
+/* 1. Orbital Ellipse Paths */
+.orbital-ellipse {
+  fill: none;
+  stroke: rgba(11, 10, 67, 0.45);
+  stroke-width: 1.15;
+  stroke-dasharray: 2.5 1.5;
+  transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
+}
+
+.dark .orbital-ellipse {
+  stroke: rgba(144, 164, 253, 0.6);
+  filter: drop-shadow(0 0 1px rgba(144, 164, 253, 0.4));
+}
+
+/* 2. Revolving Quantum Electrons (Electric Cyan / Azure - Different from purple nucleus!) */
+.electron {
+  fill: #0284c7;
+  stroke: #ffffff;
+  stroke-width: 0.6;
+  filter: drop-shadow(0 0 3px rgba(2, 132, 199, 0.8));
+  transition: fill 0.2s, stroke 0.2s;
+}
+
+.dark .electron {
+  fill: #00f0ff;
+  stroke: #0a0a0c;
+  stroke-width: 0.6;
+  filter: drop-shadow(0 0 4px #00f0ff);
+}
+
+/* 3. Central Nucleus System (Royal Amethyst Violet + Specular White Core) */
+.nucleus-aura {
+  fill: none;
+  stroke: rgba(124, 58, 237, 0.35);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  animation: nucleus-pulse 2.2s ease-in-out infinite alternate;
+}
+
+.dark .nucleus-aura {
+  stroke: rgba(168, 85, 247, 0.45);
+}
+
+@keyframes nucleus-pulse {
+  0% { transform: scale(0.85); opacity: 0.3; }
+  100% { transform: scale(1.3); opacity: 0.8; }
+}
+
+.nucleus-core {
+  fill: #6d28d9;
+  stroke: #ffffff;
+  stroke-width: 1;
+  filter: drop-shadow(0 0 3px rgba(109, 40, 217, 0.7));
+  transition: fill 0.2s, stroke 0.2s;
+}
+
+.dark .nucleus-core {
+  fill: #a855f7;
+  stroke: #ffffff;
+  stroke-width: 1;
+  filter: drop-shadow(0 0 5px #a855f7);
+}
+
+.nucleus-pip {
+  fill: #ffffff;
+}
+
+.nucleus-reticle {
+  stroke: #00f0ff;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+/* 4. Excited State (Hovering Buttons, Links, Gates, Wires) */
+body.cursor-excited .atomic-cursor-canvas {
+  transform: scale(1.3);
+}
+
+body.cursor-excited .orbital-ellipse {
+  stroke: #00e5ff;
+  stroke-width: 1.35;
+  stroke-dasharray: none;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 3px #00e5ff);
+}
+
+/* Excited electrons: Shift to Solar Gold Sparks for extreme visibility on dark buttons */
+body.cursor-excited .electron {
+  fill: #fbbf24;
+  stroke: #ffffff;
+  stroke-width: 0.8;
+  filter: drop-shadow(0 0 6px #fbbf24);
+}
+
+/* Excited nucleus: Solar White Core + Cyan Halo for infinite contrast on dark buttons */
+body.cursor-excited .nucleus-core {
+  fill: #ffffff;
+  stroke: #00f0ff;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 8px #00f0ff);
+}
+
+body.cursor-excited .nucleus-pip {
+  fill: #00f0ff;
+}
+
+body.cursor-excited .nucleus-reticle {
+  opacity: 1;
+  stroke: #00f0ff;
+  filter: drop-shadow(0 0 2px #00f0ff);
+}
+
+/* 5. Wavefunction Collapse (Click/MouseDown) */
+body.cursor-down .atomic-cursor-canvas {
+  transform: scale(0.65);
+}
+
+body.cursor-down .orbital-ellipse {
+  opacity: 0.2;
+}
+
+.cursor-shockwave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid #00f0ff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.4);
+  animation: shockwave-burst 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes shockwave-burst {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+    border-color: #00f0ff;
+  }
+  100% {
+    transform: scale(4.8);
+    opacity: 0;
+    border-color: #fbbf24;
+  }
+}
+
+/* 6. Text Collimation */
+body.cursor-collimated .atomic-cursor-canvas {
+  transform: scale(0.75, 1.3);
+}
+
+/* 7. Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nucleus-aura {
+    animation: none;
+  }
+  .cursor-shockwave {
+    display: none;
+  }
+}
+
+
 
 
 

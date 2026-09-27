@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
+import { AtomicCursor } from '@/components/ui/atomic-cursor';
 
 export const metadata: Metadata = {
   title: 'Q-Trace — Quantum Flight Recorder & Learning Platform',
   description: 'AI-assisted quantum learning platform with visual execution evidence and Quantum Flight Recorder divergence diagnosis.',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -26,9 +30,11 @@ export default function RootLayout({
       <body className="bg-surface-canvas text-text-primary font-sans antialiased min-h-screen">
         <Providers>
           {children}
+          <AtomicCursor />
         </Providers>
       </body>
     </html>
   );
 }
+
 

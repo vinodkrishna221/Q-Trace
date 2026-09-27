@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, ArrowRight, Cpu, Users, BrainCircuit, Play, ScanSearch, Wrench } from 'lucide-react';
+import { QTraceLogo } from '@/components/ui/q-trace-logo';
 
 const FLIGHT_RECORDER_STEPS = [
   { icon: BrainCircuit, title: 'Predict', body: 'Commit to an outcome before execution' },
@@ -43,10 +44,13 @@ export default function HomePage() {
   return (
     <AppShell>
       <div className="flex flex-col items-center text-center space-y-10 py-10 md:py-16">
-        {/* 1 · Status pill */}
-        <Badge variant="outline" className="px-3 py-1 text-[11px] tracking-widest text-accent border-accent/40 bg-accent/5">
-          SIH 2026 PROTOTYPE · QUANTUM FLIGHT RECORDER
-        </Badge>
+        {/* 1 · Hero Brand Mark & Status pill */}
+        <div className="flex flex-col items-center gap-3">
+          <QTraceLogo variant="hero" size={44} />
+          <Badge variant="outline" className="px-3 py-1 text-[11px] tracking-widest text-accent border-accent/40 bg-accent/5">
+            SIH 2026 PROTOTYPE · QUANTUM FLIGHT RECORDER
+          </Badge>
+        </div>
 
         {/* 2 · Hero */}
         <div className="space-y-5 max-w-4xl">
@@ -54,8 +58,8 @@ export default function HomePage() {
             Learn quantum computing from{' '}
             <span className="bg-gradient-to-r from-accent via-accent to-violet bg-clip-text text-transparent">
               verified evidence
-            </span>{' '}
-            — not guesswork.
+            </span>
+            , not guesswork.
           </h1>
           <p className="text-ink-dim text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             Q-Trace captures your prediction, replays the true simulator state gate by gate,

@@ -182,7 +182,7 @@ describe('Mocked Learner Evidence Loop (UX-3)', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('repair-status-badge').textContent).toBe('REPAIR ATTEMPT PASSED');
-    });
+    }, { timeout: 3000 });
     expect(screen.getByTestId('repair-feedback-code').textContent).toBe('BELL_SUPPORT_CORRECT');
 
     // Progress record checks

@@ -61,6 +61,11 @@ describe('Authentication & Identity UI Suite', () => {
   });
 
   it('submits Institutional Waitlist and displays priority queue position', async () => {
+    vi.spyOn(authClient, 'submitWaitlist').mockResolvedValueOnce({
+      status: 'WAITLISTED',
+      waitlistPosition: 42,
+      message: 'Priority Pilot Queued',
+    });
     const handleClose = vi.fn();
     render(<InstitutionWaitlistModal open={true} onOpenChange={handleClose} />);
 
