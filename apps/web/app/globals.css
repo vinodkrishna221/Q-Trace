@@ -629,6 +629,35 @@ body {
   animation: gate-dock 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* 3. Duolingo Path Chamber Node: Radar Sonar Beacon */
+@keyframes sonar-pulse {
+  0% { transform: scale(1.0); opacity: 0.8; }
+  50% { opacity: 0.35; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.animate-sonar-beacon {
+  animation: sonar-pulse 1800ms cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* 4. Duolingo Path Chamber Node: Locked State Head-Shake */
+@keyframes head-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+.animate-head-shake {
+  animation: head-shake 250ms ease-in-out;
+}
+
+/* 5. Duolingo Path Chamber Node: 3D Mechanical Squash */
+.mechanical-squash,
+.squash {
+  transform: scale(0.94);
+  transition: transform 80ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* 6. Theme Switcher Cross-Fade */
 ::view-transition-old(root),
 ::view-transition-new(root) {

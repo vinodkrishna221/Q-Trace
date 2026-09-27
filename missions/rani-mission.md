@@ -155,6 +155,7 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 - [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
 - [x] DATA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` → 16 passed in 1.50s.
+- [x] DUO-3 complete — pnpm test:web tests/unit/chamber-node.test.tsx — 18 passed in 0.35s.
 
 ---
 
@@ -166,7 +167,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/chamber-node.tsx` imp
 TEST: `pnpm test:web tests/unit/chamber-node.test.tsx` verifying all 6 archetypes render with correct glyph and token, all 4 states render correct opacity/border, click triggers mechanical squash class, locked state triggers head-shake, and keyboard Enter/Space interactions work.
 DEPENDS: —          UNBLOCKS: DUO-4, DUO-11
 DEMO: Six distinct ChamberNode types appear on the path — concept atom orbs, prediction compass nodes, gate lab nodes, debug stations, boss capstones with crowns, and bonus vault nodes — each responding tactilely to hover and click with the correct archetype aesthetic.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-3-chamber-node-archetypes`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
