@@ -188,7 +188,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/unit-section-banner.t
 TEST: `pnpm test:web tests/unit/unit-section-banner.test.tsx` verifying banner renders unit title and progress, Guidebook button triggers modal open, modal renders gate truth tables and Dirac formulas, and Esc key / click-outside closes the modal.
 DEPENDS: DUO-1          UNBLOCKS: DUO-11
 DEMO: Judge sees a full-width "UNIT 1: THE QUANTUM COMPASS" banner with a `[Guidebook 📖]` button; clicking it opens a slide-over drawer with all single-qubit gate matrices, truth tables, and Dirac bra-ket formulas from the curriculum spec.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-2-unit-banners-guidebook`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
