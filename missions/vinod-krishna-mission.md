@@ -193,7 +193,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/learning-hud.tsx` —
 TEST: `pnpm test:web tests/unit/learning-hud.test.tsx` verifying HUD renders all 5 items from store state, shield display changes color/class when below 50%, streak pill renders correct day count, profile dropdown opens and closes, and HUD is aria-labeled for accessibility.
 DEPENDS: DUO-5          UNBLOCKS: DUO-11
 DEMO: The top bar of `/learn` shows live `🔥 4`, `⚡ 850`, `🛡️ 80%` values that update in real-time as the judge completes stages and makes predictions — the shield visibly drops to amber tint after a wrong answer.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-6-telemetry-hud-profile`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
