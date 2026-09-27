@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Info } from 'lucide-react';
+import { GateTile, CnotTargetCrosshairIcon } from './gate-glyph';
 
 interface CircuitWorkspaceReadonlyProps {
   circuit: CircuitModel;
@@ -85,10 +86,12 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-3 flex justify-center">
                   <div
                     data-testid="gate-op_1"
-                    className="w-12 h-9 rounded-full bg-gate-h/15 border-2 border-gate-h text-ink flex flex-col items-center justify-center font-bold text-sm shadow-xs"
+                    className="cursor-pointer hover:scale-105 transition-transform"
+                    aria-label="Hadamard (H) gate on q[0]"
                   >
-                    <span className="leading-tight text-xs font-bold text-ink">H</span>
-                    <span className="text-[7.5px] font-mono tracking-tight text-ink-dim uppercase leading-none">Hadamard</span>
+                    <GateTile gate="H" size="md" />
+                    <span className="sr-only">Hadamard</span>
+                    <span className="sr-only">H</span>
                   </div>
                 </div>
 
@@ -96,11 +99,11 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-cnot-control"
-                    className="w-6 h-6 rounded-full bg-gate-cnot border-2 border-gate-cnot ring-2 ring-gate-cnot/40 flex flex-col items-center justify-center text-[10px] text-white dark:text-canvas font-bold shadow-xs"
+                    className="w-5 h-5 rounded-full bg-[#0f62fe] border-2 border-white ring-2 ring-[#0f62fe]/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform"
                     title="CNOT Control (q[0])"
                     aria-label="CNOT Control on q[0] targeting q[1]"
                   >
-                    <span>●</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
                     <span className="sr-only">CNOT Control</span>
                   </div>
                 </div>
@@ -109,11 +112,13 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-5 flex justify-center">
                   <div
                     data-testid="gate-op_3"
-                    className="w-12 h-9 rounded-full bg-surface-raised border-2 border-border-strong text-ink flex flex-col items-center justify-center text-xs font-bold shadow-xs"
+                    className="cursor-pointer hover:scale-105 transition-transform relative"
                     aria-label="Measure gate on q[0] into c[0]"
                   >
-                    <span className="text-[10px] font-mono font-bold text-caution leading-tight">MEASURE</span>
-                    <span className="text-[8px] font-mono text-ink-dim font-normal leading-none">→ c[0]</span>
+                    <GateTile gate="MEASURE" size="md" />
+                    <span className="sr-only">MEASURE</span>
+                    <span className="sr-only">Measure</span>
+                    <div className="absolute top-[42px] left-1/2 w-[1.5px] bg-border-strong h-[38px] -translate-x-1/2 pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -121,7 +126,7 @@ export function CircuitWorkspaceReadonly({
 
             {/* CNOT Vertical Connection Line */}
             <div
-              className="absolute left-[calc(16px+25%+14%)] top-6 bottom-6 w-[2px] bg-gate-cnot pointer-events-none z-0 border-l border-r border-gate-cnot/50 shadow-xs"
+              className="absolute left-[calc(16px+25%+14%)] top-6 bottom-6 w-[2px] bg-[#0f62fe] pointer-events-none z-0 shadow-xs"
               style={{ left: '46%' }}
               aria-hidden="true"
             />
@@ -131,11 +136,11 @@ export function CircuitWorkspaceReadonly({
               className="flex items-center gap-4 relative min-w-[480px]"
               data-testid="qubit-wire-1"
             >
-              <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-ink font-bold">
+              <div className="w-16 shrink-0 flex items-center gap-1.5 text-xs text-text-primary font-bold">
                 <span className="px-2 py-0.5 rounded-full bg-surface-raised border border-border-medium text-accent">
                   q[1]
                 </span>
-                <span className="text-[10px] text-ink-faint font-normal">|0⟩</span>
+                <span className="text-[10px] text-text-muted font-normal">|0⟩</span>
               </div>
 
               {/* Wire line */}
@@ -145,19 +150,19 @@ export function CircuitWorkspaceReadonly({
               <div className="grid grid-cols-12 gap-2 w-full pl-2 z-10">
                 {/* Col 0: Empty / Identity */}
                 <div className="col-span-3 flex justify-center items-center">
-                  <div className="text-[10px] text-ink-faint font-mono">— I —</div>
+                  <div className="text-[10px] text-text-muted font-mono">— I —</div>
                 </div>
 
                 {/* Col 1: CNOT Target (⊕) */}
                 <div className="col-span-4 flex justify-center items-center">
                   <div
                     data-testid="gate-op_2"
-                    className="w-11 h-11 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot flex flex-col items-center justify-center font-bold text-sm shadow-xs"
+                    className="w-10 h-10 rounded-full bg-[#0f62fe] text-white flex items-center justify-center font-bold shadow-md cursor-pointer hover:scale-105 transition-transform border border-[#0043ce]"
                     title="CNOT Target (q[1])"
                     aria-label="CNOT Target on q[1] controlled by q[0]"
                   >
-                    <span className="text-base leading-none">⊕</span>
-                    <span className="text-[8px] font-mono text-gate-cnot tracking-tighter">CX</span>
+                    <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                    <span className="sr-only">CNOT Target</span>
                   </div>
                 </div>
 
@@ -165,11 +170,12 @@ export function CircuitWorkspaceReadonly({
                 <div className="col-span-5 flex justify-center">
                   <div
                     data-testid="gate-op_4"
-                    className="w-12 h-9 rounded-full bg-surface-raised border-2 border-border-strong text-ink flex flex-col items-center justify-center text-xs font-bold shadow-xs"
+                    className="cursor-pointer hover:scale-105 transition-transform"
                     aria-label="Measure gate on q[1] into c[1]"
                   >
-                    <span className="text-[10px] font-mono font-bold text-caution leading-tight">MEASURE</span>
-                    <span className="text-[8px] font-mono text-ink-dim font-normal leading-none">→ c[1]</span>
+                    <GateTile gate="MEASURE" size="md" />
+                    <span className="sr-only">MEASURE</span>
+                    <span className="sr-only">Measure</span>
                   </div>
                 </div>
               </div>

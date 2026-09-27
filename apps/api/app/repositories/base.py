@@ -17,6 +17,12 @@ from app.models.entities import (
     SimulationRun,
     SkillState,
 )
+from app.models.auth import (
+    InstitutionWaitlistRecord,
+    PasswordResetRecord,
+    RefreshTokenRecord,
+    User,
+)
 
 
 @runtime_checkable
@@ -240,3 +246,98 @@ class DataRepositoryProtocol(Protocol):
     ) -> Optional[InstructorInsight]:
         """Compute aggregate instructor insights for a cohort."""
         ...
+
+    # --- Authentication & Identity (docs/AUTH-SYSTEM-DESIGN.md) ---
+    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Retrieve a user by unique usr_ ID."""
+        ...
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        """Retrieve a user by email address."""
+        ...
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        """Retrieve a user by username."""
+        ...
+
+    async def get_user_by_identifier(self, identifier: str) -> Optional[User]:
+        """Retrieve a user by email or username."""
+        ...
+
+    async def get_user_by_github_id(self, github_id: str) -> Optional[User]:
+        """Retrieve a user by GitHub user ID."""
+        ...
+
+    async def get_user_by_verification_token_hash(self, token_hash: str) -> Optional[User]:
+        """Retrieve a user by their email verification token hash."""
+        ...
+
+    async def create_or_update_user(self, user: User) -> User:
+        """Upsert user document."""
+        ...
+
+    async def delete_user(self, user_id: str) -> bool:
+        """Delete user document."""
+        ...
+
+    # --- Refresh Tokens & Family Rotation ---
+    async def create_refresh_token(self, record: RefreshTokenRecord) -> RefreshTokenRecord:
+        """Persist a refresh token record."""
+        ...
+
+    async def get_refresh_token_by_hash(self, token_hash: str) -> Optional[RefreshTokenRecord]:
+        """Lookup refresh token by its SHA-256 hash."""
+        ...
+
+    async def update_refresh_token_status(
+        self, token_id: str, status: str
+    ) -> Optional[RefreshTokenRecord]:
+        """Update token status (ACTIVE, USED, REVOKED)."""
+        ...
+
+    async def consume_refresh_token(self, token_hash: str) -> tuple[str, Optional[RefreshTokenRecord]]:
+        """Atomically validate and consume a refresh token.
+        
+        Returns:
+            (outcome, record) where outcome is "NOT_FOUND", "REPLAY", "EXPIRED", or "SUCCESS"
+        """
+        ...
+
+    async def revoke_refresh_token_family(self, family_id: str) -> int:
+        """Revoke all tokens belonging to a family upon replay detection."""
+        ...
+
+    async def revoke_all_user_refresh_tokens(self, user_id: str) -> int:
+        """Revoke all active tokens for a user (e.g. logout all, password reset)."""
+        ...
+
+    # --- Password Resets ---
+    async def create_password_reset(self, record: PasswordResetRecord) -> PasswordResetRecord:
+        """Persist a single-use password reset record."""
+        ...
+
+    async def get_password_reset_by_hash(self, token_hash: str) -> Optional[PasswordResetRecord]:
+        """Retrieve password reset record by token hash."""
+        ...
+
+    async def mark_password_reset_used(self, reset_id: str) -> bool:
+        """Mark a password reset token as used."""
+        ...
+
+    # --- Institutional Waitlist ---
+    async def add_institution_waitlist(
+        self, record: InstitutionWaitlistRecord
+    ) -> InstitutionWaitlistRecord:
+        """Add institutional lead to the waitlist."""
+        ...
+
+    async def get_institution_waitlist_by_email(
+        self, work_email: str
+    ) -> Optional[InstitutionWaitlistRecord]:
+        """Retrieve waitlist record by academic/work email."""
+        ...
+
+    async def count_institution_waitlist(self) -> int:
+        """Count total waitlisted institutions."""
+        ...
+

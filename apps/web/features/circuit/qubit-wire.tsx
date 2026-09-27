@@ -7,6 +7,7 @@ import { GATE_DEFINITIONS } from './circuit-types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2 } from 'lucide-react';
+import { GateTile, CnotTargetCrosshairIcon, MeasureGaugeIcon } from './gate-glyph';
 
 interface QubitWiresGridProps {
   maxColumnsDisplay?: number;
@@ -198,7 +199,7 @@ export function QubitWiresGrid({
             <div
               key={`cnot-line-${op.opId}`}
               data-testid={`cnot-vertical-link-${op.opId}`}
-              className="absolute w-[2px] bg-gate-cnot pointer-events-none z-0 border-l border-r border-gate-cnot/50 shadow-xs"
+              className="absolute w-[2px] bg-[#0f62fe] pointer-events-none z-0 shadow-xs"
               style={{
                 top: `${minQ * 60 + 20}px`,
                 height: `${(maxQ - minQ) * 60}px`,
@@ -262,19 +263,19 @@ export function QubitWiresGrid({
                         isSelected
                           ? 'border-accent ring-2 ring-accent/60 bg-accent/10'
                           : op
-                            ? 'border-transparent bg-canvas/80'
-                            : 'border-dashed border-border-subtle/60 hover:border-accent/60 hover:bg-surface-raised/40 focus:border-accent focus:ring-1 focus:ring-accent'
+                            ? 'border-transparent bg-transparent'
+                            : 'border-dashed border-border-subtle/50 hover:border-accent/60 hover:bg-surface-raised/40 focus:border-accent focus:ring-1 focus:ring-accent'
                       }`}
                     >
                       {/* If cell has a gate operation */}
                       {op && isControl && (
                         <div
                           data-testid="gate-cnot-control"
-                          className="w-6 h-6 rounded-full bg-gate-cnot border-2 border-gate-cnot ring-2 ring-gate-cnot/40 flex flex-col items-center justify-center text-[10px] text-white dark:text-canvas font-bold shadow-xs cursor-pointer hover:scale-110 transition-transform"
+                          className="w-5 h-5 rounded-full bg-[#0f62fe] border-2 border-white ring-2 ring-[#0f62fe]/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform z-10"
                           title={`CNOT Control on q[${qubitIndex}] -> q[${op.targets[0]}]`}
                           aria-label={`CNOT Control (targets q[${op.targets[0]}])`}
                         >
-                          <span>●</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-white" />
                           <span className="sr-only">CNOT Control</span>
                         </div>
                       )}
@@ -282,69 +283,40 @@ export function QubitWiresGrid({
                       {op && isTarget && op.gate === 'CNOT' && (
                         <div
                           data-testid={op.opId ? `gate-${op.opId}` : 'gate-cnot-target'}
-                          className="animate-gate-dock w-11 h-11 rounded-full bg-gate-cnot/20 border-2 border-gate-cnot text-gate-cnot flex flex-col items-center justify-center font-bold text-sm shadow-xs cursor-pointer hover:scale-105 transition-transform"
+                          className="animate-gate-dock w-10 h-10 rounded-full bg-[#0f62fe] text-white flex items-center justify-center shadow-md cursor-pointer hover:scale-105 transition-transform border border-[#0043ce] z-10"
                           title={`CNOT Target on q[${qubitIndex}] (control q[${op.controls[0]}])`}
                           aria-label={`CNOT Target (controlled by q[${op.controls[0]}])`}
                         >
-                          <span className="text-base leading-none">⊕</span>
-                          <span className="text-[8px] font-mono text-gate-cnot tracking-tighter">CX</span>
+                          <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                          <span className="sr-only">CNOT Target</span>
                         </div>
                       )}
 
-                      {op && isTarget && op.gate === 'H' && (
+                      {op && isTarget && (op.gate === 'H' || op.gate === 'X' || op.gate === 'Y' || op.gate === 'Z') && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
-                          aria-label={`Hadamard (H) gate on q[${qubitIndex}]`}
+                          className="animate-gate-dock cursor-pointer transition-all hover:-translate-y-0.5 active:scale-[1.03] z-10"
+                          aria-label={`${GATE_DEFINITIONS[op.gate]?.name || op.gate} (${op.gate}) gate on q[${qubitIndex}]`}
+                          title={`${GATE_DEFINITIONS[op.gate]?.name || op.gate} gate on q[${qubitIndex}]`}
                         >
-                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">H</span>
-                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Hadamard</span>
-                        </div>
-                      )}
-
-                      {op && isTarget && op.gate === 'X' && (
-                        <div
-                          data-testid={`gate-${op.opId}`}
-                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
-                          aria-label={`Pauli-X (X) gate on q[${qubitIndex}]`}
-                        >
-                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">X</span>
-                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-X</span>
-                        </div>
-                      )}
-
-                      {op && isTarget && op.gate === 'Y' && (
-                        <div
-                          data-testid={`gate-${op.opId}`}
-                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
-                          aria-label={`Pauli-Y (Y) gate on q[${qubitIndex}]`}
-                        >
-                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">Y</span>
-                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-Y</span>
-                        </div>
-                      )}
-
-                      {op && isTarget && op.gate === 'Z' && (
-                        <div
-                          data-testid={`gate-${op.opId}`}
-                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
-                          aria-label={`Pauli-Z (Z) gate on q[${qubitIndex}]`}
-                        >
-                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">Z</span>
-                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Pauli-Z</span>
+                          <GateTile gate={op.gate} size="md" />
+                          <span className="sr-only">{GATE_DEFINITIONS[op.gate]?.name}</span>
+                          <span className="sr-only">{op.gate}</span>
                         </div>
                       )}
 
                       {op && isTarget && op.gate === 'MEASURE' && (
                         <div
                           data-testid={`gate-${op.opId}`}
-                          className="animate-gate-dock w-[44px] h-[44px] rounded-md bg-surface border border-border-subtle flex flex-col items-center justify-center cursor-pointer transition-all hover:-translate-y-[1px] hover:border-border-strong active:scale-[1.05] active:opacity-90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_3px_rgba(0,0,0,0.25)] active:shadow-[0_8px_16px_rgba(0,0,0,0.3)]"
+                          className="animate-gate-dock cursor-pointer transition-all hover:-translate-y-0.5 active:scale-[1.03] relative z-10"
                           aria-label={`Measure gate on q[${qubitIndex}] into classical bit c[${op.classicalTargets[0] ?? qubitIndex}]`}
+                          title={`Measure on q[${qubitIndex}] -> c[${op.classicalTargets[0] ?? qubitIndex}]`}
                         >
-                          <span className="font-mono font-bold tracking-tight text-text-primary text-[14px]">M</span>
-                          <span className="text-[8px] font-sans uppercase tracking-wider text-text-secondary mt-0.5">Measure</span>
-                          {/* A downward right-angle tap line connects the measurement gate to c[i] */}
-                          <div className="absolute top-[44px] left-1/2 w-[1px] bg-text-muted h-[40px] -translate-x-1/2 pointer-events-none" />
+                          <GateTile gate="MEASURE" size="md" />
+                          <span className="sr-only">MEASURE</span>
+                          <span className="sr-only">Measure</span>
+                          {/* Downward right-angle tap line connects the measurement gate to c[i] */}
+                          <div className="absolute top-[42px] left-1/2 w-[1.5px] bg-border-strong h-[38px] -translate-x-1/2 pointer-events-none" />
                         </div>
                       )}
 

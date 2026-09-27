@@ -30,6 +30,8 @@ from app.routers.instructor import router as instructor_router
 from app.routers.learning import router as learning_router
 from app.routers.progress import router as progress_router
 from app.routers.tutor import router as tutor_router
+from app.routers.auth import router as auth_router
+from app.routers.waitlist import router as waitlist_router
 from app.services.quantum.adapter import prewarm_adapters
 
 logger = logging.getLogger("qtrace.api")
@@ -151,6 +153,8 @@ app.include_router(learning_router, prefix="/v1")
 app.include_router(progress_router, prefix="/v1")
 app.include_router(instructor_router, prefix="/v1")
 app.include_router(tutor_router, prefix="/v1")
+app.include_router(auth_router)
+app.include_router(waitlist_router)
 
 # ---------------------------------------------------------------------------
 # Core endpoints

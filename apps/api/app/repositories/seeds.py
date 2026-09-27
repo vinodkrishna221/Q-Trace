@@ -18,6 +18,7 @@ from app.models.entities import (
     SimulationRun,
     SkillState,
 )
+from app.models.auth import User
 from app.repositories.base import DataRepositoryProtocol
 
 
@@ -63,6 +64,43 @@ CORE_INSTRUCTOR_PROFILE: InstructorProfile = InstructorProfile(
     displayName="Dr. Rao",
     cohortId="cohort_demo_2026",
 )
+
+# Canonical seed password for hero users: CorrectHorseBattery99! (from docs/AUTH-SYSTEM-DESIGN.md)
+CORE_USERS: list[User] = [
+    User(
+        id="usr_aarav",
+        email="aarav@university.edu",
+        username="aarav_quantum",
+        displayName="Aarav Sharma",
+        passwordHash="$argon2id$v=19$m=65536,t=3,p=4$rubHHK4cUR0JjUALTLP0RA$PFEXZW7EBQxyNPnozGuQGf156xiNuTt/zjsekH0ri9E",
+        accountType="INDIVIDUAL",
+        personaTag="STUDENT",
+        isVerified=True,
+        learnerProfileId="lp_aarav",
+    ),
+    User(
+        id="usr_meera",
+        email="meera@university.edu",
+        username="meera_physics",
+        displayName="Meera Patel",
+        passwordHash="$argon2id$v=19$m=65536,t=3,p=4$rubHHK4cUR0JjUALTLP0RA$PFEXZW7EBQxyNPnozGuQGf156xiNuTt/zjsekH0ri9E",
+        accountType="INDIVIDUAL",
+        personaTag="LEARNER",
+        isVerified=True,
+        learnerProfileId="lp_meera",
+    ),
+    User(
+        id="usr_rao",
+        email="vrao@university.edu",
+        username="dr_rao",
+        displayName="Dr. V. Rao",
+        passwordHash="$argon2id$v=19$m=65536,t=3,p=4$rubHHK4cUR0JjUALTLP0RA$PFEXZW7EBQxyNPnozGuQGf156xiNuTt/zjsekH0ri9E",
+        accountType="INDIVIDUAL",
+        personaTag="EDUCATOR",
+        isVerified=True,
+    ),
+]
+
 
 
 # ==============================================================================
@@ -563,6 +601,12 @@ async def seed_core_truth(repo: DataRepositoryProtocol) -> dict[str, int]:
     for progress in CORE_PROGRESS_RECORDS:
         await repo.create_or_update_progress_record(progress.model_copy(deep=True))
         counts["progress_records"] += 1
+
+    # 9. Core users (Auth)
+    counts["users"] = 0
+    for user in CORE_USERS:
+        await repo.create_or_update_user(user.model_copy(deep=True))
+        counts["users"] += 1
 
     return counts
 

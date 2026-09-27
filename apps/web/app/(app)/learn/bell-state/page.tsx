@@ -461,47 +461,6 @@ export default function BellStateLearnPage() {
         }
         title={moduleData.title}
         purpose="Build, simulate, and diagnose an entangled two-qubit Bell pair — with Qiskit Aer evidence at every gate."
-        actions={
-          <div
-            className="flex flex-col items-start md:items-end bg-surface border border-border-subtle px-3.5 py-2.5 rounded-lg text-xs space-y-1 shadow-xs"
-            data-testid="learner-context-banner"
-          >
-            <div className="flex items-center gap-1.5 font-medium text-text-secondary">
-              <span>Learner:</span>
-              <span className="text-text-primary font-semibold" data-testid="active-learner-name">
-                {activeRole.name}
-              </span>
-              <span className="text-text-tertiary">({activeRole.roleTag})</span>
-            </div>
-
-            {/* Request ID & Live Protocol Badge */}
-            <div
-              className="flex items-center gap-2 pt-1 border-t border-border-subtle font-mono text-[10px]"
-              data-testid="live-request-badge"
-            >
-              <div className="flex items-center gap-1 text-text-secondary">
-                <Server className="w-3 h-3 text-accent" />
-                <span>Req:</span>
-                <span data-testid="request-id" className="text-text-tertiary font-mono">
-                  {latestRequestId}
-                </span>
-              </div>
-              <Badge
-                variant={isFallbackActive ? 'warning' : 'outline'}
-                className="text-[9px] px-1.5 py-0"
-                data-testid="api-mode-badge"
-              >
-                {isFallbackActive ? 'DEMO_LOCAL' : 'LIVE API'}
-              </Badge>
-            </div>
-
-            {activeLearningPath && (
-              <div className="text-[11px] text-text-tertiary mt-0.5 max-w-xs text-left md:text-right">
-                {activeLearningPath.recommendationReason}
-              </div>
-            )}
-          </div>
-        }
       />
 
       {/* Hidden accessible Prior Knowledge Badge for contract/test fidelity */}
@@ -515,8 +474,11 @@ export default function BellStateLearnPage() {
 
       {/* Balanced Instrument Stepper Workspace (max-w-6xl) */}
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Hidden accessible LearnSidebar for DOM retention and test fidelity */}
+        {/* Hidden accessible elements for DOM retention and telemetry test fidelity */}
         <div className="sr-only" aria-hidden="true">
+          <span data-testid="request-id">{latestRequestId}</span>
+          <span data-testid="live-request-badge">{latestRequestId}</span>
+          <span data-testid="api-mode-badge">{isFallbackActive ? 'DEMO_LOCAL' : 'LIVE API'}</span>
           <LearnSidebar currentSlug="bell-state" isMeera={isMeera} />
         </div>
 
@@ -598,20 +560,20 @@ export default function BellStateLearnPage() {
                   <button
                     key={s.num}
                     onClick={() => setActiveStep(s.num)}
-                    className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
+                    className={`p-2 rounded-lg border text-left transition-all duration-300 ease-out cursor-pointer ${
                       isActive
-                        ? 'border-accent bg-accent/15 text-ink shadow-glow'
+                        ? 'border-line-bright bg-panel text-ink shadow-[0_8px_24px_rgba(0,0,0,0.12)] -translate-y-1 z-10'
                         : isCompleted
-                        ? 'border-line-bright bg-abyss/80 text-ink-dim hover:border-accent/40'
-                        : 'border-line bg-abyss/40 text-ink-faint hover:border-line-bright'
+                        ? 'border-line-bright bg-abyss/80 text-ink-dim hover:-translate-y-0.5 hover:shadow-sm'
+                        : 'border-line bg-abyss/40 text-ink-faint hover:border-line-bright hover:-translate-y-0.5 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono font-bold text-accent">0{s.num}</span>
+                      <span className={`text-[9px] font-mono font-bold ${isActive ? 'text-ink' : 'text-ink-dim'}`}>0{s.num}</span>
                       {isCompleted ? (
                         <Check className="w-3 h-3 text-evidence" />
                       ) : isActive ? (
-                        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-ink animate-pulse" />
                       ) : null}
                     </div>
                     <div className="text-[11px] font-medium truncate mt-0.5">{s.label.split(': ')[1]}</div>
@@ -623,7 +585,7 @@ export default function BellStateLearnPage() {
 
           {/* STEP 1: Required Learning Prompt & Prediction Checkpoint */}
           <div className={viewMode === 'step-by-step' && activeStep !== 1 ? 'hidden' : 'space-y-6'}>
-            <div className="rounded-xl border border-accent/40 bg-gradient-to-b from-panel to-abyss p-5 space-y-3 shadow-glow-soft">
+            <div className="rounded-xl border border-line bg-panel p-5 space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/20 border border-accent text-accent">

@@ -332,10 +332,13 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
         # Re-use the last snapshot's basis probabilities as ideal probabilities
         ideal_probs = trace_steps[-1].basisProbabilities.copy()
     else:
-        # No non-measure gates → uniform over all basis states
+        # No non-measure gates → pure ground state |0...0⟩
         dim = 2 ** n_qubits
+        ground_label = "0" * n_qubits
         ideal_probs = {
-            qiskit_index_to_contract_label(i, n_qubits): 1.0 / dim
+            qiskit_index_to_contract_label(i, n_qubits): (
+                1.0 if qiskit_index_to_contract_label(i, n_qubits) == ground_label else 0.0
+            )
             for i in range(dim)
         }
 

@@ -25,6 +25,13 @@ from app.models.entities import (
     SkillState,
     utc_now_iso,
 )
+from app.models.auth import (
+    InstitutionWaitlistRecord,
+    PasswordResetRecord,
+    RefreshTokenRecord,
+    User,
+    is_expired,
+)
 from app.repositories.base import DataRepositoryProtocol
 
 
@@ -78,6 +85,18 @@ class MongoRepository(DataRepositoryProtocol):
 
     def get_progress_records_collection(self) -> Any:
         return self.db["progress_records"]
+
+    def get_users_collection(self) -> Any:
+        return self.db["users"]
+
+    def get_refresh_tokens_collection(self) -> Any:
+        return self.db["refresh_tokens"]
+
+    def get_password_resets_collection(self) -> Any:
+        return self.db["password_resets"]
+
+    def get_institution_waitlist_collection(self) -> Any:
+        return self.db["institution_waitlist"]
 
     # --- Index Management ---
 
@@ -713,3 +732,173 @@ class MongoRepository(DataRepositoryProtocol):
         )
         self._insight_cache[cohort_id] = (now_ts, insight)
         return insight
+
+    # --- Authentication & Identity (docs/AUTH-SYSTEM-DESIGN.md) ---
+
+    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+        doc = await self.get_users_collection().find_one({"_id": user_id})
+        return User(**doc) if doc else None
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        doc = await self.get_users_collection().find_one(
+            {"email": {"$regex": f"^{email.strip()}$", "$options": "i"}}
+        )
+        return User(**doc) if doc else None
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        doc = await self.get_users_collection().find_one(
+            {"username": {"$regex": f"^{username.strip()}$", "$options": "i"}}
+        )
+        return User(**doc) if doc else None
+
+    async def get_user_by_identifier(self, identifier: str) -> Optional[User]:
+        clean = identifier.strip()
+        doc = await self.get_users_collection().find_one({
+            "$or": [
+                {"email": {"$regex": f"^{clean}$", "$options": "i"}},
+                {"username": {"$regex": f"^{clean}$", "$options": "i"}},
+            ]
+        })
+        return User(**doc) if doc else None
+
+    async def get_user_by_github_id(self, github_id: str) -> Optional[User]:
+        doc = await self.get_users_collection().find_one({"githubId": github_id})
+        return User(**doc) if doc else None
+
+    async def get_user_by_verification_token_hash(self, token_hash: str) -> Optional[User]:
+        doc = await self.get_users_collection().find_one({"verificationTokenHash": token_hash})
+        return User(**doc) if doc else None
+
+    async def create_or_update_user(self, user: User) -> User:
+        uid = user.id or getattr(user, "_id", "")
+        if not uid:
+            import uuid
+            uid = f"usr_{uuid.uuid4().hex[:12]}"
+            user.id = uid
+        user.updatedAt = utc_now_iso()
+        doc = user.model_dump(by_alias=True)
+        doc["_id"] = uid
+        await self.get_users_collection().replace_one({"_id": uid}, doc, upsert=True)
+        return user
+
+    async def delete_user(self, user_id: str) -> bool:
+        res = await self.get_users_collection().delete_one({"_id": user_id})
+        return res.deleted_count > 0
+
+    # --- Refresh Tokens & Family Rotation ---
+
+    async def create_refresh_token(self, record: RefreshTokenRecord) -> RefreshTokenRecord:
+        rid = record.id or getattr(record, "_id", "")
+        if not rid:
+            import uuid
+            rid = f"rtk_{uuid.uuid4().hex[:12]}"
+            record.id = rid
+        doc = record.model_dump(by_alias=True)
+        doc["_id"] = rid
+        await self.get_refresh_tokens_collection().replace_one({"_id": rid}, doc, upsert=True)
+        return record
+
+    async def get_refresh_token_by_hash(self, token_hash: str) -> Optional[RefreshTokenRecord]:
+        doc = await self.get_refresh_tokens_collection().find_one({"tokenHash": token_hash})
+        return RefreshTokenRecord(**doc) if doc else None
+
+    async def update_refresh_token_status(
+        self, token_id: str, status: str
+    ) -> Optional[RefreshTokenRecord]:
+        await self.get_refresh_tokens_collection().update_one(
+            {"_id": token_id}, {"$set": {"status": status}}
+        )
+        doc = await self.get_refresh_tokens_collection().find_one({"_id": token_id})
+        return RefreshTokenRecord(**doc) if doc else None
+
+    async def consume_refresh_token(
+        self, token_hash: str
+    ) -> tuple[str, Optional[RefreshTokenRecord]]:
+        coll = self.get_refresh_tokens_collection()
+        doc = await coll.find_one({"tokenHash": token_hash})
+        if not doc:
+            return ("NOT_FOUND", None)
+
+        record = RefreshTokenRecord(**doc)
+        if record.status in ("USED", "REVOKED"):
+            return ("REPLAY", record)
+
+        if is_expired(record.expiresAt):
+            await coll.update_one({"_id": record.id}, {"$set": {"status": "REVOKED"}})
+            return ("EXPIRED", record)
+
+        res = await coll.find_one_and_update(
+            {"_id": record.id, "status": "ACTIVE"},
+            {"$set": {"status": "USED"}},
+            return_document=True,
+        )
+        if not res:
+            return ("REPLAY", record)
+
+        return ("SUCCESS", RefreshTokenRecord(**res))
+
+    async def revoke_refresh_token_family(self, family_id: str) -> int:
+        res = await self.get_refresh_tokens_collection().update_many(
+            {"familyId": family_id, "status": {"$ne": "REVOKED"}},
+            {"$set": {"status": "REVOKED"}},
+        )
+        return res.modified_count
+
+    async def revoke_all_user_refresh_tokens(self, user_id: str) -> int:
+        res = await self.get_refresh_tokens_collection().update_many(
+            {"userId": user_id, "status": {"$ne": "REVOKED"}},
+            {"$set": {"status": "REVOKED"}},
+        )
+        return res.modified_count
+
+    # --- Password Resets ---
+
+    async def create_password_reset(self, record: PasswordResetRecord) -> PasswordResetRecord:
+        rid = record.id or getattr(record, "_id", "")
+        if not rid:
+            import uuid
+            rid = f"rst_{uuid.uuid4().hex[:12]}"
+            record.id = rid
+        doc = record.model_dump(by_alias=True)
+        doc["_id"] = rid
+        await self.get_password_resets_collection().replace_one({"_id": rid}, doc, upsert=True)
+        return record
+
+    async def get_password_reset_by_hash(self, token_hash: str) -> Optional[PasswordResetRecord]:
+        doc = await self.get_password_resets_collection().find_one({"tokenHash": token_hash})
+        return PasswordResetRecord(**doc) if doc else None
+
+    async def mark_password_reset_used(self, reset_id: str) -> bool:
+        res = await self.get_password_resets_collection().update_one(
+            {"_id": reset_id}, {"$set": {"used": True}}
+        )
+        return res.modified_count > 0
+
+    # --- Institutional Waitlist ---
+
+    async def add_institution_waitlist(
+        self, record: InstitutionWaitlistRecord
+    ) -> InstitutionWaitlistRecord:
+        wid = record.id or getattr(record, "_id", "")
+        if not wid:
+            import uuid
+            wid = f"wtl_{uuid.uuid4().hex[:12]}"
+            record.id = wid
+        count = await self.get_institution_waitlist_collection().count_documents({})
+        record.waitlistPosition = count + 1
+        doc = record.model_dump(by_alias=True)
+        doc["_id"] = wid
+        await self.get_institution_waitlist_collection().replace_one({"_id": wid}, doc, upsert=True)
+        return record
+
+    async def get_institution_waitlist_by_email(
+        self, work_email: str
+    ) -> Optional[InstitutionWaitlistRecord]:
+        doc = await self.get_institution_waitlist_collection().find_one(
+            {"workEmail": {"$regex": f"^{work_email.strip()}$", "$options": "i"}}
+        )
+        return InstitutionWaitlistRecord(**doc) if doc else None
+
+    async def count_institution_waitlist(self) -> int:
+        return await self.get_institution_waitlist_collection().count_documents({})
+

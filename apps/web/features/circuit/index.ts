@@ -9,3 +9,4 @@ export * from './qiskit-code-editor';
 export * from './interactive-circuit-workspace';
 export * from './circuit-workspace-readonly';
 export * from './qiskit-code-panel';
+export * from './gate-glyph';

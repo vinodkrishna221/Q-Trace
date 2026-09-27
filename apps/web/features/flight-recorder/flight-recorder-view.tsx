@@ -220,7 +220,7 @@ export function FlightRecorderView({
                 <div className="w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse shrink-0" aria-hidden="true" />
                 <span className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-mono flex-wrap">
                   <strong data-testid="first-divergence-step">
-                    Δ MISMATCH AT STEP {misconceptionSignal.firstDivergenceStep}{' '}
+                    Δ MISMATCH AT Step {misconceptionSignal.firstDivergenceStep}{' '}
                     {(() => {
                       const divStep = stateTrace.find(
                         (s) => s.stepIndex === misconceptionSignal.firstDivergenceStep
@@ -285,7 +285,7 @@ export function FlightRecorderView({
                         Δ MISMATCH
                       </span>
                     )}
-                    {isCorrect && isSelected && (
+                    {isCorrect && (
                       <span className="text-[10px] font-mono text-evidence px-1.5 py-0.5 rounded border border-evidence/40 bg-evidence/10">
                         VERIFIED
                       </span>

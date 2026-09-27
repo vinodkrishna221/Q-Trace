@@ -229,6 +229,15 @@ export default function LabPage() {
         };
       }
 
+      if (targetCircuit.operations.length === 0) {
+        simResult.data = {
+          ...simResult.data,
+          probabilities: { '00': 1.0, '01': 0.0, '10': 0.0, '11': 0.0 },
+          counts: { '00': 1024, '01': 0, '10': 0, '11': 0 },
+          stateTrace: [GROUND_STATE_TRACE_STEP],
+        };
+      }
+
       setSimulationRun(simResult.data);
       setLatestRequestId(simResult.meta.requestId);
       setIsFallbackActive(simResult.meta.isFallback);

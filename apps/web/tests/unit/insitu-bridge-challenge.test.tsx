@@ -251,12 +251,15 @@ describe('In-Situ Repair Workspace & Near-Future Bridge Challenge', () => {
 
     // Test circuit to confirm Bell correlation restored
     fireEvent.click(screen.getByTestId('test-insitu-circuit-btn'));
-    await waitFor(() => {
-      expect(screen.getByTestId('insitu-target-achieved-badge')).toBeDefined();
-      expect(screen.getByTestId('insitu-target-achieved-badge').textContent).toContain(
-        'Target State Prepared (|00⟩ + |11⟩)'
-      );
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('insitu-target-achieved-badge')).toBeDefined();
+        expect(screen.getByTestId('insitu-target-achieved-badge').textContent).toContain(
+          'Target State Prepared (|00⟩ + |11⟩)'
+        );
+      },
+      { timeout: 5000 }
+    );
 
     // Remove CNOT gate via inline delete
     expect(screen.getByTestId('remove-cnot-gate-q1')).toBeDefined();

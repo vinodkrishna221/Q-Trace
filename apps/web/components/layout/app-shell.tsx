@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AppHeader } from './app-header';
+import { SoftVerificationBanner } from '@/features/auth/soft-verification-banner';
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader />
+      <SoftVerificationBanner />
       <main className="flex-1 container mx-auto px-4 md:px-6 py-8 max-w-7xl w-full">
         {children}
       </main>

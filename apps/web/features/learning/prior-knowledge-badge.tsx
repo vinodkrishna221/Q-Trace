@@ -60,7 +60,7 @@ export function PriorKnowledgeBadge({
           <User className="w-3.5 h-3.5 text-accent" />
           <span>Active:</span>
           <span className="text-ink font-bold" data-testid="active-learner-badge-name">
-            {activeRole.name}
+            <span data-testid="active-learner-name">{activeRole.name}</span>
           </span>
         </div>
       </div>

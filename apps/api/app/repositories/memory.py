@@ -25,6 +25,13 @@ from app.models.entities import (
     SkillState,
     utc_now_iso,
 )
+from app.models.auth import (
+    InstitutionWaitlistRecord,
+    PasswordResetRecord,
+    RefreshTokenRecord,
+    User,
+    is_expired,
+)
 from app.repositories.base import DataRepositoryProtocol
 
 
@@ -45,6 +52,10 @@ class InMemoryRepository(DataRepositoryProtocol):
         self._challenge_attempts: dict[str, ChallengeAttempt] = {}
         self._progress_records: dict[str, ProgressRecord] = {}
         self._insight_cache: dict[str, tuple[float, InstructorInsight]] = {}
+        self._users: dict[str, User] = {}
+        self._refresh_tokens: dict[str, RefreshTokenRecord] = {}
+        self._password_resets: dict[str, PasswordResetRecord] = {}
+        self._institution_waitlist: dict[str, InstitutionWaitlistRecord] = {}
 
     # --- Lifecycle ---
 
@@ -63,6 +74,10 @@ class InMemoryRepository(DataRepositoryProtocol):
             self._challenge_attempts.clear()
             self._progress_records.clear()
             self._insight_cache.clear()
+            self._users.clear()
+            self._refresh_tokens.clear()
+            self._password_resets.clear()
+            self._institution_waitlist.clear()
 
     # --- Learner & Instructor Profiles ---
 
@@ -523,3 +538,189 @@ class InMemoryRepository(DataRepositoryProtocol):
             )
             self._insight_cache[cohort_id] = (now_ts, insight)
             return insight
+
+    # --- Authentication & Identity (docs/AUTH-SYSTEM-DESIGN.md) ---
+
+    async def get_user_by_id(self, user_id: str) -> Optional[User]:
+        async with self._lock:
+            return self._users.get(user_id)
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        target = email.strip().lower()
+        async with self._lock:
+            for user in self._users.values():
+                if user.email.lower() == target:
+                    return user
+            return None
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        target = username.strip().lower()
+        async with self._lock:
+            for user in self._users.values():
+                if user.username.lower() == target:
+                    return user
+            return None
+
+    async def get_user_by_identifier(self, identifier: str) -> Optional[User]:
+        target = identifier.strip().lower()
+        async with self._lock:
+            for user in self._users.values():
+                if user.email.lower() == target or user.username.lower() == target:
+                    return user
+            return None
+
+    async def get_user_by_github_id(self, github_id: str) -> Optional[User]:
+        async with self._lock:
+            for user in self._users.values():
+                if user.githubId == github_id:
+                    return user
+            return None
+
+    async def get_user_by_verification_token_hash(self, token_hash: str) -> Optional[User]:
+        async with self._lock:
+            for user in self._users.values():
+                if user.verificationTokenHash == token_hash:
+                    return user
+            return None
+
+    async def create_or_update_user(self, user: User) -> User:
+        async with self._lock:
+            uid = user.id or getattr(user, "_id", "")
+            if not uid:
+                import uuid
+                uid = f"usr_{uuid.uuid4().hex[:12]}"
+                user.id = uid
+            user.updatedAt = utc_now_iso()
+            self._users[uid] = user
+            return user
+
+    async def delete_user(self, user_id: str) -> bool:
+        async with self._lock:
+            return bool(self._users.pop(user_id, None))
+
+    # --- Refresh Tokens & Family Rotation ---
+
+    async def create_refresh_token(self, record: RefreshTokenRecord) -> RefreshTokenRecord:
+        async with self._lock:
+            rid = record.id or getattr(record, "_id", "")
+            if not rid:
+                import uuid
+                rid = f"rtk_{uuid.uuid4().hex[:12]}"
+                record.id = rid
+            self._refresh_tokens[rid] = record
+            return record
+
+    async def get_refresh_token_by_hash(self, token_hash: str) -> Optional[RefreshTokenRecord]:
+        async with self._lock:
+            for rtk in self._refresh_tokens.values():
+                if rtk.tokenHash == token_hash:
+                    return rtk
+            return None
+
+    async def update_refresh_token_status(
+        self, token_id: str, status: str
+    ) -> Optional[RefreshTokenRecord]:
+        async with self._lock:
+            rtk = self._refresh_tokens.get(token_id)
+            if rtk:
+                rtk.status = status  # type: ignore
+                return rtk
+            return None
+
+    async def consume_refresh_token(
+        self, token_hash: str
+    ) -> tuple[str, Optional[RefreshTokenRecord]]:
+        async with self._lock:
+            target_record: Optional[RefreshTokenRecord] = None
+            for rtk in self._refresh_tokens.values():
+                if rtk.tokenHash == token_hash:
+                    target_record = rtk
+                    break
+
+            if not target_record:
+                return ("NOT_FOUND", None)
+
+            if target_record.status in ("USED", "REVOKED"):
+                return ("REPLAY", target_record)
+
+            if is_expired(target_record.expiresAt):
+                target_record.status = "REVOKED"
+                return ("EXPIRED", target_record)
+
+            target_record.status = "USED"
+            return ("SUCCESS", target_record)
+
+    async def revoke_refresh_token_family(self, family_id: str) -> int:
+        count = 0
+        async with self._lock:
+            for rtk in self._refresh_tokens.values():
+                if rtk.familyId == family_id and rtk.status != "REVOKED":
+                    rtk.status = "REVOKED"
+                    count += 1
+            return count
+
+    async def revoke_all_user_refresh_tokens(self, user_id: str) -> int:
+        count = 0
+        async with self._lock:
+            for rtk in self._refresh_tokens.values():
+                if rtk.userId == user_id and rtk.status != "REVOKED":
+                    rtk.status = "REVOKED"
+                    count += 1
+            return count
+
+    # --- Password Resets ---
+
+    async def create_password_reset(self, record: PasswordResetRecord) -> PasswordResetRecord:
+        async with self._lock:
+            rid = record.id or getattr(record, "_id", "")
+            if not rid:
+                import uuid
+                rid = f"rst_{uuid.uuid4().hex[:12]}"
+                record.id = rid
+            self._password_resets[rid] = record
+            return record
+
+    async def get_password_reset_by_hash(self, token_hash: str) -> Optional[PasswordResetRecord]:
+        async with self._lock:
+            for pr in self._password_resets.values():
+                if pr.tokenHash == token_hash:
+                    return pr
+            return None
+
+    async def mark_password_reset_used(self, reset_id: str) -> bool:
+        async with self._lock:
+            pr = self._password_resets.get(reset_id)
+            if pr:
+                pr.used = True
+                return True
+            return False
+
+    # --- Institutional Waitlist ---
+
+    async def add_institution_waitlist(
+        self, record: InstitutionWaitlistRecord
+    ) -> InstitutionWaitlistRecord:
+        async with self._lock:
+            wid = record.id or getattr(record, "_id", "")
+            if not wid:
+                import uuid
+                wid = f"wtl_{uuid.uuid4().hex[:12]}"
+                record.id = wid
+            record.waitlistPosition = len(self._institution_waitlist) + 1
+            self._institution_waitlist[wid] = record
+            return record
+
+    async def get_institution_waitlist_by_email(
+        self, work_email: str
+    ) -> Optional[InstitutionWaitlistRecord]:
+        target = work_email.strip().lower()
+        async with self._lock:
+            for rec in self._institution_waitlist.values():
+                if rec.workEmail.lower() == target:
+                    return rec
+            return None
+
+    async def count_institution_waitlist(self) -> int:
+        async with self._lock:
+            return len(self._institution_waitlist)
+

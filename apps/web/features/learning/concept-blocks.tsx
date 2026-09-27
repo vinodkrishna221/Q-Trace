@@ -82,10 +82,10 @@ export function ConceptBlocks({ contentBlocks }: ConceptBlocksProps) {
               <div
                 key={idx}
                 data-testid={`concept-formula-${idx}`}
-                className="p-4 rounded-xl bg-abyss border border-accent/30 text-center shadow-glow-soft"
+                className="p-4 rounded-xl bg-panel border border-line text-center"
               >
                 <div className="flex items-center justify-center gap-2 mb-1 text-[11px] uppercase tracking-widest text-ink-faint font-mono">
-                  <Sigma className="w-3.5 h-3.5 text-accent" />
+                  <Sigma className="w-3.5 h-3.5 text-ink-dim" />
                   <span>State Formula</span>
                 </div>
                 <FormulaBlock latex={block.latex ?? ''} />

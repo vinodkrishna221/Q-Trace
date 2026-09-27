@@ -219,6 +219,7 @@ describe('Accessibility & Projector Readability Suite (UX-9)', () => {
   it('supports prediction radio navigation and role switcher accessibility', () => {
     render(
       <AppShell>
+        <RoleSwitcher />
         <BellStateLearnPage />
       </AppShell>
     );
