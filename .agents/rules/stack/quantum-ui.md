@@ -12,6 +12,7 @@ Compatibility baseline: Next.js 15 line · React 19 · TypeScript strict · Tail
 - State amplitudes/probabilities, sampled measurement counts and reduced-qubit Bloch views are separate panels with separate labels.
 - A Bloch vector with purity `<1` is labeled `Entangled Subsystem · Purity Tr(ρ²): <purity>`; it never represents the whole entangled state.
 - Every quantum visualization displays “mathematical representation, not physical trajectory.” Do not animate qubits or photons literally splitting.
+- Use @react-three/fiber for 3D pedagogical simulations (e.g. Bloch sphere, Bell state purity loss), strictly adhering to mathematical state representation over literal physical photons.
 - Flight Recorder steps use immutable State Trace indexes; UI animation never computes quantum values.
 - Drag/drop has click-to-place and keyboard alternatives. Gate identity never depends on color alone.
 - Demo routes render seeded empty/loading/error/fallback states; no blank canvas while API or Plotly loads.
