@@ -157,4 +157,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 27 Sep 16:10 Rajeswari: DUO-7 green — curriculum registry and stage data engine for Units 1.1 to 1.3 created in apps/web/lib/curriculum/units-1-to-3.ts and types.ts; 9 stages fully typed with 5-beat pedagogical fields, mutually exclusive prediction checkpoints, normalization constraint evaluation, and hands-on collapse lab; pnpm test:web tests/unit/curriculum-units-1-to-3.test.ts passed (8/8 green), full web test suite (203/203) green, Next.js production build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-8, DUO-11.
 
+- 27 Sep 16:30 Rajeswari: DUO-8 green -- Single-Qubit Gate Chambers & QRNG Boss Milestone (Units 1.4 to 1.5) created in apps/web/lib/curriculum/units-4-to-5.ts; 10 stages typed with Bloch sphere 3D coordinates, Pauli/Hadamard/Phase gate matrices, H reversibility checkpoint (DETERMINISTIC_0), and QRNG boss capstone with F >= 0.99 fidelity acceptance; pnpm test:web tests/unit/curriculum-units-4-to-5.test.ts passed (13/13 green), full web test suite (216/216) green, Next.js production build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-9, DUO-11.
+
 

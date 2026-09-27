@@ -176,7 +176,7 @@ DELIVERABLE: Create `apps/web/lib/curriculum/units-4-to-5.ts` implementing a typ
 TEST: `pnpm test:web tests/unit/curriculum-units-4-to-5.test.ts` verifying all 10 stages present, `superposition` lessonId maps to existing route, QRNG boss has `NODE_MILESTONE` archetype, H reversibility checkpoint has exactly `DETERMINISTIC_0` as the correct answer, and statevector fidelity acceptance criteria (`F >= 0.99` for boss) is included in stage metadata.
 DEPENDS: DUO-7          UNBLOCKS: DUO-9, DUO-11
 DEMO: The path shows the Bloch sphere compass, Hadamard gate chamber, and Unit 1 Boss QRNG capstone — the judge can tap the QRNG boss to see the synthesis challenge requiring 2 random bits with 25% distribution.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

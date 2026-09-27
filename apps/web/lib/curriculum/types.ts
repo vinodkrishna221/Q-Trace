@@ -47,6 +47,7 @@ export interface CurriculumStage {
   predictionCheckpoint: StagePredictionCheckpoint;
   misconceptionHandled: string;
   handsOnLab?: HandsOnLabSpec;
+  route?: string;
   metadata?: Record<string, unknown>;
 }
 
