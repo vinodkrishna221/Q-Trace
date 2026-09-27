@@ -217,7 +217,7 @@ DELIVERABLE: Create `apps/web/lib/curriculum/units-6-to-7.ts` implementing a typ
 TEST: `pnpm test:web tests/unit/curriculum-units-6-to-7.test.ts` verifying all 7 stages present, `bell-state` lessonId maps to canonical route, Bell correlation prediction has exactly one correct option (`CORRELATED_00_11`), `INDEPENDENT_RANDOM` is present as a distractor, purity value for entangled subsystem is 0.50, and NODE_DEBUG archetype is assigned to the flight recorder stage.
 DEPENDS: DUO-8          UNBLOCKS: DUO-10, DUO-11
 DEMO: The path shows the Bell State Hero Lab node — judge clicks it to see the synthesis recipe (H + CNOT → |Φ⁺⟩), then taps the Classical Independence Trap prediction node to face the 100% correlation vs 50% random misconception checkpoint.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-9-cnot-bell-correlation`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
