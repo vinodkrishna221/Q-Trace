@@ -74,6 +74,97 @@ export interface RepairChallengeMetadata {
   misconceptionKey?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Units 1.8 to 1.10 Specific Metadata Interfaces (DUO-10)
+// ---------------------------------------------------------------------------
+
+export interface ShotNoiseConfiguration {
+  shots: number;
+  varianceFormula: string;
+  expectedErrorPercent: number | string;
+  description: string;
+}
+
+export interface ShotNoiseMetadata {
+  formula: string;
+  scalingLaw: string;
+  configurations: ShotNoiseConfiguration[];
+  samplingNote: string;
+}
+
+export interface PhaseDistinctionMetadata {
+  globalPhase: {
+    formula: string;
+    observable: boolean;
+    description: string;
+  };
+  relativePhase: {
+    formula: string;
+    observable: boolean;
+    description: string;
+  };
+  interferenceImpact: string;
+}
+
+export interface NoCloningMetadata {
+  theorem: string;
+  citation: string;
+  unitaryProofSummary: string;
+  classicalVsQuantumDifference: string;
+}
+
+export interface PhaseKickbackMetadata {
+  mechanism: string;
+  eigenvalueEquation: string;
+  controlStateEffect: string;
+  algorithmsPowered: string[];
+}
+
+export interface TeleportationCorrectionRule {
+  aliceMeasurement: string;
+  bobCorrection: string;
+}
+
+export interface TeleportationProtocolMetadata {
+  numQubits: number;
+  qubitAssignments: {
+    q0: string;
+    q1: string;
+    q2: string;
+  };
+  steps: string[];
+  classicalBitsTransmitted: number;
+  correctionRules: TeleportationCorrectionRule[];
+}
+
+export interface CapstoneAcceptanceCriteria {
+  circuitQubits: number;
+  targetFidelity: number;
+  runtimeBackend: string;
+  requiredGates: string[];
+  verificationMetric: string;
+  criteria: string[];
+}
+
+export interface CapstoneMetadata {
+  challengeName: string;
+  archetype: "NODE_MILESTONE";
+  bossChallenge: boolean;
+  acceptanceCriteria: CapstoneAcceptanceCriteria;
+  circuitDefinition: {
+    numQubits: number;
+    q0Role: string;
+    bellPairQubits: [number, number];
+    measurementQubits: [number, number];
+    correctionQubit: number;
+  };
+}
+
+export interface AlgorithmBridgeMetadata {
+  module1ConceptsMastered: string[];
+  module2Preview: string[];
+}
+
 export interface CurriculumStage {
   id: string;
   lessonId: string;
@@ -95,5 +186,14 @@ export interface CurriculumStage {
   subsystemPurity?: SubsystemPurityMetadata;
   purityValue?: number;
   repairChallenge?: RepairChallengeMetadata;
+  // Units 1.8 to 1.10 Extensions
+  shotNoise?: ShotNoiseMetadata;
+  phaseDistinction?: PhaseDistinctionMetadata;
+  noCloning?: NoCloningMetadata;
+  phaseKickback?: PhaseKickbackMetadata;
+  teleportationProtocol?: TeleportationProtocolMetadata;
+  capstone?: CapstoneMetadata;
+  acceptanceCriteria?: CapstoneAcceptanceCriteria;
+  algorithmBridge?: AlgorithmBridgeMetadata;
   metadata?: Record<string, unknown>;
 }

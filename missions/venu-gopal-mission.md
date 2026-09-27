@@ -227,7 +227,7 @@ DELIVERABLE: Create `apps/web/lib/curriculum/units-8-to-10.ts` implementing a ty
 TEST: `pnpm test:web tests/unit/curriculum-units-8-to-10.test.ts` verifying all 9 stages present, capstone `mod1_capstone_exam` has NODE_MILESTONE archetype, teleportation protocol has 6 steps in stage metadata, shot noise stage includes 3 distinct shot-count configurations (10, 100, 1024), Module 1 Capstone fidelity threshold (0.99) is in acceptance criteria, and the bridge stage `mod1_algorithm_bridge` has NODE_CONCEPT archetype.
 DEPENDS: DUO-9          UNBLOCKS: DUO-11
 DEMO: The `/learn` path shows the complete Module 1 journey culminating in a glowing "Module 1 Capstone" boss node — judge can inspect the 3-qubit teleportation protocol: share entangled pair, measure Alice's qubits, apply classical corrections on Bob's qubit.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-10-teleportation-capstone`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
