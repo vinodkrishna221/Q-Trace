@@ -160,7 +160,7 @@ counts = result.get_counts()`;
 
   return (
     <div
-      className={`fixed inset-0 z-50 pointer-events-auto transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 pointer-events-auto transition-opacity duration-300 lg:hidden ${
         isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       aria-hidden={!isOpen}

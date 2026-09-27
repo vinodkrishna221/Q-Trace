@@ -23,6 +23,7 @@ import { CurriculumStage } from '@/lib/curriculum/types';
 import { LeftQuestRail } from '@/features/learning/components/left-quest-rail';
 import { RightStageInspector } from '@/features/learning/components/right-stage-inspector';
 import { SerpentineCanvas } from '@/features/learning/components/serpentine-canvas';
+import { UnitSectionBanner } from '@/features/learning/components/unit-section-banner';
 import { StageBottomSheet } from '@/features/learning/components/stage-bottom-sheet';
 import { MobileBottomNav } from '@/features/learning/components/mobile-bottom-nav';
 
@@ -50,13 +51,111 @@ export default function LearnIndexPage() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = React.useState(false);
 
   // Selected stage for the Right Stage Inspector drawer
-  // Defaults to the Bell State hero lab or first stage
+  // Defaults to the first stage (The Quantum Compass) on the serpentine path
   const [selectedStage, setSelectedStage] = React.useState<CurriculumStage>(() => {
     return (
+      allCurriculumStages.find((s) => s.id === 'stage_1_1_compass') ||
       allCurriculumStages.find((s) => s.id === 'bell-state') ||
       allCurriculumStages[0]
     );
   });
+
+  // Dynamic vertical tracking for Right Stage Inspector and Dotted Arrow
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const inspectorWrapperRef = React.useRef<HTMLDivElement>(null);
+  const [inspectorTranslateY, setInspectorTranslateY] = React.useState(0);
+  const [arrowCoords, setArrowCoords] = React.useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    d: string;
+    visible: boolean;
+  }>({
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+    d: '',
+    visible: false,
+  });
+
+  const updateInspectorPositionAndArrow = React.useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    const container = containerRef.current;
+    const inspector = inspectorWrapperRef.current;
+    if (!container || !inspector || !selectedStage) return;
+
+    // Locate active node button
+    const nodeEl =
+      document.getElementById(`chamber-node-${selectedStage.id}`) ||
+      document.querySelector(`[data-stage-id="${selectedStage.id}"]`) ||
+      document.querySelector(`[data-testid="chamber-node-${selectedStage.id}"]`);
+
+    if (!nodeEl) {
+      setArrowCoords((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const nodeRect = nodeEl.getBoundingClientRect();
+    const inspectorRect = inspector.getBoundingClientRect();
+
+    // Node center Y and right X relative to container
+    const nodeCenterY = nodeRect.top - containerRect.top + nodeRect.height / 2;
+    const nodeRightX = nodeRect.right - containerRect.left;
+
+    // Align card top (~50px down) with node
+    const idealY = Math.max(0, nodeCenterY - 50);
+    const maxTranslateY = Math.max(0, container.scrollHeight - inspectorRect.height - 24);
+    const clampedY = Math.min(idealY, maxTranslateY);
+
+    setInspectorTranslateY(clampedY);
+
+    const cardLeftX = inspectorRect.left - containerRect.left;
+    const startX = nodeRightX + 4;
+    const startY = nodeCenterY;
+    const endX = cardLeftX - 4;
+    const endY = nodeCenterY;
+
+    if (endX > startX + 20) {
+      const midX = (startX + endX) / 2;
+      const d =
+        Math.abs(startY - endY) < 4
+          ? `M ${startX} ${startY} L ${endX} ${endY}`
+          : `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
+
+      setArrowCoords({
+        startX,
+        startY,
+        endX,
+        endY,
+        d,
+        visible: true,
+      });
+    } else {
+      setArrowCoords((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+    }
+  }, [selectedStage]);
+
+  React.useEffect(() => {
+    updateInspectorPositionAndArrow();
+    const t1 = setTimeout(updateInspectorPositionAndArrow, 50);
+    const t2 = setTimeout(updateInspectorPositionAndArrow, 150);
+    const t3 = setTimeout(updateInspectorPositionAndArrow, 400);
+
+    window.addEventListener('resize', updateInspectorPositionAndArrow);
+    window.addEventListener('scroll', updateInspectorPositionAndArrow, { passive: true });
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener('resize', updateInspectorPositionAndArrow);
+      window.removeEventListener('scroll', updateInspectorPositionAndArrow);
+    };
+  }, [updateInspectorPositionAndArrow, selectedStage]);
 
   const stepObjectives = [
     {
@@ -127,22 +226,84 @@ export default function LearnIndexPage() {
           </div>
         </div>
 
+        {/* Full-Width Unit 1 Progress & Guidebook Banner (Takes full horizontal width across the workspace) */}
+        <UnitSectionBanner
+          unitNumber={1}
+          unitTitle="THE QUANTUM COMPASS"
+          subtitle="Single-Qubit Rotations & Superposition"
+          completedCount={3}
+          totalCount={6}
+        />
+
         {/* 3-ZONE DESKTOP PRIMARY ARCHITECTURE */}
         {/* Left Rail (Col 3) + Center Serpentine Canvas (Col 6) + Right Stage Inspector (Col 3) */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
+          ref={containerRef}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative"
           data-testid="learn-desktop-3zone-layout"
         >
-          {/* ZONE 1: Left Rail (3 cols on desktop) */}
-          <div className="lg:col-span-3 w-full order-2 lg:order-1">
+          {/* Dynamic Dotted Connector Arrow between Selected Lesson and Inspector */}
+          {arrowCoords.visible && (
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none z-30 overflow-visible"
+              aria-hidden="true"
+            >
+              {/* Background Glow Path */}
+              <path
+                d={arrowCoords.d}
+                fill="none"
+                stroke="#818cf8"
+                strokeWidth="6"
+                strokeOpacity="0.3"
+                strokeLinecap="round"
+              />
+
+              {/* Animated Dotted / Dashed Path */}
+              <path
+                d={arrowCoords.d}
+                fill="none"
+                stroke="#4338ca"
+                strokeWidth="3"
+                strokeDasharray="6 5"
+                strokeLinecap="round"
+                style={{
+                  animation: 'flowDash 1.2s linear infinite',
+                }}
+              />
+
+              {/* Explicit SVG Arrowhead Polygon pointing into inspector card */}
+              <polygon
+                points={`${arrowCoords.endX},${arrowCoords.endY} ${arrowCoords.endX - 11},${arrowCoords.endY - 6} ${arrowCoords.endX - 7},${arrowCoords.endY} ${arrowCoords.endX - 11},${arrowCoords.endY + 6}`}
+                fill="#4338ca"
+              />
+
+              {/* Origin Node Pulsing Anchor */}
+              <circle cx={arrowCoords.startX} cy={arrowCoords.startY} r="4" fill="#4338ca" />
+              <circle
+                cx={arrowCoords.startX}
+                cy={arrowCoords.startY}
+                r="8"
+                fill="none"
+                stroke="#4338ca"
+                strokeWidth="1.5"
+                className="animate-ping opacity-60"
+              />
+
+              {/* Inspector Card Target Pulse Anchor */}
+              <circle cx={arrowCoords.endX} cy={arrowCoords.endY} r="3.5" fill="#4338ca" />
+            </svg>
+          )}
+
+          {/* Left Rail (Moved to /progress per user request; sr-only for accessibility/tests) */}
+          <div className="sr-only" aria-hidden="true">
             <LeftQuestRail
               currentSlug={selectedStage?.lessonId || 'bell-state'}
               isMeera={isMeera}
             />
           </div>
 
-          {/* ZONE 2: Center Serpentine Path & Canvas (6 cols on desktop) */}
-          <div className="lg:col-span-6 w-full order-1 lg:order-2 space-y-6">
+          {/* Serpentine Path & Canvas (5 cols on desktop for shifted-left layout) */}
+          <div className="lg:col-span-5 w-full space-y-6">
             <SerpentineCanvas
               stages={allCurriculumStages}
               selectedStageId={selectedStage?.id || 'bell-state'}
@@ -152,6 +313,7 @@ export default function LearnIndexPage() {
               }}
               activeStepIndex={activeStepIndex}
               setActiveStepIndex={setActiveStepIndex}
+              hideUnit1Banner={true}
             />
 
             {/* Structured Module Catalogue Cards (Preserves acceptance test compatibility) */}
@@ -284,15 +446,32 @@ export default function LearnIndexPage() {
             </div>
           </div>
 
-          {/* ZONE 3: Right Stage Inspector (3 cols on desktop) */}
-          <div className="lg:col-span-3 w-full order-3">
+          {/* Right Stage Inspector (7 cols on desktop for wide horizontal card) */}
+          <div
+            ref={inspectorWrapperRef}
+            className="lg:col-span-7 w-full transition-transform duration-500 ease-out will-change-transform"
+            style={{
+              transform: `translateY(${inspectorTranslateY}px)`,
+            }}
+          >
             <RightStageInspector
               selectedStage={selectedStage}
-              className="sticky top-20"
             />
           </div>
         </div>
       </div>
+
+      {/* Global SVG dash animation */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes flowDash {
+              from { stroke-dashoffset: 0; }
+              to { stroke-dashoffset: -20; }
+            }
+          `,
+        }}
+      />
 
       {/* Mobile Spring Bottom Sheet Modal (75vh) */}
       <StageBottomSheet

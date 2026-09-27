@@ -21,6 +21,12 @@ import {
   Inbox,
   Clock,
 } from 'lucide-react';
+import {
+  DailyQuestsCard,
+  CohortBenchmarkCard,
+  ObserverTipCard,
+} from '@/features/learning/components/left-quest-rail';
+import { FutureAlgorithmsHorizontal } from '@/features/learning/learn-sidebar';
 
 export default function ProgressPage() {
   const { activeRole, activeLearnerProfile } = useRoleStore();
@@ -167,6 +173,13 @@ export default function ProgressPage() {
         })}
       </div>
 
+      {/* Daily Calibration Quests & Cohort Benchmarks (Moved from Learn per user request) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="progress-calibration-section">
+        <DailyQuestsCard />
+        <CohortBenchmarkCard />
+        <ObserverTipCard />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Completed Modules */}
         <Card data-testid="completed-modules-card">
@@ -275,6 +288,9 @@ export default function ProgressPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Future Algorithms Roadmap (Horizontal Mode per user request) */}
+      <FutureAlgorithmsHorizontal />
     </div>
   );
 }

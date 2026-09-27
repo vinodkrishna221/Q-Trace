@@ -16,7 +16,7 @@ import {
   Atom,
 } from 'lucide-react';
 
-interface FutureAlgorithm {
+export interface FutureAlgorithm {
   id: string;
   title: string;
   category: string;
@@ -26,7 +26,7 @@ interface FutureAlgorithm {
   coreGates: string[];
 }
 
-const FUTURE_ALGORITHMS: FutureAlgorithm[] = [
+export const FUTURE_ALGORITHMS: FutureAlgorithm[] = [
   {
     id: 'teleportation',
     title: 'Quantum Teleportation',
@@ -275,5 +275,58 @@ export function LearnSidebar({ currentSlug = 'bell-state', isMeera = false }: Le
         <span>Q-Trace runtime verified with Qiskit Aer 1024 shots & statevector simulation.</span>
       </div>
     </aside>
+  );
+}
+
+export function FutureAlgorithmsHorizontal({ className = '' }: { className?: string }) {
+  return (
+    <Card data-testid="future-algorithms-horizontal-card" className={`border-line bg-panel overflow-hidden ${className}`}>
+      <CardHeader className="p-4 pb-3 border-b border-line">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-accent" />
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-ink font-bold">
+              Future Algorithms Roadmap
+            </CardTitle>
+          </div>
+          <Badge variant="outline" className="text-[10px] font-mono text-accent border-accent/40 bg-accent/10">
+            ROADMAP
+          </Badge>
+        </div>
+        <p className="text-xs text-ink-dim mt-1">
+          Upcoming benchmark circuits scheduled for future Q-Trace runtime updates.
+        </p>
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          {FUTURE_ALGORITHMS.map((algo) => (
+            <div
+              key={algo.id}
+              className="p-3.5 rounded-xl border border-line bg-abyss flex flex-col justify-between gap-3 hover:border-line-bright transition-colors"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
+                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0 font-mono">
+                    {algo.stage}
+                  </Badge>
+                  <span className="text-ink-faint flex items-center gap-1 text-[10px]">
+                    <Lock className="w-3 h-3 text-text-muted" />
+                    Locked
+                  </span>
+                </div>
+                <h4 className="text-xs font-bold text-ink leading-tight">{algo.title}</h4>
+                <p className="text-[11px] text-ink-dim line-clamp-3 leading-relaxed">
+                  {algo.description}
+                </p>
+              </div>
+              <div className="pt-2 border-t border-line/60 flex items-center justify-between text-[10px] font-mono text-ink-faint">
+                <span>{algo.qubitCount}</span>
+                <span>Gates: {algo.coreGates.join(', ')}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

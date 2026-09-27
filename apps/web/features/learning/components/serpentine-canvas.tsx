@@ -29,6 +29,7 @@ export interface SerpentineCanvasProps {
   onSelectStage: (stage: CurriculumStage) => void;
   activeStepIndex: number;
   setActiveStepIndex: (index: number | ((prev: number) => number)) => void;
+  hideUnit1Banner?: boolean;
   className?: string;
 }
 
@@ -38,6 +39,7 @@ export function SerpentineCanvas({
   onSelectStage,
   activeStepIndex,
   setActiveStepIndex,
+  hideUnit1Banner = false,
   className = '',
 }: SerpentineCanvasProps) {
   // Stepper state for legacy / acceptance test compatibility
@@ -57,9 +59,9 @@ export function SerpentineCanvas({
       data-testid="serpentine-canvas"
       aria-label="Quantum Coherence Learning Path"
     >
-      {/* 1. Guided Pedagogical Directive Prompt & Stepper (Preserves acceptance test compatibility) */}
+      {/* 1. Guided Pedagogical Directive Prompt & Stepper (Hidden from visual UI per user request; sr-only for tests) */}
       <section
-        className="rounded-2xl border border-border-subtle bg-surface p-5 shadow-xs space-y-4"
+        className="sr-only"
         data-testid="learning-guided-prompt"
         aria-label="Pedagogical Directive and Sequence"
       >
@@ -134,13 +136,15 @@ export function SerpentineCanvas({
       </section>
 
       {/* 3. Unit 1 Banner: The Quantum Compass */}
-      <UnitSectionBanner
-        unitNumber={1}
-        unitTitle="THE QUANTUM COMPASS"
-        subtitle="Single-Qubit Rotations & Superposition"
-        completedCount={3}
-        totalCount={6}
-      />
+      {!hideUnit1Banner && (
+        <UnitSectionBanner
+          unitNumber={1}
+          unitTitle="THE QUANTUM COMPASS"
+          subtitle="Single-Qubit Rotations & Superposition"
+          completedCount={3}
+          totalCount={6}
+        />
+      )}
 
       {/* 4. Serpentine Winding Path with ChamberNodes */}
       <div
@@ -163,7 +167,7 @@ export function SerpentineCanvas({
         </svg>
 
         {/* List of Chamber Nodes positioned along sinusoidal serpentine path */}
-        <div className="w-full max-w-md mx-auto space-y-7 relative z-10">
+        <div className="w-full max-w-lg lg:ml-2 xl:ml-6 space-y-10 sm:space-y-12 relative z-10">
           {stages.slice(0, 8).map((stage, index) => {
             const isSelected = stage.id === selectedStageId || stage.lessonId === selectedStageId;
             const isCompleted = index < 2;
@@ -172,9 +176,9 @@ export function SerpentineCanvas({
             const isLocked = index > 3 && !isActive && !isDiverged;
 
             // Sinusoidal horizontal offset:
-            // Mobile (<640px): 44px arc per UI Spec Section 4
-            // Desktop (%640px): 56px arc
-            const desktopOffsets = [0, 48, -48, 56, -32, 40, -56, 0];
+            // Mobile (<640px): 36-44px arc
+            // Desktop (>=640px): 56-68px arc
+            const desktopOffsets = [0, 56, -44, 68, -32, 52, -56, 0];
             const mobileOffsets = [0, 36, -36, 44, -28, 32, -44, 0];
             const desktopX = desktopOffsets[index % desktopOffsets.length];
             const mobileX = mobileOffsets[index % mobileOffsets.length];
@@ -192,10 +196,10 @@ export function SerpentineCanvas({
                 data-mobile-offset={mobileX}
                 data-desktop-offset={desktopX}
               >
-                {/* Active Popover Preview (if selected) */}
+                {/* Active Popover Preview (if selected on mobile) */}
                 {isSelected && (
                   <div
-                    className="mb-2 p-2.5 rounded-xl border border-accent/40 bg-surface shadow-md text-center max-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200"
+                    className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 p-2.5 rounded-xl border border-accent/40 bg-surface shadow-md text-center max-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto lg:hidden"
                     data-testid="anchored-node-popover"
                   >
                     <p className="text-[11px] font-bold text-text-primary leading-tight truncate">
@@ -219,15 +223,16 @@ export function SerpentineCanvas({
                   </div>
                 )}
 
-                {/* Tactile ChamberNode Button (52px on mobile per UI Spec Section 4) */}
+                {/* Tactile ChamberNode Button (52px on mobile per UI Spec Section 4, 76px on desktop) */}
                 <button
                   type="button"
+                  id={`chamber-node-${stage.id}`}
                   onClick={() => onSelectStage(stage)}
                   data-testid={`chamber-node-${stage.id}`}
                   data-stage-id={stage.id}
                   data-node-state={isCompleted ? 'COMPLETED' : isActive ? 'ACTIVE' : isDiverged ? 'DIVERGED' : 'LOCKED'}
                   aria-label={`${stage.title} (${stage.archetype})`}
-                  className={`relative group w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
+                  className={`relative group w-[52px] h-[52px] sm:w-[68px] sm:h-[68px] lg:w-[76px] lg:h-[76px] rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
                     isSelected
                       ? 'ring-4 ring-accent/30 scale-105'
                       : 'hover:scale-105 active:scale-95'
@@ -251,24 +256,32 @@ export function SerpentineCanvas({
 
                   {/* Node Glyph Icon based on Archetype / State */}
                   {isCompleted ? (
-                    <Check className="w-5 h-5 text-emerald-600 stroke-[2.5]" />
+                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 stroke-[2.5]" />
                   ) : isLocked ? (
-                    <Lock className="w-4 h-4 text-text-muted" />
+                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-text-muted" />
                   ) : isDiverged ? (
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
                   ) : stage.archetype === 'NODE_MILESTONE' ? (
-                    <Trophy className="w-5 h-5 text-accent" />
+                    <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
                   ) : stage.archetype === 'NODE_GATE_LAB' ? (
-                    <Atom className="w-5 h-5 text-accent" />
+                    <Atom className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
                   ) : stage.archetype === 'NODE_PREDICTION' ? (
-                    <HelpCircle className="w-5 h-5 text-accent" />
+                    <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
                   ) : (
-                    <Compass className="w-5 h-5 text-accent" />
+                    <Compass className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
+                  )}
+
+                  {/* Selected Node Dotted Connector Anchor (Desktop) */}
+                  {isSelected && (
+                    <span
+                      className="hidden lg:block absolute -right-1 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-accent ring-2 ring-surface shadow-xs pointer-events-none"
+                      aria-hidden="true"
+                    />
                   )}
                 </button>
 
                 {/* Node Label Below */}
-                <span className="text-[10px] font-mono text-text-secondary mt-1 font-semibold max-w-[120px] text-center truncate">
+                <span className="text-[11px] sm:text-xs font-mono text-text-secondary mt-2 font-semibold max-w-[150px] text-center truncate">
                   {stage.title.split(':')[0]}
                 </span>
               </div>
