@@ -19,6 +19,11 @@ export default function SuperpositionLearnPage() {
   const contentBlocksWithMath = [
     ...(moduleData.contentBlocks || []),
     {
+      type: 'BLOCH_SPHERE_3D' as const,
+      initialState: '0' as const,
+      interactable: true,
+    },
+    {
       type: 'FORMULA' as const,
       latex: '|\\psi\\rangle = H|0\\rangle = \\frac{|0\\rangle + |1\\rangle}{\\sqrt{2}}',
     },

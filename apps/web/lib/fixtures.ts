@@ -141,6 +141,9 @@ export const DEMO_MODULES: Record<string, ModuleDetail> = {
         type: 'FORMULA',
         latex: '|\\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}',
       },
+      {
+        type: 'BELL_STATE_SIMULATION',
+      },
     ],
     predictionCheckpoint: {
       id: 'pc_bell_outcomes',

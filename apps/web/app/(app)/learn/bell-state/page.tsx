@@ -607,11 +607,12 @@ export default function BellStateLearnPage() {
             </div>
 
             {/* Main Stage: Theory paired with Hypothesis */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-              <div className="space-y-6">
-                <ConceptBlocks contentBlocks={moduleData.contentBlocks} />
-              </div>
+            <div className="w-full">
+              <ConceptBlocks contentBlocks={moduleData.contentBlocks} />
+            </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              {/* Left Side: Prediction Checkpoint */}
               <div className="space-y-6">
                 {moduleData.predictionCheckpoint && (
                   <PredictionCheckpoint
@@ -622,83 +623,85 @@ export default function BellStateLearnPage() {
                   />
                 )}
               </div>
-            </div>
 
-            {/* Starter Circuit: Full-width card at bottom with horizontal 50/50 split */}
-            <Card data-testid="starter-circuit-card" className="border-line bg-panel shadow-sm">
-              <CardHeader className="py-3 px-4 bg-raised/40 border-b border-line">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <CardTitle className="text-xs font-mono tracking-wider text-ink font-semibold flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-accent" />
-                    <span>STARTER CIRCUIT · {DEMO_STARTER_CIRCUIT.name.toUpperCase()}</span>
-                  </CardTitle>
-                  <CardDescription className="text-[11px] font-mono text-ink-dim">
-                    {DEMO_STARTER_CIRCUIT.qubitCount} qubits · {DEMO_STARTER_CIRCUIT.operations.length} operations · Target: Qiskit Aer
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-                  {/* Left Side: Visual Qubit Wire Diagram */}
-                  <div
-                    className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
-                    role="img"
-                    aria-label="Bell circuit: Hadamard on qubit 0, CNOT from qubit 0 to qubit 1, then both qubits measured"
-                  >
-                    {[0, 1].map((wire) => (
-                      <div key={wire} className="flex items-center gap-2">
-                        <span className="w-8 text-accent font-semibold">q[{wire}]</span>
-                        <div className="relative flex-1 h-px bg-line-bright">
-                          <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-around">
-                            {wire === 0 ? (
-                              <>
-                                <span className="px-1.5 py-0.5 -mt-px bg-accent/15 border border-accent/60 text-accent rounded font-bold shadow-glow">H</span>
-                                <span className="h-2.5 w-2.5 rounded-full bg-accent border border-accent shadow-glow" />
-                                <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="w-6" />
-                                <span className="px-1.5 py-0.5 bg-violet/15 border border-violet/60 text-violet rounded font-bold">⊕</span>
-                                <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
-                              </>
-                            )}
+              {/* Right Side: Starter Circuit */}
+              <div className="space-y-6">
+                <Card data-testid="starter-circuit-card" className="border-line bg-panel shadow-sm h-full">
+                  <CardHeader className="py-3 px-4 bg-raised/40 border-b border-line">
+                    <div className="flex flex-col gap-2">
+                      <CardTitle className="text-xs font-mono tracking-wider text-ink font-semibold flex items-center gap-2">
+                        <Cpu className="w-4 h-4 text-accent" />
+                        <span>STARTER CIRCUIT · {DEMO_STARTER_CIRCUIT.name.toUpperCase()}</span>
+                      </CardTitle>
+                      <CardDescription className="text-[11px] font-mono text-ink-dim">
+                        {DEMO_STARTER_CIRCUIT.qubitCount} qubits · {DEMO_STARTER_CIRCUIT.operations.length} operations · Target: Qiskit Aer
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col gap-6">
+                      {/* Left Side: Visual Qubit Wire Diagram */}
+                      <div
+                        className="rounded-lg bg-abyss p-4 border border-line space-y-5 font-mono text-xs"
+                        role="img"
+                        aria-label="Bell circuit: Hadamard on qubit 0, CNOT from qubit 0 to qubit 1, then both qubits measured"
+                      >
+                        {[0, 1].map((wire) => (
+                          <div key={wire} className="flex items-center gap-2">
+                            <span className="w-8 text-accent font-semibold">q[{wire}]</span>
+                            <div className="relative flex-1 h-px bg-line-bright">
+                              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-around">
+                                {wire === 0 ? (
+                                  <>
+                                    <span className="px-1.5 py-0.5 -mt-px bg-accent/15 border border-accent/60 text-accent rounded font-bold shadow-glow">H</span>
+                                    <span className="h-2.5 w-2.5 rounded-full bg-accent border border-accent shadow-glow" />
+                                    <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="w-6" />
+                                    <span className="px-1.5 py-0.5 bg-violet/15 border border-violet/60 text-violet rounded font-bold">⊕</span>
+                                    <span className="px-1.5 py-0.5 bg-raised border border-line-bright text-ink-dim rounded">M</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
                           </div>
+                        ))}
+                        <div className="text-center text-[10px] text-violet font-mono tracking-widest">
+                          ┆ CNOT(0 → 1) · entanglement ┆
                         </div>
                       </div>
-                    ))}
-                    <div className="text-center text-[10px] text-violet font-mono tracking-widest">
-                      ┆ CNOT(0 → 1) · entanglement ┆
-                    </div>
-                  </div>
 
-                  {/* Right Side: Gates Explanation & Specs */}
-                  <div className="space-y-3">
-                    <div className="rounded-lg bg-abyss p-3 border border-line font-mono text-xs text-ink-dim space-y-1.5">
-                      {DEMO_STARTER_CIRCUIT.operations.map((op) => (
-                        <div key={op.opId} className="flex justify-between items-center bg-panel/60 p-1.5 rounded border border-line/60">
-                          <span className="text-accent font-bold px-1.5 py-0.5 rounded bg-accent/10 border border-accent/30">
-                            {op.gate}
-                          </span>
-                          <span>targets: [{op.targets.join(', ')}]</span>
-                          {op.controls.length > 0 && (
-                            <span className="text-violet">ctrl: [{op.controls.join(', ')}]</span>
-                          )}
+                      {/* Right Side: Gates Explanation & Specs */}
+                      <div className="space-y-3">
+                        <div className="rounded-lg bg-abyss p-3 border border-line font-mono text-xs text-ink-dim space-y-1.5">
+                          {DEMO_STARTER_CIRCUIT.operations.map((op) => (
+                            <div key={op.opId} className="flex justify-between items-center bg-panel/60 p-1.5 rounded border border-line/60">
+                              <span className="text-accent font-bold px-1.5 py-0.5 rounded bg-accent/10 border border-accent/30">
+                                {op.gate}
+                              </span>
+                              <span>targets: [{op.targets.join(', ')}]</span>
+                              {op.controls.length > 0 && (
+                                <span className="text-violet">ctrl: [{op.controls.join(', ')}]</span>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-ink-dim font-mono bg-abyss p-2 rounded border border-line">
-                      <div className="flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-evidence" />
-                        <span>Target: Qiskit Aer · 1024 shots</span>
+                        <div className="flex items-center justify-between text-[11px] text-ink-dim font-mono bg-abyss p-2 rounded border border-line">
+                          <div className="flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-evidence" />
+                            <span>Target: Qiskit Aer · 1024 shots</span>
+                          </div>
+                          <span className="text-ink-faint">Ideal Statevector</span>
+                        </div>
                       </div>
-                      <span className="text-ink-faint">Ideal Statevector</span>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
 
             {viewMode === 'step-by-step' && (
               <div className="flex justify-end pt-4 border-t border-line">

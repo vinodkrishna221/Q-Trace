@@ -6,6 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BookOpen, AlertCircle, Info, Sigma } from 'lucide-react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BlochSphere3D } from './components/bloch-sphere-3d';
+import { MeasurementSimulation } from './components/measurement-simulation';
+import { BellStateSimulation } from './components/bell-state-simulation';
 
 interface ConceptBlocksProps {
   contentBlocks: ContentBlock[];
@@ -92,6 +95,33 @@ export function ConceptBlocks({ contentBlocks }: ConceptBlocksProps) {
                 <div className="text-[11px] text-ink-faint mt-1">
                   Mathematical representation (not physical trajectory)
                 </div>
+              </div>
+            );
+          }
+
+          if (block.type === 'BLOCH_SPHERE_3D') {
+            return (
+              <div key={idx} className="my-6">
+                <BlochSphere3D 
+                  initialState={block.initialState} 
+                  interactable={block.interactable} 
+                />
+              </div>
+            );
+          }
+
+          if (block.type === 'MEASUREMENT_SIMULATION') {
+            return (
+              <div key={idx} className="my-6">
+                <MeasurementSimulation />
+              </div>
+            );
+          }
+
+          if (block.type === 'BELL_STATE_SIMULATION') {
+            return (
+              <div key={idx} className="my-6">
+                <BellStateSimulation />
               </div>
             );
           }

@@ -55,7 +55,10 @@ export type ContentBlock =
   | { type: "TEXT"; body: string }
   | { type: "CALLOUT"; tone: "INFO" | "CAUTION"; body: string }
   | { type: "FORMULA"; latex: string }
-  | { type: "CIRCUIT_PREVIEW"; circuitModelId: string };
+  | { type: "CIRCUIT_PREVIEW"; circuitModelId: string }
+  | { type: "BLOCH_SPHERE_3D"; initialState: "0" | "1"; interactable: boolean }
+  | { type: "MEASUREMENT_SIMULATION" }
+  | { type: "BELL_STATE_SIMULATION" };
 
 export type PredictionAnswerType = "SINGLE_CHOICE";
 

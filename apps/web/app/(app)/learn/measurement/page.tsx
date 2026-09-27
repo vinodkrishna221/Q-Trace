@@ -19,6 +19,9 @@ export default function MeasurementLearnPage() {
   const contentBlocksWithMath = [
     ...(moduleData.contentBlocks || []),
     {
+      type: 'MEASUREMENT_SIMULATION' as const,
+    },
+    {
       type: 'FORMULA' as const,
       latex: 'P(x) = |\\langle x | \\psi \\rangle|^2, \\quad \\sum_{x} P(x) = 1',
     },
