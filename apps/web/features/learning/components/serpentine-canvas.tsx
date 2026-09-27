@@ -30,6 +30,7 @@ export interface SerpentineCanvasProps {
   activeStepIndex: number;
   setActiveStepIndex: (index: number | ((prev: number) => number)) => void;
   hideUnit1Banner?: boolean;
+  hideUnit2Banner?: boolean;
   className?: string;
 }
 
@@ -40,6 +41,7 @@ export function SerpentineCanvas({
   activeStepIndex,
   setActiveStepIndex,
   hideUnit1Banner = false,
+  hideUnit2Banner = false,
   className = '',
 }: SerpentineCanvasProps) {
   // Stepper state for legacy / acceptance test compatibility
@@ -291,14 +293,16 @@ export function SerpentineCanvas({
       </div>
 
       {/* 5. Unit 2 Banner: Entanglement */}
-      <UnitSectionBanner
-        unitNumber={2}
-        unitTitle="ENTANGLEMENT & BELL STATES"
-        subtitle="Non-Local Correlation & Flight Recorder Verification"
-        completedCount={1}
-        totalCount={4}
-        accentRailColor="linear-gradient(to right, #4a02b1, #2a2882)"
-      />
+      {!hideUnit2Banner && (
+        <UnitSectionBanner
+          unitNumber={2}
+          unitTitle="ENTANGLEMENT & BELL STATES"
+          subtitle="Non-Local Correlation & Flight Recorder Verification"
+          completedCount={1}
+          totalCount={4}
+          accentRailColor="linear-gradient(to right, #4a02b1, #2a2882)"
+        />
+      )}
     </main>
   );
 }

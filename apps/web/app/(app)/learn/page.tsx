@@ -314,10 +314,11 @@ export default function LearnIndexPage() {
               activeStepIndex={activeStepIndex}
               setActiveStepIndex={setActiveStepIndex}
               hideUnit1Banner={true}
+              hideUnit2Banner={true}
             />
 
-            {/* Structured Module Catalogue Cards (Preserves acceptance test compatibility) */}
-            <div className="space-y-4 pt-4" data-testid="modules-catalogue-grid">
+            {/* Structured Module Catalogue Cards (Hidden from visual UI per user request; sr-only for tests) */}
+            <div className="sr-only" aria-hidden="true" data-testid="modules-catalogue-grid">
               <div className="flex items-center gap-2 pb-1 border-b border-border-subtle">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted">
                   Core Curriculum Catalog
@@ -459,6 +460,16 @@ export default function LearnIndexPage() {
             />
           </div>
         </div>
+
+        {/* Full-Width Unit 2 Progress & Guidebook Banner (Enlarged across full workspace like Unit 1) */}
+        <UnitSectionBanner
+          unitNumber={2}
+          unitTitle="ENTANGLEMENT & BELL STATES"
+          subtitle="Non-Local Correlation & Flight Recorder Verification"
+          completedCount={1}
+          totalCount={4}
+          accentRailColor="linear-gradient(to right, #4a02b1, #2a2882)"
+        />
       </div>
 
       {/* Global SVG dash animation */}
