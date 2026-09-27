@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 import { AtomicCursor } from '@/components/ui/atomic-cursor';
+import { PrewarmPing } from '@/components/prewarm-ping';
 
 export const metadata: Metadata = {
   title: 'Q-Trace — Quantum Flight Recorder & Learning Platform',
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body className="bg-surface-canvas text-text-primary font-sans antialiased min-h-screen">
         <Providers>
+          <PrewarmPing />
           {children}
           <AtomicCursor />
         </Providers>

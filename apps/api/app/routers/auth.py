@@ -4,11 +4,14 @@ Implements API contracts from docs/AUTH-SYSTEM-DESIGN.md Section 6.
 
 from __future__ import annotations
 
+import base64
 import logging
 import os
+import secrets
 import time
 import uuid
 from typing import Optional
+from urllib.parse import urlparse
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
 
@@ -56,7 +59,50 @@ logger = logging.getLogger("qtrace.routers.auth")
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
 
-APP_URL = os.getenv("APP_URL", "http://localhost:3000")
+APP_URL = (os.getenv("APP_URL") or os.getenv("WEB_ORIGIN") or "http://localhost:3000").rstrip("/")
+
+
+def get_frontend_url(request: Request) -> str:
+    """Resolve the frontend application base URL dynamically."""
+    env_app_url = (os.getenv("APP_URL") or os.getenv("WEB_ORIGIN") or "").strip()
+    if env_app_url and "localhost" not in env_app_url:
+        return env_app_url.rstrip("/")
+
+    origin = request.headers.get("origin")
+    if origin and not origin.startswith("chrome-extension://"):
+        return origin.rstrip("/")
+
+    referer = request.headers.get("referer")
+    if referer:
+        try:
+            parsed = urlparse(referer)
+            if parsed.scheme and parsed.netloc:
+                return f"{parsed.scheme}://{parsed.netloc}"
+        except Exception:
+            pass
+
+    return (env_app_url or "http://localhost:3000").rstrip("/")
+
+
+def encode_oauth_state(origin: str) -> str:
+    """Encode nonce and origin domain into OAuth state parameter."""
+    nonce = secrets.token_urlsafe(12)
+    raw = f"{nonce}|{origin}"
+    return base64.urlsafe_b64encode(raw.encode()).decode()
+
+
+def decode_oauth_state(state: Optional[str]) -> Optional[str]:
+    """Decode and extract origin domain from OAuth state parameter."""
+    if not state:
+        return None
+    try:
+        decoded = base64.urlsafe_b64decode(state.encode()).decode()
+        if "|" in decoded:
+            _, origin = decoded.split("|", 1)
+            return origin
+    except Exception:
+        pass
+    return None
 
 
 # --- Authentication Dependencies ---
@@ -195,10 +241,12 @@ async def signup(
     )
 
     # 9. Email dispatch (non-blocking / local fallback)
+    frontend_url = get_frontend_url(request)
     await email_service.send_verification_email(
         to_email=clean_email,
         token=raw_verify_token,
         user_name=payload.displayName.strip(),
+        app_url=frontend_url,
     )
 
     # 10. Issue tokens and HttpOnly SameSite=Lax cookies
@@ -224,6 +272,8 @@ async def signup(
 
     return {
         "user": new_user.to_public_dict(),
+        "accessToken": access_token,
+        "refreshToken": raw_refresh_token,
         "message": "Account created. Soft access granted. Verification email dispatched.",
     }
 
@@ -332,6 +382,8 @@ async def login(
 
     return {
         "user": user.to_public_dict(),
+        "accessToken": access_token,
+        "refreshToken": raw_refresh_token,
         "mfaRequired": False,
         "message": "Login successful",
     }
@@ -518,7 +570,8 @@ async def forgot_password(
             expiresAt=expires_at,
         )
         await repo.create_password_reset(reset_record)
-        await email_service.send_password_reset_email(to_email=clean_email, token=raw_token)
+        frontend_url = get_frontend_url(request)
+        await email_service.send_password_reset_email(to_email=clean_email, token=raw_token, app_url=frontend_url)
 
     return {"message": "If that email exists, reset instructions have been dispatched."}
 
@@ -583,6 +636,7 @@ async def verify_email(
     repo: DataRepositoryProtocol = Depends(get_repository),
 ):
     """Confirm user email address via token link."""
+    frontend_url = get_frontend_url(request)
     token_hash = hash_token(token.strip())
     target_user = await repo.get_user_by_verification_token_hash(token_hash)
 
@@ -597,7 +651,7 @@ async def verify_email(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"code": "INVALID_VERIFICATION_TOKEN", "message": "Verification link has expired or is invalid."},
             )
-        return RedirectResponse(url=f"{APP_URL}/verify-email?token_error=invalid_or_expired")
+        return RedirectResponse(url=f"{frontend_url}/verify-email?token_error=invalid_or_expired")
 
     target_user.isVerified = True
     target_user.verificationTokenHash = None
@@ -607,7 +661,7 @@ async def verify_email(
     if is_json:
         return {"verified": True, "message": "Email address verified successfully."}
 
-    return RedirectResponse(url=f"{APP_URL}/learn?email_verified=true")
+    return RedirectResponse(url=f"{frontend_url}/learn?email_verified=true")
 
 
 @router.post("/resend-verification")
@@ -653,10 +707,12 @@ async def resend_verification(
     user.verificationExpiresAt = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + 86400))
     await repo.create_or_update_user(user)
 
+    frontend_url = get_frontend_url(request)
     await email_service.send_verification_email(
         to_email=user.email,
         token=raw_verify_token,
         user_name=user.displayName,
+        app_url=frontend_url,
     )
 
     return {"message": f"Verification email dispatched to {user.email}."}
@@ -665,7 +721,10 @@ async def resend_verification(
 # --- GitHub OAuth 2.0 Endpoints ---
 
 @router.get("/github/login")
-async def github_login(request: Request):
+async def github_login(
+    request: Request,
+    origin: Optional[str] = Query(None),
+):
     """Initiate GitHub OAuth 2.0 authorization."""
     client_ip = get_client_ip(request)
     if await rate_limiter.is_rate_limited(f"gh_login:{client_ip}", max_requests=10, window_seconds=60):
@@ -673,7 +732,9 @@ async def github_login(request: Request):
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail={"code": "RATE_LIMIT_EXCEEDED", "message": "Too many requests. Please wait a minute."},
         )
-    auth_url = github_oauth_service.get_authorization_url()
+    frontend_url = origin or get_frontend_url(request)
+    state = encode_oauth_state(frontend_url)
+    auth_url = github_oauth_service.get_authorization_url(state=state)
     return RedirectResponse(url=auth_url)
 
 
@@ -692,11 +753,12 @@ async def github_callback(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail={"code": "RATE_LIMIT_EXCEEDED", "message": "Too many requests. Please wait a minute."},
         )
+    target_origin = (decode_oauth_state(state) or get_frontend_url(request)).rstrip("/")
     try:
         gh_user = await github_oauth_service.exchange_code_for_user(code)
     except Exception as exc:
         logger.error("GitHub OAuth exchange failed: %s", exc)
-        return RedirectResponse(url=f"{APP_URL}/login?oauth_error=exchange_failed")
+        return RedirectResponse(url=f"{target_origin}/login?oauth_error=exchange_failed")
 
     # 1. Find user by githubId or email
     user = await repo.get_user_by_github_id(gh_user["githubId"])
@@ -763,7 +825,7 @@ async def github_callback(
     )
     await repo.create_refresh_token(refresh_record)
 
-    redir = RedirectResponse(url=f"{APP_URL}/learn", status_code=status.HTTP_302_FOUND)
+    redir = RedirectResponse(url=f"{target_origin}/learn?oauth_token={access_token}", status_code=status.HTTP_302_FOUND)
     set_auth_cookies(redir, access_token=access_token, refresh_token=raw_refresh)
     return redir
 
@@ -870,7 +932,12 @@ async def mfa_verify(
         )
         await repo.create_refresh_token(refresh_record)
         set_auth_cookies(response, access_token=access_token, refresh_token=raw_refresh)
-        return {"user": user.to_public_dict(), "message": "2FA verification successful."}
+        return {
+            "user": user.to_public_dict(),
+            "accessToken": access_token,
+            "refreshToken": raw_refresh,
+            "message": "2FA verification successful.",
+        }
 
     # Case B: confirming setup for already logged-in user
     current_user_token = get_current_user_token(request)

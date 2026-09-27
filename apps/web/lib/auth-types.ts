@@ -35,6 +35,8 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   user?: AuthUser;
+  accessToken?: string;
+  refreshToken?: string;
   message?: string;
   mfaRequired?: boolean;
   mfaSessionToken?: string;

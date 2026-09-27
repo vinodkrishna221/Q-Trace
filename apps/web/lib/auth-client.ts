@@ -15,6 +15,72 @@ import {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
+const TOKEN_KEY = 'qtrace_access_token';
+const USER_KEY = 'qtrace_user';
+
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredToken(token: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  } catch {
+    // Ignore localStorage restrictions
+  }
+}
+
+export function getStoredUser(): AuthUser | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredUser(user: AuthUser | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(USER_KEY);
+    }
+  } catch {
+    // Ignore localStorage restrictions
+  }
+}
+
+export function handleOAuthCallbackToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const url = new URL(window.location.href);
+    const oauthToken = url.searchParams.get('oauth_token');
+    if (oauthToken) {
+      setStoredToken(oauthToken);
+      url.searchParams.delete('oauth_token');
+      const cleanUrl = url.pathname + (url.search ? url.search : '') + (url.hash ? url.hash : '');
+      window.history.replaceState({}, document.title, cleanUrl);
+      return oauthToken;
+    }
+  } catch {
+    // Ignore URL parse errors
+  }
+  return null;
+}
+
 function getCsrfTokenFromCookie(): string | null {
   if (typeof document === 'undefined') return null;
   const match = document.cookie.match(/(?:^|;\s*)qtrace_csrf=([^;]*)/);
@@ -26,6 +92,11 @@ async function authFetch<T>(path: string, options: RequestInit = {}): Promise<T>
   headers.set('Accept', 'application/json');
   if (options.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  const token = getStoredToken();
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
 
   const csrfToken = getCsrfTokenFromCookie();
@@ -76,26 +147,41 @@ export const DEMO_FALLBACK_USER: AuthUser = {
 };
 
 export const authClient = {
+  getStoredUser,
+  setStoredUser,
+  getStoredToken,
+  setStoredToken,
+  handleOAuthCallbackToken,
+
   async signup(payload: SignupRequest): Promise<AuthResponse> {
     try {
-      return await authFetch<AuthResponse>('/v1/auth/signup', {
+      const res = await authFetch<AuthResponse>('/v1/auth/signup', {
         method: 'POST',
         body: JSON.stringify(payload),
       });
+      if (res.accessToken) {
+        setStoredToken(res.accessToken);
+      }
+      if (res.user) {
+        setStoredUser(res.user);
+      }
+      return res;
     } catch (err) {
       if ((err as any).status) throw err;
       // Offline fallback: simulate local registration
+      const fallbackUser: AuthUser = {
+        id: `usr_demo_${Date.now().toString(36)}`,
+        email: payload.email,
+        username: payload.username,
+        displayName: payload.displayName,
+        accountType: 'INDIVIDUAL',
+        personaTag: payload.personaTag,
+        isVerified: false,
+        learnerProfileId: 'lp_aarav',
+      };
+      setStoredUser(fallbackUser);
       return {
-        user: {
-          id: `usr_demo_${Date.now().toString(36)}`,
-          email: payload.email,
-          username: payload.username,
-          displayName: payload.displayName,
-          accountType: 'INDIVIDUAL',
-          personaTag: payload.personaTag,
-          isVerified: false,
-          learnerProfileId: 'lp_aarav',
-        },
+        user: fallbackUser,
         message: 'Account created (Demo offline mode). Soft verification banner active.',
       };
     }
@@ -103,10 +189,17 @@ export const authClient = {
 
   async login(payload: LoginRequest): Promise<AuthResponse> {
     try {
-      return await authFetch<AuthResponse>('/v1/auth/login', {
+      const res = await authFetch<AuthResponse>('/v1/auth/login', {
         method: 'POST',
         body: JSON.stringify(payload),
       });
+      if (res.accessToken) {
+        setStoredToken(res.accessToken);
+      }
+      if (res.user) {
+        setStoredUser(res.user);
+      }
+      return res;
     } catch (err) {
       if ((err as any).status) throw err;
       // Offline fallback: allow local test accounts
@@ -115,6 +208,7 @@ export const authClient = {
         payload.identifier.includes('student') ||
         payload.identifier === 'demo'
       ) {
+        setStoredUser(DEMO_FALLBACK_USER);
         return {
           user: DEMO_FALLBACK_USER,
           mfaRequired: false,
@@ -126,16 +220,27 @@ export const authClient = {
   },
 
   async verifyMfa(payload: MfaVerifyRequest): Promise<AuthResponse> {
-    return await authFetch<AuthResponse>('/v1/auth/mfa/verify', {
+    const res = await authFetch<AuthResponse>('/v1/auth/mfa/verify', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+    if (res.accessToken) {
+      setStoredToken(res.accessToken);
+    }
+    if (res.user) {
+      setStoredUser(res.user);
+    }
+    return res;
   },
 
   async getMe(): Promise<AuthUser | null> {
     try {
       const data = await authFetch<{ user: AuthUser }>('/v1/auth/me');
-      return data.user;
+      if (data?.user) {
+        setStoredUser(data.user);
+        return data.user;
+      }
+      return null;
     } catch {
       return null;
     }
@@ -146,11 +251,19 @@ export const authClient = {
       await authFetch('/v1/auth/logout', { method: 'POST' });
     } catch {
       // Ignore network errors on logout
+    } finally {
+      setStoredToken(null);
+      setStoredUser(null);
     }
   },
 
   async logoutAll(): Promise<void> {
-    await authFetch('/v1/auth/logout-all', { method: 'POST' });
+    try {
+      await authFetch('/v1/auth/logout-all', { method: 'POST' });
+    } finally {
+      setStoredToken(null);
+      setStoredUser(null);
+    }
   },
 
   async forgotPassword(email: string): Promise<{ message: string }> {

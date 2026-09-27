@@ -67,10 +67,19 @@ app = FastAPI(
 # CORS — must be first middleware (SIH demo: localhost + deployed frontend)
 # ---------------------------------------------------------------------------
 
-web_origin = os.getenv("WEB_ORIGIN", "http://localhost:3000")
+web_origin_env = os.getenv("WEB_ORIGIN", "http://localhost:3000")
+app_url_env = os.getenv("APP_URL", "").strip()
+allowed_origins = [o.strip() for o in web_origin_env.split(",") if o.strip()]
+if app_url_env and app_url_env not in allowed_origins:
+    allowed_origins.append(app_url_env)
+for dev_host in ("http://localhost:3000", "http://127.0.0.1:3000"):
+    if dev_host not in allowed_origins:
+        allowed_origins.append(dev_host)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[web_origin, "http://localhost:3000"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|.*\.vercel\.app|.*\.onrender\.com)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

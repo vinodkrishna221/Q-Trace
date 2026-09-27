@@ -44,3 +44,13 @@ services:
         sync: false
       - key: WEB_ORIGIN
         sync: false
+      - key: APP_URL
+        sync: false
+      - key: GITHUB_REDIRECT_URI
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: SECURE_COOKIES
+        value: "1"
+      - key: COOKIE_SAMESITE
+        value: none

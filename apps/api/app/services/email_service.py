@@ -12,7 +12,7 @@ logger = logging.getLogger("qtrace.services.email")
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
 DEMO_LOCAL = os.getenv("DEMO_LOCAL", "1") == "1"
-APP_URL = os.getenv("APP_URL", "http://localhost:3000")
+APP_URL = (os.getenv("APP_URL") or os.getenv("WEB_ORIGIN") or "http://localhost:3000").rstrip("/")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "Q-Trace <onboarding@resend.dev>")
 
 
@@ -57,9 +57,16 @@ class EmailService:
             logger.error("Failed to send transactional email to %s: %s", to_email, exc)
             return False
 
-    async def send_verification_email(self, to_email: str, token: str, user_name: str) -> bool:
+    async def send_verification_email(
+        self,
+        to_email: str,
+        token: str,
+        user_name: str,
+        app_url: Optional[str] = None,
+    ) -> bool:
         """Send 24-hr email verification link."""
-        verify_url = f"{APP_URL}/verify-email?token={token}"
+        base_url = (app_url or os.getenv("APP_URL") or os.getenv("WEB_ORIGIN") or APP_URL).rstrip("/")
+        verify_url = f"{base_url}/verify-email?token={token}"
         subject = "Verify your Q-Trace Quantum Learning Account"
         text = (
             f"Hello {user_name},\n\n"
@@ -81,9 +88,15 @@ class EmailService:
         """
         return await self._send(to_email, subject, html, text)
 
-    async def send_password_reset_email(self, to_email: str, token: str) -> bool:
+    async def send_password_reset_email(
+        self,
+        to_email: str,
+        token: str,
+        app_url: Optional[str] = None,
+    ) -> bool:
         """Send 15-min single-use password recovery email."""
-        reset_url = f"{APP_URL}/reset-password?token={token}"
+        base_url = (app_url or os.getenv("APP_URL") or os.getenv("WEB_ORIGIN") or APP_URL).rstrip("/")
+        reset_url = f"{base_url}/reset-password?token={token}"
         subject = "Reset your Q-Trace Password"
         text = (
             f"Hello,\n\n"

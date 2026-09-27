@@ -25,20 +25,34 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
+  user: typeof window !== 'undefined' ? authClient.getStoredUser() : null,
   isLoading: true,
   error: null,
 
   clearError: () => set({ error: null }),
-  setUser: (user) => set({ user, isLoading: false }),
+  setUser: (user) => {
+    authClient.setStoredUser(user);
+    set({ user, isLoading: false });
+  },
 
   checkSession: async () => {
+    if (typeof window !== 'undefined') {
+      authClient.handleOAuthCallbackToken();
+    }
+    const storedUser = authClient.getStoredUser();
+    if (storedUser) {
+      set({ user: storedUser });
+    }
     set({ isLoading: true });
     try {
       const user = await authClient.getMe();
-      set({ user, isLoading: false, error: null });
+      if (user) {
+        set({ user, isLoading: false, error: null });
+      } else {
+        set({ user: null, isLoading: false });
+      }
     } catch {
-      set({ user: null, isLoading: false });
+      set({ user: storedUser || null, isLoading: false });
     }
   },
 

@@ -18,6 +18,7 @@ CSRF_HEADER_NAME = "X-CSRF-Token"
 
 IS_PRODUCTION = os.getenv("ENVIRONMENT", "development").lower() == "production"
 SECURE_COOKIES = os.getenv("SECURE_COOKIES", "0" if not IS_PRODUCTION else "1") == "1"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "none" if (SECURE_COOKIES or IS_PRODUCTION) else "lax")
 
 
 def generate_csrf_token() -> str:
@@ -31,15 +32,21 @@ def set_auth_cookies(
     refresh_token: Optional[str] = None,
     csrf_token: Optional[str] = None,
 ) -> None:
-    """Set HttpOnly, Secure, SameSite=Lax authentication cookies."""
+    """Set HttpOnly, Secure authentication cookies.
+    When SECURE_COOKIES or IS_PRODUCTION is true, SameSite=None + Secure is enforced
+    to enable cross-origin authenticated fetch from decoupled frontends.
+    """
+    use_secure = SECURE_COOKIES or (COOKIE_SAMESITE == "none")
+    samesite_policy = COOKIE_SAMESITE
+
     # 1. Access Token Cookie: 15 min (900 seconds)
     response.set_cookie(
         key=ACCESS_COOKIE_NAME,
         value=access_token,
         max_age=900,
         httponly=True,
-        secure=SECURE_COOKIES,
-        samesite="lax",
+        secure=use_secure,
+        samesite=samesite_policy,
         path="/",
     )
 
@@ -50,8 +57,8 @@ def set_auth_cookies(
             value=refresh_token,
             max_age=604800,
             httponly=True,
-            secure=SECURE_COOKIES,
-            samesite="lax",
+            secure=use_secure,
+            samesite=samesite_policy,
             path="/v1/auth",
         )
 
@@ -62,8 +69,8 @@ def set_auth_cookies(
         value=token_csrf,
         max_age=604800,
         httponly=False,
-        secure=SECURE_COOKIES,
-        samesite="lax",
+        secure=use_secure,
+        samesite=samesite_policy,
         path="/",
     )
 
