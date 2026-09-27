@@ -156,6 +156,7 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 - [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
 - [x] DATA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` → 16 passed in 1.50s.
 - [x] DUO-3 complete — pnpm test:web tests/unit/chamber-node.test.tsx — 18 passed in 0.35s.
+- [x] DUO-4 complete — pnpm test:web tests/unit/node-popover.test.tsx — 17 passed in 0.39s.
 
 ---
 
@@ -177,7 +178,7 @@ DELIVERABLE: Create `apps/web/features/learning/components/node-popover.tsx` wit
 TEST: `pnpm test:web tests/unit/node-popover.test.tsx` verifying popover renders with correct anchoring beak direction (above/below node based on viewport position), click-outside dismissal, Esc key dismissal, stage number/title/XP reward render correctly, and `▶ START` CTA is keyboard-operable.
 DEPENDS: DUO-3          UNBLOCKS: DUO-11
 DEMO: Clicking the active Hadamard node on the path sprouts a floating speech-bubble card directly above the node with "Stage 03 · Foundation · The Hadamard Gate · +50⚡ · ★★☆ · ▶ START" — dismissing on Esc or click-outside.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-4-anchored-node-popover`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
