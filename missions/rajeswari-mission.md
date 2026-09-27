@@ -38,6 +38,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | AI-6 | `feat/ai-pedagogy/ai-6-prove-cloud-and-fallback-parity` | card TEST + fresh Warden verdict + contract check |
 | AI-7 | `feat/ai-pedagogy/ai-7-recommend-the-next-module-from` | card TEST + fresh Warden verdict + contract check |
 | AI-8 | `feat/ai-pedagogy/ai-8-polish-anti-copy-guidance-and` | card TEST + fresh Warden verdict + contract check |
+| DUO-7 | `feat/duolingo-curriculum/duo-7-foundations-units-1-3` | card TEST + fresh Warden verdict + contract check |
+| DUO-8 | `feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/ai-pedagogy-phase-plan.md`
 
@@ -153,3 +155,28 @@ Explain the first-divergence logic, closed misconception taxonomy, why AI cannot
 - [ ] I, **Rajeswari**, accept this mission, the 18h card load, file boundary, first branch and shared pitch beat.
 - [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+
+---
+
+## Duolingo Curriculum Phase Cards
+
+### DUO-7 · Curriculum Registry & Stage Data Engine for Units 1.1 to 1.3 [timebox: 4h]
+CONTEXT: Per `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3 (Deep-Dive Lesson Breakdown), Units 1.1 through 1.3 define 9 stages covering: "What is Quantum?" (Stage 1.1.1 `mod1_transistor_limits` — Moore's Law, 1.1.2 `mod1_wave_particle` — double-slit, 1.1.3 `mod1_discrete_quanta` — energy quantization), "Bit vs Qubit" (1.2.1 `mod1_bit_vs_qubit` — spinning coin, 1.2.2 `mod1_braket_notation` — Dirac notation, 1.2.3 `mod1_amplitudes_normalization` — normalization), and "Superposition & Collapse" (1.3.1 `mod1_superposition_truth` — busting the myth, 1.3.2 `mod1_measurement_collapse` — polarized sunglasses lab, 1.3.3 `mod1_born_rule` — squaring amplitudes). Each stage has the 5-beat structure (analogy, concept, prediction checkpoint, simulation evidence, flight recorder). Stage data must conform to `board/contracts/learning-content.md` (`ModuleDetail`, `LearnerProfile`, `LearningPath` types).
+DELIVERABLE: Create `apps/web/lib/curriculum/units-1-to-3.ts` implementing a typed `CurriculumStage[]` array for all 9 stages across Units 1.1–1.3, each with: `id`, `lessonId`, `unitId`, `archetype` (NODE_CONCEPT | NODE_PREDICTION | NODE_GATE_LAB), `title`, `estimatedMinutes`, `coherenceReward`, `analogyHook`, `conceptSummary`, `predictionCheckpoint` (options array with correct flag), and `misconceptionHandled`.
+TEST: `pnpm test:web tests/unit/curriculum-units-1-to-3.test.ts` validating all 9 stages are present, `|α|² + |β|² = 1` normalization checkpoint options parse correctly, prediction checkpoint correct flags are mutually exclusive (exactly one correct per stage), and all stage IDs match the lessonId slugs from the curriculum spec.
+DEPENDS: —          UNBLOCKS: DUO-8, DUO-11
+DEMO: The `/learn` path populates Units 1.1–1.3 with real pedagogical content — the "Why Quantum?" transistor stage, the spinning coin bit/qubit analogy, and the polarized sunglasses measurement collapse lab — as learnable ChamberNodes.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/duolingo-curriculum/duo-7-foundations-units-1-3`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-8 · Single-Qubit Gate Chambers & QRNG Boss Milestone (Units 1.4 to 1.5) [timebox: 4h]
+CONTEXT: Per `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3, Units 1.4 (Bloch Sphere — 3 stages: `mod1_bloch_sphere_intro`, `mod1_bloch_coordinates`, `mod1_bloch_sandbox`) and 1.5 (Single-Qubit Gates — 7 stages: `mod1_gate_x`, `superposition`, `mod1_gate_h_reversibility`, `mod1_gate_z`, `mod1_gate_y`, `mod1_phase_gates_s_t`, `mod1_boss_qrng`) covering 10 total stages. Stage 1.5.2 `superposition` maps to existing route `/learn/superposition`. Stage 1.5.7 `mod1_boss_qrng` is a `NODE_MILESTONE` archetype (Boss) requiring: circuit on Qiskit Aer with 1024 shots, all 4 outcomes in [20%, 30%] tolerance, zero CNOT. Gate truth tables: X matrix [[0,1],[1,0]], H matrix [[1,1],[1,-1]]/√2, Z matrix [[1,0],[0,-1]], S matrix [[1,0],[0,i]], T matrix [[1,0],[0,e^(iπ/4)]]. H·H = I reversibility prediction checkpoint and Z phase invisibility to direct measurement.
+DELIVERABLE: Create `apps/web/lib/curriculum/units-4-to-5.ts` implementing a typed `CurriculumStage[]` for all 10 stages in Units 1.4–1.5, including 3D Bloch sphere stage metadata (θ/φ coordinate explanations), Pauli gate matrix definitions, H reversibility prediction checkpoint with options `DETERMINISTIC_0` / `RANDOM_50_50` / `ALWAYS_1`, Z phase flip insight, S/T gate quarter/eighth-turn descriptions, and the QRNG Boss capstone with acceptance criteria (fidelity thresholds and shot counts).
+TEST: `pnpm test:web tests/unit/curriculum-units-4-to-5.test.ts` verifying all 10 stages present, `superposition` lessonId maps to existing route, QRNG boss has `NODE_MILESTONE` archetype, H reversibility checkpoint has exactly `DETERMINISTIC_0` as the correct answer, and statevector fidelity acceptance criteria (`F >= 0.99` for boss) is included in stage metadata.
+DEPENDS: DUO-7          UNBLOCKS: DUO-9, DUO-11
+DEMO: The path shows the Bloch sphere compass, Hadamard gate chamber, and Unit 1 Boss QRNG capstone — the judge can tap the QRNG boss to see the synthesis challenge requiring 2 random bits with 25% distribution.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+

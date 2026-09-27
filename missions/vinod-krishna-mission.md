@@ -39,6 +39,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | SHIP-7 | `feat/story-ship/ship-7-rehearse-twice-and-record-the` | card TEST + fresh Warden verdict + contract check |
 | SHIP-8 | `feat/story-ship/ship-8-freeze-the-final-submission-and` | card TEST + fresh Warden verdict + contract check |
 | SHIP-9 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
+| DUO-5 | `feat/duolingo-path/duo-5-coherence-shield-store` | card TEST + fresh Warden verdict + contract check |
+| DUO-6 | `feat/duolingo-path/duo-6-telemetry-hud-profile` | card TEST + fresh Warden verdict + contract check |
 
 
 ## Your cards — verbatim from `plans/story-ship-phase-plan.md`
@@ -170,3 +172,28 @@ Lead the opening problem and one-line pitch; explain architecture, feasibility a
 - [x] I, **Vinod Krishna**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
 - [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [x] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+
+---
+
+## Duolingo Path Phase Cards
+
+### DUO-5 · Coherence Shield & Joules Store with Decoherence Penalty [timebox: 4h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 2.1 (Navigation & Telemetry HUD Items 2–4), the gamification layer manages: Calibration Streak Pill (`🔥 N-Day Streak`), Coherence Joules / XP (`⚡ 850 Coherence`), and Coherence Shield / health meter (`🛡️ 100% Coherence`). Per Section 10.2, an incorrect prediction at a Prediction Checkpoint triggers a decoherence penalty (shield loss) and activates an Amber Diagnostic Detour. Shield recovery occurs by completing Flight Recorder calibration practice. Per `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3 Stage rewards (e.g. +30⚡ concept, +50⚡ gate lab, +100⚡ boss), XP is awarded on stage completion. Store must be client-side only (no API) and Zustand-based to feed DUO-6's HUD.
+DELIVERABLE: Create `apps/web/lib/gamification-store.ts` — a Zustand store with: `coherenceJoules` (XP total), `coherenceShield` (0–100%), `streakDays`, `lastActiveDate`; actions `awardXP(amount)`, `applyDecoherencePenalty(percentage)`, `restoreShield(percentage)`, `incrementStreak()`, `resetStreak()`; and persistence via `localStorage` (use Zustand `persist` middleware). Shield starts at 100%; incorrect prediction applies -20% penalty; practice restore applies +15%.
+TEST: `pnpm test:web tests/unit/gamification-store.test.ts` verifying initial state is correct (100% shield, 0 joules, 0 streak), `applyDecoherencePenalty` reduces shield by correct amount, `awardXP` increments joules correctly, shield cannot go below 0% or above 100%, and localStorage persistence round-trips correctly.
+DEPENDS: —          UNBLOCKS: DUO-6
+DEMO: After Aarav makes an incorrect Prediction Checkpoint, the `🛡️ 100%` in the top HUD drops to `🛡️ 80%` with an amber flash. Completing a calibration practice restores it. XP ticks upward after each completed stage.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-5-coherence-shield-store`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-6 · Unified Top Telemetry HUD & Account Profile Pill [timebox: 3h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 2.1 (HUD Items 1–5) and Section 3.1 (Desktop ASCII wireframe top bar), the unified learning HUD displays: Brand wordmark `Q-TRACE`, Streak Pill `🔥 4-Day Streak`, Coherence Joules `⚡ 850 Coherence`, Coherence Shield `🛡️ 100%`, and Account Profile Pill `[👤 Learner Profile ▾] [⚙]`. Mobile shows a compact version per Section 4.1 ASCII wireframe. All values read reactively from the `gamification-store` created in DUO-5. Design tokens from `docs/DESIGN-SYSTEM.md` — no neon, hairline borders, Inter typography. The HUD is sticky at the top of the `/learn` route.
+DELIVERABLE: Create `apps/web/features/learning/components/learning-hud.tsx` — a sticky header component that reactively subscribes to `gamification-store` and renders: brand wordmark, streak pill (with freeze-shield tooltip), coherence energy counter (flashes on XP award), shield gauge (amber flash on decoherence hit), and learner profile dropdown menu with avatar, calibration telemetry summary, streak status, settings link, and sign-out. Mobile: compact icon + number layout per Section 4.1.
+TEST: `pnpm test:web tests/unit/learning-hud.test.tsx` verifying HUD renders all 5 items from store state, shield display changes color/class when below 50%, streak pill renders correct day count, profile dropdown opens and closes, and HUD is aria-labeled for accessibility.
+DEPENDS: DUO-5          UNBLOCKS: DUO-11
+DEMO: The top bar of `/learn` shows live `🔥 4`, `⚡ 850`, `🛡️ 80%` values that update in real-time as the judge completes stages and makes predictions — the shield visibly drops to amber tint after a wrong answer.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-6-telemetry-hud-profile`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+

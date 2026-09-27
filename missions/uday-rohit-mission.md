@@ -39,6 +39,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | SIM-7 | `feat/simulation-api/sim-7-swap-routes-to-the-production` | card TEST + fresh Warden verdict + contract check |
 | SIM-8 | `feat/simulation-api/sim-8-harden-timeouts-flags-and-deployed` | card TEST + fresh Warden verdict + contract check |
 | SIM-9 | `feat/simulation-api/sim-9-tune-the-supported-runtime-and` | card TEST + fresh Warden verdict + contract check |
+| DUO-1 | `feat/duolingo-path/duo-1-serpentine-canvas-spline` | card TEST + fresh Warden verdict + contract check |
+| DUO-2 | `feat/duolingo-path/duo-2-unit-banners-guidebook` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/simulation-api-phase-plan.md`
 
@@ -165,3 +167,28 @@ Explain the Circuit Model, why submitted Python is never executed, Qiskit numeri
 - [ ] I, **Uday Rohit**, accept this mission, the 20h card load, file boundary, first branch and shared pitch beat.
 - [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+
+---
+
+## Duolingo Path Phase Cards
+
+### DUO-1 · Sinusoidal Serpentine Path Canvas & SVG Bus Spline [timebox: 4h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 3 (Desktop Architecture) and Section 7.2 (Path Voltage Animation), the `/learn` route requires a responsive SVG serpentine canvas connecting ChamberNodes via a dual-rail coherence bus spline. Node x-coordinates swing sinusoidally: ±120px desktop (≥1024px), ±96px tablet, ±68px landscape, ±42px mobile (<640px) as specified in Section 9 (Breakpoints). The bus uses animated `stroke-dashoffset` for the voltage stream and `--border-subtle` for locked segments.
+DELIVERABLE: Create `apps/web/features/learning/components/serpentine-path.tsx` — a purely computational SVG canvas component that accepts a list of node positions and outputs bezier/sinusoidal coordinate math for dual-rail bus paths with animated `stroke-dashoffset` coherence-flow stream. No node rendering — path geometry only.
+TEST: `pnpm test:web tests/unit/serpentine-path.test.ts` verifying SVG path coordinate calculations produce correct x-offsets at 390px and 1440px viewport widths, dual-rail path generation, and stroke-dashoffset animation class presence.
+DEPENDS: —          UNBLOCKS: DUO-2, DUO-11
+DEMO: The winding quantum coherence bus spine appears on `/learn`, connecting all ChamberNodes in a sinusoidal serpentine pattern with animated voltage pulses flowing along the completed path segments.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-1-serpentine-canvas-spline`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-2 · Path Section Banners & Unit Guidebook Cheatsheet Modal [timebox: 3h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 2.2 (Curriculum Structure Items 6–8) and `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3 (Module 1 Units), each unit requires a full-width Unit Section Banner with subtitle, progress count, accent rail, a `[Guidebook 📖]` button, and a milled progress fill bar. The Guidebook slide-over modal contains high-yield gate truth tables (X, H, Z, S, T), Dirac formulas, and Bloch sphere summaries from the curriculum spec.
+DELIVERABLE: Create `apps/web/features/learning/components/unit-section-banner.tsx` (unit title, subtitle, `X/Y Completed` count, progress fill bar, Guidebook button) and `apps/web/features/learning/components/unit-guidebook-modal.tsx` (slide-over drawer with gate truth tables, Dirac notation formulas, and Born rule summary using design tokens from `docs/DESIGN-SYSTEM.md`).
+TEST: `pnpm test:web tests/unit/unit-section-banner.test.tsx` verifying banner renders unit title and progress, Guidebook button triggers modal open, modal renders gate truth tables and Dirac formulas, and Esc key / click-outside closes the modal.
+DEPENDS: DUO-1          UNBLOCKS: DUO-11
+DEMO: Judge sees a full-width "UNIT 1: THE QUANTUM COMPASS" banner with a `[Guidebook 📖]` button; clicking it opens a slide-over drawer with all single-qubit gate matrices, truth tables, and Dirac bra-ket formulas from the curriculum spec.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-2-unit-banners-guidebook`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+

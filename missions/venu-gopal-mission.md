@@ -42,6 +42,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | UX-10 | `feat/learning-ux/learn-page-stepper-and-sidebar` | card TEST + fresh Warden verdict + contract check |
 | UX-11 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
 | UX-12 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
+| DUO-9 | `feat/duolingo-curriculum/duo-9-cnot-bell-correlation` | card TEST + fresh Warden verdict + contract check |
+| DUO-10 | `feat/duolingo-curriculum/duo-10-teleportation-capstone` | card TEST + fresh Warden verdict + contract check |
 
 
 ## Your cards — verbatim from `plans/learning-ux-phase-plan.md`
@@ -204,3 +206,28 @@ Operate the live demo; narrate Aarav/Meera entry, Prediction Checkpoint, Circuit
 - [x] I, **Venu Gopal**, accept this mission, the 20h card load, file boundary, first branch and shared pitch beat.
 - [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [x] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+
+---
+
+## Duolingo Curriculum Phase Cards
+
+### DUO-9 · Multi-Qubit, CNOT & Bell Correlation Stages (Units 1.6 to 1.7) [timebox: 4h]
+CONTEXT: Per `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3, Units 1.6 (Multi-Qubit — 3 stages: `mod1_multi_qubit_register` tensor product 2^n explosion, `mod1_gate_cnot` controlled-NOT truth table |00⟩→|00⟩|10⟩→|11⟩, `mod1_gates_cz_swap` CZ and SWAP) and 1.7 (Entanglement — 4 stages: `bell-state` Hero Lab synthesis |Φ⁺⟩, `mod1_entanglement_correlation` Classical Independence Trap prediction checkpoint, `mod1_subsystem_purity` reduced density matrix Tr(ρ²)=0.50, `mod1_flight_recorder_repair` Socratic Repair Challenge). 7 stages total. The `bell-state` lessonId maps to existing route `/learn/bell-state`. The Classical Independence Trap prediction checkpoint has options `CORRELATED_00_11` (correct), `INDEPENDENT_RANDOM` (the common misconception), `ZERO_PERCENT`. All data must conform to `board/contracts/learning-content.md`.
+DELIVERABLE: Create `apps/web/lib/curriculum/units-6-to-7.ts` implementing a typed `CurriculumStage[]` for all 7 stages in Units 1.6–1.7, including tensor product explanation metadata (1 qubit=2 amplitudes, 2=4, N=2^N), CNOT truth table as stage data, Bell state synthesis recipe (H on q0, CNOT q0→q1, result |Φ⁺⟩=(|00⟩+|11⟩)/√2), Classical Independence Trap prediction checkpoint with correct=`CORRELATED_00_11`, subsystem purity value (Tr(ρ²)=0.50), and Socratic Repair Challenge metadata (|Φ⁺⟩→|Ψ⁺⟩ via X gate on q1).
+TEST: `pnpm test:web tests/unit/curriculum-units-6-to-7.test.ts` verifying all 7 stages present, `bell-state` lessonId maps to canonical route, Bell correlation prediction has exactly one correct option (`CORRELATED_00_11`), `INDEPENDENT_RANDOM` is present as a distractor, purity value for entangled subsystem is 0.50, and NODE_DEBUG archetype is assigned to the flight recorder stage.
+DEPENDS: DUO-8          UNBLOCKS: DUO-10, DUO-11
+DEMO: The path shows the Bell State Hero Lab node — judge clicks it to see the synthesis recipe (H + CNOT → |Φ⁺⟩), then taps the Classical Independence Trap prediction node to face the 100% correlation vs 50% random misconception checkpoint.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/duolingo-curriculum/duo-9-cnot-bell-correlation`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-10 · Quantum Telemetry, Kickback & Teleportation Stages (Units 1.8 to 1.10) [timebox: 4h]
+CONTEXT: Per `docs/QUANTUM-FOUNDATIONS-CURRICULUM-SPEC.md` Section 3, Units 1.8 (Telemetry — 3 stages: `mod1_shot_noise` 1024-shot variance σ∝1/√N, `mod1_global_vs_relative_phase` phase observability, `mod1_no_cloning` Wootters & Zurek 1982), 1.9 (Pre-Algorithms — 4 stages: `mod1_quantum_interference` constructive/destructive, `mod1_phase_kickback` eigenvalue kickback trapdoor, `mod1_teleportation` 3-qubit protocol Alice→Bob, `mod1_superdense_coding` 2 classical bits via 1 qubit), and 1.10 (Capstone — 2 stages: `mod1_capstone_exam` NODE_MILESTONE Boss 3-qubit teleportation fidelity F≥0.99, `mod1_algorithm_bridge` concept handoff). 9 stages total. The capstone requires 3-qubit circuit definition: arbitrary state q0, Bell pair (q1,q2), CNOT+H measurement, classical correction via X/Z. Contract compatibility with `board/contracts/learning-content.md`.
+DELIVERABLE: Create `apps/web/lib/curriculum/units-8-to-10.ts` implementing a typed `CurriculumStage[]` for all 9 stages, including shot-noise variance formula metadata (σ∝1/√N for 10/100/1024 shots), global vs relative phase distinction, no-cloning theorem statement, phase kickback mechanism (control qubit absorbs eigenvalue), full teleportation protocol 6-step recipe (share Bell pair, CNOT+H, measure 2 bits, classical transmit, conditional X+Z), and the Module 1 Capstone Boss acceptance criteria (F≥0.99 on Qiskit Aer, 3-qubit circuit).
+TEST: `pnpm test:web tests/unit/curriculum-units-8-to-10.test.ts` verifying all 9 stages present, capstone `mod1_capstone_exam` has NODE_MILESTONE archetype, teleportation protocol has 6 steps in stage metadata, shot noise stage includes 3 distinct shot-count configurations (10, 100, 1024), Module 1 Capstone fidelity threshold (0.99) is in acceptance criteria, and the bridge stage `mod1_algorithm_bridge` has NODE_CONCEPT archetype.
+DEPENDS: DUO-9          UNBLOCKS: DUO-11
+DEMO: The `/learn` path shows the complete Module 1 journey culminating in a glowing "Module 1 Capstone" boss node — judge can inspect the 3-qubit teleportation protocol: share entangled pair, measure Alice's qubits, apply classical corrections on Bob's qubit.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/duolingo-curriculum/duo-10-teleportation-capstone`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+

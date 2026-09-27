@@ -38,6 +38,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | QA-6 | `feat/fixtures-qa/qa-6-automate-the-learner-led-playwright` | card TEST + fresh Warden verdict + contract check |
 | QA-7 | `feat/fixtures-qa/qa-7-run-offline-live-deploy-and` | card TEST + fresh Warden verdict + contract check |
 | QA-8 | `feat/fixtures-qa/qa-8-certify-projector-demo-and-backup` | card TEST + fresh Warden verdict + contract check |
+| DUO-11 | `feat/duolingo-ui/duo-11-desktop-assembly-inspector` | card TEST + fresh Warden verdict + contract check |
+| DUO-12 | `feat/duolingo-ui/duo-12-mobile-sheet-acceptance` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/fixtures-qa-phase-plan.md`
 
@@ -165,3 +167,28 @@ Explain the real HTTP smoke path, malicious-code rejection, cross-backend tolera
 - [ ] I, **Sohail**, accept this mission, the 16h card load, file boundary, first branch and shared pitch beat.
 - [ ] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [ ] I posted `ACCEPTED — <mission> — starting <card> — <branch>` in Discord.
+
+---
+
+## Duolingo UI Phase Cards
+
+### DUO-11 · Desktop Master-Detail Assembly & Right Stage Inspector Drawer [timebox: 5h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 3 (Desktop Primary Architecture) and Section 3.1 (ASCII Wireframe), the `/learn` desktop layout requires a 3-zone `max-w-7xl` grid: Left Rail Col-3 (Daily Calibration Quests Card + Cohort Benchmark Card + Observer Tip), Center Col-6 (Serpentine Canvas from DUO-1 + Unit Banners from DUO-2 + ChamberNodes from DUO-3 + Popovers from DUO-4 + Telemetry HUD from DUO-6), Right Col-3 (Stage Inspector Drawer showing deep stage telemetry: difficulty, estimated time, XP reward, shield restore, key concepts, prediction checkpoint, Qiskit preview, prerequisite status). Stage selection via node click updates the Right Inspector without page reload per Section 2.4 (item 19). Design tokens from `docs/DESIGN-SYSTEM.md`; hairline borders, no neon shadows, `--bg-canvas: #faf6f0` background.
+DELIVERABLE: Create `apps/web/app/learn/page.tsx` (or update existing) assembling the complete 3-zone desktop layout on `/learn`: Left Rail with daily quests and cohort leaderboard cards (hardcoded fixtures), Center serpentine canvas using DUO-1/2/3/4/6 components, Right Stage Inspector panel that reactively renders the selected stage's full telemetry when a node is clicked. Stage selection state managed via Zustand or React context. Preserves `data-testid="learning-guided-prompt"` and `data-testid="learn-sidebar"` for existing acceptance test compatibility per Section 11.
+TEST: `pnpm test:web tests/integration/learn-desktop-assembly.test.tsx` verifying 3-column grid renders on viewport ≥1024px, clicking a ChamberNode updates the Right Inspector stage data without navigation, Left Rail quests card renders daily goals, and existing `data-testid` attributes are preserved.
+DEPENDS: DUO-1, DUO-3, DUO-6, DUO-7          UNBLOCKS: DUO-12
+DEMO: The complete `/learn` desktop experience — judge sees the winding serpentine path with unit banners, clicks a ChamberNode, the Right Inspector animates open with the stage's Qiskit preview and prediction checkpoint, while the top HUD tracks live XP and streak.
+PERSONA: Warden           STATUS: [ ] ready
+BRANCH: `feat/duolingo-ui/duo-11-desktop-assembly-inspector`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-12 · Mobile Sinusoidal Arc, Spring Bottom Sheet & Full Test Suite [timebox: 5h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 4 (Mobile Architecture) and Section 4.1 (Mobile ASCII Wireframe, 390px viewport), mobile layout requires: Sticky Top HUD (h-12, compact icon+number layout from DUO-6), single-column sinusoidal path (x ∈ [-44px, +44px] swing, 52px node diameter), In-Situ Anchored Popover on active node tap (from DUO-4), and Swipe-Up Spring Bottom Sheet Modal (75vh, drag handle pill, stage telemetry, `▶ ENTER CHAMBER` 48px thumb CTA, Prediction Checkpoint radio options). Section 2.4 item 20 specifies spring-animated bottom sheet for deep inspection on mobile. Section 2.4 item 21 specifies fixed 4-tab bottom navigation bar (`Learn`, `Practice`, `Quests`, `Profile`). Post-implementation: run full regression `pnpm test:web` and confirm all 195+ existing tests remain green.
+DELIVERABLE: Implement the responsive mobile layout adaptations on `/learn`: (1) sticky compact HUD at h-12 with icon+number layout below 640px, (2) single-column path with ±44px sinusoidal swing on mobile viewport, (3) spring-animated bottom sheet component at `apps/web/features/learning/components/stage-bottom-sheet.tsx` with 75vh height, drag handle, full stage metadata, prediction checkpoint radio options, and 48px `▶ ENTER CHAMBER` CTA, (4) fixed bottom 4-tab navigation bar. Verify full `pnpm test:web` suite passes with no regressions.
+TEST: `pnpm test:web` — full suite must pass with 195+ tests green. Additionally: `pnpm test:web tests/acceptance/learning-visuals.test.tsx tests/acceptance/bell-live.test.tsx` verifying mobile bottom sheet opens on node tap, drag handle is accessible, `▶ ENTER CHAMBER` fires stage navigation, and existing canonical slug routes (`/learn/superposition`, `/learn/measurement`, `/learn/bell-state`) remain intact.
+DEPENDS: DUO-11          UNBLOCKS: —
+DEMO: On mobile (390px), the judge taps the active Hadamard node — the In-Situ Popover appears briefly, then a spring-animated sheet glides up from the bottom (75vh) revealing full stage details, prediction checkpoint, and the large `▶ ENTER CHAMBER` button. The bottom 4-tab bar stays fixed throughout.
+PERSONA: Warden           STATUS: [ ] ready
+BRANCH: `feat/duolingo-ui/duo-12-mobile-sheet-acceptance`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+

@@ -38,6 +38,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | DATA-6 | `feat/data-analytics/data-6-prove-repository-parity-and-deploy` | card TEST + fresh Warden verdict + contract check |
 | DATA-7 | `feat/data-analytics/data-7-harden-analytics-aggregation-and-idempotency` | card TEST + fresh Warden verdict + contract check |
 | DATA-8 | `feat/data-analytics/data-8-freeze-schema-and-polish-edge` | card TEST + fresh Warden verdict + contract check |
+| DUO-3 | `feat/duolingo-path/duo-3-chamber-node-archetypes` | card TEST + fresh Warden verdict + contract check |
+| DUO-4 | `feat/duolingo-path/duo-4-anchored-node-popover` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/data-analytics-phase-plan.md`
 
@@ -153,3 +155,28 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 - [x] I have opened the first card in a fresh agent session and confirmed its TEST command is executable from the repo.
 - [x] I posted `ACCEPTED — Learning data, progress and instructor analytics — starting DATA-1 — feat/data-analytics/data-1-define-repositories-and-the-in` in Discord.
 - [x] DATA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` → 16 passed in 1.50s.
+
+---
+
+## Duolingo Path Phase Cards
+
+### DUO-3 · Tactile ChamberNode Component & 6 Archetype Glyphs [timebox: 4h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 5 (Chamber Node Typology) and Section 5.1 (6 Chamber Archetypes), each stepping-stone node is a multi-layered scientific instrument circle supporting 6 archetypes: Concept (`NODE_CONCEPT`), Prediction (`NODE_PREDICTION`), Gate Lab (`NODE_GATE_LAB`), Flight Recorder Debug (`NODE_DEBUG`), Milestone Boss (`NODE_MILESTONE`), and Bonus Vault (`NODE_BONUS`). Each archetype maps to distinct design tokens from `docs/DESIGN-SYSTEM.md`. States: `STATE_LOCKED` (opacity 0.45, head-shake), `STATE_ACTIVE` (sonar beacon pulse, 1.06x hover), `STATE_COMPLETED` (Pine Emerald border, 100% orbital ring), `STATE_DIVERGED` (Amber border, amber sonar pip) per Section 7.1. Node has specular top bevel (`box-shadow: inset 0 1px 0 rgba(255,255,255,0.9)`), radar sonar beacon animation (1.8s pulse), and 3D mechanical press (`scale(0.94)`) on click.
+DELIVERABLE: Create `apps/web/features/learning/components/chamber-node.tsx` implementing all 6 archetypes with their glyph icons, all 4 interaction states, specular crest, radar sonar beacon CSS animation, locked head-shake animation, and keyboard accessibility (`Tab` + `Enter` to open, `Space` to launch).
+TEST: `pnpm test:web tests/unit/chamber-node.test.tsx` verifying all 6 archetypes render with correct glyph and token, all 4 states render correct opacity/border, click triggers mechanical squash class, locked state triggers head-shake, and keyboard Enter/Space interactions work.
+DEPENDS: DUO-1          UNBLOCKS: DUO-4, DUO-11
+DEMO: Six distinct ChamberNode types appear on the path — concept atom orbs, prediction compass nodes, gate lab nodes, debug stations, boss capstones with crowns, and bonus vault nodes — each responding tactilely to hover and click with the correct archetype aesthetic.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-3-chamber-node-archetypes`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### DUO-4 · In-Situ Anchored Popover with Pointing Beak [timebox: 3h]
+CONTEXT: Per `docs/LEARN-DUOLINGO-PATH-UI-SPEC.md` Section 6 (In-Situ Anchored Popover) and Section 6.1 (Popover Specifications), clicking any active node sprouts an anchored speech-bubble card 260px wide (desktop) / 240px wide (mobile), auto-height ~160px, with a 12×8px SVG triangular beak pointing to the node center. Surface uses `--bg-surface` (#ffffff), 1px `--border-strong` border, `rounded-2xl`, and shadow `0 10px 25px -5px rgba(0,0,0,0.1)`. Contents: stage number + category tag, lesson title (Inter 14px SemiBold), objective micro-copy, reward badge strip (`+XP⚡`, `🛡️ +%Shield`), star rating (★★☆), and tactile `▶ START (+XP)` CTA (h-10, full-width, `--accent`). Dismissal: click-outside, Esc key, or clicking another node. Anchors to nodes created by DUO-3.
+DELIVERABLE: Create `apps/web/features/learning/components/node-popover.tsx` with computed position anchoring to the active node's DOM bounding rect, pointing SVG beak, all 6 content fields, `▶ START` CTA triggering stage navigation, and dismissal logic (click-outside via `useEffect`, Esc key listener, keyboard accessibility per WCAG 2.1 AA).
+TEST: `pnpm test:web tests/unit/node-popover.test.tsx` verifying popover renders with correct anchoring beak direction (above/below node based on viewport position), click-outside dismissal, Esc key dismissal, stage number/title/XP reward render correctly, and `▶ START` CTA is keyboard-operable.
+DEPENDS: DUO-3          UNBLOCKS: DUO-11
+DEMO: Clicking the active Hadamard node on the path sprouts a floating speech-bubble card directly above the node with "Stage 03 · Foundation · The Hadamard Gate · +50⚡ · ★★☆ · ▶ START" — dismissing on Esc or click-outside.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/duolingo-path/duo-4-anchored-node-popover`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
