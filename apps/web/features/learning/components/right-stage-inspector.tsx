@@ -58,8 +58,9 @@ export function RightStageInspector({
   } = selectedStage;
 
   // Derive difficulty from unit/stage
+  const safeUnitNumber = unitNumber ?? 1;
   const difficulty =
-    unitNumber >= 8 ? 'Advanced' : unitNumber >= 6 ? 'Intermediate' : 'Introductory';
+    safeUnitNumber >= 8 ? 'Advanced' : safeUnitNumber >= 6 ? 'Intermediate' : 'Introductory';
 
   // Format archetype badge
   const archetypeLabel = archetype
@@ -190,7 +191,7 @@ export function RightStageInspector({
                     className="p-1.5 rounded bg-surface border border-border-subtle text-[10px] font-mono text-text-secondary flex items-center gap-1.5"
                   >
                     <span className="w-2 h-2 rounded-full border border-border-medium shrink-0" />
-                    <span className="truncate">{opt.label}</span>
+                    <span className="truncate">{'label' in opt ? opt.label : opt.text}</span>
                   </div>
                 ))}
               </div>

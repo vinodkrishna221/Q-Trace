@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Curriculum Data Types for Q-Trace Progressive Learning Path
  * Conforms to:
  * - board/contracts/learning-content.md (v1)
@@ -17,6 +17,7 @@ export type StageArchetype =
 export interface PredictionCheckpointOption {
   id: string;
   text: string;
+  label?: string;
   correct: boolean;
 }
 
@@ -31,6 +32,7 @@ export interface StagePredictionCheckpoint {
 export interface PredictionOption {
   id: string;
   label: string;
+  text?: string;
   correct: boolean;
   explanation?: string;
 }
