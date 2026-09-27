@@ -85,9 +85,9 @@ export default function LearnIndexPage() {
       data-testid="learn-catalogue-page"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
-        {/* Learner Context Metadata Bar (for acceptance tests) */}
+        {/* Learner Context Metadata Bar (hidden from visual UI; sr-only for accessibility/tests) */}
         <div
-          className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border border-border-subtle bg-surface shadow-2xs"
+          className="sr-only"
           data-testid="learner-context-bar"
         >
           <div className="flex items-center gap-3">

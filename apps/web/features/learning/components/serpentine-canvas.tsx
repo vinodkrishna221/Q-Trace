@@ -18,7 +18,6 @@ import {
   Star,
   Check,
 } from 'lucide-react';
-import { LearningHUD } from './learning-hud';
 import { UnitSectionBanner } from './unit-section-banner';
 import { CurriculumStage } from '@/lib/curriculum/types';
 import { Button } from '@/components/ui/button';
@@ -58,10 +57,7 @@ export function SerpentineCanvas({
       data-testid="serpentine-canvas"
       aria-label="Quantum Coherence Learning Path"
     >
-      {/* 1. Sticky Top HUD */}
-      <LearningHUD />
-
-      {/* 2. Guided Pedagogical Directive Prompt & Stepper (Preserves acceptance test compatibility) */}
+      {/* 1. Guided Pedagogical Directive Prompt & Stepper (Preserves acceptance test compatibility) */}
       <section
         className="rounded-2xl border border-border-subtle bg-surface p-5 shadow-xs space-y-4"
         data-testid="learning-guided-prompt"
