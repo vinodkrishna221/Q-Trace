@@ -229,7 +229,7 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
               </pre>
             </div>
           ) : (
-            <div className="relative font-mono text-xs flex">
+            <div className={`relative font-mono text-xs flex transition-all ${parseError ? 'animate-shake ring-1 ring-inset ring-red-500/50' : ''}`}>
               {/* Line Numbers */}
               <div className="w-10 bg-slate-900/50 border-r border-slate-800 text-slate-500 flex flex-col p-4 pt-[18px] text-right select-none font-mono text-[11px] leading-relaxed">
                 {localInput.split('\n').map((_, i) => (
@@ -281,14 +281,19 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
                 onClick={handleApply}
                 disabled={!isCodeModified}
                 data-testid="apply-code-btn"
-                className={`h-8 px-4 text-xs font-mono font-bold transition-all duration-300 ${
+                className={`h-8 px-4 text-xs font-mono font-bold transition-all duration-300 relative overflow-hidden group ${
                   isCodeModified 
                     ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_15px_rgba(124,58,237,0.5)] animate-pulse border-violet-400' 
-                    : 'bg-surface-raised text-text-muted opacity-60'
+                    : 'bg-surface-raised text-text-muted opacity-80'
                 }`}
               >
-                <Sparkles className={`w-3.5 h-3.5 mr-1.5 ${isCodeModified ? 'text-amber-300' : ''}`} />
-                {isCodeModified ? 'Sync to Circuit Model' : 'Code Synchronized'}
+                {!isCodeModified && (
+                  <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:animate-shimmer" />
+                )}
+                <span className="relative z-10 flex items-center">
+                  <Sparkles className={`w-3.5 h-3.5 mr-1.5 ${isCodeModified ? 'text-amber-300' : ''}`} />
+                  {isCodeModified ? 'Sync to Circuit Model' : 'Code Synchronized'}
+                </span>
               </Button>
             </div>
           </div>

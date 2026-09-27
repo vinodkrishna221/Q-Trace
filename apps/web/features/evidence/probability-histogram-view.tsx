@@ -145,7 +145,7 @@ export function ProbabilityHistogramView({
             <div className="rounded-xl border border-border-subtle bg-canvas p-4 space-y-4 font-mono">
               <div className="flex items-center justify-between border-b border-border-subtle pb-2">
                 <span className="text-xs font-bold text-ink flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-evidence" />
+                  <BarChart3 className="w-3.5 h-3.5 text-evidence animate-pulse" />
                   Sampled Measurement Histogram
                 </span>
                 <span className="text-[10px] text-ink-faint">{shots} Shots</span>
@@ -156,6 +156,10 @@ export function ProbabilityHistogramView({
                   const count = counts[basis] ?? 0;
                   const percent = shots > 0 ? ((count / shots) * 100).toFixed(1) : '0.0';
                   const isPresent = count > 0;
+                  
+                  // Use local animation state from the parent component or just a pure CSS animation
+                  // Since we can't easily hook in here without changing the top-level block, let's use CSS keyframes.
+                  // We'll calculate the target width inline and use a generic style.
 
                   return (
                     <div
@@ -173,10 +177,13 @@ export function ProbabilityHistogramView({
                       </div>
                       <div className="prob-pill-trough w-full h-4.5 bg-surface-sunken rounded-full overflow-hidden border border-border-subtle">
                         <div
-                          className={`prob-pill-bar h-full rounded-full transition-all duration-500 ${
-                            isPresent ? 'bg-[var(--evidence-success)] shadow-xs' : 'bg-line-bright'
+                          className={`prob-pill-bar h-full rounded-full transition-all duration-1000 ease-out ${
+                            isPresent ? 'bg-violet-600 shadow-xs' : 'bg-line-bright'
                           }`}
-                          style={{ width: `${Math.max(shots > 0 ? (count / shots) * 100 : 0, 0)}%` }}
+                          style={{ 
+                             width: `${Math.max(shots > 0 ? (count / shots) * 100 : 0, 0)}%`,
+                             animation: `grow-bar 1s cubic-bezier(0.16, 1, 0.3, 1) forwards` 
+                          }}
                         />
                       </div>
                     </div>

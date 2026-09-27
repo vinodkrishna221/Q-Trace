@@ -114,23 +114,24 @@ export function FlightRecorderView({
         {/* Misconception Signal or Confirmed Hypothesis Banner */}
         {isCorrect ? (
           <div
-            className="rounded-lg border border-evidence/50 bg-evidence/10 p-4 space-y-3"
+            className="rounded-lg border border-emerald-500 bg-emerald-500/10 p-4 space-y-3 shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-shadow duration-500"
             data-testid="misconception-signal-card"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-evidence/20 pb-2">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-evidence" />
-                <span className="text-xs font-bold text-evidence uppercase tracking-wider">
-                  Hypothesis Confirmed:
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+                <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider relative overflow-hidden group">
+                  <span className="relative z-10 group-hover:animate-shimmer">Hypothesis Confirmed:</span>
                 </span>
                 <span
                   data-testid="hypothesis-confirmed-badge"
-                  className="text-xs font-mono font-bold text-evidence px-2 py-0.5 rounded bg-abyss border border-evidence/40"
+                  className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-abyss border border-emerald-500/40 relative overflow-hidden"
                 >
+                  <div className="absolute inset-0 bg-white/20 -translate-x-full animate-shimmer" />
                   NO MISCONCEPTION DETECTED
                 </span>
               </div>
-              <Badge variant="outline" className="text-[10px] font-mono text-evidence border-evidence/40">
+              <Badge variant="outline" className="text-[10px] font-mono text-emerald-400 border-emerald-500/40">
                 Confidence: 100% (Deterministic Match)
               </Badge>
             </div>
@@ -138,7 +139,7 @@ export function FlightRecorderView({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
               <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
                 <span className="text-ink-faint text-[11px] block">Learner Prediction (Hypothesis):</span>
-                <span className="text-evidence font-bold flex items-center gap-1.5">
+                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
                   ✓ {misconceptionSignal.evidence?.prediction ?? 'CORRELATED_00_11'}
                 </span>
                 <span className="text-[10px] text-ink-dim block font-sans">
@@ -149,7 +150,7 @@ export function FlightRecorderView({
 
               <div className="bg-abyss p-2.5 rounded border border-line space-y-1">
                 <span className="text-ink-faint text-[11px] block">Verified Simulation Behavior:</span>
-                <span className="text-evidence font-bold flex items-center gap-1.5">
+                <span className="text-emerald-400 font-bold flex items-center gap-1.5">
                   ✓ {misconceptionSignal.evidence?.verifiedBehavior ?? 'CORRELATED_00_11'}
                 </span>
                 <span className="text-[10px] text-ink-dim block font-sans">
@@ -159,11 +160,11 @@ export function FlightRecorderView({
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-xs text-evidence pt-1">
+            <div className="flex items-center justify-between text-xs text-emerald-500 pt-1">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-evidence" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                 <span>Status:</span>
-                <strong data-testid="no-divergence-status" className="font-mono text-evidence">
+                <strong data-testid="no-divergence-status" className="font-mono text-emerald-400 animate-pulse">
                   ✓ Hypothesis Confirmed — No Misconception Detected
                 </strong>
               </span>
@@ -247,7 +248,10 @@ export function FlightRecorderView({
             </span>
           </div>
 
-          <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-2 px-1 snap-x">
+          <div className="relative flex items-center gap-3 overflow-x-auto pb-4 pt-6 px-4 snap-x">
+            {/* The Scrubber Timeline Wire */}
+            <div className="absolute top-[38px] left-8 right-8 h-[2px] bg-line z-0 pointer-events-none" />
+            
             {stateTrace.map((step) => {
               const isSelected = activeStepIndex === step.stepIndex;
               const isDivergence = !isCorrect && step.stepIndex === misconceptionSignal.firstDivergenceStep;
@@ -261,16 +265,15 @@ export function FlightRecorderView({
                   aria-current={isSelected ? 'step' : undefined}
                   aria-label={`Step ${step.stepIndex}: ${step.label}${isDivergence ? ' (First Conceptual Divergence)' : ''}`}
                   onClick={() => handleStepClick(step.stepIndex)}
-                  className={`relative min-w-[220px] p-4 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none snap-start focus-visible:ring-2 focus-visible:ring-accent ${
+                  className={`relative z-10 min-w-[220px] p-4 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none snap-start focus-visible:ring-2 focus-visible:ring-accent hover:-translate-y-0.5 ${
                     isSelected
-                      ? 'border-border-strong bg-surface-raised shadow-md'
-                      : 'border-border-subtle bg-surface text-ink-dim hover:border-border-medium hover:bg-surface-raised'
+                      ? 'border-accent bg-surface-raised shadow-[0_0_15px_rgba(124,58,237,0.15)] ring-1 ring-accent'
+                      : 'border-border-subtle bg-surface text-ink-dim hover:border-accent/40 hover:bg-surface-raised'
                   }`}
                 >
-                  {/* Active notch */}
-                  {isSelected && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-accent rounded-t-lg" />
-                  )}
+                  {/* Timeline Glowing Node */}
+                  <div className={`absolute -top-[19px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 transition-colors duration-300 ${isSelected ? 'bg-accent border-surface shadow-[0_0_10px_rgba(124,58,237,0.8)]' : 'bg-surface border-line'}`} />
+
                   {/* Divergent pip */}
                   {isDivergence && (
                     <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-[rgba(245,158,11,1)] border-2 border-surface rounded-full shadow-[0_0_0_rgba(245,158,11,0.6)] animate-[ping_2s_cubic-bezier(0,0,0.2,1)_2_forwards]" />
@@ -366,10 +369,25 @@ export function FlightRecorderView({
                         </span>
                       </div>
 
-                      <div className="text-[11px] font-mono text-ink-dim space-y-0.5">
-                        <div>Purity: <strong className={isMixed ? 'text-caution' : 'text-evidence'}>{rq.purity}</strong></div>
+                      <div className="text-[11px] font-mono text-ink-dim space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span>Purity: <strong className={isMixed ? 'text-caution' : 'text-evidence'}>{rq.purity.toFixed(3)}</strong></span>
+                          {/* Mini Purity Donut Gauge */}
+                          <div className="relative w-4 h-4 flex items-center justify-center shrink-0">
+                            <svg className="w-full h-full -rotate-90" viewBox="0 0 16 16">
+                              <circle cx="8" cy="8" r="7" className="fill-none stroke-line" strokeWidth="2" />
+                              <circle 
+                                cx="8" cy="8" r="7" 
+                                className={`fill-none transition-all duration-1000 ease-out ${isMixed ? 'stroke-caution' : 'stroke-evidence'}`} 
+                                strokeWidth="2"
+                                strokeDasharray="43.98" 
+                                strokeDashoffset={43.98 - (rq.purity * 43.98)} 
+                              />
+                            </svg>
+                          </div>
+                        </div>
                         <div className="text-[10px] text-ink-faint">
-                          Bloch vector: (x: {rq.bloch.x}, y: {rq.bloch.y}, z: {rq.bloch.z})
+                          Bloch vector: (x: {rq.bloch.x.toFixed(3)}, y: {rq.bloch.y.toFixed(3)}, z: {rq.bloch.z.toFixed(3)})
                         </div>
                       </div>
                     </div>

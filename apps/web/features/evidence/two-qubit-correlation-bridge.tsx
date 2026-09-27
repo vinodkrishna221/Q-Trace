@@ -223,24 +223,24 @@ export function TwoQubitCorrelationBridge({
                 const absVal = Math.abs(val);
                 const isSignificant = absVal > 0.05;
 
-                // Color based on sign and significance
-                let cellClass = 'bg-raised/40 text-ink-faint border-line/40';
+                // Heatmap Color based on sign and significance
+                let cellClass = 'bg-surface-sunken text-ink-faint border-transparent';
                 if (isSignificant) {
                   if (val > 0) {
-                    cellClass = 'bg-accent/15 text-accent border-accent/40 font-bold';
+                    cellClass = 'bg-violet-600/20 text-violet-400 border-violet-500/40 shadow-[inset_0_0_12px_rgba(139,92,246,0.15)] font-bold';
                   } else {
-                    cellClass = 'bg-violet/20 text-violet border-violet/40 font-bold';
+                    cellClass = 'bg-amber-500/20 text-amber-400 border-amber-500/40 shadow-[inset_0_0_12px_rgba(245,158,11,0.15)] font-bold';
                   }
                 }
 
                 return (
                   <div
-                    key={`${rIdx}-${cIdx}`}
+                    key={`${rIdx}-${cIdx}-${val.toFixed(2)}`}
                     data-testid={`pauli-cell-${rowLabel}${colLabel}`}
-                    className={`p-2 rounded border transition-colors ${cellClass}`}
+                    className={`p-2 rounded border transition-colors relative overflow-hidden animate-cell-flash ${cellClass}`}
                   >
                     <div className="text-[9px] opacity-70">⟨{rowLabel}{colLabel}⟩</div>
-                    <div className="text-xs">{val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</div>
+                    <div className="text-xs relative z-10">{val >= 0 ? `+${val.toFixed(2)}` : val.toFixed(2)}</div>
                   </div>
                 );
               })}

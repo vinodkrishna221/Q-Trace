@@ -199,7 +199,7 @@ export function QubitWiresGrid({
             <div
               key={`cnot-line-${op.opId}`}
               data-testid={`cnot-vertical-link-${op.opId}`}
-              className="absolute w-[3px] bg-violet-500 pointer-events-none z-0 shadow-[0_0_10px_rgba(139,92,246,0.8)]"
+              className="absolute w-[3px] bg-violet-500 pointer-events-none z-0 shadow-[0_0_10px_rgba(139,92,246,0.8)] overflow-hidden"
               style={{
                 top: `${minQ * 80 + 20}px`,
                 height: `${(maxQ - minQ) * 80}px`,
@@ -207,7 +207,10 @@ export function QubitWiresGrid({
                 transform: 'translateX(-50%)',
               }}
               aria-hidden="true"
-            />
+            >
+              {/* Entanglement Pulse Particle */}
+              <div className="w-[3px] h-[30px] bg-white shadow-[0_0_10px_#fff,0_0_20px_#fff] animate-particle-flow" />
+            </div>
           );
         })}
 
