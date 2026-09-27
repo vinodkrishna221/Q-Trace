@@ -166,7 +166,7 @@ DELIVERABLE: Create `apps/web/lib/curriculum/units-1-to-3.ts` implementing a typ
 TEST: `pnpm test:web tests/unit/curriculum-units-1-to-3.test.ts` validating all 9 stages are present, `|α|² + |β|² = 1` normalization checkpoint options parse correctly, prediction checkpoint correct flags are mutually exclusive (exactly one correct per stage), and all stage IDs match the lessonId slugs from the curriculum spec.
 DEPENDS: —          UNBLOCKS: DUO-8, DUO-11
 DEMO: The `/learn` path populates Units 1.1–1.3 with real pedagogical content — the "Why Quantum?" transistor stage, the spinning coin bit/qubit analogy, and the polarized sunglasses measurement collapse lab — as learnable ChamberNodes.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-7-foundations-units-1-3`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
