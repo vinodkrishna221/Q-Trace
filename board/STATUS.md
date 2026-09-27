@@ -147,4 +147,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 27 Sep 15:35 Rani: DUO-3 green — tactile ChamberNode component and 6 archetype glyphs (Concept, Prediction, Gate Lab, Debug, Milestone Boss, Bonus Vault) established in apps/web/features/learning/components/chamber-node.tsx with 4 interaction states (locked, active, completed, diverged), specular crest, radar sonar beacon, 3D mechanical press, locked head-shake animation, and WCAG keyboard accessibility; pnpm test:web tests/unit/chamber-node.test.tsx passed (18/18 tests green), full 213/213 web tests passed, Next.js build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-4, DUO-11.
 
+- 27 Sep 15:45 Rani: DUO-4 green -- in-situ anchored NodePopover with 12x8px pointing SVG beak established in apps/web/features/learning/components/node-popover.tsx with all 6 content fields (stage number, category, title, objective micro-copy, XP/shield reward badges, 3-star rating, tactile START CTA), dynamic viewport-aware placement (above/below node based on anchor rect), click-outside/Esc/button dismissal, and WCAG AA accessibility; pnpm test:web tests/unit/node-popover.test.tsx passed (17/17 tests green), full 230/230 web tests passed, Next.js build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-11.
+
 
