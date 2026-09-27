@@ -178,7 +178,7 @@ DELIVERABLE: Update `apps/web/app/(app)/learn/page.tsx` (the existing Next.js ro
 TEST: `pnpm test:web tests/integration/learn-desktop-assembly.test.tsx` verifying 3-column grid renders on viewport ≥1024px, clicking a ChamberNode updates the Right Inspector stage data without navigation, Left Rail quests card renders daily goals, and existing `data-testid` attributes are preserved.
 DEPENDS: DUO-1, DUO-2, DUO-3, DUO-4, DUO-6, DUO-7          UNBLOCKS: DUO-12
 DEMO: The complete `/learn` desktop experience — judge sees the winding serpentine path with unit banners, clicks a ChamberNode, the Right Inspector animates open with the stage's Qiskit preview and prediction checkpoint, while the top HUD tracks live XP and streak.
-PERSONA: Warden           STATUS: [ ] ready
+PERSONA: Warden           STATUS: [x] green
 BRANCH: `feat/duolingo-ui/duo-11-desktop-assembly-inspector`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
