@@ -150,3 +150,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 - 27 Sep 15:45 Rani: DUO-4 green -- in-situ anchored NodePopover with 12x8px pointing SVG beak established in apps/web/features/learning/components/node-popover.tsx with all 6 content fields (stage number, category, title, objective micro-copy, XP/shield reward badges, 3-star rating, tactile START CTA), dynamic viewport-aware placement (above/below node based on anchor rect), click-outside/Esc/button dismissal, and WCAG AA accessibility; pnpm test:web tests/unit/node-popover.test.tsx passed (17/17 tests green), full 230/230 web tests passed, Next.js build (17/17 routes) clean; PR ready for Warden review. Unblocks DUO-11.
 
 
+- 27 Sep 15:45 Vinod: DUO-5 green - Coherence Shield & Joules Store with Decoherence Penalty implemented in apps/web/lib/gamification-store.ts (Zustand store with coherenceJoules, coherenceShield 0-100%, streakDays, lastActiveDate, awardXP, applyDecoherencePenalty -20%, restoreShield +15%, streak tracking, and localStorage persistence); 16/16 unit tests green in tests/unit/gamification-store.test.ts, Next.js production build clean (17/17 routes); PR ready for Warden review. Unblocks DUO-6.
+
+
