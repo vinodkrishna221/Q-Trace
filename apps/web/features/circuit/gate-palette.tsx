@@ -45,28 +45,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
             </CardTitle>
           </div>
           <div className="flex items-center gap-1.5">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={resetToBellSeed}
-              data-testid="reset-bell-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent/40 focus-visible:ring-2 focus-visible:ring-accent"
-              title="Reset to seeded Bell State circuit (H + CNOT) or load reference template"
-            >
-              <RotateCcw className="w-3 h-3 mr-1 text-accent" />
-              Reset Bell Seed / Load Template
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={clearCircuit}
-              data-testid="clear-circuit-btn"
-              className="h-7 px-2 text-[11px] font-mono border-border-subtle text-text-secondary hover:text-danger hover:border-danger/40 focus-visible:ring-2 focus-visible:ring-accent"
-              title="Clear all gates from circuit wires"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              Clear Grid
-            </Button>
+            {/* Redundant buttons removed per user request */}
           </div>
         </div>
         <CardDescription className="text-[11px] text-text-secondary mt-1">
@@ -76,7 +55,7 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
 
       <CardContent className="p-3">
         <div
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2"
+          className="flex flex-wrap justify-center sm:justify-start gap-2"
           role="toolbar"
           aria-label="Quantum Gate Palette"
         >
@@ -97,30 +76,21 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
                 onClick={() => {
                   selectGateToPlace(isSelected ? null : gateKey);
                 }}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all duration-150 relative cursor-pointer select-none group outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-canvas ${
+                className={`group flex items-center justify-center p-2 rounded-lg border transition-all duration-150 relative cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   isSelected
-                    ? 'ring-2 ring-accent border-accent/80 bg-accent/10 shadow-xs'
-                    : 'border-border-subtle bg-surface hover:border-border-medium hover:bg-surface-raised/70 hover:shadow-xs'
+                    ? 'ring-2 ring-accent border-accent bg-accent/10 shadow-xs'
+                    : 'border-border-subtle bg-surface hover:border-border-medium hover:bg-surface-raised/70 hover:shadow-sm'
                 }`}
                 aria-pressed={isSelected}
+                title={`${def.name} gate (Shortcut: ${def.shortcutKey.toUpperCase()})`}
                 aria-label={`${def.name} gate (shortcut: ${def.shortcutKey.toUpperCase()})`}
               >
-                {/* Gate Badge Tile */}
+                {/* Compact Gate Badge Tile */}
                 <GateTile
                   gate={gateKey}
                   size="md"
-                  className="mb-2 group-hover:scale-105 group-hover:-translate-y-0.5 transition-transform"
+                  className="group-hover:scale-105 transition-transform"
                 />
-
-                {/* Gate Name & Shortcut */}
-                <span className="text-[11px] font-sans font-medium text-text-primary leading-tight">
-                  {def.name}
-                </span>
-                <span className="sr-only">{def.name.toUpperCase()}</span>
-                {def.gate === 'MEASURE' && <span className="sr-only">MEASURE</span>}
-                <span className="text-[10px] font-mono text-text-muted mt-1 flex items-center gap-1">
-                  key: <kbd className="px-1.5 py-0.5 rounded bg-surface-raised border border-border-subtle text-text-primary font-mono font-semibold text-[10px] shadow-2xs">{def.shortcutKey}</kbd>
-                </span>
 
                 {isSelected && (
                   <span

@@ -221,22 +221,28 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
         )}
 
         {/* Editor text area / display */}
-        <div className="relative bg-abyss">
+        <div className="relative bg-slate-950 border-b border-line">
           {isReadOnly ? (
-            <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed border-b border-line bg-surface">
+            <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300">
               <pre data-testid="qiskit-code-content" className="font-mono">
                 <code>{renderHighlightedQiskitCode(localInput)}</code>
               </pre>
             </div>
           ) : (
-            <div className="relative font-mono text-xs">
+            <div className="relative font-mono text-xs flex">
+              {/* Line Numbers */}
+              <div className="w-10 bg-slate-900/50 border-r border-slate-800 text-slate-500 flex flex-col p-4 pt-[18px] text-right select-none font-mono text-[11px] leading-relaxed">
+                {localInput.split('\n').map((_, i) => (
+                  <span key={i}>{i + 1}</span>
+                ))}
+              </div>
               <textarea
                 data-testid="qiskit-code-editor-input"
                 value={localInput}
                 onChange={handleChange}
                 spellCheck={false}
                 rows={Math.max(8, localInput.split('\n').length + 1)}
-                className="w-full p-4 bg-abyss text-ink font-mono text-xs leading-relaxed border-b border-line focus:outline-none focus:ring-1 focus:ring-accent resize-y selection:bg-accent/20"
+                className="w-full p-4 bg-transparent text-sky-200 font-mono text-xs leading-relaxed focus:outline-none resize-y selection:bg-accent/40"
                 placeholder="Write Qiskit Python code..."
                 aria-label="Qiskit Python Code Editor"
               />
@@ -250,7 +256,7 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
 
         {/* Editor controls bar */}
         {!isReadOnly && (
-          <div className="py-2.5 px-4 bg-raised/30 border-b border-line flex flex-wrap items-center justify-between gap-2">
+          <div className={`py-3 px-4 flex flex-wrap items-center justify-between gap-2 border-b border-line transition-colors duration-300 ${isCodeModified ? 'bg-violet-500/10' : 'bg-raised/30'}`}>
             <div className="flex items-center gap-1.5 text-[11px] text-ink-faint font-mono">
               <Terminal className="w-3.5 h-3.5 text-ink-dim" />
               <span>AST parse-and-replace edit flow</span>
@@ -266,7 +272,7 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
                   className="h-7 px-2.5 text-xs font-mono border-line text-ink-dim hover:text-ink"
                 >
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  Revert Edits
+                  Revert
                 </Button>
               )}
               <Button
@@ -275,10 +281,14 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
                 onClick={handleApply}
                 disabled={!isCodeModified}
                 data-testid="apply-code-btn"
-                className="h-7 px-3 text-xs font-mono font-semibold bg-accent text-white hover:bg-accent-hover"
+                className={`h-8 px-4 text-xs font-mono font-bold transition-all duration-300 ${
+                  isCodeModified 
+                    ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_15px_rgba(124,58,237,0.5)] animate-pulse border-violet-400' 
+                    : 'bg-surface-raised text-text-muted opacity-60'
+                }`}
               >
-                <Sparkles className="w-3 h-3 mr-1.5" />
-                Sync to Circuit Model
+                <Sparkles className={`w-3.5 h-3.5 mr-1.5 ${isCodeModified ? 'text-amber-300' : ''}`} />
+                {isCodeModified ? 'Sync to Circuit Model' : 'Code Synchronized'}
               </Button>
             </div>
           </div>

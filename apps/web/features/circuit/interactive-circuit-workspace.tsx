@@ -96,12 +96,12 @@ export function InteractiveCircuitWorkspace({
           {/* Gate Palette */}
           {!isLocked && <GatePalette />}
 
-          {/* Side-by-Side Instrument: Wires Grid (7 cols) + Qiskit Code Editor (5 cols) */}
+          {/* Side-by-Side Instrument: Wires Grid + Qiskit Code Editor */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-8 space-y-4">
               <QubitWiresGrid readOnly={isLocked} />
             </div>
-            <div className="lg:col-span-5 space-y-4">
+            <div className="lg:col-span-4 space-y-4">
               <QiskitCodeEditor isReadOnly={isLocked} />
             </div>
           </div>
