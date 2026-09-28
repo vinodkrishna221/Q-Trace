@@ -10,7 +10,7 @@
 |---|---|---|---|
 | 1 | Status pill | copy table | Small mono pill above headline |
 | 2 | Hero | copy table | Display headline + one-sentence lede; product name gets accent gradient |
-| 3 | Primary actions | routes | 2 buttons: Enter the Bell-State Module (primary, glow), Open Circuit Lab (outline) |
+| 3 | Primary actions | routes | 2 buttons: Begin Your Journey (primary, glow), Open Circuit Lab (outline) |
 | 4 | Flight Recorder strip | copy table | Horizontal 4-step spine: Predict → Simulate → Diagnose → Repair. The differentiator, visible without scrolling |
 | 5 | Persona cards ×3 | copy table | Aarav / Meera / Dr. Rao — one card each, links to their surface |
 | 6 | Footer | AppShell | Mandatory disclaimer verbatim |
@@ -24,7 +24,7 @@
 | headline.accent | `verified evidence` |
 | headline.post | `— not guesswork.` |
 | lede | `Q-Trace captures your prediction, replays the true simulator state gate by gate, and pinpoints the exact moment your mental model diverges from the physics.` |
-| cta.primary | `Enter the Bell-State Module` |
+| cta.primary | `Begin Your Journey` |
 | cta.secondary | `Open Circuit Lab` |
 | spine.1 | `Predict` / `Commit to an outcome before execution` |
 | spine.2 | `Simulate` / `Run the circuit on Qiskit Aer` |

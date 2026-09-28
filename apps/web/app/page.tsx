@@ -72,7 +72,7 @@ export default function HomePage() {
           <Link href="/learn">
             <Button size="lg" className="gap-2">
               <BookOpen className="w-4 h-4" />
-              <span>Enter the Bell-State Module</span>
+              <span>Begin Your Journey</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
