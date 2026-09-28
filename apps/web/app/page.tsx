@@ -69,7 +69,7 @@ export default function HomePage() {
 
         {/* 3 · Primary actions */}
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Link href="/learn/bell-state">
+          <Link href="/learn">
             <Button size="lg" className="gap-2">
               <BookOpen className="w-4 h-4" />
               <span>Enter the Bell-State Module</span>

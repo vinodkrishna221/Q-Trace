@@ -30,7 +30,7 @@ export function AppHeader() {
   }, [checkSession]);
 
   const navItems = [
-    { href: '/learn/bell-state', label: 'Learn', icon: BookOpen, activePrefix: '/learn' },
+    { href: '/learn', label: 'Learn', icon: BookOpen, activePrefix: '/learn' },
     { href: '/lab', label: 'Circuit Lab', icon: Cpu, activePrefix: '/lab' },
     { href: '/progress', label: 'Progress', icon: BarChart3, activePrefix: '/progress', hideFor: 'INSTRUCTOR' },
   ];
