@@ -32,6 +32,13 @@ import {
 } from './contracts';
 import { generateOpenQasm3 } from '@/features/circuit/circuit-qasm-exporter';
 import {
+  lintCircuitLocally,
+  LintWarning,
+  LintSeverity,
+  LintCircuitRequest,
+  LintCircuitResponse,
+} from '@/features/circuit/circuit-linter';
+import {
   DEMO_SIMULATION_RUN,
   DEMO_STARTER_CIRCUIT,
   DEMO_FLIGHT_RECORDER_DIAGNOSIS,
@@ -918,4 +925,40 @@ export const apiClient = {
       };
     }
   },
+
+  /**
+   * POST /v1/circuits/lint
+   * Invariant Linter with fallback resilience.
+   */
+  async lintCircuit(
+    circuitModel: CircuitModel
+  ): Promise<ApiResponseWithMeta<LintCircuitResponse>> {
+    try {
+      const { data, requestId } = await requestJson<LintCircuitResponse>(
+        '/v1/circuits/lint',
+        {
+          method: 'POST',
+          body: JSON.stringify({ circuitModel }),
+        }
+      );
+      return {
+        data,
+        meta: { requestId, isFallback: false },
+      };
+    } catch {
+      const warnings = lintCircuitLocally(circuitModel);
+      return {
+        data: { lintWarnings: warnings },
+        meta: { requestId: `req_lint_fb_${Date.now().toString(36)}`, isFallback: true },
+      };
+    }
+  },
 };
+
+export type {
+  LintSeverity,
+  LintWarning,
+  LintCircuitRequest,
+  LintCircuitResponse,
+};
+

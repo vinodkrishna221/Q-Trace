@@ -223,7 +223,7 @@ DELIVERABLE: Modify apps/web/features/circuit/interactive-circuit-workspace.tsx 
 TEST: `pnpm test:web tests/unit/circuit-linter-ui.test.tsx`
 DEPENDS: FEA-2          UNBLOCKS: —
 DEMO: When the user adds an H gate after a MEASURE on wire q[0], within 300ms an amber pill appears above q[0] and a wavy amber underline highlights the qc.h(0) line in the Qiskit editor.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-5-linter-frontend`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
