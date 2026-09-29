@@ -225,7 +225,7 @@ DELIVERABLE: Create apps/web/lib/types/grading.ts (mirror TypeScript interfaces 
 TEST: `pnpm test:web tests/unit/assess-page.test.tsx`
 DEPENDS: FEA-6          UNBLOCKS: —
 DEMO: When a failed Bell circuit is assessed, the judge sees student vs target circuits side-by-side, the exact gate where behavior diverged on input |+⟩, and the quantum physics explanation for why entanglement failed.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] green
 BRANCH: `feat/features-phase/fea-7-assess-route-ui`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

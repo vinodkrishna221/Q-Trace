@@ -150,5 +150,5 @@ FEA-14 (Cross-Feature Contract & Golden Fixtures — grading-assessment.md + gol
 - `Venu Gopal: ACCEPTED — Features Phase — starting FEA-10 — feat/features-phase/fea-10-nisq-noise-backend` — STATUS: [ ] ready
 - `Venu Gopal: ACCEPTED — Features Phase — starting FEA-11 — feat/features-phase/fea-11-noise-toggle-qsphere-ui` — STATUS: [ ] ready
 - `Sohail: ACCEPTED — Features Phase — starting FEA-6 — feat/features-phase/fea-6-socratic-grading-engine` — STATUS: [ ] ready
-- `Sohail: ACCEPTED — Features Phase — starting FEA-7 — feat/features-phase/fea-7-assess-route-ui` — STATUS: [ ] ready
+- `Sohail: ACCEPTED — Features Phase — starting FEA-7 — feat/features-phase/fea-7-assess-route-ui` — STATUS: [x] green
 
