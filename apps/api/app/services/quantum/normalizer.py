@@ -124,3 +124,39 @@ def normalize_counts(
         contract_label = bits[::-1]
         result[contract_label] = result.get(contract_label, 0) + count
     return result
+
+
+def normalize_statevector(
+    statevector: list[complex] | Any,
+    n_qubits: int,
+    source_endian: str = "big",
+) -> Any:
+    """Normalize statevector basis ordering between big-endian (Cirq/PennyLane)
+    and little-endian (Qiskit).
+
+    In big-endian systems (Cirq, PennyLane), qubit 0 is the most-significant bit (MSB).
+    In little-endian systems (Qiskit), qubit 0 is the least-significant bit (LSB).
+
+    Converting from big-endian to little-endian reverses the bit order of the basis index:
+    basis index k with binary string b maps to index j with reversed binary b[::-1].
+
+    Args:
+        statevector: Array or sequence of complex amplitudes of length 2^n_qubits
+        n_qubits: Number of qubits in the circuit
+        source_endian: "big" (Cirq / PennyLane) or "little" (Qiskit)
+
+    Returns:
+        Numpy array with little-endian (Qiskit) basis indexing.
+    """
+    import numpy as np
+
+    sv = np.asarray(statevector, dtype=complex)
+    if source_endian == "little":
+        return sv
+    normalized = np.zeros_like(sv)
+    for k in range(len(sv)):
+        b = format(k, f"0{n_qubits}b")
+        j = int(b[::-1], 2)
+        normalized[j] = sv[k]
+    return normalized
+

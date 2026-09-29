@@ -159,6 +159,7 @@ Explain learner progress, synthetic cohort disclosure, Instructor Insight, priva
 - [x] DATA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/data/test_schema_freeze.py` → 16 passed in 1.50s.
 - [x] DUO-3 complete — pnpm test:web tests/unit/chamber-node.test.tsx — 18 passed in 0.35s.
 - [x] DUO-4 complete — pnpm test:web tests/unit/node-popover.test.tsx — 17 passed in 0.39s.
+- [x] FEA-8 complete — `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_cirq_adapter.py -v` — 11 passed in 9.82s.
 
 ---
 
@@ -197,7 +198,7 @@ DELIVERABLE: Create apps/api/app/services/quantum/cirq_adapter.py (implement bui
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_cirq_adapter.py -v`
 DEPENDS: FEA-1          UNBLOCKS: FEA-9, FEA-14
 DEMO: Backend simulates circuits across Qiskit Aer, PennyLane, and Google Cirq concurrently, returning cross-engine statevector comparison with delta <= 1e-6.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-8-cirq-adapter-backend`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

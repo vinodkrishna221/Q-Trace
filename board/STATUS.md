@@ -167,3 +167,5 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 29 Sep 11:25 Vinod: FEA-1 green (feat/features-phase/fea-1-gate-model-expansion) — expanded GateName enum and models with CCX (Toffoli), CZ, S, and T; added CCX/CZ validators and increased operations limit to 30; wired Qiskit Aer simulation and AST parser allowlist; added OpenQASM 3 mappings and frontend GateName union; 29/29 FEA-1 unit tests passed, 173/173 simulation regression passed; PR ready for Warden review. Unblocks FEA-2, FEA-3, FEA-6, FEA-8, FEA-10, FEA-12, FEA-14.
 
+- 29 Sep 12:05 Rani: FEA-8 green (feat/features-phase/fea-8-cirq-adapter-backend) — implemented Google Cirq adapter in apps/api/app/services/quantum/cirq_adapter.py with build_cirq_circuit, run_cirq, and big-to-little endianness normalization via normalizer.py; added tri-engine parallel execution in simulation_service.py computing pairwise statevector L2 delta and conformanceBadge (VERIFIED for delta <= 1e-6); updated POST /v1/simulation-runs with backends list support; 11/11 FEA-8 tests passed, 541/541 full backend test suite green; PR ready for Warden review. Unblocks FEA-9, FEA-14.
+

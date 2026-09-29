@@ -31,6 +31,7 @@ class SimulationRunRequest(BaseModel):
     primaryAdapter: Literal["QISKIT_AER"] = "QISKIT_AER"
     runConformance: bool = False
     shots: int = Field(default=1024, ge=1, le=8192)
+    backends: list[str] = Field(default_factory=lambda: ["qiskit"])
 
 
 # ---------------------------------------------------------------------------
@@ -92,6 +93,10 @@ class SimulationRunOut(BaseModel):
     conformance: ConformanceResult
     durationMs: int
     createdAt: str
+    conformanceResults: dict[str, Any] | None = None
+    conformanceDelta: float | None = None
+    conformanceBadge: Literal["VERIFIED", "DIVERGED"] | None = None
+
 
 
 # ---------------------------------------------------------------------------

@@ -22,6 +22,7 @@ quantum = [
     "qiskit>=2.3.0",
     "qiskit-aer>=0.17.0",
     "pennylane>=0.45.0",
+    "cirq-core>=1.4.0",
 ]
 dev = [
     "pytest>=8.3.0",

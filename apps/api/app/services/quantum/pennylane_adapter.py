@@ -33,7 +33,17 @@ from app.models.circuit import CircuitModel, GateName
 _CONFORMANCE_EPSILON = 1e-6
 
 # Supported gates in this adapter (subset of CircuitModel GateNames)
-_PL_SUPPORTED_GATES = {GateName.H, GateName.X, GateName.Y, GateName.Z, GateName.CNOT}
+_PL_SUPPORTED_GATES = {
+    GateName.H,
+    GateName.X,
+    GateName.Y,
+    GateName.Z,
+    GateName.CNOT,
+    GateName.CZ,
+    GateName.CCX,
+    GateName.S,
+    GateName.T,
+}
 
 
 @dataclass
@@ -117,6 +127,14 @@ def _run_pennylane(circuit: CircuitModel) -> dict[str, float]:
                 qml.PauliZ(wires=op.targets[0])
             elif gate == GateName.CNOT:
                 qml.CNOT(wires=[op.controls[0], op.targets[0]])
+            elif gate == GateName.CZ:
+                qml.CZ(wires=[op.controls[0], op.targets[0]])
+            elif gate == GateName.CCX:
+                qml.Toffoli(wires=[op.controls[0], op.controls[1], op.targets[0]])
+            elif gate == GateName.S:
+                qml.S(wires=op.targets[0])
+            elif gate == GateName.T:
+                qml.T(wires=op.targets[0])
             # MEASURE is already excluded; the CircuitModel validator ensures
             # no other gate can appear.
         return qml.probs(wires=list(range(n_qubits)))
@@ -247,3 +265,62 @@ def prewarm_pennylane() -> None:
 
     _warmup()
     _pl_warmed = True
+
+
+def run_pennylane_statevector(circuit: CircuitModel) -> dict[str, Any]:
+    """Execute CircuitModel on PennyLane default.qubit and return normalized statevector.
+
+    Returns statevector normalized from PennyLane's big-endian convention (q0 MSB)
+    to Qiskit's little-endian convention (q0 LSB) via normalize_statevector.
+
+    Args:
+        circuit: Validated CircuitModel
+
+    Returns:
+        dict with:
+          backend: "pennylane"
+          statevector: list[complex]
+          durationMs: int
+    """
+    import time  # noqa: PLC0415
+    import pennylane as qml  # noqa: PLC0415
+    from app.services.quantum.normalizer import normalize_statevector  # noqa: PLC0415
+
+    t0 = time.monotonic()
+    n_qubits = circuit.qubitCount
+    dev = qml.device("default.qubit", wires=n_qubits)
+    non_measure_ops = [op for op in circuit.operations if op.gate != GateName.MEASURE]
+
+    @qml.qnode(dev)
+    def _circuit():
+        for op in non_measure_ops:
+            gate = op.gate
+            if gate == GateName.H:
+                qml.Hadamard(wires=op.targets[0])
+            elif gate == GateName.X:
+                qml.PauliX(wires=op.targets[0])
+            elif gate == GateName.Y:
+                qml.PauliY(wires=op.targets[0])
+            elif gate == GateName.Z:
+                qml.PauliZ(wires=op.targets[0])
+            elif gate == GateName.CNOT:
+                qml.CNOT(wires=[op.controls[0], op.targets[0]])
+            elif gate == GateName.CZ:
+                qml.CZ(wires=[op.controls[0], op.targets[0]])
+            elif gate == GateName.CCX:
+                qml.Toffoli(wires=[op.controls[0], op.controls[1], op.targets[0]])
+            elif gate == GateName.S:
+                qml.S(wires=op.targets[0])
+            elif gate == GateName.T:
+                qml.T(wires=op.targets[0])
+        return qml.state()
+
+    raw_sv = _circuit()
+    normalized = normalize_statevector(raw_sv, n_qubits, source_endian="big")
+    elapsed_ms = max(1, int((time.monotonic() - t0) * 1000))
+    return {
+        "backend": "pennylane",
+        "statevector": normalized.tolist(),
+        "durationMs": elapsed_ms,
+    }
+

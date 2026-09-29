@@ -130,6 +130,9 @@ class SimulationRun(BaseModel):
     stateTrace: list[dict[str, Any]] = Field(default_factory=list)
     conformance: Optional[dict[str, Any]] = None
     durationMs: int = 0
+    conformanceResults: Optional[dict[str, Any]] = None
+    conformanceDelta: Optional[float] = None
+    conformanceBadge: Optional[str] = None
     error: Optional[dict[str, Any]] = None
     schemaVersion: int = 1
     createdAt: str = Field(default_factory=utc_now_iso)

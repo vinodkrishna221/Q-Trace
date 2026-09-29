@@ -250,6 +250,9 @@ class MongoSimRunRepo:
                     conformance=run.conformance.model_dump() if run.conformance else None,
                     durationMs=run.durationMs,
                     createdAt=run.createdAt,
+                    conformanceResults=run.conformanceResults,
+                    conformanceDelta=run.conformanceDelta,
+                    conformanceBadge=run.conformanceBadge,
                 )
             except ModuleNotFoundError:
                 # DATA-6 not merged — pass SimulationRunOut directly (mock path).
