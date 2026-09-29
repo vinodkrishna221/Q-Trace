@@ -238,7 +238,7 @@ def test_rejects_out_of_column_order():
 
 def test_gate_name_enum_values():
     supported = {g.value for g in GateName}
-    assert supported == {"H", "X", "Y", "Z", "CNOT", "MEASURE"}
+    assert supported == {"H", "X", "Y", "Z", "CNOT", "MEASURE", "CCX", "CZ", "S", "T"}
 
 
 # ---------------------------------------------------------------------------

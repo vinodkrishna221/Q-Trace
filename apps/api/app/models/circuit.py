@@ -7,8 +7,8 @@ importing a quantum SDK."
 
 Prototype limits (quantum-runtime.md):
   - 2–5 qubits (inclusive)
-  - ≤20 operations
-  - Supported gates: H, X, Y, Z, CNOT, MEASURE only
+  - ≤30 operations
+  - Supported gates: H, X, Y, Z, CNOT, MEASURE, CCX, CZ, S, T only
 
 No quantum SDK import anywhere in this module.
 """
@@ -32,6 +32,10 @@ class GateName(str, Enum):
     Z = "Z"
     CNOT = "CNOT"
     MEASURE = "MEASURE"
+    CCX = "CCX"
+    CZ = "CZ"
+    S = "S"
+    T = "T"
 
 
 # ---------------------------------------------------------------------------
@@ -77,11 +81,13 @@ class CircuitModel(BaseModel):
     Invariants enforced by validators:
       - qubitCount in [2, 5]
       - classicalBitCount >= 0
-      - len(operations) <= 20
+      - len(operations) <= 30
       - No duplicate opId
       - Every target/control qubit index < qubitCount
       - Every classicalTarget index < classicalBitCount
       - CNOT: exactly 1 target, exactly 1 control, control != target
+      - CZ: exactly 1 target, exactly 1 control, control != target
+      - CCX: exactly 1 target, exactly 2 controls, distinct controls != target
       - MEASURE: len(targets) == len(classicalTargets) >= 1, no controls
       - Non-MEASURE gates: classicalTargets must be empty
       - Operations are normalized by column (ascending order enforced)
@@ -91,7 +97,7 @@ class CircuitModel(BaseModel):
     name: str = Field(..., min_length=1)
     qubitCount: Annotated[int, Field(ge=2, le=5)]
     classicalBitCount: Annotated[int, Field(ge=0)]
-    operations: list[Operation] = Field(..., max_length=20)
+    operations: list[Operation] = Field(..., max_length=30)
     source: _SOURCE_LITERAL
     modelVersion: Literal[1] = 1
     ownerLearnerProfileId: str | None = None
@@ -158,6 +164,48 @@ class CircuitModel(BaseModel):
                         f"CNOT '{op.opId}': classicalTargets must be empty for CNOT."
                     )
 
+            elif gate == GateName.CZ:
+                # Exactly 1 target, exactly 1 control, control != target
+                if len(op.targets) != 1:
+                    raise ValueError(
+                        f"CZ '{op.opId}' must have exactly 1 target, got {len(op.targets)}."
+                    )
+                if len(op.controls) != 1:
+                    raise ValueError(
+                        f"CZ '{op.opId}' must have exactly 1 control, got {len(op.controls)}."
+                    )
+                if op.controls[0] == op.targets[0]:
+                    raise ValueError(
+                        f"CZ '{op.opId}': control and target must be different qubits."
+                    )
+                if op.classicalTargets:
+                    raise ValueError(
+                        f"CZ '{op.opId}': classicalTargets must be empty for CZ."
+                    )
+
+            elif gate == GateName.CCX:
+                # Exactly 1 target, exactly 2 controls, distinct controls != target
+                if len(op.targets) != 1:
+                    raise ValueError(
+                        f"CCX '{op.opId}' must have exactly 1 target, got {len(op.targets)}."
+                    )
+                if len(op.controls) != 2:
+                    raise ValueError(
+                        f"CCX '{op.opId}' must have exactly 2 controls, got {len(op.controls)}."
+                    )
+                if op.controls[0] == op.controls[1]:
+                    raise ValueError(
+                        f"CCX '{op.opId}': control qubits must be distinct, got {op.controls}."
+                    )
+                if op.targets[0] in op.controls:
+                    raise ValueError(
+                        f"CCX '{op.opId}': controls and target must be different qubits."
+                    )
+                if op.classicalTargets:
+                    raise ValueError(
+                        f"CCX '{op.opId}': classicalTargets must be empty for CCX."
+                    )
+
             elif gate == GateName.MEASURE:
                 # targets and classicalTargets must be same length, non-empty; no controls
                 if not op.targets:
@@ -175,7 +223,7 @@ class CircuitModel(BaseModel):
                     )
 
             else:
-                # H, X, Y, Z: exactly 1 target, no controls, no classicalTargets
+                # H, X, Y, Z, S, T: exactly 1 target, no controls, no classicalTargets
                 if len(op.targets) != 1:
                     raise ValueError(
                         f"{gate.value} '{op.opId}' must have exactly 1 target, got {len(op.targets)}."

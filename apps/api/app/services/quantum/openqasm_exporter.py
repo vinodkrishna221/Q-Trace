@@ -44,6 +44,10 @@ _GATE_TO_QASM: dict[GateName, str] = {
     GateName.Y:       "y",
     GateName.Z:       "z",
     GateName.CNOT:    "cx",
+    GateName.CZ:      "cz",
+    GateName.CCX:     "ccx",
+    GateName.S:       "s",
+    GateName.T:       "t",
     GateName.MEASURE: "measure",
 }
 
@@ -93,6 +97,17 @@ def export_openqasm3(circuit: CircuitModel) -> dict:
             tgt = op.targets[0]
             lines.append(f'cx q[{ctrl}], q[{tgt}];')
 
+        elif gate == GateName.CZ:
+            ctrl = op.controls[0]
+            tgt = op.targets[0]
+            lines.append(f'cz q[{ctrl}], q[{tgt}];')
+
+        elif gate == GateName.CCX:
+            ctrl1 = op.controls[0]
+            ctrl2 = op.controls[1]
+            tgt = op.targets[0]
+            lines.append(f'ccx q[{ctrl1}], q[{ctrl2}], q[{tgt}];')
+
         elif gate == GateName.MEASURE:
             # Multiple qubit→classical pairs can be in one MEASURE op
             for q_idx, c_idx in zip(op.targets, op.classicalTargets):
@@ -128,20 +143,19 @@ def validate_roundtrip(circuit: CircuitModel) -> list[str]:
 
     NOTE: This uses qiskit for validation only — no simulation occurs.
     """
-    # Deferred import — only used for round-trip structural check
-    try:
-        from qiskit import QuantumCircuit as QC  # noqa: PLC0415
-    except ImportError:
-        # Qiskit not available — skip round-trip, surface a warning
-        return ["Qiskit not available; round-trip validation skipped."]
-
     export_result = export_openqasm3(circuit)
     qasm_str = export_result["openQasm3"]
     warnings: list[str] = []
 
+    # Deferred import — only used for round-trip structural check
     try:
-        qc = QC.from_qasm_str(qasm_str)
-    except Exception as exc:
+        from qiskit.qasm3 import loads as qasm3_loads  # noqa: PLC0415
+        qc = qasm3_loads(qasm_str)
+    except (ImportError, Exception) as exc:
+        # If qiskit_qasm3_import is not installed or QASM3 parser is unavailable,
+        # surface a warning rather than crashing.
+        if "qiskit_qasm3_import" in str(exc) or "MissingOptionalLibraryError" in type(exc).__name__:
+            return ["OpenQASM 3 parser (qiskit_qasm3_import) not available; round-trip validation skipped."]
         raise ExportError(
             code="OPENQASM_EXPORT_UNSUPPORTED",
             message=f"Round-trip parse failed: {exc}.",
@@ -164,6 +178,10 @@ def validate_roundtrip(circuit: CircuitModel) -> list[str]:
         "x": GateName.X,
         "y": GateName.Y,
         "z": GateName.Z,
+        "s": GateName.S,
+        "t": GateName.T,
+        "cz": GateName.CZ,
+        "ccx": GateName.CCX,
         "cx": GateName.CNOT,
     }
     actual_gates: list[GateName] = []

@@ -32,7 +32,7 @@ import math
 import time
 from dataclasses import dataclass, field
 
-from app.models.circuit import CircuitModel, GateName
+from app.models.circuit import CircuitModel, GateName, Operation
 from app.services.quantum.normalizer import (
     build_normalized_amplitude_map,
     build_normalized_probability_map,
@@ -216,7 +216,25 @@ _SINGLE_QUBIT_GATES = {
     GateName.X: "x",
     GateName.Y: "y",
     GateName.Z: "z",
+    GateName.S: "s",
+    GateName.T: "t",
 }
+
+
+def _apply_gate(qc, op: Operation) -> None:
+    """Apply a non-MEASURE Operation to a Qiskit QuantumCircuit."""
+    gate = op.gate
+    if gate in _SINGLE_QUBIT_GATES:
+        getattr(qc, _SINGLE_QUBIT_GATES[gate])(op.targets[0])
+    elif gate == GateName.CNOT:
+        qc.cx(op.controls[0], op.targets[0])
+    elif gate == GateName.CZ:
+        qc.cz(op.controls[0], op.targets[0])
+    elif gate == GateName.CCX:
+        qc.ccx(op.controls[0], op.controls[1], op.targets[0])
+    else:
+        # Should never happen — CircuitModel validation already enforced the enum
+        raise ValueError(f"Unexpected gate {gate} in adapter")  # pragma: no cover
 
 
 # ---------------------------------------------------------------------------
@@ -271,16 +289,7 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
     sv_simulator = _sv_simulator if _sv_simulator is not None else AerSimulator(method="statevector")
 
     for op in non_measure_ops:
-        gate = op.gate
-
-        if gate in _SINGLE_QUBIT_GATES:
-            qiskit_method = _SINGLE_QUBIT_GATES[gate]
-            getattr(qc_trace, qiskit_method)(op.targets[0])
-        elif gate == GateName.CNOT:
-            qc_trace.cx(op.controls[0], op.targets[0])
-        else:
-            # Should never happen — CircuitModel validation already enforced the enum
-            raise ValueError(f"Unexpected gate {gate} in adapter")  # pragma: no cover
+        _apply_gate(qc_trace, op)
 
         # Save statevector snapshot after this gate
         qc_snap = qc_trace.copy()
@@ -352,11 +361,7 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
 
         # Re-apply all non-measure gates
         for op in non_measure_ops:
-            gate = op.gate
-            if gate in _SINGLE_QUBIT_GATES:
-                getattr(qc_measure, _SINGLE_QUBIT_GATES[gate])(op.targets[0])
-            elif gate == GateName.CNOT:
-                qc_measure.cx(op.controls[0], op.targets[0])
+            _apply_gate(qc_measure, op)
 
         # Apply MEASURE gates
         for op in measure_ops:

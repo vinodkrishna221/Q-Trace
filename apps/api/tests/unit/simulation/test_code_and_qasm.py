@@ -262,12 +262,12 @@ class TestParserRejects:
         )
         self._assert_parse_error(code, "UNSUPPORTED_GATE")
 
-    def test_ccx_gate_rejected(self):
-        """Toffoli (ccx) is not in the prototype subset."""
+    def test_ry_gate_rejected(self):
+        """RY is outside the supported subset."""
         code = (
             "from qiskit import QuantumCircuit\n"
-            "qc = QuantumCircuit(3)\n"
-            "qc.ccx(0, 1, 2)\n"
+            "qc = QuantumCircuit(2)\n"
+            "qc.ry(0.5, 0)\n"
         )
         self._assert_parse_error(code, "UNSUPPORTED_GATE")
 

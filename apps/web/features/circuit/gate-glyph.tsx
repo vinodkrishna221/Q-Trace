@@ -135,6 +135,34 @@ export const GATE_VISUAL_STYLES: Record<
     shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(15,98,254,0.25)]',
     displayGlyph: <CnotTargetCrosshairIcon className="w-5 h-5" strokeWidth={2.2} />,
   },
+  CZ: {
+    bgClass: 'bg-[#0ea5e9]', // Electric Cyan / Sky
+    textClass: 'text-white',
+    borderClass: 'border-[#0284c7]',
+    shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(14,165,233,0.25)]',
+    displayGlyph: <span className="font-mono font-bold tracking-tight">CZ</span>,
+  },
+  CCX: {
+    bgClass: 'bg-[#0f62fe]', // IBM Quantum Royal Blue
+    textClass: 'text-white',
+    borderClass: 'border-[#0043ce]',
+    shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(15,98,254,0.25)]',
+    displayGlyph: <span className="font-mono font-bold tracking-tight">CCX</span>,
+  },
+  S: {
+    bgClass: 'bg-[#1192e8]',
+    textClass: 'text-white',
+    borderClass: 'border-[#0072c3]',
+    shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(17,146,232,0.25)]',
+    displayGlyph: <span className="font-mono font-bold tracking-tight">S</span>,
+  },
+  T: {
+    bgClass: 'bg-[#8a3ffc]',
+    textClass: 'text-white',
+    borderClass: 'border-[#6929c4]',
+    shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(138,63,252,0.25)]',
+    displayGlyph: <span className="font-mono font-bold tracking-tight">T</span>,
+  },
   MEASURE: {
     bgClass: 'bg-[#475569]', // IBM Quantum Charcoal / Slate
     textClass: 'text-white',

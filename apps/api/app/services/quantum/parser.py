@@ -51,6 +51,10 @@ _QISKIT_METHOD_TO_GATE: Final[dict[str, GateName]] = {
     "y":       GateName.Y,
     "z":       GateName.Z,
     "cx":      GateName.CNOT,
+    "cz":      GateName.CZ,
+    "ccx":     GateName.CCX,
+    "s":       GateName.S,
+    "t":       GateName.T,
     "measure": GateName.MEASURE,
 }
 
@@ -311,6 +315,58 @@ class _SafeQiskitVisitor(ast.NodeVisitor):
                 column=col,
             ))
 
+        elif gate == GateName.CZ:
+            # qc.cz(control, target)
+            if len(raw_args) != 2:
+                raise ParseError(
+                    code="PARSE_ERROR",
+                    message=f"cz() requires exactly 2 args (control, target), got {len(raw_args)}.",
+                )
+            control = self._extract_qubit_index(raw_args[0], "cz control", n_qubits)
+            target = self._extract_qubit_index(raw_args[1], "cz target", n_qubits)
+            if control == target:
+                raise ParseError(
+                    code="PARSE_ERROR",
+                    message="cz(): control and target must be different qubits.",
+                )
+            self._operations.append(Operation(
+                opId=op_id,
+                gate=gate,
+                targets=[target],
+                controls=[control],
+                classicalTargets=[],
+                column=col,
+            ))
+
+        elif gate == GateName.CCX:
+            # qc.ccx(control1, control2, target)
+            if len(raw_args) != 3:
+                raise ParseError(
+                    code="PARSE_ERROR",
+                    message=f"ccx() requires exactly 3 args (control1, control2, target), got {len(raw_args)}.",
+                )
+            c1 = self._extract_qubit_index(raw_args[0], "ccx control1", n_qubits)
+            c2 = self._extract_qubit_index(raw_args[1], "ccx control2", n_qubits)
+            target = self._extract_qubit_index(raw_args[2], "ccx target", n_qubits)
+            if c1 == c2:
+                raise ParseError(
+                    code="PARSE_ERROR",
+                    message="ccx(): control qubits must be distinct.",
+                )
+            if target in (c1, c2):
+                raise ParseError(
+                    code="PARSE_ERROR",
+                    message="ccx(): controls and target must be different qubits.",
+                )
+            self._operations.append(Operation(
+                opId=op_id,
+                gate=gate,
+                targets=[target],
+                controls=[c1, c2],
+                classicalTargets=[],
+                column=col,
+            ))
+
         elif gate == GateName.MEASURE:
             # qc.measure(qubit_or_list, classical_or_list)
             if len(raw_args) != 2:
@@ -452,10 +508,10 @@ class _SafeQiskitVisitor(ast.NodeVisitor):
                 code="PARSE_ERROR",
                 message="QuantumCircuit qubit count could not be determined.",
             )
-        if len(self._operations) > 20:
+        if len(self._operations) > 30:
             raise ParseError(
                 code="CIRCUIT_LIMIT_EXCEEDED",
-                message=f"Circuit has {len(self._operations)} operations; maximum is 20.",
+                message=f"Circuit has {len(self._operations)} operations; maximum is 30.",
                 details={"operationCount": len(self._operations)},
             )
         return CircuitModel(

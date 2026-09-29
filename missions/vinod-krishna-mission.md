@@ -213,7 +213,7 @@ DELIVERABLE: Modify apps/api/app/models/circuit.py (add CCX, CZ, S, T to GateNam
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_gate_expansion.py -v`
 DEPENDS: —          UNBLOCKS: FEA-2, FEA-3, FEA-6, FEA-8, FEA-10, FEA-12, FEA-14
 DEMO: Backend accepts, simulates, and round-trips 3-qubit circuits containing Toffoli (CCX), CZ, and phase gates without 422 validation rejections, unblocking the entire Features Phase.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-1-gate-model-expansion`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
