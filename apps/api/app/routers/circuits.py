@@ -17,9 +17,12 @@ from fastapi import APIRouter, HTTPException, Request
 from app.models.circuit import (
     ExportOpenQasm3Request,
     ExportOpenQasm3Response,
+    LintCircuitRequest,
+    LintCircuitResponse,
     ParseQiskitRequest,
     ParseQiskitResponse,
 )
+from app.services.quantum.linter import lint_circuit
 from app.services.quantum.openqasm_exporter import ExportError, export_openqasm3
 from app.services.quantum.parser import ParseError, parse_qiskit_code
 
@@ -77,7 +80,39 @@ async def parse_qiskit(
             },
         ) from exc
 
-    return ParseQiskitResponse(circuitModel=circuit_model, warnings=[])
+    lint_warnings = lint_circuit(circuit_model)
+
+    return ParseQiskitResponse(
+        circuitModel=circuit_model,
+        warnings=[],
+        lintWarnings=lint_warnings,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /v1/circuits/lint (FEA-2 / F2 Quantum Invariant Linter)
+# ---------------------------------------------------------------------------
+
+@router.post(
+    "/lint",
+    status_code=200,
+    response_model=LintCircuitResponse,
+)
+async def lint_circuit_endpoint(
+    body: LintCircuitRequest,
+    request: Request,
+) -> LintCircuitResponse:
+    """Analyze circuit operations for quantum physics invariant violations.
+
+    Enforces:
+      - QI-1: Post-collapse unitary gate (WARNING)
+      - QI-2: No-cloning violation attempt (INFO)
+      - QI-3: Controlled gate wire collision (ERROR)
+
+    Pure AST/model inspection without SDK simulation for sub-300ms UI debounce calls.
+    """
+    warnings = lint_circuit(body.circuitModel)
+    return LintCircuitResponse(lintWarnings=warnings)
 
 
 # ---------------------------------------------------------------------------

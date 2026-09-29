@@ -211,7 +211,7 @@ DELIVERABLE: Create apps/api/app/services/quantum/linter.py (implement LintSever
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_linter.py -v`
 DEPENDS: FEA-1          UNBLOCKS: FEA-5, FEA-14
 DEMO: Backend instantaneously flags quantum physics violations (post-collapse unitary, cloning attempt, wire collision) via structured lintWarnings payload with rule IDs and human-readable explanations.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-2-linter-backend`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
