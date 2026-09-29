@@ -2,46 +2,16 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRoleStore } from '@/lib/role-store';
-import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
-import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DiffusionMeanScrubber } from '@/features/learning/components/diffusion-mean-scrubber';
+import { DiffusionReflect3D } from '@/features/learning/components/diffusion-reflect-3d';
 import { GroverRotation2D } from '@/features/learning/components/grover-rotation-2d';
-import { Clock, Layers, ArrowRight, ArrowLeft, ShieldCheck, Zap, BarChart3, HelpCircle } from 'lucide-react';
-import { ContentBlock } from '@/lib/contracts';
+import { Clock, Layers, ArrowRight, ArrowLeft, ShieldCheck, BarChart3, HelpCircle, Waves, AlertTriangle } from 'lucide-react';
 
 export default function GroverDiffusionLearnPage() {
-  const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
   const [selectedAnswer, setSelectedAnswer] = React.useState<string | null>(null);
-
-  const contentBlocks: ContentBlock[] = [
-    {
-      type: 'TEXT',
-      body: 'Once the oracle has marked the answer state with a negative sign (-1), the amplitudes are out of balance. The Grover Diffusion operator (U_s) exploits this imbalance by reflecting every amplitude across their average height ᾱ.',
-    },
-    {
-      type: 'FORMULA',
-      latex: 'U_s = 2|s\\rangle\\langle s| - I, \\quad \\alpha_i \\to 2\\bar{\\alpha} - \\alpha_i \\quad \\text{where } \\bar{\\alpha} = \\frac{1}{N}\\sum_{j=1}^{N} \\alpha_j',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'INFO',
-      body: 'Geometric Reflection Insight: Because the marked state is negative (-0.354), its distance to the mean is large and positive. When reflected across the mean, it catapults above the average line to +0.729, while the other 7 positive states shrink from +0.354 to +0.177!',
-    },
-    {
-      type: 'TEXT',
-      body: 'Grover\'s algorithm is a geometric rotation in a 2D plane spanned by the target state |ω⟩ and the uniform superposition of all other states |ω_⟂⟩. Each Grover iteration (Oracle + Diffusion) rotates the statevector by angle 2θ, where sin(θ) = 1/√N.',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'CAUTION',
-      body: 'The Soufflé Pitfall (Over-Rotation): Classical search benefits from "trying more times." Quantum search does NOT! For 3 qubits (N=8), exactly 2 iterations reach 94.5% fidelity. A 3rd iteration rotates the vector past the target axis, causing probability to collapse back to 33%!',
-    },
-  ];
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-16" data-testid="learn-grover-diffusion-view">
@@ -57,7 +27,7 @@ export default function GroverDiffusionLearnPage() {
           </>
         }
         title="Amplitude Amplification & Inversion About the Mean"
-        purpose="Reflect quantum amplitudes about their average to boost the marked state's probability to 94.5%."
+        purpose="See how a physical reflection across the average water level catapults the secret state from underground to 94.5% certainty."
         actions={
           <div className="flex items-center gap-2">
             <Link href="/learn/oracle">
@@ -76,24 +46,56 @@ export default function GroverDiffusionLearnPage() {
         }
       />
 
-      {/* Prior Knowledge Badge */}
-      <PriorKnowledgeBadge
-        activeRole={activeRole}
-        learnerProfile={activeLearnerProfile}
-        learningPath={activeLearningPath}
-      />
+      {/* Intuitive Metaphor Intro Card */}
+      <Card className="border border-line bg-card shadow-xs">
+        <CardContent className="p-5 sm:p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
+              <Waves className="w-5 h-5 text-sky-400" />
+            </div>
+            <div className="space-y-1.5">
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary">
+                The Water Level Trampoline
+              </h2>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                In the previous chamber, the Oracle pulled our target coin <strong className="text-amber-400">upside-down</strong>. But its probability was still only 12.5%.
+                How do we turn an upside-down mark into a guaranteed win?
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="p-4 rounded-lg bg-surface border border-line space-y-2">
+              <div className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-sky-400" />
+                <span>The Average Line (The Mirror)</span>
+              </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Because 1 state is pulled underground, the average height of all 8 states drops slightly. Imagine this average as a glowing glass mirror slicing horizontally through all states.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 space-y-2">
+              <div className="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>The Diffusion Flip</span>
+              </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                The Diffusion operator reflects every state across that mirror. States that were near the mirror barely move. But our underground target was far below—so when reflected, it bounces <strong className="text-emerald-400">sky high</strong>!
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Learning Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Theory & Interactive Simulators */}
+        {/* Left Column: 3D Interactive Simulators & Logic */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Core Theory Concept Blocks */}
-          <ConceptBlocks contentBlocks={contentBlocks} />
+          {/* Primary 3D Visual: The 3D Water Level / Mean Reflection */}
+          <DiffusionReflect3D />
 
-          {/* Interactive Diffusion Mean Scrubber */}
-          <DiffusionMeanScrubber />
-
-          {/* Interactive 2D State Plane Rotation */}
+          {/* 2D Geometric Rotation & Soufflé Warning */}
           <GroverRotation2D />
         </div>
 
@@ -133,7 +135,7 @@ qc.h([0, 1, 2])`}
 
               <div className="flex items-center gap-1.5 text-[11px] text-text-muted font-mono bg-surface-raised/60 p-2 rounded border border-border-subtle">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Unitary & Hermitian: (U_s)† = U_s</span>
+                <span>Unitary & Reversible: (U_s)† = U_s</span>
               </div>
             </CardContent>
           </Card>

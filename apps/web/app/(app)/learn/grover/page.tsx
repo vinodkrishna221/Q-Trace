@@ -19,8 +19,7 @@ import {
   useTutorExplainMutation,
   useChallengeAttemptMutation,
 } from '@/lib/hooks/use-quantum-api';
-import { apiClient, simulateFallbackCircuit, fallbackSimulationRuns } from '@/lib/api-client';
-import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
+import { apiClient } from '@/lib/api-client';
 import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PredictionCheckpoint } from '@/features/learning/prediction-checkpoint';
 import { InteractiveCircuitWorkspace } from '@/features/circuit/interactive-circuit-workspace';
@@ -268,12 +267,7 @@ export default function GroverLearnPage() {
         }
       />
 
-      {/* Prior Knowledge Badge */}
-      <PriorKnowledgeBadge
-        activeRole={activeRole}
-        learnerProfile={activeLearnerProfile}
-        learningPath={activeLearningPath}
-      />
+      {/* Main Learning Flow */}
 
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Stepper Controller */}

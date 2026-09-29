@@ -2,46 +2,16 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRoleStore } from '@/lib/role-store';
-import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
-import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { OracleCoinFlip3D } from '@/features/learning/components/oracle-coin-flip-3d';
 import { CcxGateSimulation } from '@/features/learning/components/ccx-gate-simulation';
-import { PhaseInversionMirror } from '@/features/learning/components/phase-inversion-mirror';
-import { Clock, Cpu, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, HelpCircle, CheckCircle2 } from 'lucide-react';
-import { ContentBlock } from '@/lib/contracts';
+import { Clock, Cpu, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, HelpCircle, CheckCircle2, KeyRound, Box } from 'lucide-react';
 
 export default function GroverOracleLearnPage() {
-  const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
   const [selectedAnswer, setSelectedAnswer] = React.useState<string | null>(null);
-
-  const contentBlocks: ContentBlock[] = [
-    {
-      type: 'TEXT',
-      body: 'In classical computing, finding a secret item requires reading each memory address sequentially. Grover\'s quantum search uses an Oracle operator (U_ω) that marks the matching state with a phase inversion without measuring or collapsing the query register.',
-    },
-    {
-      type: 'FORMULA',
-      latex: 'U_\\omega |x\\rangle = (-1)^{f(x)} |x\\rangle = \\begin{cases} -|x\\rangle & \\text{if } x = \\omega \\text{ (Marked State)} \\\\ +|x\\rangle & \\text{if } x \\neq \\omega \\end{cases}',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'INFO',
-      body: 'Phase Kickback Key Insight: The oracle negates the amplitude of the marked state |101⟩. Because measurement probabilities depend on |α|², the probability remains exactly 1/8 (12.5%). The mark is invisible until the Diffusion operator performs quantum interference!',
-    },
-    {
-      type: 'TEXT',
-      body: 'To construct a phase oracle for a 3-qubit state like |101⟩ (where q0=1, q1=0, q2=1), we use the Toffoli (CCX) gate. An X gate inverts q1 so that all three inputs become 1 only when the state is |101⟩, firing the gate and applying the phase flip.',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'CAUTION',
-      body: 'Conceptual Pitfall: Never measure inside the oracle. Any measurement collapses the superposition into a single random bitstring, destroying quantum parallelism permanently.',
-    },
-  ];
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-16" data-testid="learn-grover-oracle-view">
@@ -57,7 +27,7 @@ export default function GroverOracleLearnPage() {
           </>
         }
         title="The Phase Oracle & Toffoli Gate (CCX)"
-        purpose="Learn how quantum oracles tag target basis states with phase inversion without collapsing the superposition."
+        purpose="Discover how a quantum computer secretly tags a target item by flipping it upside down—without looking inside or collapsing the wave."
         actions={
           <div className="flex items-center gap-2">
             <Link href="/learn">
@@ -76,25 +46,87 @@ export default function GroverOracleLearnPage() {
         }
       />
 
-      {/* Prior Knowledge Badge */}
-      <PriorKnowledgeBadge
-        activeRole={activeRole}
-        learnerProfile={activeLearnerProfile}
-        learningPath={activeLearningPath}
-      />
+      {/* Intuitive Story Intro Card */}
+      <Card className="border border-line bg-card shadow-xs">
+        <CardContent className="p-5 sm:p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 mt-0.5">
+              <Box className="w-5 h-5 text-accent" />
+            </div>
+            <div className="space-y-1.5">
+              <h2 className="text-base sm:text-lg font-semibold text-text-primary">
+                The Mystery of the 8 Secret Coins
+              </h2>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                Imagine 8 identical coins placed in front of you. Exactly one coin holds the secret prize (for example, coin <span className="font-mono text-accent font-semibold">|101⟩</span>).
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="p-4 rounded-lg bg-surface border border-line space-y-2">
+              <div className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-400" />
+                <span>Classical Computer</span>
+              </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Has no choice but to inspect coin #1, then coin #2, then #3... one by one. In the worst case, it has to check all 8 boxes.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-lg bg-accent/5 border border-accent/20 space-y-2">
+              <div className="text-xs font-mono font-semibold text-accent uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-3 h-3 text-accent" />
+                <span>Quantum Computer & The Oracle</span>
+              </div>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Puts all 8 coins into a <strong>superposition</strong> at once. Then, it uses the <strong>Oracle</strong>: a magic scanner that recognizes the winner and secretly <strong className="text-text-primary">flips it upside-down</strong> (Phase Inversion: +1 → -1).
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Learning Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Theory & Interactive Simulators */}
+        {/* Left Column: 3D Interactive Simulators & Logic */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Core Theory Concept Blocks */}
-          <ConceptBlocks contentBlocks={contentBlocks} />
+          {/* Primary 3D Visual: The 3D Quantum Coin Flip */}
+          <OracleCoinFlip3D />
 
-          {/* Interactive Phase Inversion Mirror */}
-          <PhaseInversionMirror />
+          {/* Intuitive Hardware Circuit Bridge: The 3-Key Vault */}
+          <Card className="border border-line bg-card shadow-xs">
+            <CardHeader className="p-5 pb-3 border-b border-line bg-surface/30">
+              <div className="flex items-center gap-2 text-xs font-mono text-accent">
+                <KeyRound className="w-4 h-4" />
+                <span>HOW THE CIRCUIT DOES IT</span>
+              </div>
+              <CardTitle className="text-base text-text-primary">
+                The 3-Key Quantum Vault (Toffoli / CCX Gate)
+              </CardTitle>
+              <CardDescription className="text-xs text-text-secondary">
+                How does a quantum circuit flip <em>only</em> coin |101⟩ without guessing? Think of it like a vault with 3 locks.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-5 space-y-4">
+              <div className="text-xs text-text-secondary leading-relaxed space-y-2">
+                <p>
+                  To trigger an action only when the state is <strong className="text-text-primary font-mono">|101⟩</strong> (q0=1, q1=0, q2=1):
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Key 0 (<code className="font-mono text-text-primary">q0</code>) is already <strong className="font-mono text-emerald-400">1</strong>.</li>
+                  <li>Key 1 (<code className="font-mono text-text-primary">q1</code>) is a <strong className="font-mono">0</strong>, so an <strong>X gate</strong> (NOT) flips it to <strong className="font-mono text-emerald-400">1</strong>.</li>
+                  <li>Key 2 (<code className="font-mono text-text-primary">q2</code>) is already <strong className="font-mono text-emerald-400">1</strong>.</li>
+                </ul>
+                <p>
+                  When all three keys are simultaneously <strong className="text-emerald-400 font-mono">1</strong>, the <strong>Toffoli (CCX) gate</strong> trips its wire and inverts the phase! Test the switches below:
+                </p>
+              </div>
 
-          {/* Interactive Toffoli (CCX) Gate Simulator */}
-          <CcxGateSimulation />
+              {/* Interactive Toffoli Gate Component */}
+              <CcxGateSimulation />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column: Qiskit Code & Checkpoint Card */}
@@ -157,19 +189,19 @@ qc.x(1)`}
                     id: 'opt_1',
                     text: 'State |101⟩ with 100% certainty',
                     correct: false,
-                    hint: 'Incorrect. The oracle only changes phase (sign), not measurement probability.',
+                    hint: 'Incorrect. The oracle only flipped the sign upside down (-1). Its size (probability) is still only 12.5%.',
                   },
                   {
                     id: 'opt_2',
                     text: 'A completely random 1/8 (12.5%) distribution across all 8 states',
                     correct: true,
-                    hint: 'Correct! |(-1)/√8|² = 1/8. The phase change is invisible until the diffusion operator!',
+                    hint: 'Correct! |(-0.35)|² = 12.5%. Flipping a coin upside-down does not make it more likely to be picked until the Diffusion step amplifies it!',
                   },
                   {
                     id: 'opt_3',
                     text: 'All states collapse to |000⟩',
                     correct: false,
-                    hint: 'Incorrect. Measurement samples according to Born probabilities.',
+                    hint: 'Incorrect. Measurement samples uniformly according to probability.',
                   },
                 ].map((opt) => {
                   const isSelected = selectedAnswer === opt.id;
