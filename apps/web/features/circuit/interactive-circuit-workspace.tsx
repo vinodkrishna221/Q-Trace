@@ -12,7 +12,7 @@ import { LintWarning, lintCircuitLocally } from './circuit-linter';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2, Plus, Minus, AlertTriangle } from 'lucide-react';
+import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2, Plus, Minus, AlertTriangle, ChevronDown, ChevronUp, Code2 } from 'lucide-react';
 
 interface InteractiveCircuitWorkspaceProps {
   initialCircuit?: CircuitModel;
@@ -20,6 +20,71 @@ interface InteractiveCircuitWorkspaceProps {
   hasExecuted?: boolean;
   onRunSimulation?: (circuit: CircuitModel) => void;
   readOnly?: boolean;
+}
+
+interface CodeDrawerProps {
+  isReadOnly: boolean;
+  lintWarnings: LintWarning[];
+}
+
+function CodeDrawer({ isReadOnly, lintWarnings }: CodeDrawerProps) {
+  const [open, setOpen] = React.useState(false);
+  const { code, isCodeModified } = useCircuitStore();
+  const lineCount = code.split('\n').length;
+
+  return (
+    <div className="rounded-xl border border-border-subtle overflow-hidden bg-slate-950 shadow-sm">
+      {/* Drawer trigger bar */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-2.5 cursor-pointer group hover:bg-white/[0.03] transition-colors"
+        aria-expanded={open}
+        aria-label="Toggle Qiskit code panel"
+      >
+        <div className="flex items-center gap-3">
+          <Code2 className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+          <span className="text-[11px] font-mono font-semibold text-slate-300">
+            Synchronized Qiskit (Python)
+          </span>
+          <span className="text-[10px] font-mono text-slate-600">
+            {lineCount} lines
+          </span>
+          <Badge
+            variant="outline"
+            className={`text-[9px] font-mono py-0 px-1.5 ${
+              isCodeModified
+                ? 'text-amber-400 border-amber-500/40 bg-amber-500/10'
+                : 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
+            }`}
+          >
+            {isCodeModified ? 'Unsaved' : 'Synced ✓'}
+          </Badge>
+          {lintWarnings.length > 0 && (
+            <Badge variant="outline" className="text-[9px] font-mono py-0 px-1.5 text-amber-400 border-amber-500/40 bg-amber-500/10">
+              ⚠ {lintWarnings.length} warning{lintWarnings.length > 1 ? 's' : ''}
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono text-slate-600 group-hover:text-slate-400 transition-colors">
+            {open ? 'collapse' : 'view code'}
+          </span>
+          {open
+            ? <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+            : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+          }
+        </div>
+      </button>
+
+      {/* Expandable code editor */}
+      {open && (
+        <div className="border-t border-slate-800">
+          <QiskitCodeEditor isReadOnly={isReadOnly} lintWarnings={lintWarnings} />
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function InteractiveCircuitWorkspace({
@@ -192,15 +257,11 @@ export function InteractiveCircuitWorkspace({
             </div>
           )}
 
-          {/* Side-by-Side Instrument: Wires Grid + Qiskit Code Editor */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-8 space-y-4">
-              <QubitWiresGrid readOnly={isLocked} lintWarnings={lintWarnings} />
-            </div>
-            <div className="lg:col-span-4 space-y-4">
-              <QiskitCodeEditor isReadOnly={isLocked} lintWarnings={lintWarnings} />
-            </div>
-          </div>
+          {/* Circuit Wires Grid — full width now */}
+          <QubitWiresGrid readOnly={isLocked} lintWarnings={lintWarnings} />
+
+          {/* Qiskit Code — collapsible drawer below the circuit */}
+          <CodeDrawer isReadOnly={isLocked} lintWarnings={lintWarnings} />
         </CardContent>
 
         <CardFooter className="bg-surface-raised/40 p-3 md:p-4 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3">
