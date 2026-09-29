@@ -12,6 +12,7 @@ import { CcxGateSimulation } from '@/features/learning/components/ccx-gate-simul
 import { PhaseInversionMirror } from '@/features/learning/components/phase-inversion-mirror';
 import { QuantumChestRing3D } from '@/features/learning/components/quantum-chest-ring-3d';
 import { InteractiveFormulaDecoder } from '@/features/learning/components/interactive-formula-decoder';
+import { LearnPageTutor, ORACLE_PAGE_CONTEXT } from '@/features/learning/components/learn-page-tutor';
 import {
   Clock,
   Cpu,
@@ -244,6 +245,9 @@ qc.x(1)`}
           </Card>
         </div>
       </div>
+
+      {/* ── PAGE-AWARE AI TUTOR ── */}
+      <LearnPageTutor pageContext={ORACLE_PAGE_CONTEXT} />
     </div>
   );
 }

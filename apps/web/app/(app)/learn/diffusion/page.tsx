@@ -13,6 +13,7 @@ import { GroverRotation2D } from '@/features/learning/components/grover-rotation
 import { DiffusionAmplitudeVisualizer } from '@/features/learning/components/diffusion-amplitude-visualizer';
 import { DiffusionFormulaDecoder } from '@/features/learning/components/diffusion-formula-decoder';
 import { SouffleOverRotationMeter } from '@/features/learning/components/souffle-over-rotation-meter';
+import { LearnPageTutor, DIFFUSION_PAGE_CONTEXT } from '@/features/learning/components/learn-page-tutor';
 import {
   Clock,
   Layers,
@@ -314,6 +315,9 @@ qc.h([0, 1, 2])`}
           </Card>
         </div>
       </div>
+
+      {/* ── PAGE-AWARE AI TUTOR ── */}
+      <LearnPageTutor pageContext={DIFFUSION_PAGE_CONTEXT} />
     </div>
   );
 }

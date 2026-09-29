@@ -674,9 +674,44 @@ export const apiClient = {
       };
     } catch {
       // Smart contextual client-side fallback if backend/cloud is offline
+      const q = payload.question.toLowerCase().trim();
+      const moduleId = payload.moduleId ?? '';
+
+      // ── Oracle page fallback ──────────────────────────────────────────────
+      if (moduleId === 'mod_oracle') {
+        let answer =
+          'The **Phase Oracle** U_ω marks the target state |101⟩ by flipping its amplitude sign: U_ω|x⟩ = (-1)^{f(x)}|x⟩.\n\nThe phase flip is invisible to measurement (|amplitude|² removes the sign), but the Diffusion operator will amplify it into probability.';
+        if (q.includes('ccx') || q.includes('toffoli')) {
+          answer = 'The **CCX (Toffoli) gate** is a 3-qubit gate that flips its target only when both controls are |1⟩. In the oracle, it implements the phase kickback by acting on an ancilla in |−⟩, phase-flipping only the |101⟩ control pattern.';
+        } else if (q.includes('phase') || q.includes('kickback')) {
+          answer = '**Phase kickback**: when CCX fires on an ancilla in |−⟩ = (|0⟩-|1⟩)/√2, the -1 phase "kicks back" onto the control qubits. Only the marked state |101⟩ picks up this phase. All others are unchanged.';
+        } else if (q.includes('measur') || q.includes('invisible')) {
+          answer = 'After the oracle, measurement still shows a **uniform distribution** (each state has probability 1/8 = 12.5%). The phase sign cancels in |amplitude|² — the mark is invisible until the Diffusion operator runs.';
+        }
+        return {
+          data: { answer, model: 'DEMO_FALLBACK', fallbackUsed: true, groundedEvidenceKeys: ['oracle.phase_flip'] },
+          meta: { requestId: `req_fb_${Date.now().toString(36)}`, isFallback: true, durationMs: Date.now() - startTime },
+        };
+      }
+
+      // ── Diffusion page fallback ───────────────────────────────────────────
+      if (moduleId === 'mod_diffusion') {
+        let answer =
+          'The **Diffusion operator** D = 2|ψ⟩⟨ψ| - I reflects all amplitudes about their mean. After the oracle phase-flips |101⟩, diffusion catapults the marked state from 12.5% → ~78% probability in one iteration.';
+        if (q.includes('over') || q.includes('souffle') || q.includes('too many')) {
+          answer = '**Over-rotation**: optimal Grover iterations = ⌊π√N/4⌋. For N=8 that is ~2 iterations. Running more causes the marked state to "overshoot" and probability decreases — like a soufflé that bakes too long!';
+        } else if (q.includes('mean') || q.includes('reflect') || q.includes('inversion')) {
+          answer = '**Inversion about the mean**: new_amplitude = 2·μ - old_amplitude. After oracle, the marked state is below zero, so reflection pushes it far above the mean, dramatically increasing its probability.';
+        }
+        return {
+          data: { answer, model: 'DEMO_FALLBACK', fallbackUsed: true, groundedEvidenceKeys: ['diffusion.mean_reflection'] },
+          meta: { requestId: `req_fb_${Date.now().toString(36)}`, isFallback: true, durationMs: Date.now() - startTime },
+        };
+      }
+
+      // ── Default Bell state fallback ───────────────────────────────────────
       let answer =
         'In this simulation run, the Hadamard gate placed qubit 0 in equal superposition (|00⟩ + |10⟩)/√2, and the CNOT gate correlated qubit 1, producing the Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2.\n\nNotice that outcomes 01 and 10 have probability exactly 0.0, while 00 and 11 each occur with probability 0.5.';
-      const q = payload.question.toLowerCase().trim();
       if (q.includes('mixed') || q.includes('trace') || q.includes('purity')) {
         answer =
           'Tracing out qubit 1 from |Φ+⟩ yields the reduced density matrix ρ₀ = 0.5|0⟩⟨0| + 0.5|1⟩⟨1|. Its purity Tr(ρ₀²) = 0.5, which is a **maximally mixed state**. Neither qubit has a definite state vector on its own—the correlation is purely joint!';
