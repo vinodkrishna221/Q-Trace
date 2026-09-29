@@ -393,6 +393,39 @@ export const apiClient = {
 
       // Offline / DEMO_LOCAL fallback path with accurate 2-qubit state evaluation
       const simulated = simulateFallbackCircuit(payload.circuitModel, payload.shots || 1024);
+      let probabilities = simulated.probabilities;
+      let counts = simulated.counts;
+      let stateTrace = simulated.stateTrace;
+
+      if (payload.noisePreset === 'superconducting') {
+        const shots = payload.shots || 1024;
+        const keys = ['00', '01', '10', '11'];
+        const noisyProbs: Record<string, number> = {};
+        const noisyCounts: Record<string, number> = {};
+        keys.forEach((k) => {
+          const idealP = probabilities[k] || 0;
+          const noisyP = Math.round((idealP * 0.92 + 0.02) * 1000) / 1000;
+          noisyProbs[k] = noisyP;
+          noisyCounts[k] = Math.round(noisyP * shots);
+        });
+        probabilities = noisyProbs;
+        counts = noisyCounts;
+
+        stateTrace = stateTrace.map((step) => ({
+          ...step,
+          reducedQubits: step.reducedQubits.map((rq) => ({
+            ...rq,
+            purity: 0.847,
+            bloch: {
+              x: Math.round(rq.bloch.x * 0.847 * 1000) / 1000,
+              y: Math.round(rq.bloch.y * 0.847 * 1000) / 1000,
+              z: Math.round(rq.bloch.z * 0.847 * 1000) / 1000,
+            },
+            label: 'MIXED_SUBSYSTEM' as const,
+          })),
+        }));
+      }
+
       const isStarterBell =
         payload.circuitModel.id === DEMO_STARTER_CIRCUIT.id ||
         payload.circuitModel.id === 'cm_bell_seed';
@@ -407,9 +440,10 @@ export const apiClient = {
         moduleId: payload.moduleId,
         circuitModelId: payload.circuitModel.id,
         predictionResponse: payload.predictionResponse,
-        probabilities: simulated.probabilities,
-        counts: simulated.counts,
-        stateTrace: simulated.stateTrace,
+        noisePreset: payload.noisePreset,
+        probabilities,
+        counts,
+        stateTrace,
         createdAt: new Date().toISOString(),
         ...(payload.backends && (payload.backends.length > 1 || payload.backends.includes('cirq') || payload.backends.includes('pennylane'))
           ? {
