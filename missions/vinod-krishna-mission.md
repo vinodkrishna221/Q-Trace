@@ -223,7 +223,7 @@ DELIVERABLE: Modify apps/web/features/circuit/gate-palette.tsx (add CCX, CZ, S, 
 TEST: `pnpm test:web tests/unit/gate-palette-expansion.test.tsx`
 DEPENDS: FEA-1          UNBLOCKS: —
 DEMO: The judge sees CCX (Toffoli), CZ, S, and T in the gate palette and can drag a 3-qubit Toffoli gate onto the circuit canvas, seeing connected multi-wire control dots and target glyphs snap into place.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-12-gate-palette-glyph`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

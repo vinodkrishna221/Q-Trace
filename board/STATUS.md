@@ -167,3 +167,5 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 29 Sep 11:25 Vinod: FEA-1 green (feat/features-phase/fea-1-gate-model-expansion) — expanded GateName enum and models with CCX (Toffoli), CZ, S, and T; added CCX/CZ validators and increased operations limit to 30; wired Qiskit Aer simulation and AST parser allowlist; added OpenQASM 3 mappings and frontend GateName union; 29/29 FEA-1 unit tests passed, 173/173 simulation regression passed; PR ready for Warden review. Unblocks FEA-2, FEA-3, FEA-6, FEA-8, FEA-10, FEA-12, FEA-14.
 
+- 29 Sep 12:28 Vinod: FEA-12 green (feat/features-phase/fea-12-gate-palette-glyph) — implemented gate palette family groupings (Single Qubit, Phase, Multi-Qubit, Measure) and SVG glyphs for CCX, CZ, S, T; added multi-wire vertical connection spans and control/target rendering on qubit wires with dynamic qubit count controls; 13/13 FEA-12 unit tests passed, full web suite and Next.js 17/17 routes clean; PR ready for Warden review.
+

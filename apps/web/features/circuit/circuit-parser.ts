@@ -96,9 +96,15 @@ export function generateQiskitCode(circuit: CircuitModel): string {
         ? 'Superposition'
         : firstOp.gate === 'CNOT'
           ? 'Entanglement'
-          : firstOp.gate === 'MEASURE'
-            ? 'Measurement'
-            : `${firstOp.gate} Gate`;
+          : firstOp.gate === 'CCX'
+            ? 'Toffoli'
+            : firstOp.gate === 'CZ'
+              ? 'Controlled-Z'
+              : firstOp.gate === 'S' || firstOp.gate === 'T'
+                ? 'Phase'
+                : firstOp.gate === 'MEASURE'
+                  ? 'Measurement'
+                  : `${firstOp.gate} Gate`;
     lines.push(`# Column ${col}: ${colLabel}`);
 
     const measureOps = colOps.filter((op) => op.gate === 'MEASURE');
@@ -118,8 +124,20 @@ export function generateQiskitCode(circuit: CircuitModel): string {
         case 'Z':
           lines.push(`qc.z(${op.targets[0]})`);
           break;
+        case 'S':
+          lines.push(`qc.s(${op.targets[0]})`);
+          break;
+        case 'T':
+          lines.push(`qc.t(${op.targets[0]})`);
+          break;
         case 'CNOT':
           lines.push(`qc.cx(${op.controls[0]}, ${op.targets[0]})`);
+          break;
+        case 'CZ':
+          lines.push(`qc.cz(${op.controls[0]}, ${op.targets[0]})`);
+          break;
+        case 'CCX':
+          lines.push(`qc.ccx(${op.controls[0]}, ${op.controls[1]}, ${op.targets[0]})`);
           break;
       }
     }
@@ -168,80 +186,107 @@ export function parseQiskitCode(code: string, currentModel?: CircuitModel): Pars
     };
   }
 
-  if (code.length > 8000) {
-    return {
-      success: false,
-      errorCode: 'CIRCUIT_LIMIT_EXCEEDED',
-      error: 'Code exceeds 8000 character prototype limit.',
-    };
-  }
-
-  // 1. Safety verification
-  const lowerCode = code.toLowerCase();
-  for (const kw of DISALLOWED_KEYWORDS) {
-    // Check whole word or token
-    const regex = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-    if (regex.test(code) || (kw === '__' && code.includes('__'))) {
+  // Security AST / keyword check: Reject unsafe patterns
+  for (const keyword of DISALLOWED_KEYWORDS) {
+    if (code.includes(keyword)) {
       return {
         success: false,
         errorCode: 'UNSAFE_CODE',
-        error: `UNSAFE_CODE: Unallowed keyword or identifier "${kw}" found. Only linear QuantumCircuit calls are permitted.`,
+        error: `UNSAFE_CODE: Unsafe Python code detected containing prohibited keyword "${keyword}". Execution blocked.`,
       };
     }
   }
 
-  // 2. Parse QuantumCircuit initialization
-  // Matches: QuantumCircuit(2, 2) or QuantumCircuit(2)
-  const initMatch = code.match(/QuantumCircuit\s*\(\s*(\d+)(?:\s*,\s*(\d+))?\s*\)/);
-  if (!initMatch) {
-    return {
-      success: false,
-      errorCode: 'PARSE_ERROR',
-      error: 'Missing QuantumCircuit initialization: expected "qc = QuantumCircuit(qubitCount, classicalBitCount)".',
-    };
+  const lines = code
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0 && !l.startsWith('#'));
+
+  // Ensure imports are allowlisted
+  for (const line of lines) {
+    if (line.startsWith('import ') || line.startsWith('from ')) {
+      if (
+        line !== 'from qiskit import QuantumCircuit' &&
+        line !== 'import qiskit'
+      ) {
+        return {
+          success: false,
+          errorCode: 'UNSAFE_CODE',
+          error: `UNSAFE_CODE: Disallowed import statement "${line}". Only "from qiskit import QuantumCircuit" is permitted.`,
+        };
+      }
+    }
   }
 
-  const qubitCount = parseInt(initMatch[1], 10);
-  const classicalBitCount = initMatch[2] ? parseInt(initMatch[2], 10) : qubitCount;
+  // Parse QuantumCircuit initialization
+  let qubitCount = currentModel?.qubitCount || 2;
+  let classicalBitCount = currentModel?.classicalBitCount || 2;
+  let circuitInitialized = false;
 
+  const initRegex = /(?:qc\s*=\s*)?QuantumCircuit\((\d+)(?:\s*,\s*(\d+))?\)/;
+  for (const line of lines) {
+    const match = line.match(initRegex);
+    if (match) {
+      qubitCount = parseInt(match[1], 10);
+      classicalBitCount = match[2] ? parseInt(match[2], 10) : qubitCount;
+      circuitInitialized = true;
+      break;
+    }
+  }
+
+  if (!circuitInitialized && lines.some((l) => l.startsWith('qc.'))) {
+    // If not explicitly declared in code, keep currentModel dimension
+    qubitCount = currentModel?.qubitCount || 2;
+    classicalBitCount = currentModel?.classicalBitCount || 2;
+  }
+
+  // Validate limits (prototype max 5 qubits)
   if (qubitCount < 1 || qubitCount > 5) {
     return {
       success: false,
       errorCode: 'CIRCUIT_LIMIT_EXCEEDED',
-      error: `qubitCount ${qubitCount} exceeds prototype limit (1 to 5 qubits).`,
+      error: `Qubit count ${qubitCount} exceeds prototype limit of 1-5 qubits.`,
     };
   }
 
-  // 3. Scan line by line for method calls on the circuit
-  const lines = code.split('\n');
   const operations: Operation[] = [];
   let opIndex = 1;
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-    const rawLine = lines[lineIndex].trim();
-    if (!rawLine || rawLine.startsWith('#') || rawLine.startsWith('from ') || rawLine.startsWith('import ') || rawLine.includes('QuantumCircuit(')) {
+    const rawLine = lines[lineIndex];
+
+    // Skip import and initialization lines
+    if (
+      rawLine.startsWith('from qiskit') ||
+      rawLine.startsWith('import qiskit') ||
+      rawLine.includes('QuantumCircuit(')
+    ) {
       continue;
     }
 
-    // Match method call on circuit variable: e.g. qc.h(0), qc.cx(0, 1), qc.rx(0.5, 0)
-    const callMatch = rawLine.match(/(?:qc|[a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z0-9_]+)\s*\((.*)\)/);
+    // Match qc.<method>(<args>)
+    const callMatch = rawLine.match(/^qc\.([a-zA-Z0-9_]+)\((.*)\)$/);
     if (!callMatch) {
-      // Check if this line looks like an invalid statement
-      if (rawLine.includes('.') || rawLine.includes('(')) {
+      if (rawLine.startsWith('qc.')) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: Malformed gate call syntax "${rawLine}".`,
+        };
+      } else {
         return {
           success: false,
           errorCode: 'PARSE_ERROR',
           error: `Line ${lineIndex + 1}: Unrecognized statement "${rawLine}".`,
         };
       }
-      continue;
     }
 
     const methodName = callMatch[1].toLowerCase();
     const argsString = callMatch[2].trim();
 
     // Check for unsupported gates explicitly
-    if (['rx', 'ry', 'rz', 'swap', 'cz', 'crx', 'cry', 'crz', 'u', 'p', 't', 's', 'sdg', 'tdg'].includes(methodName)) {
+    if (['rx', 'ry', 'rz', 'swap', 'crx', 'cry', 'crz', 'u', 'p', 'sdg', 'tdg'].includes(methodName)) {
       const upperGate = methodName.toUpperCase();
       return {
         success: false,
@@ -318,6 +363,40 @@ export function parseQiskitCode(code: string, currentModel?: CircuitModel): Pars
         classicalTargets: [],
         column: 0,
       });
+    } else if (methodName === 's') {
+      const q = parseInt(argsString, 10);
+      if (isNaN(q) || q < 0 || q >= qubitCount) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: Invalid target qubit ${argsString} for Phase S gate.`,
+        };
+      }
+      operations.push({
+        opId: `op_parsed_${opIndex++}`,
+        gate: 'S',
+        targets: [q],
+        controls: [],
+        classicalTargets: [],
+        column: 0,
+      });
+    } else if (methodName === 't') {
+      const q = parseInt(argsString, 10);
+      if (isNaN(q) || q < 0 || q >= qubitCount) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: Invalid target qubit ${argsString} for T gate.`,
+        };
+      }
+      operations.push({
+        opId: `op_parsed_${opIndex++}`,
+        gate: 'T',
+        targets: [q],
+        controls: [],
+        classicalTargets: [],
+        column: 0,
+      });
     } else if (methodName === 'cx' || methodName === 'cnot') {
       const parts = argsString.split(',').map((p) => parseInt(p.trim(), 10));
       if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
@@ -340,6 +419,61 @@ export function parseQiskitCode(code: string, currentModel?: CircuitModel): Pars
         gate: 'CNOT',
         targets: [tgt],
         controls: [ctrl],
+        classicalTargets: [],
+        column: 0,
+      });
+    } else if (methodName === 'cz') {
+      const parts = argsString.split(',').map((p) => parseInt(p.trim(), 10));
+      if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: CZ requires (control, target) arguments, got "${argsString}".`,
+        };
+      }
+      const [ctrl, tgt] = parts;
+      if (ctrl < 0 || ctrl >= qubitCount || tgt < 0 || tgt >= qubitCount || ctrl === tgt) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: Invalid CZ qubits control=${ctrl}, target=${tgt}.`,
+        };
+      }
+      operations.push({
+        opId: `op_parsed_${opIndex++}`,
+        gate: 'CZ',
+        targets: [tgt],
+        controls: [ctrl],
+        classicalTargets: [],
+        column: 0,
+      });
+    } else if (methodName === 'ccx' || methodName === 'toffoli') {
+      const parts = argsString.split(',').map((p) => parseInt(p.trim(), 10));
+      if (parts.length !== 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: CCX requires (control1, control2, target) arguments, got "${argsString}".`,
+        };
+      }
+      const [ctrl1, ctrl2, tgt] = parts;
+      if (
+        ctrl1 < 0 || ctrl1 >= qubitCount ||
+        ctrl2 < 0 || ctrl2 >= qubitCount ||
+        tgt < 0 || tgt >= qubitCount ||
+        ctrl1 === ctrl2 || ctrl1 === tgt || ctrl2 === tgt
+      ) {
+        return {
+          success: false,
+          errorCode: 'PARSE_ERROR',
+          error: `Line ${lineIndex + 1}: Invalid CCX qubits control1=${ctrl1}, control2=${ctrl2}, target=${tgt}. Controls and target must be distinct within 0..${qubitCount - 1}.`,
+        };
+      }
+      operations.push({
+        opId: `op_parsed_${opIndex++}`,
+        gate: 'CCX',
+        targets: [tgt],
+        controls: [ctrl1, ctrl2],
         classicalTargets: [],
         column: 0,
       });

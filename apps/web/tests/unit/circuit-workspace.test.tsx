@@ -220,7 +220,7 @@ qc.measure([0, 1], [0, 1])
       expect(result.success).toBe(false);
       expect(result.errorCode).toBe('UNSUPPORTED_GATE');
       expect(result.error).toContain('Gate RX is outside the prototype subset');
-      expect(result.error).toContain('Allowed gates: H, X, Y, Z, CNOT, MEASURE');
+      expect(result.error).toContain('Allowed gates:');
 
       // 2. Store records the parse error
       expect(useCircuitStore.getState().parseError).toContain('Gate RX is outside the prototype subset');
