@@ -89,3 +89,66 @@ Note: DUO-1 and DUO-3 run IN PARALLEL (no dependency between them). Both feed DU
 - `Venu Gopal: ACCEPTED — DUO Duolingo Path Phase — starting DUO-10 — feat/duolingo-curriculum/duo-10-teleportation-capstone` — STATUS: [x] merged
 - `Sohail: ACCEPTED — DUO Duolingo Path Phase — starting DUO-11 — feat/duolingo-ui/duo-11-desktop-assembly-inspector` — STATUS: [x] merged
 - `Sohail: ACCEPTED — DUO Duolingo Path Phase — starting DUO-12 — feat/duolingo-ui/duo-12-mobile-sheet-acceptance` — STATUS: [ ] ready
+
+---
+
+## Features Phase — FEA-1 through FEA-14
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase.
+> All cards target files defined in docs/FEATURES-SPEC.md — read it before starting any FEA card.
+
+### Load Summary
+
+| Member | FEA Cards | New Branches | Phase Load |
+|---|---|---|---|
+| Vinod Krishna | FEA-1, FEA-12, FEA-14 | `feat/features-phase/fea-1-gate-model-expansion`, `feat/features-phase/fea-12-gate-palette-glyph`, `feat/features-phase/fea-14-contracts-golden-fixtures` | ~7h |
+| Rajeswari | FEA-3, FEA-4 | `feat/features-phase/fea-3-grover-curriculum`, `feat/features-phase/fea-4-grover-amplitude-scrubber` | ~7h |
+| Uday Rohit | FEA-2, FEA-5 | `feat/features-phase/fea-2-linter-backend`, `feat/features-phase/fea-5-linter-frontend` | ~6h |
+| Rani | FEA-8, FEA-9 | `feat/features-phase/fea-8-cirq-adapter-backend`, `feat/features-phase/fea-9-engine-selector-rosetta-ui` | ~6h |
+| Venu Gopal | FEA-10, FEA-11 | `feat/features-phase/fea-10-nisq-noise-backend`, `feat/features-phase/fea-11-noise-toggle-qsphere-ui` | ~5h |
+| Sohail | FEA-6, FEA-7 | `feat/features-phase/fea-6-socratic-grading-engine`, `feat/features-phase/fea-7-assess-route-ui` | ~7h |
+
+### Dependency Chain
+
+```
+FEA-1 (Gate Model Expansion) ──────────────────────────────────────────────────────────────────┐
+  │                                                                                             │
+  ├──► FEA-2 (F2: Linter Backend — linter.py + /v1/circuits/lint)                              │
+  │         └──► FEA-5 (F2: Linter Frontend — amber pills + code editor squiggles)             │
+  │                                                                                             │
+  ├──► FEA-3 (F1: Grover Curriculum — module2-unit-2-1.ts, 9 stages)                           │
+  │         └──► FEA-4 (F1: Grover Amplitude Scrubber — grover-amplitude-scrubber.tsx)         │
+  │                                                                                             │
+  ├──► FEA-6 (F5: Grading Engine — socratic_engine.py + /v1/grading/assess)                    │
+  │         └──► FEA-7 (F5: /assess Route — assess/page.tsx two-column UI)                    │
+  │                                                                                             │
+  ├──► FEA-8 (F3: Cirq Adapter — cirq_adapter.py, reuse normalizer.py)                         │
+  │         └──► FEA-9 (F3: Engine Selector UI + Conformance Badge + Rosetta Stone panel)      │
+  │                                                                                             │
+  ├──► FEA-10 (F4: Noise Model Backend — adapter.py noise_preset param + API field)            │
+  │         └──► FEA-11 (F4: Noise Toggle UI + Bloch Contraction + Q-Sphere Wiring)             │
+  │                                                                                             │
+  └──► FEA-12 (Gate Palette & Glyph — CCX/CZ/S/T in gate-palette.tsx + gate-glyph.tsx)        │
+  (parallel with other FEA cards)                                                               │
+                                                                                                │
+FEA-14 (Cross-Feature Contract & Golden Fixtures — grading-assessment.md + golden fixtures      │
+         for Grover, Linter, Conformance) ── depends on FEA-1, FEA-2, FEA-6, FEA-8             │
+         ── UNBLOCKS: SHIP-6 re-run, final certify                                             │
+```
+
+### Discord Acceptance Lines — FEA Phase
+
+- `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-1 — feat/features-phase/fea-1-gate-model-expansion` — STATUS: [ ] ready
+- `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-12 — feat/features-phase/fea-12-gate-palette-glyph` — STATUS: [ ] ready
+- `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-14 — feat/features-phase/fea-14-contracts-golden-fixtures` — STATUS: [ ] ready
+- `Rajeswari: ACCEPTED — Features Phase — starting FEA-3 — feat/features-phase/fea-3-grover-curriculum` — STATUS: [ ] ready
+- `Rajeswari: ACCEPTED — Features Phase — starting FEA-4 — feat/features-phase/fea-4-grover-amplitude-scrubber` — STATUS: [ ] ready
+- `Uday Rohit: ACCEPTED — Features Phase — starting FEA-2 — feat/features-phase/fea-2-linter-backend` — STATUS: [ ] ready
+- `Uday Rohit: ACCEPTED — Features Phase — starting FEA-5 — feat/features-phase/fea-5-linter-frontend` — STATUS: [ ] ready
+- `Rani: ACCEPTED — Features Phase — starting FEA-8 — feat/features-phase/fea-8-cirq-adapter-backend` — STATUS: [ ] ready
+- `Rani: ACCEPTED — Features Phase — starting FEA-9 — feat/features-phase/fea-9-engine-selector-rosetta-ui` — STATUS: [ ] ready
+- `Venu Gopal: ACCEPTED — Features Phase — starting FEA-10 — feat/features-phase/fea-10-nisq-noise-backend` — STATUS: [ ] ready
+- `Venu Gopal: ACCEPTED — Features Phase — starting FEA-11 — feat/features-phase/fea-11-noise-toggle-qsphere-ui` — STATUS: [ ] ready
+- `Sohail: ACCEPTED — Features Phase — starting FEA-6 — feat/features-phase/fea-6-socratic-grading-engine` — STATUS: [ ] ready
+- `Sohail: ACCEPTED — Features Phase — starting FEA-7 — feat/features-phase/fea-7-assess-route-ui` — STATUS: [ ] ready
+

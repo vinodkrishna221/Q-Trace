@@ -40,6 +40,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | QA-8 | `feat/fixtures-qa/qa-8-certify-projector-demo-and-backup` | card TEST + fresh Warden verdict + contract check |
 | DUO-11 | `feat/duolingo-ui/duo-11-desktop-assembly-inspector` | card TEST + fresh Warden verdict + contract check |
 | DUO-12 | `feat/duolingo-ui/duo-12-mobile-sheet-acceptance` | card TEST + fresh Warden verdict + contract check |
+| FEA-6 | `feat/features-phase/fea-6-socratic-grading-engine` | card TEST + fresh Warden verdict + contract check |
+| FEA-7 | `feat/features-phase/fea-7-assess-route-ui` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/fixtures-qa-phase-plan.md`
 
@@ -191,4 +193,40 @@ DEMO: On mobile (390px), the judge taps the active Hadamard node — the In-Situ
 PERSONA: Warden           STATUS: [x] green
 BRANCH: `feat/duolingo-ui/duo-12-mobile-sheet-acceptance`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-6 · Socratic Counterexample Grading Engine Backend [timebox: 4h]
+CONTEXT: Per docs/FEATURES-SPEC.md §5.1, §5.2 (Three Quantum Invariants for Grading), §5.3, and §5.5 (New API Endpoints), Q-Trace replaces generic "Wrong answer" feedback with deterministic physics counterexamples. Create apps/api/app/services/grading/socratic_engine.py evaluating 3 invariants without LLM dependencies:
+- G-1: Entanglement Entropy (S(ρ_A) = -Tr(ρ_A log2 ρ_A)): flags separable product states when entangled state is required.
+- G-2: Phase Observability: verifies phase interference in Hadamard basis (H^(⊗n)) to detect missing relative phases.
+- G-3: Unitary Reversibility: checks U† U |0⟩^n = |0⟩^n with fidelity >= 0.99.
+generate_counterexample() tests basis inputs (|0⟩, |1⟩, |+⟩) to find the smallest input where student and target circuits diverge. Expose POST /v1/grading/assess and GET /v1/grading/assess/{attemptId}, and seed the 4 mutation challenges (CH_BELL_ENTANGLE, CH_PHASE_SUPER, CH_GROVER_2Q, CH_UNITARY_REV) in seed.py.
+DELIVERABLE: Create apps/api/app/services/grading/socratic_engine.py (implement invariant checkers G-1, G-2, G-3 and generate_counterexample()), create apps/api/app/routers/grading.py (implement POST /v1/grading/assess and GET /v1/grading/assess/{attemptId}), modify apps/api/app/services/data/seed.py (seed mutation challenges CH_BELL_ENTANGLE, CH_PHASE_SUPER, CH_GROVER_2Q, CH_UNITARY_REV), and create apps/api/tests/unit/grading/test_socratic_engine.py.
+TEST: `uv run --project apps/api pytest apps/api/tests/unit/grading/test_socratic_engine.py -v`
+DEPENDS: FEA-1          UNBLOCKS: FEA-7, FEA-14
+DEMO: Submitting an X+CNOT circuit against the Bell challenge returns an invariant violation G-1 with input |+⟩ proving subsystem purity produces deterministic |1⟩ instead of random 50/50.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-6-socratic-grading-engine`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-7 · /assess Route — Socratic Counterexample UI [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §5.1, §5.4 (/assess Route — UI Specification), and §5.7 (Demo Wow-Moment Script), when a student fails a challenge, they are directed to /assess?challengeId=<id>&attemptId=<id>. This dedicated page renders:
+1. Two-column 50/50 read-only circuit canvas comparison: student circuit on the left, target circuit on the right.
+2. Flight Recorder divergence panel below showing the specific input state (e.g. |+⟩), the step where outputs diverged, student output statevector vs target output statevector.
+3. Invariant violation banner with clear human-readable explanation (e.g. "G-1: Entanglement Entropy violated — your circuit produces separable product state |11⟩; target produces Bell state with S(ρ_A) = 1.0").
+4. "[Try Again]" button (navigates back to challenge) and "[View Hint]" collapsible drawer.
+DELIVERABLE: Create apps/web/lib/types/grading.ts (mirror TypeScript interfaces for InvariantResult, CounterExample, and AssessResponse), create apps/web/app/(app)/assess/page.tsx (two-column read-only circuit comparator, divergence step indicator, invariant violation banner, and action buttons), and create apps/web/tests/unit/assess-page.test.tsx.
+TEST: `pnpm test:web tests/unit/assess-page.test.tsx`
+DEPENDS: FEA-6          UNBLOCKS: —
+DEMO: When a failed Bell circuit is assessed, the judge sees student vs target circuits side-by-side, the exact gate where behavior diverged on input |+⟩, and the quantum physics explanation for why entanglement failed.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-7-assess-route-ui`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 

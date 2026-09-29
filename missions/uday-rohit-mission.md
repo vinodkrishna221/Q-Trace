@@ -41,6 +41,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | SIM-9 | `feat/simulation-api/sim-9-tune-the-supported-runtime-and` | card TEST + fresh Warden verdict + contract check |
 | DUO-1 | `feat/duolingo-path/duo-1-serpentine-canvas-spline` | card TEST + fresh Warden verdict + contract check |
 | DUO-2 | `feat/duolingo-path/duo-2-unit-banners-guidebook` | card TEST + fresh Warden verdict + contract check |
+| FEA-2 | `feat/features-phase/fea-2-linter-backend` | card TEST + fresh Warden verdict + contract check |
+| FEA-5 | `feat/features-phase/fea-5-linter-frontend` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/simulation-api-phase-plan.md`
 
@@ -191,4 +193,38 @@ DEMO: Judge sees a full-width "UNIT 1: THE QUANTUM COMPASS" banner with a `[Guid
 PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-2-unit-banners-guidebook`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-2 · Quantum Invariant Linter Backend [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §2.2 (Three Invariant Rules to Enforce) and §2.3 (Backend Architecture), Q-Trace must validate quantum physics constraints at authoring time. Three rules must be implemented without quantum SDK dependencies:
+1. QI-1: Post-collapse unitary (unitary gate on qubit after MEASURE on same qubit) → WARNING
+2. QI-2: No-cloning violation attempt (two CNOTs attempting to duplicate a superposition register) → INFO
+3. QI-3: Controlled gate wire collision (control qubit index == target qubit index) → ERROR
+The backend must expose lint_circuit(circuit: CircuitModel) -> list[LintWarning], extend ParseQiskitResponse in apps/api/app/models/circuit.py with lintWarnings: list[LintWarning], and add a dedicated POST /v1/circuits/lint endpoint in apps/api/app/routers/circuits.py for sub-300ms debounce calls from the UI.
+DELIVERABLE: Create apps/api/app/services/quantum/linter.py (implement LintSeverity, LintWarning, and lint_circuit() with rules QI-1, QI-2, QI-3), modify apps/api/app/models/circuit.py (add LintSeverity, LintWarning, and lintWarnings field to ParseQiskitResponse), modify apps/api/app/routers/circuits.py (add POST /v1/circuits/lint route and include lint warnings in /parse-qiskit), and create apps/api/tests/unit/quantum/test_linter.py.
+TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_linter.py -v`
+DEPENDS: FEA-1          UNBLOCKS: FEA-5, FEA-14
+DEMO: Backend instantaneously flags quantum physics violations (post-collapse unitary, cloning attempt, wire collision) via structured lintWarnings payload with rule IDs and human-readable explanations.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-2-linter-backend`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-5 · Quantum Invariant Linter Frontend Integration [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §2.3 (Frontend — Circuit Canvas Integration) and §2.4 (Demo Wow-Moment Script), the frontend must surface real-time quantum mechanics lint feedback. On every circuit canvas change or code edit in /lab, the frontend debounces (300ms) a call to POST /v1/circuits/lint. When violations are detected:
+1. interactive-circuit-workspace.tsx renders amber warning pills at the top of the affected qubit wire column showing rule code (e.g. QI-1) with tooltip expansion.
+2. qiskit-code-editor.tsx highlights the offending lines with an amber wavy underline (text-decoration: underline wavy #F59E0B) and displays an inline gutter warning icon (⚠) at the line number.
+DELIVERABLE: Modify apps/web/features/circuit/interactive-circuit-workspace.tsx (integrate debounced lint query, render amber warning badge pill at affected column/qubit wire with hover tooltip), modify apps/web/features/circuit/qiskit-code-editor.tsx (map lintWarnings line targets to code editor DOM, add wavy amber underline styling and gutter warning glyph), and create apps/web/tests/unit/circuit-linter-ui.test.tsx.
+TEST: `pnpm test:web tests/unit/circuit-linter-ui.test.tsx`
+DEPENDS: FEA-2          UNBLOCKS: —
+DEMO: When the user adds an H gate after a MEASURE on wire q[0], within 300ms an amber pill appears above q[0] and a wavy amber underline highlights the qc.h(0) line in the Qiskit editor.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-5-linter-frontend`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 

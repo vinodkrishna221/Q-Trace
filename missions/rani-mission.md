@@ -40,6 +40,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | DATA-8 | `feat/data-analytics/data-8-freeze-schema-and-polish-edge` | card TEST + fresh Warden verdict + contract check |
 | DUO-3 | `feat/duolingo-path/duo-3-chamber-node-archetypes` | card TEST + fresh Warden verdict + contract check |
 | DUO-4 | `feat/duolingo-path/duo-4-anchored-node-popover` | card TEST + fresh Warden verdict + contract check |
+| FEA-8 | `feat/features-phase/fea-8-cirq-adapter-backend` | card TEST + fresh Warden verdict + contract check |
+| FEA-9 | `feat/features-phase/fea-9-engine-selector-rosetta-ui` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/data-analytics-phase-plan.md`
 
@@ -181,4 +183,32 @@ DEMO: Clicking the active Hadamard node on the path sprouts a floating speech-bu
 PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-4-anchored-node-popover`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-8 · Cirq Adapter Backend [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §3.2 (Backend Architecture), Q-Trace must become a true multi-engine simulator supporting Qiskit Aer, PennyLane, and Google Cirq. Create apps/api/app/services/quantum/cirq_adapter.py mapping CircuitModel to cirq.Circuit, simulating with cirq.Simulator, and using normalizer.py to convert Cirq's big-endian convention (q₀ MSB) to the contract standard. Gate mapping: H, X, Y, Z, S, T, CNOT, CCX, CZ, MEASURE. Upgrade POST /v1/simulation-runs to accept backends: list[str] (e.g. ["qiskit", "pennylane", "cirq"]), execute engines in parallel via threadpool, compute maximum pairwise statevector delta, and return conformanceResults, conformanceDelta, and conformanceBadge (VERIFIED if delta <= 1e-6 else DIVERGED).
+DELIVERABLE: Create apps/api/app/services/quantum/cirq_adapter.py (implement build_cirq_circuit(), run_cirq(), and endianness normalization), modify apps/api/app/services/quantum/simulation_service.py (add multi-engine execution support running Qiskit, PennyLane, and Cirq, computing conformanceDelta and conformanceBadge), modify apps/api/app/routers/simulation.py (accept backends list in POST /v1/simulation-runs request body and return conformanceResults), and create apps/api/tests/unit/quantum/test_cirq_adapter.py.
+TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_cirq_adapter.py -v`
+DEPENDS: FEA-1          UNBLOCKS: FEA-9, FEA-14
+DEMO: Backend simulates circuits across Qiskit Aer, PennyLane, and Google Cirq concurrently, returning cross-engine statevector comparison with delta <= 1e-6.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-8-cirq-adapter-backend`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-9 · Engine Selector UI + Conformance Badge + Endianness Rosetta Stone [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §3.1 and §3.3 (Frontend Architecture), /lab/page.tsx must allow learners to select execution engines (Qiskit Aer, PennyLane, Google Cirq). When multiple engines run, a ConformanceBadge displays green "✓ Multi-Engine Verified Δ = 0.000000" (or red "✗ Engines Diverged" if delta > 1e-6). When Cirq or PennyLane is active, an inline EndiannessRosettaStone panel explains why Qiskit's little-endian convention |q₁q₀⟩ differs in string notation from Cirq's big-endian convention |q₀q₁⟩ while preserving identical physics, complete with an interactive basis-label ordering toggle.
+DELIVERABLE: Create apps/web/features/circuit/conformance-badge.tsx (badge component showing verification status, delta value, and tooltip breakdown), create apps/web/features/circuit/endianness-rosetta-stone.tsx (educational panel explaining endianness differences with interactive bit-order flip toggle), modify apps/web/app/(app)/lab/page.tsx (add multi-engine selection pill toggle group, render ConformanceBadge, and embed EndiannessRosettaStone in Stage 2 Visual Evidence), and create apps/web/tests/unit/conformance-arena-ui.test.tsx.
+TEST: `pnpm test:web tests/unit/conformance-arena-ui.test.tsx`
+DEPENDS: FEA-8          UNBLOCKS: —
+DEMO: Judge selects all three engines (Qiskit, PennyLane, Cirq), runs a Bell circuit, sees the green "✓ Multi-Engine Verified Δ = 0.000000" badge appear, and opens the Endianness Rosetta Stone to see side-by-side bit mappings.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-9-engine-selector-rosetta-ui`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 

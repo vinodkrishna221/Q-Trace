@@ -41,6 +41,9 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | SHIP-9 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
 | DUO-5 | `feat/duolingo-path/duo-5-coherence-shield-store` | card TEST + fresh Warden verdict + contract check |
 | DUO-6 | `feat/duolingo-path/duo-6-telemetry-hud-profile` | card TEST + fresh Warden verdict + contract check |
+| FEA-1 | `feat/features-phase/fea-1-gate-model-expansion` | card TEST + fresh Warden verdict + contract check |
+| FEA-12 | `feat/features-phase/fea-12-gate-palette-glyph` | card TEST + fresh Warden verdict + contract check |
+| FEA-14 | `feat/features-phase/fea-14-contracts-golden-fixtures` | card TEST + fresh Warden verdict + contract check |
 
 
 ## Your cards — verbatim from `plans/story-ship-phase-plan.md`
@@ -196,4 +199,42 @@ DEMO: The top bar of `/learn` shows live `🔥 4`, `⚡ 850`, `🛡️ 80%` valu
 PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/duolingo-path/duo-6-telemetry-hud-profile`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-1 · Gate Model Expansion (CCX / CZ / S / T) [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §1.2 (New Gates Required) and §1.5 (Backend Changes Required), the current GateName enum in apps/api/app/models/circuit.py supports only H, X, Y, Z, CNOT, MEASURE. Grover's algorithm, phase oracles, and S/T single-qubit rotations require expanding this closed set with CCX (Toffoli: 2 controls, 1 target), CZ (controlled-Z: 1 control, 1 target), S (phase gate), and T (π/8 gate). In addition, 3-qubit Grover diffusion requires expanding the CircuitModel.operations length limit from 20 to 30. Qiskit execution in apps/api/app/services/quantum/adapter.py must map these gates (qc.ccx, qc.cz, qc.s, qc.t), AST allowlist in apps/api/app/services/quantum/parser.py must admit qc.ccx, qc.cz, qc.s, qc.t, OpenQASM 3 exporter in apps/api/app/services/quantum/openqasm_exporter.py must serialize them, and frontend types in apps/web/features/circuit/circuit-types.ts must mirror the updated GateName union.
+DELIVERABLE: Modify apps/api/app/models/circuit.py (add CCX, CZ, S, T to GateName; add CCX/CZ validators; increase operations max_length to 30), apps/api/app/services/quantum/adapter.py (add CCX/CZ/S/T simulation handlers), apps/api/app/services/quantum/parser.py (add ccx/cz/s/t to AST allowlist and visitor), apps/api/app/services/quantum/openqasm_exporter.py (add OpenQASM 3 mappings for CCX/CZ/S/T), apps/web/features/circuit/circuit-types.ts (add CCX, CZ, S, T to GateName union), and create apps/api/tests/unit/quantum/test_gate_expansion.py.
+TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_gate_expansion.py -v`
+DEPENDS: —          UNBLOCKS: FEA-2, FEA-3, FEA-6, FEA-8, FEA-10, FEA-12, FEA-14
+DEMO: Backend accepts, simulates, and round-trips 3-qubit circuits containing Toffoli (CCX), CZ, and phase gates without 422 validation rejections, unblocking the entire Features Phase.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-1-gate-model-expansion`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-12 · Gate Palette & Multi-Terminal Glyph Renderer [timebox: 2h]
+CONTEXT: Per docs/FEATURES-SPEC.md §1.2 and §1.6 (Frontend Changes Required), the visual circuit designer palette currently exposes only H, X, Y, Z, CNOT, and MEASURE tiles. Now that FEA-1 expands GateName with CCX, CZ, S, and T, the UI palette in apps/web/features/circuit/gate-palette.tsx and the glyph renderer in apps/web/features/circuit/gate-glyph.tsx must be updated. CCX requires a 3-qubit vertical multi-terminal representation (two control dots connected by a vertical spine to a ⊕ target symbol), CZ requires two connected control dots (●─●), and S/T require styled single-qubit tiles conforming to docs/DESIGN-SYSTEM.md. Canvas placement in interactive-circuit-workspace.tsx must support multi-wire drop spans.
+DELIVERABLE: Modify apps/web/features/circuit/gate-palette.tsx (add CCX, CZ, S, T gate tiles with family groupings), apps/web/features/circuit/gate-glyph.tsx (implement SVG glyph renderers for CCX, CZ, S, T), apps/web/features/circuit/interactive-circuit-workspace.tsx (handle CCX and CZ drop and selection on wire grid), and create apps/web/tests/unit/gate-palette-expansion.test.tsx.
+TEST: `pnpm test:web tests/unit/gate-palette-expansion.test.tsx`
+DEPENDS: FEA-1          UNBLOCKS: —
+DEMO: The judge sees CCX (Toffoli), CZ, S, and T in the gate palette and can drag a 3-qubit Toffoli gate onto the circuit canvas, seeing connected multi-wire control dots and target glyphs snap into place.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-12-gate-palette-glyph`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-14 · Cross-Feature Contracts & Golden Fixtures [timebox: 2h]
+CONTEXT: Per docs/FEATURES-SPEC.md §Cross-Feature Contracts and §Build Priority & Dependency Order, the additions across F1–F5 require contract updates and new golden fixtures to lock in zero contract drift before final release certification. board/contracts/circuit-simulation.md must be updated with the expanded GateName enum (CCX, CZ, S, T), noisePreset request field, and conformanceResults schema. A new contract board/contracts/grading-assessment.md must specify POST /v1/grading/assess and GET /v1/grading/assess/{attemptId} with InvariantResult and CounterExample types. Three new golden fixtures must be added to apps/api/tests/fixtures/golden/ and verified with scripts/validate_fixtures.py.
+DELIVERABLE: Update board/contracts/circuit-simulation.md (new gates, noisePreset, conformanceResults, lintWarnings), create board/contracts/grading-assessment.md, create golden fixtures apps/api/tests/fixtures/golden/grover_simulation_run.json, apps/api/tests/fixtures/golden/lint_warning_response.json, apps/api/tests/fixtures/golden/conformance_result.json, and update scripts/validate_fixtures.py.
+TEST: `python scripts/validate_fixtures.py; & "C:\Program Files\Git\bin\bash.exe" scripts/contract-check.sh`
+DEPENDS: FEA-1, FEA-2, FEA-6, FEA-8          UNBLOCKS: SHIP-6
+DEMO: Contract verification and fixture validation report 10/10 golden fixtures valid with zero schema drift across all 5 differentiating features.
+PERSONA: Patch           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-14-contracts-golden-fixtures`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 

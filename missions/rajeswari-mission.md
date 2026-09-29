@@ -40,6 +40,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | AI-8 | `feat/ai-pedagogy/ai-8-polish-anti-copy-guidance-and` | card TEST + fresh Warden verdict + contract check |
 | DUO-7 | `feat/duolingo-curriculum/duo-7-foundations-units-1-3` | card TEST + fresh Warden verdict + contract check |
 | DUO-8 | `feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng` | card TEST + fresh Warden verdict + contract check |
+| FEA-3 | `feat/features-phase/fea-3-grover-curriculum` | card TEST + fresh Warden verdict + contract check |
+| FEA-4 | `feat/features-phase/fea-4-grover-amplitude-scrubber` | card TEST + fresh Warden verdict + contract check |
 
 ## Your cards — verbatim from `plans/ai-pedagogy-phase-plan.md`
 
@@ -179,4 +181,32 @@ DEMO: The path shows the Bloch sphere compass, Hadamard gate chamber, and Unit 1
 PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-8-single-qubit-gates-qrng`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-3 · Grover Algorithm Curriculum — Module 2 Unit 2.1 [timebox: 4h]
+CONTEXT: Per docs/FEATURES-SPEC.md §1.1 and §1.3 (Curriculum Stage Plan — Unit 2.1), Module 1 completed at mod1_algorithm_bridge. F1 launches Module 2 with Unit 2.1 ("Grover's Search Algorithm"), containing 9 stages across 5 pedagogical categories: Stage 2.1.1 (Oracle Concept: marking without reading, mod2_grover_oracle_concept), Stage 2.1.2 (Amplitude Amplification: reflecting about the mean, mod2_amplitude_amplification), Stage 2.1.3 (Toffoli Gate CCX: quantum AND, mod2_toffoli_ccx), Stage 2.1.4 (Grover Speedup: O(√N) vs O(N), mod2_grover_speedup), Stage 2.1.5 (CCX Gate Lab: build a quantum AND, mod2_ccx_lab), Stage 2.1.6 (Phase Oracle Lab: mark |101⟩, mod2_phase_oracle_lab), Stage 2.1.7 (Prediction Checkpoint: predict optimal iteration count, pc_grover_iterations), Stage 2.1.8 (Full 3-Qubit Grover Circuit Lab, mod2_full_grover_lab), and Stage 2.1.9 (Grover Boss: find the hidden marked state, mod2_boss_grover). All stages must conform to CurriculumStage in apps/web/lib/curriculum/types.ts and spread into all-stages.ts.
+DELIVERABLE: Create apps/web/lib/curriculum/module2-unit-2-1.ts exporting module2Unit21Stages: CurriculumStage[] containing all 9 fully typed stages with 5-beat pedagogical fields, formulas, truth tables, and starter circuit definitions; modify apps/web/lib/curriculum/all-stages.ts to import and spread module2Unit21Stages; and create apps/web/tests/unit/curriculum-module2-unit-2-1.test.ts.
+TEST: `pnpm test:web tests/unit/curriculum-module2-unit-2-1.test.ts`
+DEPENDS: FEA-1          UNBLOCKS: FEA-4
+DEMO: The /learn path extends into Module 2 Unit 2.1 showing all 9 Grover stages on the serpentine canvas, allowing learners to progress from the Oracle analogy to the CCX lab and Grover Boss.
+PERSONA: Sage           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-3-grover-curriculum`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-4 · Grover Amplitude Scrubber UI Component [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §1.4 (Flight Recorder Scrubber — Grover Amplitude View), F1 requires an interactive amplitude amplification visualizer inside /lab's Stage 3: Flight Recorder panel. When a circuit is identified as Grover (heuristically: uses CCX and Hadamard), the component renders a horizontal timeline scrubber linked to the stateTrace array. At each step, it displays a signed amplitude bar chart of all 2^n basis states showing negative phase flips, highlights the marked state |ω⟩ in Electric Cyan (#00D4FF), shows non-marked states in Cobalt (#1E40AF), renders a dashed horizontal line for mean amplitude ᾱ, and provides step labels ("Oracle Phase Flip", "Inversion About Mean").
+DELIVERABLE: Create apps/web/features/evidence/grover-amplitude-scrubber.tsx with interactive range scrubber, signed bar charts, marked-state highlighting, mean amplitude line, and step labels; modify apps/web/app/(app)/lab/page.tsx to mount GroverAmplitudeScrubber conditionally in Stage 3 Flight Recorder; and create apps/web/tests/unit/grover-amplitude-scrubber.test.tsx.
+TEST: `pnpm test:web tests/unit/grover-amplitude-scrubber.test.tsx`
+DEPENDS: FEA-3          UNBLOCKS: —
+DEMO: As the presenter drags the scrubber across the Grover execution steps in /lab, judges watch the marked state |101⟩ flip negative during the Oracle step, then invert about the mean during diffusion, surging to 94.5% probability.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-4-grover-amplitude-scrubber`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 

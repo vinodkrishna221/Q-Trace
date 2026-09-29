@@ -44,6 +44,8 @@ Start every card in a fresh session by copying `missions/AGENT-CARD-PROMPT.md` a
 | UX-12 | `feat/learning-ux/ux-linear-design-system-and-contracts` | card TEST + fresh Warden verdict + contract check |
 | DUO-9 | `feat/duolingo-curriculum/duo-9-cnot-bell-correlation` | card TEST + fresh Warden verdict + contract check |
 | DUO-10 | `feat/duolingo-curriculum/duo-10-teleportation-capstone` | card TEST + fresh Warden verdict + contract check |
+| FEA-10 | `feat/features-phase/fea-10-nisq-noise-backend` | card TEST + fresh Warden verdict + contract check |
+| FEA-11 | `feat/features-phase/fea-11-noise-toggle-qsphere-ui` | card TEST + fresh Warden verdict + contract check |
 
 
 ## Your cards — verbatim from `plans/learning-ux-phase-plan.md`
@@ -230,4 +232,35 @@ DEMO: The `/learn` path shows the complete Module 1 journey culminating in a glo
 PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/duolingo-curriculum/duo-10-teleportation-capstone`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+---
+
+## Features Phase Cards (FEA)
+
+> Appended at kickoff of the F1–F5 Differentiating Features Phase. All cards target
+> files defined in docs/FEATURES-SPEC.md. Read that document before starting any FEA card.
+
+### FEA-10 · NISQ Noise Model Backend [timebox: 2h]
+CONTEXT: Per docs/FEATURES-SPEC.md §4.1 and §4.3 (NISQ Noise Emulation Backend), ideal quantum simulation ignores real hardware decoherence. In apps/api/app/services/quantum/adapter.py, add support for a noise_preset parameter in run_circuit(). Implement the "superconducting" preset using qiskit_aer.noise: thermal relaxation errors with T1 = 50μs, T2 = 70μs, gate time 50ns for single and two-qubit gates, plus readout errors [[0.99, 0.01], [0.01, 0.99]]. Update SimulationRunRequest to accept noisePreset: str | None and compute noisy density matrices, subsystem purity Tr(ρ²) < 1.0, and contracted Bloch vectors.
+DELIVERABLE: Modify apps/api/app/services/quantum/adapter.py (add noise_preset parameter to run_circuit(), build NoiseModel with thermal relaxation and readout errors when noise_preset == "superconducting"), modify apps/api/app/models/circuit.py (add noisePreset: Literal["superconducting"] | None = None to simulation request model), modify apps/api/app/routers/simulation.py (pass noisePreset to adapter), and create apps/api/tests/unit/quantum/test_noise_model.py.
+TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_noise_model.py -v`
+DEPENDS: FEA-1          UNBLOCKS: FEA-11
+DEMO: Backend executes circuits under realistic superconducting noise parameters, returning mixed state density matrices with purity < 1.0 and contracted Bloch vector coordinates.
+PERSONA: Forge           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-10-nisq-noise-backend`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
+### FEA-11 · Noise Toggle UI + Bloch Contraction + Q-Sphere Wiring [timebox: 3h]
+CONTEXT: Per docs/FEATURES-SPEC.md §4.2 (Q-Sphere Integration), §4.3 (Frontend Noise Toggle), and §4.4 (Demo Wow-Moment Script), /lab/page.tsx must connect both visual evidence dimensions:
+1. Mount the existing apps/web/features/evidence/two-qubit-qsphere.tsx component in Stage 2 (Visual Evidence) when circuit.qubitCount >= 2, providing multi-qubit state visualization alongside the single-qubit Bloch sphere.
+2. Add a "NISQ Noise Model (Superconducting T₁/T₂)" toggle Switch to Stage 2. Toggling re-submits the circuit with noisePreset: "superconducting".
+3. In bloch-3d-sphere.tsx, ensure the 3D sphere renders contracted vectors (|r⃗| < 1) inside the sphere without clamping to 1.0, and add a purity readout label below the sphere (Purity: Tr(ρ²) = 0.847 [mixed state]).
+DELIVERABLE: Modify apps/web/app/(app)/lab/page.tsx (import and mount TwoQubitQSphere when qubitCount >= 2; add NISQ Noise toggle Switch with re-simulation trigger and loading indicator), modify apps/web/features/evidence/bloch-3d-sphere.tsx (support unclamped interior vector rendering for mixed states and add the purity readout badge below the canvas), and create apps/web/tests/unit/noise-toggle-qsphere.test.tsx.
+TEST: `pnpm test:web tests/unit/noise-toggle-qsphere.test.tsx`
+DEPENDS: FEA-10          UNBLOCKS: —
+DEMO: Judge flips the "NISQ Noise" switch; the Bloch vector contracts inside the sphere with purity 0.847, the histogram shows noise leakage, and the 3D Q-Sphere displays the multi-qubit state.
+PERSONA: Nova           STATUS: [ ] ready
+BRANCH: `feat/features-phase/fea-11-noise-toggle-qsphere-ui`
+PR: one card per PR; paste the TEST result and link any contract/version decision.
+
 
