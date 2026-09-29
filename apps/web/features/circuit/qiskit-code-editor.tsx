@@ -15,14 +15,24 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
+import { LintWarning, mapWarningsToCodeLines } from './circuit-linter';
 
 interface QiskitCodeEditorProps {
   isReadOnly?: boolean;
+  lintWarnings?: LintWarning[];
+  code?: string;
 }
 
-function renderHighlightedQiskitCode(code: string) {
+function renderHighlightedQiskitCode(
+  code: string,
+  offendingLines?: Map<number, LintWarning[]>
+) {
   const lines = code.split('\n');
   return lines.map((line, lineIdx) => {
+    const lineNum = lineIdx + 1;
+    const warningsOnLine = offendingLines?.get(lineNum);
+    const hasWarning = Boolean(warningsOnLine && warningsOnLine.length > 0);
+
     const commentIdx = line.indexOf('#');
     const codePart = commentIdx >= 0 ? line.slice(0, commentIdx) : line;
     const commentPart = commentIdx >= 0 ? line.slice(commentIdx) : null;
@@ -76,7 +86,18 @@ function renderHighlightedQiskitCode(code: string) {
     }
 
     return (
-      <div key={`line-${lineIdx}`} className="leading-relaxed">
+      <div
+        key={`line-${lineIdx}`}
+        data-testid={hasWarning ? 'offending-code-line' : `code-line-${lineNum}`}
+        data-line-number={lineNum}
+        className={`leading-relaxed ${
+          hasWarning
+            ? 'underline decoration-wavy decoration-amber-500 underline-offset-4 text-amber-200'
+            : ''
+        }`}
+        style={hasWarning ? { textDecoration: 'underline wavy #F59E0B' } : undefined}
+        title={hasWarning ? warningsOnLine![0].message : undefined}
+      >
         {tokens}
         {commentPart && (
           <span className="text-slate-400 dark:text-slate-500 italic">
@@ -88,9 +109,13 @@ function renderHighlightedQiskitCode(code: string) {
   });
 }
 
-export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) {
+export function QiskitCodeEditor({
+  isReadOnly = false,
+  lintWarnings = [],
+  code: codeProp,
+}: QiskitCodeEditorProps) {
   const {
-    code,
+    code: storeCode,
     updateCode,
     applyCodeEdit,
     revertCodeToCircuit,
@@ -100,15 +125,21 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
     circuit,
   } = useCircuitStore();
 
+  const code = codeProp ?? storeCode;
   const [copied, setCopied] = React.useState(false);
   const [localInput, setLocalInput] = React.useState(code);
+
+  const offendingLines = React.useMemo(
+    () => mapWarningsToCodeLines(localInput, lintWarnings),
+    [localInput, lintWarnings]
+  );
 
   // Sync local input with store code when store code changes externally (e.g. from visual builder)
   React.useEffect(() => {
     if (!isCodeModified) {
-      setLocalInput(code);
+      setLocalInput(codeProp ?? storeCode);
     }
-  }, [code, isCodeModified]);
+  }, [codeProp, storeCode, isCodeModified]);
 
   const handleCopy = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -220,36 +251,102 @@ export function QiskitCodeEditor({ isReadOnly = false }: QiskitCodeEditorProps) 
           </div>
         )}
 
+        {/* Quantum Invariant Linter Notification Banner */}
+        {lintWarnings.length > 0 && (
+          <div
+            data-testid="code-lint-warning-banner"
+            className="p-3 bg-amber-500/10 border-b border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs font-mono flex items-start gap-2.5 animate-in fade-in"
+          >
+            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-1 w-full">
+              <div className="font-bold flex items-center justify-between">
+                <span>Quantum Invariant Warning</span>
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-normal">
+                  {lintWarnings.length} violation{lintWarnings.length > 1 ? 's' : ''} detected
+                </span>
+              </div>
+              {lintWarnings.map((w, idx) => (
+                <div key={idx} className="text-[11px] text-amber-700 dark:text-amber-300">
+                  <span className="font-bold">[{w.rule}]</span> {w.message}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Editor text area / display */}
         <div className="relative bg-slate-950 border-b border-line">
           {isReadOnly ? (
             <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300">
               <pre data-testid="qiskit-code-content" className="font-mono">
-                <code>{renderHighlightedQiskitCode(localInput)}</code>
+                <code>{renderHighlightedQiskitCode(localInput, offendingLines)}</code>
               </pre>
             </div>
           ) : (
             <div className={`relative font-mono text-xs flex transition-all ${parseError ? 'animate-shake ring-1 ring-inset ring-red-500/50' : ''}`}>
-              {/* Line Numbers */}
-              <div className="w-10 bg-slate-900/50 border-r border-slate-800 text-slate-500 flex flex-col p-4 pt-[18px] text-right select-none font-mono text-[11px] leading-relaxed">
-                {localInput.split('\n').map((_, i) => (
-                  <span key={i}>{i + 1}</span>
-                ))}
+              {/* Line Numbers Gutter */}
+              <div
+                className="w-12 bg-slate-900/50 border-r border-slate-800 text-slate-500 flex flex-col p-4 pt-[18px] text-right select-none font-mono text-[11px] leading-relaxed"
+                data-testid="qiskit-editor-gutter"
+              >
+                {localInput.split('\n').map((_, i) => {
+                  const lineNum = i + 1;
+                  const warnings = offendingLines.get(lineNum);
+                  const hasWarning = Boolean(warnings && warnings.length > 0);
+                  return (
+                    <div
+                      key={i}
+                      data-testid={`gutter-line-${lineNum}`}
+                      className="flex items-center justify-end gap-1 h-[21px]"
+                    >
+                      {hasWarning && (
+                        <span
+                          data-testid="gutter-warning-icon"
+                          title={warnings![0].message}
+                          className="text-amber-400 font-bold text-[11px] animate-pulse cursor-help"
+                          aria-label={`Warning on line ${lineNum}: ${warnings![0].rule}`}
+                        >
+                          ⚠
+                        </span>
+                      )}
+                      <span>{lineNum}</span>
+                    </div>
+                  );
+                })}
               </div>
-              <textarea
-                data-testid="qiskit-code-editor-input"
-                value={localInput}
-                onChange={handleChange}
-                spellCheck={false}
-                rows={Math.max(8, localInput.split('\n').length + 1)}
-                className="w-full p-4 bg-transparent text-sky-200 font-mono text-xs leading-relaxed focus:outline-none resize-y selection:bg-accent/40"
-                placeholder="Write Qiskit Python code..."
-                aria-label="Qiskit Python Code Editor"
-              />
-              {/* Hidden pre for test query compatibility if needed */}
-              <pre data-testid="qiskit-code-content" className="hidden" aria-hidden="true">
-                <code>{localInput}</code>
-              </pre>
+
+              {/* Code editing and live AST view */}
+              <div className="relative flex-1">
+                <textarea
+                  data-testid="qiskit-code-editor-input"
+                  value={localInput}
+                  onChange={handleChange}
+                  spellCheck={false}
+                  rows={Math.max(8, localInput.split('\n').length + 1)}
+                  className="w-full p-4 bg-transparent text-sky-200 font-mono text-xs leading-relaxed focus:outline-none resize-y selection:bg-accent/40"
+                  placeholder="Write Qiskit Python code..."
+                  aria-label="Qiskit Python Code Editor"
+                />
+
+                {/* DOM representation with wavy underlines for inspection & visual AST tracking */}
+                <div className="border-t border-slate-800/80 bg-slate-950/60 p-3">
+                  <div className="text-[10px] text-slate-400 font-semibold mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Code2 className="w-3 h-3 text-accent" />
+                      <span>AST Live View &amp; Invariants</span>
+                    </span>
+                    {lintWarnings.length > 0 && (
+                      <span className="text-amber-400 text-[10px] font-mono flex items-center gap-1">
+                        <span>⚠</span>
+                        <span>{lintWarnings.length} Invariant Warning{lintWarnings.length > 1 ? 's' : ''}</span>
+                      </span>
+                    )}
+                  </div>
+                  <pre data-testid="qiskit-code-content" className="font-mono text-xs leading-relaxed overflow-x-auto">
+                    <code>{renderHighlightedQiskitCode(localInput, offendingLines)}</code>
+                  </pre>
+                </div>
+              </div>
             </div>
           )}
         </div>

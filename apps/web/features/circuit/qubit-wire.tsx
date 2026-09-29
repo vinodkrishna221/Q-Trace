@@ -8,15 +8,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { GateTile, CnotTargetCrosshairIcon, MeasureGaugeIcon } from './gate-glyph';
+import { LintWarning } from './circuit-linter';
 
 interface QubitWiresGridProps {
   maxColumnsDisplay?: number;
   readOnly?: boolean;
+  lintWarnings?: LintWarning[];
 }
 
 export function QubitWiresGrid({
   maxColumnsDisplay = 4,
   readOnly = false,
+  lintWarnings = [],
 }: QubitWiresGridProps) {
   const {
     circuit,
@@ -174,15 +177,61 @@ export function QubitWiresGrid({
         }}
       >
         <div className="text-center font-semibold text-ink-dim">WIRE</div>
-        {columnsList.map((col) => (
-          <div
-            key={`col-header-${col}`}
-            className="text-center font-mono py-0.5 px-1 bg-surface-raised/30 rounded-full border border-border-subtle/40"
-            data-testid={`column-header-${col}`}
-          >
-            Col {col}
-          </div>
-        ))}
+        {columnsList.map((col) => {
+          const colWarnings = lintWarnings.filter((w) => w.column === col);
+          const hasWarning = colWarnings.length > 0;
+          return (
+            <div
+              key={`col-header-${col}`}
+              className="flex flex-col items-center gap-1"
+            >
+              <div
+                className={`text-center font-mono py-0.5 px-2 rounded-full border transition-all ${
+                  hasWarning
+                    ? 'bg-amber-500/10 border-amber-500/50 text-amber-700 dark:text-amber-300 font-semibold'
+                    : 'bg-surface-raised/30 border-border-subtle/40 text-ink-faint'
+                }`}
+                data-testid={`column-header-${col}`}
+              >
+                Col {col}
+              </div>
+              {hasWarning && (
+                <div className="flex flex-col items-center gap-1 mt-0.5">
+                  {colWarnings.map((w, wIdx) => (
+                    <div
+                      key={`col-pill-${col}-${wIdx}`}
+                      data-testid="lint-warning-pill"
+                      data-rule={w.rule}
+                      data-column={col}
+                      data-qubit={w.qubit}
+                      className="group relative cursor-pointer"
+                    >
+                      <span
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/50 hover:bg-amber-500/30 transition-colors shadow-xs"
+                        title={w.message}
+                      >
+                        <span>⚠</span>
+                        <span>{w.rule}</span>
+                        {w.qubit !== null && <span>· q[{w.qubit}]</span>}
+                      </span>
+                      {/* Tooltip hover expansion */}
+                      <div
+                        role="tooltip"
+                        className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-1.5 hidden group-hover:block w-64 p-2 bg-slate-900 text-slate-100 text-[10px] font-sans rounded shadow-xl border border-slate-700 pointer-events-none text-left"
+                      >
+                        <div className="font-mono font-bold text-amber-400 flex items-center justify-between mb-1">
+                          <span>{w.rule} [{w.severity}]</span>
+                          <span className="text-slate-400 font-normal">Col {col} · q[{w.qubit}]</span>
+                        </div>
+                        <div className="text-slate-200 leading-snug">{w.message}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Qubit Wires Container */}
