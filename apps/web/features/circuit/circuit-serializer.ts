@@ -161,11 +161,11 @@ export function importCircuitModelJson(jsonString: string): ImportCircuitResult 
     };
   }
 
-  if (obj.operations.length > 20) {
+  if (obj.operations.length > 30) {
     return {
       success: false,
       errorCode: 'CIRCUIT_LIMIT_EXCEEDED',
-      error: `Operation count ${obj.operations.length} exceeds prototype limit of 20 operations.`,
+      error: `Operation count ${obj.operations.length} exceeds prototype limit of 30 operations.`,
     };
   }
 
@@ -225,19 +225,36 @@ export function importCircuitModelJson(jsonString: string): ImportCircuitResult 
       }
     }
 
-    if (gate === 'CNOT') {
+    if (gate === 'CNOT' || gate === 'CZ') {
       if (controls.length !== 1) {
         return {
           success: false,
           errorCode: 'INVALID_CIRCUIT_MODEL',
-          error: `CNOT operation at index ${i} must have exactly one control qubit.`,
+          error: `${gate} operation at index ${i} must have exactly one control qubit.`,
         };
       }
       if (controls[0] === targets[0]) {
         return {
           success: false,
           errorCode: 'INVALID_CIRCUIT_MODEL',
-          error: `CNOT operation at index ${i} cannot have the same control and target qubit (${targets[0]}).`,
+          error: `${gate} operation at index ${i} cannot have the same control and target qubit (${targets[0]}).`,
+        };
+      }
+    }
+
+    if (gate === 'CCX') {
+      if (controls.length !== 2) {
+        return {
+          success: false,
+          errorCode: 'INVALID_CIRCUIT_MODEL',
+          error: `CCX operation at index ${i} must have exactly two control qubits.`,
+        };
+      }
+      if (controls[0] === controls[1] || controls[0] === targets[0] || controls[1] === targets[0]) {
+        return {
+          success: false,
+          errorCode: 'INVALID_CIRCUIT_MODEL',
+          error: `CCX operation at index ${i} must have distinct controls and target qubits.`,
         };
       }
     }

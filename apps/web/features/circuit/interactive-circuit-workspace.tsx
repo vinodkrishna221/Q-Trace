@@ -10,7 +10,7 @@ import { CircuitSharePanel } from './circuit-share-panel';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2 } from 'lucide-react';
+import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2, Plus, Minus } from 'lucide-react';
 
 interface InteractiveCircuitWorkspaceProps {
   initialCircuit?: CircuitModel;
@@ -27,7 +27,7 @@ export function InteractiveCircuitWorkspace({
   onRunSimulation,
   readOnly = false,
 }: InteractiveCircuitWorkspaceProps) {
-  const { circuit, setCircuit } = useCircuitStore();
+  const { circuit, setCircuit, setQubitCount } = useCircuitStore();
   const [showSharePanel, setShowSharePanel] = React.useState(false);
   const isLocked = Boolean(readOnly || isSimulating);
 
@@ -63,9 +63,40 @@ export function InteractiveCircuitWorkspace({
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono text-text-tertiary">
-                {circuit.qubitCount} Qubits · {circuit.classicalBitCount} Classical Bits · {circuit.operations.length} Gates
-              </span>
+              <div className="flex items-center gap-1.5 bg-surface-raised/70 px-2 py-0.5 rounded border border-border-subtle/60 text-[11px] font-mono text-text-tertiary">
+                <span data-testid="qubit-count-display">{circuit.qubitCount} Qubits</span>
+                {!isLocked && (
+                  <span className="inline-flex items-center gap-0.5 ml-1">
+                    <button
+                      type="button"
+                      data-testid="decrease-qubits-btn"
+                      disabled={circuit.qubitCount <= 1}
+                      onClick={() => setQubitCount(circuit.qubitCount - 1)}
+                      className="w-4 h-4 rounded flex items-center justify-center hover:bg-surface-sunken disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      title="Decrease qubit count"
+                      aria-label="Decrease qubit count"
+                    >
+                      <Minus className="w-2.5 h-2.5" />
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="increase-qubits-btn"
+                      disabled={circuit.qubitCount >= 5}
+                      onClick={() => setQubitCount(circuit.qubitCount + 1)}
+                      className="w-4 h-4 rounded flex items-center justify-center hover:bg-surface-sunken disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      title="Increase qubit count"
+                      aria-label="Increase qubit count"
+                    >
+                      <Plus className="w-2.5 h-2.5" />
+                    </button>
+                  </span>
+                )}
+                <span className="text-text-muted">·</span>
+                <span>{circuit.classicalBitCount} Bits</span>
+                <span className="text-text-muted">·</span>
+                <span>{circuit.operations.length} Gates</span>
+              </div>
+
               <Badge variant="outline" className="text-[10px] font-mono text-text-secondary">
                 v{circuit.modelVersion}
               </Badge>
@@ -88,7 +119,7 @@ export function InteractiveCircuitWorkspace({
             <span>Synchronized Quantum Circuit Builder</span>
           </CardTitle>
           <CardDescription className="text-xs text-text-secondary">
-            Drag gates onto qubit wires or edit code directly. The Circuit Model is the single synchronized source of truth.
+            Drag gates onto qubit wires or edit code directly. Supports single-qubit, phase rotations, and multi-wire controlled gates (CNOT, CZ, CCX).
           </CardDescription>
         </CardHeader>
 

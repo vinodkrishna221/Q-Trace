@@ -7,7 +7,7 @@ import { GATE_DEFINITIONS } from './circuit-types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { GateTile, CnotTargetCrosshairIcon, MeasureGaugeIcon } from './gate-glyph';
+import { GateTile, CnotTargetCrosshairIcon, MeasureGaugeIcon, CcxMultiTerminalIcon, CzMultiTerminalIcon } from './gate-glyph';
 
 interface QubitWiresGridProps {
   maxColumnsDisplay?: number;
@@ -54,7 +54,7 @@ export function QubitWiresGrid({
       return { op: targetOp, isControl: false, isTarget: true };
     }
 
-    // Find CNOT operation controlling this qubit at this column
+    // Find operation controlling this qubit at this column (CNOT, CZ, CCX)
     const controlOp = circuit.operations.find(
       (op) => op.column === column && op.controls.includes(qubit)
     );
@@ -65,8 +65,10 @@ export function QubitWiresGrid({
     return { op: undefined, isControl: false, isTarget: false };
   };
 
-  // Find all CNOT operations to render vertical connecting lines
-  const cnotOps = circuit.operations.filter((op) => op.gate === 'CNOT');
+  // Find all multi-qubit operations (CNOT, CZ, CCX) to render vertical connecting lines
+  const multiQubitOps = circuit.operations.filter(
+    (op) => op.gate === 'CNOT' || op.gate === 'CZ' || op.gate === 'CCX'
+  );
 
   // Handle cell click
   const handleCellClick = (qubit: number, column: number) => {
@@ -75,7 +77,6 @@ export function QubitWiresGrid({
     if (selectedGateToPlace) {
       // Place armed gate
       addGate(selectedGateToPlace, qubit, column);
-      // Optional: keep armed or disarm
     } else {
       const { op } = getOpAt(qubit, column);
       if (op) {
@@ -125,9 +126,21 @@ export function QubitWiresGrid({
     } else if (key === 'z') {
       e.preventDefault();
       addGate('Z', qubit, column);
+    } else if (key === 's') {
+      e.preventDefault();
+      addGate('S', qubit, column);
+    } else if (key === 't') {
+      e.preventDefault();
+      addGate('T', qubit, column);
     } else if (key === 'c') {
       e.preventDefault();
       addGate('CNOT', qubit, column);
+    } else if (key === 'j') {
+      e.preventDefault();
+      addGate('CZ', qubit, column);
+    } else if (key === 'o') {
+      e.preventDefault();
+      addGate('CCX', qubit, column);
     } else if (key === 'm') {
       e.preventDefault();
       addGate('MEASURE', qubit, column);
@@ -187,19 +200,34 @@ export function QubitWiresGrid({
 
       {/* Qubit Wires Container */}
       <div className="space-y-6 relative min-w-[540px]">
-        {/* Render CNOT Vertical Connection Lines */}
-        {cnotOps.map((op) => {
-          const ctrl = op.controls[0] ?? 0;
-          const tgt = op.targets[0] ?? 1;
-          const minQ = Math.min(ctrl, tgt);
-          const maxQ = Math.max(ctrl, tgt);
+        {/* Render Multi-Wire Vertical Connection Lines for CNOT, CZ, and CCX */}
+        {multiQubitOps.map((op) => {
+          const allQubits = [...op.controls, ...op.targets];
+          if (allQubits.length < 2) return null;
+          const minQ = Math.min(...allQubits);
+          const maxQ = Math.max(...allQubits);
           const colIndex = op.column;
+
+          const isCcx = op.gate === 'CCX';
+          const isCz = op.gate === 'CZ';
+
+          const linkTestId = isCcx
+            ? `ccx-vertical-link-${op.opId}`
+            : isCz
+            ? `cz-vertical-link-${op.opId}`
+            : `cnot-vertical-link-${op.opId}`;
+
+          const colorClass = isCcx
+            ? 'bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)]'
+            : isCz
+            ? 'bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.8)]'
+            : 'bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.8)]';
 
           return (
             <div
-              key={`cnot-line-${op.opId}`}
-              data-testid={`cnot-vertical-link-${op.opId}`}
-              className="absolute w-[3px] bg-violet-500 pointer-events-none z-0 shadow-[0_0_10px_rgba(139,92,246,0.8)] overflow-hidden"
+              key={`${op.gate.toLowerCase()}-line-${op.opId}`}
+              data-testid={linkTestId}
+              className={`absolute w-[3px] pointer-events-none z-0 overflow-hidden ${colorClass}`}
               style={{
                 top: `${minQ * 80 + 20}px`,
                 height: `${(maxQ - minQ) * 80}px`,
@@ -208,7 +236,7 @@ export function QubitWiresGrid({
               }}
               aria-hidden="true"
             >
-              {/* Entanglement Pulse Particle */}
+              {/* Entanglement / Control Pulse Particle */}
               <div className="w-[3px] h-[30px] bg-white shadow-[0_0_10px_#fff,0_0_20px_#fff] animate-particle-flow" />
             </div>
           );
@@ -245,23 +273,25 @@ export function QubitWiresGrid({
 
                   const cellAriaLabel = op
                     ? isControl
-                      ? `Qubit ${qubitIndex} column ${col}: CNOT Control targeting qubit ${op.targets[0]}`
-                      : isTarget && op.gate === 'CNOT'
-                        ? `Qubit ${qubitIndex} column ${col}: CNOT Target controlled by qubit ${op.controls[0]}`
-                        : `Qubit ${qubitIndex} column ${col}: ${op.gate} (${GATE_DEFINITIONS[op.gate]?.name || op.gate}) gate`
-                    : `Qubit ${qubitIndex} column ${col}: empty cell (press H, X, Y, Z, C, M to place gate)`;
+                      ? `Qubit ${qubitIndex} column ${col}: ${op.gate} Control targeting qubit ${op.targets[0]}`
+                      : isTarget
+                        ? `Qubit ${qubitIndex} column ${col}: ${op.gate} Target`
+                        : `Qubit ${qubitIndex} column ${col}: ${op.gate} gate`
+                    : `Empty slot on qubit ${qubitIndex}, column ${col}`;
 
                   return (
                     <div
                       key={`cell-${qubitIndex}-${col}`}
                       data-testid={`wire-cell-${qubitIndex}-${col}`}
-                      tabIndex={0}
+                      tabIndex={readOnly ? -1 : 0}
                       role="button"
                       aria-label={cellAriaLabel}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => handleCellDrop(e, qubitIndex, col)}
                       onClick={() => handleCellClick(qubitIndex, col)}
                       onKeyDown={(e) => handleCellKeyDown(e, qubitIndex, col)}
+                      onDragOver={(e) => {
+                        if (!readOnly) e.preventDefault();
+                      }}
+                      onDrop={(e) => handleCellDrop(e, qubitIndex, col)}
                       className={`h-14 rounded-xl border flex items-center justify-center relative transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-canvas ${
                         isSelected
                           ? 'border-accent ring-2 ring-accent/60 bg-accent/10'
@@ -270,8 +300,8 @@ export function QubitWiresGrid({
                             : 'border-dashed border-border-subtle/50 hover:border-accent hover:bg-accent/5 focus:border-accent focus:ring-1 focus:ring-accent'
                       }`}
                     >
-                      {/* If cell has a gate operation */}
-                      {op && isControl && (
+                      {/* Control dot for CNOT */}
+                      {op && isControl && op.gate === 'CNOT' && (
                         <div
                           data-testid="gate-cnot-control"
                           className="w-5 h-5 rounded-full bg-violet-600 border-2 border-white ring-2 ring-violet-500/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform z-10 shadow-[0_0_8px_rgba(139,92,246,0.5)]"
@@ -283,19 +313,75 @@ export function QubitWiresGrid({
                         </div>
                       )}
 
+                      {/* Control dot for CZ */}
+                      {op && isControl && op.gate === 'CZ' && (
+                        <div
+                          data-testid="gate-cz-control"
+                          className="w-5 h-5 rounded-full bg-sky-600 border-2 border-white ring-2 ring-sky-500/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform z-10 shadow-[0_0_8px_rgba(14,165,233,0.5)]"
+                          title={`CZ Control on q[${qubitIndex}] -> q[${op.targets[0]}]`}
+                          aria-label={`CZ Control (targets q[${op.targets[0]}])`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                          <span className="sr-only">CZ Control</span>
+                        </div>
+                      )}
+
+                      {/* Control dot for CCX */}
+                      {op && isControl && op.gate === 'CCX' && (
+                        <div
+                          data-testid="gate-ccx-control"
+                          className="w-5 h-5 rounded-full bg-blue-600 border-2 border-white ring-2 ring-blue-500/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform z-10 shadow-[0_0_8px_rgba(37,99,235,0.5)]"
+                          title={`Toffoli Control on q[${qubitIndex}] -> q[${op.targets[0]}]`}
+                          aria-label={`CCX Control (targets q[${op.targets[0]}])`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                          <span className="sr-only">CCX Control</span>
+                        </div>
+                      )}
+
+                      {/* CNOT Target Crosshair */}
                       {op && isTarget && op.gate === 'CNOT' && (
                         <div
-                          data-testid={op.opId ? `gate-${op.opId}` : 'gate-cnot-target'}
+                          data-testid={`gate-${op.opId}`}
                           className="animate-gate-dock w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center cursor-pointer hover:scale-105 transition-transform border border-violet-700 z-10 shadow-[0_0_8px_rgba(139,92,246,0.5)]"
                           title={`CNOT Target on q[${qubitIndex}] (control q[${op.controls[0]}])`}
                           aria-label={`CNOT Target (controlled by q[${op.controls[0]}])`}
                         >
-                          <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                          <CnotTargetCrosshairIcon data-testid="gate-cnot-target" className="w-6 h-6 text-white" strokeWidth={2.4} />
                           <span className="sr-only">CNOT Target</span>
                         </div>
                       )}
 
-                      {op && isTarget && (op.gate === 'H' || op.gate === 'X' || op.gate === 'Y' || op.gate === 'Z') && (
+                      {/* CCX Toffoli Target Crosshair */}
+                      {op && isTarget && op.gate === 'CCX' && (
+                        <div
+                          data-testid={`gate-${op.opId}`}
+                          className="animate-gate-dock w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center cursor-pointer hover:scale-105 transition-transform border border-blue-700 z-10 shadow-[0_0_8px_rgba(37,99,235,0.5)]"
+                          title={`Toffoli Target on q[${qubitIndex}] (controls q[${op.controls.join(', ')}])`}
+                          aria-label={`Toffoli Target (controlled by q[${op.controls.join(', ')}])`}
+                        >
+                          <span data-testid="gate-ccx-target" className="flex items-center justify-center">
+                            <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                          </span>
+                          <span className="sr-only">CCX Target</span>
+                        </div>
+                      )}
+
+                      {/* CZ Target Dot */}
+                      {op && isTarget && op.gate === 'CZ' && (
+                        <div
+                          data-testid={`gate-${op.opId}`}
+                          className="animate-gate-dock w-6 h-6 rounded-full bg-sky-600 border-2 border-white ring-2 ring-sky-500/40 flex items-center justify-center text-white shadow-xs cursor-pointer hover:scale-110 transition-transform z-10 shadow-[0_0_8px_rgba(14,165,233,0.5)]"
+                          title={`CZ Target on q[${qubitIndex}] (controlled by q[${op.controls[0]}])`}
+                          aria-label={`CZ Target (controlled by q[${op.controls[0]}])`}
+                        >
+                          <span data-testid="gate-cz-target" className="w-2 h-2 rounded-full bg-white" />
+                          <span className="sr-only">CZ Target</span>
+                        </div>
+                      )}
+
+                      {/* Single Qubit Gates: H, X, Y, Z, S, T */}
+                      {op && isTarget && (op.gate === 'H' || op.gate === 'X' || op.gate === 'Y' || op.gate === 'Z' || op.gate === 'S' || op.gate === 'T') && (
                         <div
                           data-testid={`gate-${op.opId}`}
                           className="animate-gate-dock cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg active:scale-[1.03] z-10 relative"
@@ -308,6 +394,7 @@ export function QubitWiresGrid({
                         </div>
                       )}
 
+                      {/* Measurement Gate */}
                       {op && isTarget && op.gate === 'MEASURE' && (
                         <div
                           data-testid={`gate-${op.opId}`}
@@ -354,6 +441,14 @@ export function QubitWiresGrid({
                               {selectedGateToPlace === 'CNOT' ? (
                                 <div className="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center border border-violet-700">
                                   <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                                </div>
+                              ) : selectedGateToPlace === 'CCX' ? (
+                                <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center border border-blue-700">
+                                  <CnotTargetCrosshairIcon className="w-6 h-6 text-white" strokeWidth={2.4} />
+                                </div>
+                              ) : selectedGateToPlace === 'CZ' ? (
+                                <div className="w-6 h-6 rounded-full bg-sky-600 border-2 border-white flex items-center justify-center text-white">
+                                  <span className="w-2 h-2 rounded-full bg-white" />
                                 </div>
                               ) : (
                                 <GateTile gate={selectedGateToPlace} size="md" />

@@ -28,7 +28,7 @@ export interface CircuitStoreState {
     gate: GateName,
     targetQubit: number,
     column?: number,
-    controlQubit?: number,
+    controlQubit?: number | number[],
     classicalTarget?: number
   ) => Operation;
   removeGate: (opId: string) => void;
@@ -108,17 +108,47 @@ export const useCircuitStore = create<CircuitStoreState>((set, get) => ({
     gate: GateName,
     targetQubit: number,
     column?: number,
-    controlQubit?: number,
+    controlQubit?: number | number[],
     classicalTarget?: number
   ) => {
     const state = get();
-    const currentCircuit = state.circuit;
+    let currentCircuit = state.circuit;
+
+    // CCX requires at least 3 qubits — automatically expand qubit count if circuit has fewer
+    if (gate === 'CCX' && currentCircuit.qubitCount < 3) {
+      currentCircuit = {
+        ...currentCircuit,
+        qubitCount: 3,
+        classicalBitCount: Math.max(3, currentCircuit.classicalBitCount),
+      };
+    }
+
     const opId = `op_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
-    const controls =
-      gate === 'CNOT'
-        ? [controlQubit !== undefined ? controlQubit : targetQubit === 0 ? 1 : 0]
-        : [];
+    let controls: number[] = [];
+    if (gate === 'CNOT' || gate === 'CZ') {
+      if (typeof controlQubit === 'number') {
+        controls = [controlQubit];
+      } else if (Array.isArray(controlQubit) && controlQubit.length > 0) {
+        controls = [controlQubit[0]];
+      } else {
+        controls = [targetQubit === 0 ? 1 : 0];
+      }
+    } else if (gate === 'CCX') {
+      if (Array.isArray(controlQubit) && controlQubit.length >= 2) {
+        controls = [controlQubit[0], controlQubit[1]];
+      } else if (typeof controlQubit === 'number') {
+        const available = Array.from({ length: currentCircuit.qubitCount }, (_, i) => i)
+          .filter((q) => q !== targetQubit && q !== controlQubit);
+        controls = [controlQubit, available[0] ?? 0];
+      } else {
+        // Derive 2 controls distinct from targetQubit
+        const available = Array.from({ length: currentCircuit.qubitCount }, (_, i) => i)
+          .filter((q) => q !== targetQubit);
+        controls = [available[0] ?? 0, available[1] ?? 1];
+      }
+    }
+
     const classicalTargets =
       gate === 'MEASURE'
         ? [classicalTarget !== undefined ? classicalTarget : targetQubit]
@@ -150,7 +180,7 @@ export const useCircuitStore = create<CircuitStoreState>((set, get) => ({
       column: assignedCol,
     };
 
-    // Remove any existing gate at this exact cell if single gate (unless CNOT target/control)
+    // Remove any existing gate at this exact cell if single gate (unless CNOT/CZ/CCX target/control)
     const filteredOps = currentCircuit.operations.filter(
       (op) => !(op.column === assignedCol && op.targets.includes(targetQubit))
     );
@@ -221,13 +251,20 @@ export const useCircuitStore = create<CircuitStoreState>((set, get) => ({
     const targetOp = state.circuit.operations.find((op) => op.opId === opId);
     if (!targetOp) return;
 
+    let updatedControls: number[] = [];
+    if (targetOp.gate === 'CNOT' || targetOp.gate === 'CZ') {
+      const prevCtrl = targetOp.controls[0] ?? (toQubit === 0 ? 1 : 0);
+      updatedControls = [prevCtrl === toQubit ? (toQubit === 0 ? 1 : 0) : prevCtrl];
+    } else if (targetOp.gate === 'CCX') {
+      const available = Array.from({ length: state.circuit.qubitCount }, (_, i) => i)
+        .filter((q) => q !== toQubit);
+      updatedControls = [available[0] ?? 0, available[1] ?? 1];
+    }
+
     const updatedOp: Operation = {
       ...targetOp,
       targets: [toQubit],
-      controls:
-        targetOp.gate === 'CNOT'
-          ? [targetOp.controls[0] === toQubit ? (toQubit === 0 ? 1 : 0) : targetOp.controls[0]]
-          : [],
+      controls: updatedControls,
       column: toColumn,
     };
 

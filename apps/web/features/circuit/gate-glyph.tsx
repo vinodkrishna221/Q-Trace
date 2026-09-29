@@ -68,10 +68,38 @@ export function MeasureGaugeIcon({ className = 'w-6 h-6' }: { className?: string
 }
 
 /**
- * Circled Plus Crosshair SVG Icon for CNOT Target.
+ * Circled Plus Crosshair SVG Icon for CNOT & CCX Target.
  * Horizontal and vertical crossbars meet the outer circle with mathematical precision.
  */
-export function CnotTargetCrosshairIcon({ className = 'w-6 h-6', strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
+export function CnotTargetCrosshairIcon({
+  className = 'w-6 h-6',
+  strokeWidth = 2,
+  'data-testid': dataTestId,
+}: {
+  className?: string;
+  strokeWidth?: number;
+  'data-testid'?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+      data-testid={dataTestId}
+    >
+      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth={strokeWidth} />
+      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * 3-Qubit Vertical Multi-Terminal Glyph for CCX (Toffoli).
+ * Two control dots connected by a vertical spine to a circled plus target symbol.
+ */
+export function CcxMultiTerminalIcon({ className = 'w-6 h-6' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -79,10 +107,74 @@ export function CnotTargetCrosshairIcon({ className = 'w-6 h-6', strokeWidth = 2
       className={className}
       aria-hidden="true"
     >
-      <circle cx="12" cy="12" r="9.5" stroke="currentColor" strokeWidth={strokeWidth} />
-      <line x1="12" y1="2.5" x2="12" y2="21.5" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
-      <line x1="2.5" y1="12" x2="21.5" y2="12" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+      {/* Vertical spine */}
+      <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      {/* Control dot 1 */}
+      <circle cx="12" cy="4" r="2.2" fill="currentColor" />
+      {/* Control dot 2 */}
+      <circle cx="12" cy="9.5" r="2.2" fill="currentColor" />
+      {/* Circled plus target */}
+      <circle cx="12" cy="17" r="4.5" stroke="currentColor" strokeWidth="1.6" />
+      <line x1="12" y1="13.5" x2="12" y2="20.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="8.5" y1="17" x2="15.5" y2="17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
+  );
+}
+
+/**
+ * Connected Multi-Terminal Glyph for CZ (Controlled-Z).
+ * Two control dots connected by a vertical line (●—●).
+ */
+export function CzMultiTerminalIcon({ className = 'w-6 h-6' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Connecting spine */}
+      <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      {/* Control dot 1 */}
+      <circle cx="12" cy="6" r="3.2" fill="currentColor" />
+      {/* Control dot 2 / Target dot */}
+      <circle cx="12" cy="18" r="3.2" fill="currentColor" />
+      {/* Subtle basis notation 'Z' */}
+      <text
+        x="17"
+        y="13"
+        fontSize="6.5"
+        fontWeight="bold"
+        fontFamily="ui-monospace, monospace"
+        fill="currentColor"
+      >
+        Z
+      </text>
+    </svg>
+  );
+}
+
+/**
+ * S Gate Phase Rotation Glyph (π/2 phase shift).
+ */
+export function PhaseSIcon({ className = 'w-6 h-6' }: { className?: string }) {
+  return (
+    <div className={`relative flex items-center justify-center font-mono ${className}`}>
+      <span className="font-bold text-[15px] tracking-tight">S</span>
+      <span className="absolute -top-1 -right-1 text-[8px] font-semibold opacity-80">π/2</span>
+    </div>
+  );
+}
+
+/**
+ * T Gate π/8 Rotation Glyph (π/4 phase shift).
+ */
+export function PhaseTIcon({ className = 'w-6 h-6' }: { className?: string }) {
+  return (
+    <div className={`relative flex items-center justify-center font-mono ${className}`}>
+      <span className="font-bold text-[15px] tracking-tight">T</span>
+      <span className="absolute -top-1 -right-1 text-[8px] font-semibold opacity-80">π/4</span>
+    </div>
   );
 }
 
@@ -140,28 +232,28 @@ export const GATE_VISUAL_STYLES: Record<
     textClass: 'text-white',
     borderClass: 'border-[#0284c7]',
     shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(14,165,233,0.25)]',
-    displayGlyph: <span className="font-mono font-bold tracking-tight">CZ</span>,
+    displayGlyph: <CzMultiTerminalIcon className="w-5 h-5" />,
   },
   CCX: {
     bgClass: 'bg-[#0f62fe]', // IBM Quantum Royal Blue
     textClass: 'text-white',
     borderClass: 'border-[#0043ce]',
     shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(15,98,254,0.25)]',
-    displayGlyph: <span className="font-mono font-bold tracking-tight">CCX</span>,
+    displayGlyph: <CcxMultiTerminalIcon className="w-5 h-5" />,
   },
   S: {
     bgClass: 'bg-[#1192e8]',
     textClass: 'text-white',
     borderClass: 'border-[#0072c3]',
     shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(17,146,232,0.25)]',
-    displayGlyph: <span className="font-mono font-bold tracking-tight">S</span>,
+    displayGlyph: <PhaseSIcon className="w-5 h-5" />,
   },
   T: {
     bgClass: 'bg-[#8a3ffc]',
     textClass: 'text-white',
     borderClass: 'border-[#6929c4]',
     shadowClass: 'shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4),0_2px_4px_rgba(138,63,252,0.25)]',
-    displayGlyph: <span className="font-mono font-bold tracking-tight">T</span>,
+    displayGlyph: <PhaseTIcon className="w-5 h-5" />,
   },
   MEASURE: {
     bgClass: 'bg-[#475569]', // IBM Quantum Charcoal / Slate
