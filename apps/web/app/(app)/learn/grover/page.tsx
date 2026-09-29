@@ -270,12 +270,14 @@ export default function GroverLearnPage() {
         }
       />
 
-      {/* Prior Knowledge Badge */}
-      <PriorKnowledgeBadge
-        activeRole={activeRole}
-        learnerProfile={activeLearnerProfile}
-        learningPath={activeLearningPath}
-      />
+      {/* Hidden accessible Prior Knowledge Badge */}
+      <div className="sr-only" aria-hidden="true">
+        <PriorKnowledgeBadge
+          activeRole={activeRole}
+          learnerProfile={activeLearnerProfile}
+          learningPath={activeLearningPath}
+        />
+      </div>
 
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Stepper Controller */}

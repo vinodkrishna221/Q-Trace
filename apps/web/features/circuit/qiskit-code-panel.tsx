@@ -85,8 +85,8 @@ export function QiskitCodePanel({
       </CardHeader>
 
       <CardContent className="p-0">
-        <div className="p-4 bg-abyss font-mono text-xs text-ink-dim overflow-x-auto leading-relaxed border-b border-line">
-          <pre data-testid="qiskit-code-content" className="text-accent/90">
+        <div className="p-4 bg-abyss font-mono text-xs text-ink-dim overflow-x-auto border-b border-line" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+          <pre data-testid="qiskit-code-content" className="text-accent/90 leading-relaxed">
             <code>{code}</code>
           </pre>
         </div>
