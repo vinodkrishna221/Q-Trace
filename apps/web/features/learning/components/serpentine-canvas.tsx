@@ -32,6 +32,9 @@ export interface SerpentineCanvasProps {
   setActiveStepIndex: (index: number | ((prev: number) => number)) => void;
   hideUnit1Banner?: boolean;
   hideUnit2Banner?: boolean;
+  hideInlineBanners?: boolean;
+  activeUnitTab?: number | 'all';
+  onAdvanceUnit?: (unitNumber: number) => void;
   className?: string;
 }
 
@@ -43,6 +46,9 @@ export function SerpentineCanvas({
   setActiveStepIndex,
   hideUnit1Banner = false,
   hideUnit2Banner = false,
+  hideInlineBanners = false,
+  activeUnitTab = 'all',
+  onAdvanceUnit,
   className = '',
 }: SerpentineCanvasProps) {
   // Stepper state for legacy / acceptance test compatibility
@@ -116,10 +122,10 @@ export function SerpentineCanvas({
       hideBanner: hideUnit2Banner,
     },
     {
-      key: 'unit_2_1',
-      unitNumber: '2.1',
+      key: 'unit_3',
+      unitNumber: 3,
       unitTitle: "GROVER'S SEARCH ALGORITHM",
-      subtitle: 'Amplitude Amplification & Quantum Database Search (Module 2 Launch)',
+      subtitle: 'Amplitude Amplification & Quantum Database Search',
       completedCount: 0,
       totalCount: 9,
       accentRailColor: 'linear-gradient(to right, #00D4FF, #1E40AF)',
@@ -127,6 +133,11 @@ export function SerpentineCanvas({
       hideBanner: false,
     },
   ];
+
+  const displayedSections =
+    activeUnitTab && activeUnitTab !== 'all'
+      ? unitSections.filter((s) => s.unitNumber === activeUnitTab)
+      : unitSections;
 
   // Sinusoidal horizontal offset sequence
   const desktopOffsets = [0, 56, -44, 68, -32, 52, -56, 0];
@@ -217,10 +228,10 @@ export function SerpentineCanvas({
 
       {/* 2. Structured Multi-Unit Serpentine Tracks */}
       <div className="space-y-12">
-        {unitSections.map((section) => (
+        {displayedSections.map((section) => (
           <div key={section.key} className="space-y-6">
-            {/* Unit Section Banner */}
-            {!section.hideBanner && (
+            {/* Unit Section Banner (if not hidden by parent full-width layout) */}
+            {!hideInlineBanners && !section.hideBanner && (
               <UnitSectionBanner
                 unitNumber={section.unitNumber}
                 unitTitle={section.unitTitle}
@@ -229,6 +240,16 @@ export function SerpentineCanvas({
                 totalCount={section.totalCount}
                 accentRailColor={section.accentRailColor}
               />
+            )}
+
+            {/* In-stream Unit Marker if inline banners are hidden and viewing all units */}
+            {hideInlineBanners && typeof section.unitNumber === 'number' && section.unitNumber > 1 && (
+              <div className="flex items-center justify-center my-6">
+                <span className="px-3.5 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase border border-accent/30 bg-accent/10 text-accent flex items-center gap-1.5 shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>UNIT {section.unitNumber}: {section.unitTitle}</span>
+                </span>
+              </div>
             )}
 
             {/* Serpentine Winding Path with ChamberNodes */}
@@ -269,7 +290,7 @@ export function SerpentineCanvas({
                       ? localIndex === 2
                       : section.unitNumber === 2
                       ? stage.id === 'bell-state'
-                      : section.unitNumber === '2.1'
+                      : section.unitNumber === 3
                       ? stage.id === 'mod2_grover_oracle_concept'
                       : false;
 
@@ -283,6 +304,12 @@ export function SerpentineCanvas({
                   const desktopX = desktopOffsets[nodeGlobalIdx % desktopOffsets.length];
                   const mobileX = mobileOffsets[nodeGlobalIdx % mobileOffsets.length];
 
+                  const isLabStage =
+                    stage.archetype === 'NODE_GATE_LAB' ||
+                    stage.archetype === 'NODE_MILESTONE' ||
+                    stage.archetype === 'NODE_DEBUG' ||
+                    stage.id === 'bell-state';
+
                   const isGrover =
                     stage.unitId === 'unit_2_1' ||
                     stage.id.startsWith('mod2_') ||
@@ -291,7 +318,7 @@ export function SerpentineCanvas({
                   const stageRoute =
                     stage.route ||
                     (isGrover
-                      ? '/lab?preset=grover'
+                      ? (isLabStage ? '/lab?preset=grover' : '#')
                       : stage.id === 'bell-state'
                       ? '/learn/bell-state'
                       : `/learn/${stage.lessonId}`);
@@ -326,15 +353,26 @@ export function SerpentineCanvas({
                               +{stage.coherenceReward || 35} XP
                             </span>
                           </div>
-                          <Link href={stageRoute}>
+                          {isLabStage && stageRoute !== '#' ? (
+                            <Link href={stageRoute}>
+                              <Button
+                                type="button"
+                                size="sm"
+                                className="w-full h-6 text-[10px] font-mono bg-accent hover:bg-accent-hover text-white py-0 px-2"
+                              >
+                                ✦ START LAB
+                              </Button>
+                            </Link>
+                          ) : (
                             <Button
                               type="button"
                               size="sm"
+                              onClick={() => onSelectStage(stage)}
                               className="w-full h-6 text-[10px] font-mono bg-accent hover:bg-accent-hover text-white py-0 px-2"
                             >
-                              ✦ START
+                              ✦ VIEW CONCEPT
                             </Button>
-                          </Link>
+                          )}
                         </div>
                       )}
 
@@ -411,6 +449,40 @@ export function SerpentineCanvas({
                   );
                 })}
               </div>
+
+              {/* Unit Advancement Card when single unit is active */}
+              {activeUnitTab && activeUnitTab !== 'all' && (
+                <div className="pt-8 pb-4 flex justify-center w-full relative z-20">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextUnit = section.unitNumber === 1 ? 2 : section.unitNumber === 2 ? 3 : 1;
+                      onAdvanceUnit?.(nextUnit);
+                    }}
+                    className="p-3.5 rounded-2xl border border-accent/40 bg-surface shadow-xs hover:border-accent hover:shadow-md transition-all flex items-center gap-3 text-left max-w-sm w-full group cursor-pointer"
+                  >
+                    <div className="h-9 w-9 rounded-xl bg-accent text-white flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-mono text-accent uppercase font-bold tracking-wider">
+                        {section.unitNumber === 1
+                          ? 'CONTINUE TO UNIT 02'
+                          : section.unitNumber === 2
+                          ? 'ADVANCE TO UNIT 03'
+                          : 'RETURN TO UNIT 01'}
+                      </p>
+                      <p className="text-xs font-bold text-text-primary truncate">
+                        {section.unitNumber === 1
+                          ? 'Entanglement & Bell States'
+                          : section.unitNumber === 2
+                          ? "Grover's Search Algorithm"
+                          : 'The Quantum Compass'}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}

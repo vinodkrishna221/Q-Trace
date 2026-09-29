@@ -121,6 +121,12 @@ export function StageBottomSheet({
       ? 'Medium'
       : 'Foundational';
 
+  const isLabStage =
+    archetype === 'NODE_GATE_LAB' ||
+    archetype === 'NODE_MILESTONE' ||
+    archetype === 'NODE_DEBUG' ||
+    stage.id === 'bell-state';
+
   const isGrover =
     stage.unitId === 'unit_2_1' ||
     stage.id.startsWith('mod2_') ||
@@ -129,10 +135,12 @@ export function StageBottomSheet({
   const targetRoute =
     stage.route ||
     (isGrover
-      ? '/lab?preset=grover'
+      ? (isLabStage ? '/lab?preset=grover' : undefined)
       : stage.id === 'bell-state' || stage.lessonId === 'bell-state'
       ? '/learn/bell-state'
-      : `/learn/${stage.lessonId}`);
+      : stage.lessonId && stage.lessonId !== stage.id
+      ? `/learn/${stage.lessonId}`
+      : undefined);
 
   // Fallback Qiskit Aer Snippet
   const qiskitCode =
@@ -387,18 +395,34 @@ counts = result.get_counts()`);
 
         {/* 6. Footer: 48px Thumb Action CTA */}
         <div className="p-4 border-t border-border-subtle bg-surface shrink-0">
-          <Link href={targetRoute} className="w-full block">
+          {isLabStage && targetRoute ? (
+            <Link href={targetRoute} className="w-full block">
+              <Button
+                type="button"
+                className="w-full h-12 gap-2 bg-accent hover:bg-accent-hover text-white font-mono text-xs sm:text-sm font-bold shadow-md transition-transform active:scale-[0.98] rounded-xl flex items-center justify-center cursor-pointer"
+                data-testid="mobile-enter-chamber-btn"
+                onClick={() => onEnterChamber?.(stage)}
+              >
+                <Sparkles className="w-4 h-4 fill-current" />
+                <span>✦ ENTER CHAMBER & RUN CIRCUIT</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          ) : (
             <Button
               type="button"
               className="w-full h-12 gap-2 bg-accent hover:bg-accent-hover text-white font-mono text-xs sm:text-sm font-bold shadow-md transition-transform active:scale-[0.98] rounded-xl flex items-center justify-center cursor-pointer"
               data-testid="mobile-enter-chamber-btn"
-              onClick={() => onEnterChamber?.(stage)}
+              onClick={() => {
+                onEnterChamber?.(stage);
+                onClose();
+              }}
             >
               <Sparkles className="w-4 h-4 fill-current" />
-              <span>✦ ENTER CHAMBER & RUN CIRCUIT</span>
+              <span>✦ ENTER CHAMBER · MASTER CONCEPT</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
-          </Link>
+          )}
         </div>
       </div>
     </div>

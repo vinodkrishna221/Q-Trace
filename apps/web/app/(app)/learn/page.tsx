@@ -26,6 +26,7 @@ import { SerpentineCanvas } from '@/features/learning/components/serpentine-canv
 import { UnitSectionBanner } from '@/features/learning/components/unit-section-banner';
 import { StageBottomSheet } from '@/features/learning/components/stage-bottom-sheet';
 import { MobileBottomNav } from '@/features/learning/components/mobile-bottom-nav';
+import { UNIT_DEFINITIONS, getUnitForStage } from '@/lib/curriculum/unit-definitions';
 
 export default function LearnIndexPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
@@ -59,6 +60,43 @@ export default function LearnIndexPage() {
       allCurriculumStages[0]
     );
   });
+
+  // Active unit tab: 1, 2, 3, or 'all'
+  const [activeUnitTab, setActiveUnitTab] = React.useState<number | 'all'>(1);
+
+  const activeBannerUnit = React.useMemo(() => {
+    if (activeUnitTab !== 'all') {
+      return (
+        UNIT_DEFINITIONS.find((u) => u.unitNumber === activeUnitTab) || UNIT_DEFINITIONS[0]
+      );
+    }
+    const stageUnitNum = getUnitForStage(selectedStage);
+    return (
+      UNIT_DEFINITIONS.find((u) => u.unitNumber === stageUnitNum) || UNIT_DEFINITIONS[0]
+    );
+  }, [activeUnitTab, selectedStage]);
+
+  const handleSelectUnitTab = (tab: number | 'all') => {
+    setActiveUnitTab(tab);
+    if (tab !== 'all') {
+      const def = UNIT_DEFINITIONS.find((u) => u.unitNumber === tab);
+      if (def) {
+        const stage = allCurriculumStages.find((s) => s.id === def.firstStageId);
+        if (stage) {
+          setSelectedStage(stage);
+        }
+      }
+    }
+  };
+
+  const handleSelectStage = (stage: CurriculumStage) => {
+    setSelectedStage(stage);
+    setIsBottomSheetOpen(true);
+    const unitNum = getUnitForStage(stage);
+    if (activeUnitTab !== 'all' && activeUnitTab !== unitNum) {
+      setActiveUnitTab(unitNum);
+    }
+  };
 
   // Dynamic vertical tracking for Right Stage Inspector and Dotted Arrow
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -226,6 +264,80 @@ export default function LearnIndexPage() {
           </div>
         </div>
 
+        {/* Interactive Unit Navigation Tabs & Full-Spanning Section Banner */}
+        <section
+          className="w-full space-y-4"
+          data-testid="learn-unit-banner-container"
+          aria-label="Quantum Curriculum Units"
+        >
+          {/* Unit Switcher Tabs */}
+          <div
+            className="flex items-center gap-2 overflow-x-auto pb-1"
+            role="tablist"
+            aria-label="Curriculum Units"
+          >
+            {UNIT_DEFINITIONS.map((unit) => {
+              const isTabActive = activeUnitTab === unit.unitNumber;
+              return (
+                <button
+                  key={unit.unitNumber}
+                  type="button"
+                  role="tab"
+                  aria-selected={isTabActive}
+                  onClick={() => handleSelectUnitTab(unit.unitNumber)}
+                  data-testid={`unit-tab-${unit.unitNumber}`}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                    isTabActive
+                      ? 'bg-accent text-white shadow-xs ring-2 ring-accent/30'
+                      : 'bg-surface border border-border-subtle text-text-secondary hover:border-border-medium hover:text-text-primary'
+                  }`}
+                >
+                  <span>Unit {unit.unitNumber}: {unit.shortTitle}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                      isTabActive ? 'bg-white/20 text-white' : 'bg-surface-sunken text-text-muted'
+                    }`}
+                  >
+                    {unit.completedCount}/{unit.totalCount}
+                  </span>
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeUnitTab === 'all'}
+              onClick={() => handleSelectUnitTab('all')}
+              data-testid="unit-tab-all"
+              className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                activeUnitTab === 'all'
+                  ? 'bg-accent text-white shadow-xs ring-2 ring-accent/30'
+                  : 'bg-surface border border-border-subtle text-text-secondary hover:border-border-medium hover:text-text-primary'
+              }`}
+            >
+              <span>All Units</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                  activeUnitTab === 'all' ? 'bg-white/20 text-white' : 'bg-surface-sunken text-text-muted'
+                }`}
+              >
+                19 Stages
+              </span>
+            </button>
+          </div>
+
+          {/* Active Unit Section Banner spanning above 3-zone layout */}
+          <UnitSectionBanner
+            unitNumber={activeBannerUnit.unitNumber}
+            unitTitle={activeBannerUnit.unitTitle}
+            subtitle={activeBannerUnit.subtitle}
+            completedCount={activeBannerUnit.completedCount}
+            totalCount={activeBannerUnit.totalCount}
+            accentRailColor={activeBannerUnit.accentRailColor}
+            className="w-full shadow-xs"
+          />
+        </section>
+
         {/* 3-ZONE DESKTOP PRIMARY ARCHITECTURE */}
         {/* Left Rail (Col 3) + Center Serpentine Canvas (Col 6) + Right Stage Inspector (Col 3) */}
         <div
@@ -298,12 +410,12 @@ export default function LearnIndexPage() {
             <SerpentineCanvas
               stages={allCurriculumStages}
               selectedStageId={selectedStage?.id || 'bell-state'}
-              onSelectStage={(stage) => {
-                setSelectedStage(stage);
-                setIsBottomSheetOpen(true);
-              }}
+              onSelectStage={handleSelectStage}
               activeStepIndex={activeStepIndex}
               setActiveStepIndex={setActiveStepIndex}
+              hideInlineBanners={true}
+              activeUnitTab={activeUnitTab}
+              onAdvanceUnit={handleSelectUnitTab}
             />
 
             {/* Structured Module Catalogue Cards (Hidden from visual UI per user request; sr-only for tests) */}

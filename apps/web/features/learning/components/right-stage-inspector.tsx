@@ -19,6 +19,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CurriculumStage } from '@/lib/curriculum/types';
+import { cn } from '@/lib/utils';
 
 export interface RightStageInspectorProps {
   selectedStage: CurriculumStage | null;
@@ -31,6 +32,14 @@ export function RightStageInspector({
   onEnterChamber,
   className = '',
 }: RightStageInspectorProps) {
+  const [selectedOptionId, setSelectedOptionId] = React.useState<string | null>(null);
+  const [completedConceptIds, setCompletedConceptIds] = React.useState<Set<string>>(new Set());
+
+  // Reset selected prediction option when stage changes
+  React.useEffect(() => {
+    setSelectedOptionId(null);
+  }, [selectedStage?.id]);
+
   if (!selectedStage) {
     return (
       <aside
@@ -55,6 +64,9 @@ export function RightStageInspector({
     route,
     cnotTruthTable,
     bellSynthesis,
+    gateTruthTable,
+    speedupTable,
+    groverMath,
   } = selectedStage;
 
   // Derive difficulty from unit/stage
@@ -71,6 +83,19 @@ export function RightStageInspector({
     selectedStage.unitId === 'unit_2_1' ||
     selectedStage.id.startsWith('mod2_') ||
     selectedStage.id.startsWith('pc_grover');
+
+  const isLabStage =
+    archetype === 'NODE_GATE_LAB' ||
+    archetype === 'NODE_MILESTONE' ||
+    archetype === 'NODE_DEBUG' ||
+    selectedStage.id === 'bell-state';
+
+  const isConceptCompleted = completedConceptIds.has(selectedStage.id);
+
+  const handleCompleteConcept = () => {
+    setCompletedConceptIds((prev) => new Set([...prev, selectedStage.id]));
+    onEnterChamber?.(selectedStage);
+  };
 
   // Generate dynamic Qiskit preview based on stage
   const qiskitCode =
@@ -89,10 +114,12 @@ export function RightStageInspector({
   const targetRoute =
     route ||
     (isGrover
-      ? '/lab?preset=grover'
+      ? (isLabStage ? '/lab?preset=grover' : undefined)
       : selectedStage.id === 'bell-state'
       ? '/learn/bell-state'
-      : `/learn/${selectedStage.lessonId}`);
+      : selectedStage.lessonId && selectedStage.lessonId !== selectedStage.id
+      ? `/learn/${selectedStage.lessonId}`
+      : undefined);
 
   return (
     <aside
@@ -178,7 +205,20 @@ export function RightStageInspector({
                 </div>
               </div>
 
-              {/* 2. Key Concepts */}
+              {/* 2. Concept Summary Telemetry Box */}
+              {conceptSummary && (
+                <div
+                  className="p-3 rounded-xl border border-border-subtle bg-surface-sunken/60 text-text-secondary leading-relaxed text-[11px] space-y-1"
+                  data-testid="inspector-concept-summary"
+                >
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-text-muted block">
+                    Conceptual Telemetry
+                  </span>
+                  <p>{conceptSummary}</p>
+                </div>
+              )}
+
+              {/* 3. Key Concepts */}
               <div className="space-y-1.5" data-testid="inspector-key-concepts">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted block">
                   Key Concepts Grounded
@@ -215,7 +255,7 @@ export function RightStageInspector({
                 </div>
               </div>
 
-              {/* 3. Prerequisite Status */}
+              {/* 4. Prerequisite Status */}
               <div className="space-y-1.5 pt-1" data-testid="inspector-prerequisites">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted block">
                   Prerequisite Status
@@ -235,7 +275,7 @@ export function RightStageInspector({
                         <span className="h-3.5 w-3.5 rounded-full border-2 border-accent flex items-center justify-center text-[9px]">
                           •
                         </span>
-                        <span>Unit 2.1: Amplitude Amplification [Active]</span>
+                        <span>Unit 03: Grover Search & Amplitude Amplification [Active]</span>
                       </div>
                     </>
                   ) : (
@@ -259,7 +299,7 @@ export function RightStageInspector({
                 </div>
               </div>
 
-              {/* 4. Scientific Honesty Callout */}
+              {/* 5. Scientific Honesty Callout */}
               <div className="p-2.5 rounded-lg border border-border-subtle bg-surface-raised/40 text-[10px] text-text-muted flex items-start gap-1.5">
                 <Info className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
                 <span className="italic leading-tight">
@@ -271,10 +311,90 @@ export function RightStageInspector({
             {/* Right Column: Code, Checkpoint & CTA */}
             <div className="space-y-4 flex flex-col justify-between">
               <div className="space-y-3">
-                {/* Prediction Checkpoint Preview (if present) */}
+                {/* Gate Truth Table (if available, e.g. CCX Toffoli) */}
+                {gateTruthTable && (
+                  <div
+                    className="p-3 rounded-xl border border-accent/25 bg-accent/5 space-y-2"
+                    data-testid="inspector-truth-table"
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-accent">
+                      <span>{gateTruthTable.gate} Truth Table</span>
+                      <span className="text-text-muted">
+                        {gateTruthTable.controls} controls, {gateTruthTable.targets} target
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 text-[10px] font-mono">
+                      {gateTruthTable.truthTable.map((row, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between px-2 py-1 rounded bg-surface border border-border-subtle"
+                        >
+                          <span className="text-text-muted">{row.input}</span>
+                          <span className="text-text-muted text-[8px]">➔</span>
+                          <span
+                            className={
+                              row.input !== row.output
+                                ? 'text-accent font-bold'
+                                : 'text-text-secondary'
+                            }
+                          >
+                            {row.output}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {gateTruthTable.universality && (
+                      <p className="text-[9px] font-mono text-text-muted pt-0.5">
+                        {gateTruthTable.universality}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Speedup Complexity Table (if available, e.g. Grover Speedup) */}
+                {speedupTable && (
+                  <div
+                    className="p-3 rounded-xl border border-emerald-500/25 bg-emerald-500/5 space-y-2"
+                    data-testid="inspector-speedup-table"
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400">
+                      <span>Speedup Matrix: O(√N) vs Classical O(N)</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[10px] font-mono text-left">
+                        <thead>
+                          <tr className="border-b border-border-subtle text-text-muted">
+                            <th className="py-1">Items</th>
+                            <th className="py-1">Classical Avg</th>
+                            <th className="py-1 text-emerald-600 font-bold">Grover (k)</th>
+                            <th className="py-1 text-right">P(Success)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {speedupTable.items.map((itemCount, i) => (
+                            <tr key={i} className="border-b border-border-subtle/40">
+                              <td className="py-1 font-semibold">{itemCount}</td>
+                              <td className="py-1 text-text-muted">
+                                {speedupTable.classicalAvg[i]}
+                              </td>
+                              <td className="py-1 text-emerald-600 font-bold">
+                                {speedupTable.groverIterations[i]}
+                              </td>
+                              <td className="py-1 text-right text-text-primary">
+                                {(speedupTable.successProbability[i] * 100).toFixed(1)}%
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Prediction Checkpoint with Interactive Selection */}
                 {predictionCheckpoint && (
                   <div
-                    className="p-3 rounded-xl border border-accent/30 bg-accent/5 space-y-2"
+                    className="p-3 rounded-xl border border-accent/30 bg-accent/5 space-y-2.5"
                     data-testid="inspector-checkpoint-preview"
                   >
                     <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-accent uppercase">
@@ -284,16 +404,48 @@ export function RightStageInspector({
                     <p className="text-[11px] text-text-primary font-medium leading-snug">
                       {predictionCheckpoint.prompt}
                     </p>
-                    <div className="space-y-1 pt-0.5">
-                      {predictionCheckpoint.options.slice(0, 3).map((opt) => (
-                        <div
-                          key={opt.id}
-                          className="p-1.5 rounded bg-surface border border-border-subtle text-[10px] font-mono text-text-secondary flex items-center gap-1.5"
-                        >
-                          <span className="w-2 h-2 rounded-full border border-border-medium shrink-0" />
-                          <span className="truncate">{'label' in opt ? opt.label : opt.text}</span>
-                        </div>
-                      ))}
+                    <div className="space-y-1.5 pt-0.5">
+                      {predictionCheckpoint.options.slice(0, 3).map((opt) => {
+                        const isSelected = selectedOptionId === opt.id;
+                        const isCorrect = opt.correct;
+                        return (
+                          <div
+                            key={opt.id}
+                            onClick={() => setSelectedOptionId(opt.id)}
+                            className={cn(
+                              'p-2 rounded-lg border text-[10px] font-mono cursor-pointer transition-all flex flex-col gap-1',
+                              isSelected
+                                ? isCorrect
+                                  ? 'border-emerald-500 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300'
+                                  : 'border-rose-400 bg-rose-500/10 text-rose-700 dark:text-rose-300'
+                                : 'border-border-subtle bg-surface text-text-secondary hover:border-border-medium hover:bg-surface-raised'
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={cn(
+                                  'w-3 h-3 rounded-full border flex items-center justify-center shrink-0',
+                                  isSelected
+                                    ? isCorrect
+                                      ? 'border-emerald-600 bg-emerald-600 text-white'
+                                      : 'border-rose-500 bg-rose-500 text-white'
+                                    : 'border-border-medium bg-surface'
+                                )}
+                              >
+                                {isSelected && <div className="w-1 h-1 rounded-full bg-white" />}
+                              </div>
+                              <span className="font-semibold leading-snug">
+                                {'label' in opt ? opt.label : opt.text}
+                              </span>
+                            </div>
+                            {isSelected && 'explanation' in opt && Boolean(opt.explanation) && (
+                              <p className="pl-5 text-[9px] text-text-secondary font-sans leading-normal">
+                                {String(opt.explanation)}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -313,20 +465,54 @@ export function RightStageInspector({
                 </div>
               </div>
 
-              {/* Action Button: ENTER CHAMBER */}
+              {/* Action Button: Conditional Lab vs In-Situ Concept */}
               <div className="pt-2">
-                <Link href={targetRoute} className="w-full block">
+                {isLabStage && targetRoute ? (
+                  <Link href={targetRoute} className="w-full block">
+                    <Button
+                      type="button"
+                      className="w-full gap-2 bg-accent hover:bg-accent-hover text-white font-mono text-xs font-semibold py-3 h-11 shadow-sm transition-transform active:scale-[0.98]"
+                      data-testid="enter-chamber-button"
+                      onClick={() => onEnterChamber?.(selectedStage)}
+                    >
+                      <Zap className="w-4 h-4 fill-current" />
+                      <span>ENTER CHAMBER</span>
+                      <span className="text-[10px] opacity-85 font-normal">· LAUNCH LAB ➔</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                ) : (
                   <Button
                     type="button"
-                    className="w-full gap-2 bg-accent hover:bg-accent-hover text-white font-mono text-xs font-semibold py-3 h-11 shadow-sm transition-transform active:scale-[0.98]"
+                    className={cn(
+                      'w-full gap-2 font-mono text-xs font-semibold py-3 h-11 shadow-sm transition-all active:scale-[0.98]',
+                      isConceptCompleted
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        : 'bg-accent hover:bg-accent-hover text-white'
+                    )}
                     data-testid="enter-chamber-button"
-                    onClick={() => onEnterChamber?.(selectedStage)}
+                    onClick={handleCompleteConcept}
                   >
-                    <Zap className="w-4 h-4 fill-current" />
-                    <span>ENTER CHAMBER</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {isConceptCompleted ? (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>ENTER CHAMBER</span>
+                        <span className="text-[10px] opacity-90 font-normal">
+                          · CONCEPT GROUNDED ✓
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 fill-current" />
+                        <span>ENTER CHAMBER</span>
+                        <span className="text-[10px] opacity-85 font-normal">
+                          · COMPLETE CONCEPT
+                        </span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </Button>
-                </Link>
+                )}
                 <p className="text-[10px] font-mono text-text-muted text-center mt-1.5">
                   [Press ↵ to Launch]
                 </p>
