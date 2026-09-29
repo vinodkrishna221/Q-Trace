@@ -5,7 +5,7 @@ import { CircuitModel } from '@/lib/contracts';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Info } from 'lucide-react';
+import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Info, RotateCcw } from 'lucide-react';
 import { GateTile, CnotTargetCrosshairIcon } from './gate-glyph';
 
 interface CircuitWorkspaceReadonlyProps {

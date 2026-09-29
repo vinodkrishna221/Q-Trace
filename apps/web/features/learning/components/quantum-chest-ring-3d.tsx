@@ -156,30 +156,19 @@ function Chest({ index, label, isMarked, isOracleApplied, isMeasured, measuredIn
 
 // Glowing Ring Platform with concentric quantum coordinate rings
 function QuantumStageRings() {
-  const innerPoints: THREE.Vector3[] = [];
-  const outerPoints: THREE.Vector3[] = [];
-  const segments = 80;
-
-  for (let i = 0; i <= segments; i++) {
-    const angle = (i / segments) * Math.PI * 2;
-    innerPoints.push(new THREE.Vector3(Math.cos(angle) * RING_RADIUS, -0.4, Math.sin(angle) * RING_RADIUS));
-    outerPoints.push(new THREE.Vector3(Math.cos(angle) * (RING_RADIUS + 0.6), -0.42, Math.sin(angle) * (RING_RADIUS + 0.6)));
-  }
-
-  const innerGeo = new THREE.BufferGeometry().setFromPoints(innerPoints);
-  const outerGeo = new THREE.BufferGeometry().setFromPoints(outerPoints);
-
   return (
     <group>
       {/* Primary Glowing Orbit Rail */}
-      <line geometry={innerGeo}>
-        <lineBasicMaterial color="#38bdf8" transparent opacity={0.6} />
-      </line>
+      <mesh position={[0, -0.4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[RING_RADIUS - 0.02, RING_RADIUS + 0.02, 80]} />
+        <meshBasicMaterial color="#38bdf8" transparent opacity={0.6} side={THREE.DoubleSide} />
+      </mesh>
 
       {/* Outer Ground Ring */}
-      <line geometry={outerGeo}>
-        <lineBasicMaterial color="#6366f1" transparent opacity={0.25} />
-      </line>
+      <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[RING_RADIUS + 0.58, RING_RADIUS + 0.62, 80]} />
+        <meshBasicMaterial color="#6366f1" transparent opacity={0.25} side={THREE.DoubleSide} />
+      </mesh>
 
       {/* Stage Floor Disc with soft radial glow */}
       <mesh position={[0, -0.45, 0]} rotation={[-Math.PI / 2, 0, 0]}>
