@@ -195,7 +195,7 @@ DELIVERABLE: Create apps/web/lib/curriculum/module2-unit-2-1.ts exporting module
 TEST: `pnpm test:web tests/unit/curriculum-module2-unit-2-1.test.ts`
 DEPENDS: FEA-1          UNBLOCKS: FEA-4
 DEMO: The /learn path extends into Module 2 Unit 2.1 showing all 9 Grover stages on the serpentine canvas, allowing learners to progress from the Oracle analogy to the CCX lab and Grover Boss.
-PERSONA: Sage           STATUS: [ ] ready
+PERSONA: Sage           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-3-grover-curriculum`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

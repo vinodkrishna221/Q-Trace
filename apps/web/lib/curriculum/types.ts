@@ -218,9 +218,84 @@ export interface CurriculumStage {
   phaseKickback?: PhaseKickbackMetadata;
   teleportationProtocol?: TeleportationProtocolMetadata;
   capstone?: CapstoneMetadata;
-  acceptanceCriteria?: CapstoneAcceptanceCriteria;
+  acceptanceCriteria?: CapstoneAcceptanceCriteria | GroverAcceptanceCriteria;
   algorithmBridge?: AlgorithmBridgeMetadata;
+  // Module 2 Unit 2.1 Extensions (FEA-3)
+  groverMath?: GroverMathMetadata;
+  gateTruthTable?: GateTruthTableMetadata;
+  speedupTable?: GroverSpeedupTableMetadata;
+  labCircuit?: GroverLabCircuitMetadata;
+  starterCircuitDefinition?: StarterCircuitDefinition;
+  bossChallenge?: boolean;
   metadata?: Record<string, unknown>;
+}
+
+// ---------------------------------------------------------------------------
+// Module 2 Unit 2.1 Grover's Search Algorithm Extensions (FEA-3)
+// ---------------------------------------------------------------------------
+
+export interface GroverMathMetadata {
+  diffusionOperator: string;
+  meanAmplitude: string;
+  reflectionRule: string;
+  optimalIterations: string;
+  finalProbability: string;
+}
+
+export interface GateTruthTableEntry {
+  input: string;
+  output: string;
+}
+
+export interface GateTruthTableMetadata {
+  gate: string;
+  qiskitAPI: string;
+  controls?: number;
+  targets?: number;
+  truthTable: GateTruthTableEntry[];
+  universality?: string;
+}
+
+export interface GroverSpeedupTableMetadata {
+  items: number[];
+  classicalAvg: number[];
+  groverIterations: number[];
+  successProbability: number[];
+}
+
+export interface GroverLabCircuitMetadata {
+  qubitCount: number;
+  classicalBitCount?: number;
+  targetState?: string;
+  steps?: string[];
+  oracleSteps?: string[];
+  expectedOutput?: string;
+  learnerTask?: string;
+}
+
+export interface StarterCircuitOperation {
+  gate: string;
+  targets: number[];
+  controls?: number[];
+  classicalTargets?: number[];
+  column: number;
+}
+
+export interface StarterCircuitDefinition {
+  qubitCount: number;
+  classicalBitCount: number;
+  operations: StarterCircuitOperation[];
+}
+
+export interface GroverAcceptanceCriteria {
+  criteria?: string[];
+  requiredGates?: string[];
+  targetProbability?: number;
+  targetFidelity?: number;
+  targetState?: string;
+  runtimeBackend?: string;
+  shots?: number;
+  bossChallenge?: boolean;
 }
 
 export interface CurriculumUnitInfo {
