@@ -205,7 +205,7 @@ DELIVERABLE: Create apps/web/features/evidence/grover-amplitude-scrubber.tsx wit
 TEST: `pnpm test:web tests/unit/grover-amplitude-scrubber.test.tsx`
 DEPENDS: FEA-3          UNBLOCKS: —
 DEMO: As the presenter drags the scrubber across the Grover execution steps in /lab, judges watch the marked state |101⟩ flip negative during the Oracle step, then invert about the mean during diffusion, surging to 94.5% probability.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-4-grover-amplitude-scrubber`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

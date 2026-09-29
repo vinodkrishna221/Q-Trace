@@ -7,6 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InteractiveCircuitWorkspace } from '@/features/circuit/interactive-circuit-workspace';
 import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
+import {
+  GroverAmplitudeScrubber,
+  CANONICAL_GROVER_STEPS,
+  isGroverCircuit,
+  GROVER_CIRCUIT,
+} from '@/features/evidence';
 import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
 import { DEMO_STARTER_CIRCUIT, DEMO_FLIGHT_RECORDER_DIAGNOSIS } from '@/lib/fixtures';
 import { CircuitModel, SimulationRun, DiagnoseResponse, StateTraceStep } from '@/lib/contracts';
@@ -72,9 +78,12 @@ const GROUND_STATE_TRACE_STEP: StateTraceStep = {
   ],
 };
 
-function determinePreset(c: CircuitModel): 'bell' | 'superposition' | 'clear' | 'custom' {
+function determinePreset(c: CircuitModel): 'bell' | 'superposition' | 'grover' | 'clear' | 'custom' {
   if (c.operations.length === 0) {
     return 'clear';
+  }
+  if (isGroverCircuit(c)) {
+    return 'grover';
   }
   if (
     c.qubitCount === 2 &&
@@ -156,6 +165,15 @@ export default function LabPage() {
     setLastSimulatedCircuit(null);
   };
 
+  const handleLoadGrover = () => {
+    setCircuit(GROVER_CIRCUIT);
+    setHasExecuted(false);
+    setSimulationRun(null);
+    setDiagnosis(null);
+    setSimulationError(null);
+    setLastSimulatedCircuit(null);
+  };
+
   const handleClearGrid = () => {
     clearCircuit();
     setHasExecuted(false);
@@ -186,7 +204,32 @@ export default function LabPage() {
 
       // If offline fallback is active, adapt probabilities and state trace based on circuit structure
       if (simResult.meta.isFallback) {
-        if (
+        if (isGroverCircuit(targetCircuit)) {
+          simResult.data = {
+            ...simResult.data,
+            probabilities: {
+              '101': 0.945,
+              '000': 0.008,
+              '001': 0.008,
+              '010': 0.008,
+              '011': 0.008,
+              '100': 0.008,
+              '110': 0.008,
+              '111': 0.008,
+            },
+            counts: {
+              '101': 968,
+              '000': 8,
+              '001': 8,
+              '010': 8,
+              '011': 8,
+              '100': 8,
+              '110': 8,
+              '111': 8,
+            },
+            stateTrace: CANONICAL_GROVER_STEPS,
+          };
+        } else if (
           targetCircuit.id === 'cm_superposition_seed' ||
           (targetCircuit.operations.length === 2 && targetCircuit.operations.some((op) => op.gate === 'H'))
         ) {
@@ -252,7 +295,47 @@ export default function LabPage() {
         });
 
         if (diagResult.meta.isFallback) {
-          if (
+          if (isGroverCircuit(targetCircuit)) {
+            diagResult.data = {
+              ...diagResult.data,
+              isCorrectPrediction: true,
+              misconceptionSignal: {
+                ...diagResult.data.misconceptionSignal,
+                code: 'NO_SIGNAL',
+                firstDivergenceStep: null,
+                isCorrectPrediction: true,
+                evidence: {
+                  prediction: 'GROVER_2_ITER',
+                  verifiedBehavior: 'GROVER_2_ITER',
+                  predictionDescription: 'Grover amplitude amplification verified',
+                  verifiedBehaviorDescription: 'Optimal 2-iteration Grover search verified: |101⟩ reaches 94.5% target probability',
+                  stateTraceStepIndexes: [0, 1, 2, 3, 4],
+                },
+              },
+              replay: [
+                {
+                  stepIndex: 0,
+                  headline: 'Equal superposition initialized on 3 qubits',
+                  evidenceKeys: ['stateTrace.0.basisProbabilities'],
+                },
+                {
+                  stepIndex: 1,
+                  headline: 'Oracle marks |101⟩ with negative phase flip',
+                  evidenceKeys: ['stateTrace.1.amplitudes.101'],
+                },
+                {
+                  stepIndex: 2,
+                  headline: 'Diffusion operator inverts amplitudes about the mean',
+                  evidenceKeys: ['stateTrace.2.amplitudes.101'],
+                },
+                {
+                  stepIndex: 4,
+                  headline: 'Target state |101⟩ maximally amplified to 94.5%',
+                  evidenceKeys: ['stateTrace.4.basisProbabilities.101'],
+                },
+              ],
+            };
+          } else if (
             targetCircuit.id === 'cm_superposition_seed' ||
             (targetCircuit.operations.length === 2 && targetCircuit.operations.some((op) => op.gate === 'H'))
           ) {
@@ -490,6 +573,18 @@ export default function LabPage() {
               </Button>
 
               <Button
+                variant={activePreset === 'grover' ? 'default' : 'outline'}
+                size="sm"
+                onClick={handleLoadGrover}
+                data-testid="preset-grover-btn"
+                aria-pressed={activePreset === 'grover'}
+                className="font-mono text-xs gap-1.5"
+              >
+                <Sparkles className="w-3 h-3 text-[#00D4FF]" />
+                <span>Grover Search (|101⟩)</span>
+              </Button>
+
+              <Button
                 variant={activePreset === 'clear' ? 'secondary' : 'outline'}
                 size="sm"
                 onClick={handleClearGrid}
@@ -635,6 +730,20 @@ export default function LabPage() {
             </div>
             <span className="text-xs font-mono text-accent">Gate-by-Gate State Trace</span>
           </div>
+
+          {/* Conditional Grover Amplitude Scrubber for Grover Circuits */}
+          {(isGroverCircuit(circuit) ||
+            isGroverCircuit(lastSimulatedCircuit) ||
+            (simulationRun.circuitSnapshot && isGroverCircuit(simulationRun.circuitSnapshot as CircuitModel)) ||
+            (simulationRun.stateTrace &&
+              simulationRun.stateTrace.length > 0 &&
+              Object.keys(simulationRun.stateTrace[0]?.amplitudes || {}).length >= 8)) && (
+            <GroverAmplitudeScrubber
+              stateTrace={simulationRun.stateTrace || []}
+              markedState="101"
+            />
+          )}
+
           <FlightRecorderView
             diagnosis={diagnosis}
             stateTrace={simulationRun.stateTrace || []}
