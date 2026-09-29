@@ -2,13 +2,13 @@
 
 import React, { useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, Text } from '@react-three/drei';
+import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Button } from '@/components/ui/button';
-import { Eye, Zap, RotateCcw } from 'lucide-react';
+import { Eye, Zap, RotateCcw, Sparkles } from 'lucide-react';
 
 const STATES = ['|000⟩', '|001⟩', '|010⟩', '|011⟩', '|100⟩', '|101⟩', '|110⟩', '|111⟩'];
-const RING_RADIUS = 3.8;
+const RING_RADIUS = 3.4;
 
 interface ChestProps {
   index: number;
@@ -21,6 +21,7 @@ interface ChestProps {
 
 function Chest({ index, label, isMarked, isOracleApplied, isMeasured, measuredIndex }: ChestProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
   const currentRotX = useRef(0);
   const currentGlow = useRef(0);
   const angle = (index / 8) * Math.PI * 2 - Math.PI / 2;
@@ -28,66 +29,124 @@ function Chest({ index, label, isMarked, isOracleApplied, isMeasured, measuredIn
   const z = Math.sin(angle) * RING_RADIUS;
 
   const targetRotX = isOracleApplied && isMarked ? Math.PI : 0;
-  const targetGlow = isOracleApplied && isMarked ? 1 : 0;
+  const targetGlow = isOracleApplied && isMarked ? 1.2 : 0.35;
 
   const isThisMeasured = isMeasured && measuredIndex === index;
-  const baseColor = isMarked && isOracleApplied ? '#f59e0b' : '#06b6d4';
-  const dimColor = '#64748b';
+  const baseColor = isMarked && isOracleApplied ? '#fbbf24' : '#38bdf8';
+  const dimColor = '#475569';
   const color = isMeasured ? (isThisMeasured ? '#22c55e' : dimColor) : baseColor;
 
-  useFrame((_, delta) => {
-    currentRotX.current = THREE.MathUtils.lerp(currentRotX.current, targetRotX, delta * 3);
+  useFrame((state, delta) => {
+    currentRotX.current = THREE.MathUtils.lerp(currentRotX.current, targetRotX, delta * 4);
     currentGlow.current = THREE.MathUtils.lerp(currentGlow.current, targetGlow, delta * 3);
+
     if (groupRef.current) {
       groupRef.current.rotation.x = currentRotX.current;
+      // Gentle zero-g quantum levitation
+      const hoverOffset = Math.sin(state.clock.elapsedTime * 2 + index * 0.78) * 0.08;
+      groupRef.current.position.y = hoverOffset;
     }
   });
 
   return (
     <group position={[x, 0, z]}>
+      {/* Light ray connecting center singularity to each state */}
+      <line>
+        <bufferGeometry attach="geometry" {...new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(-x, 0, -z),
+          new THREE.Vector3(0, 0, 0)
+        ])} />
+        <lineBasicMaterial
+          attach="material"
+          color={isMarked && isOracleApplied ? '#f59e0b' : '#0284c7'}
+          transparent
+          opacity={isMarked && isOracleApplied ? 0.6 : 0.22}
+          linewidth={1}
+        />
+      </line>
+
       <group ref={groupRef}>
-        {/* Chest body */}
+        {/* Local glow point light for the marked state */}
+        {isMarked && isOracleApplied && (
+          <pointLight color="#f59e0b" intensity={2.8} distance={3.5} />
+        )}
+
+        {/* Outer specular aura */}
         <mesh>
-          <boxGeometry args={[0.55, 0.55, 0.55]} />
+          <boxGeometry args={[0.72, 0.72, 0.72]} />
+          <meshBasicMaterial
+            color={color}
+            wireframe
+            transparent
+            opacity={isMarked && isOracleApplied ? 0.45 : 0.18}
+          />
+        </mesh>
+
+        {/* Main Chest body with metallic specular reflection */}
+        <mesh ref={meshRef}>
+          <boxGeometry args={[0.62, 0.62, 0.62]} />
           <meshStandardMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={isOracleApplied && isMarked ? 0.6 : 0.15}
-            roughness={0.3}
-            metalness={0.5}
+            emissiveIntensity={isOracleApplied && isMarked ? 0.85 : 0.28}
+            roughness={0.2}
+            metalness={0.65}
           />
         </mesh>
-        {/* Lid line */}
-        <mesh position={[0, 0.29, 0]}>
-          <boxGeometry args={[0.56, 0.04, 0.56]} />
-          <meshStandardMaterial color={isOracleApplied && isMarked ? '#fbbf24' : '#0e7490'} />
+
+        {/* Golden quantum latch / lid rim */}
+        <mesh position={[0, 0.32, 0]}>
+          <boxGeometry args={[0.64, 0.05, 0.64]} />
+          <meshStandardMaterial
+            color={isOracleApplied && isMarked ? '#fef08a' : '#e0f2fe'}
+            emissive={isOracleApplied && isMarked ? '#f59e0b' : '#38bdf8'}
+            emissiveIntensity={0.6}
+            metalness={0.9}
+            roughness={0.1}
+          />
         </mesh>
-        {/* Label */}
+
+        {/* State Label: high contrast readable pill */}
         <Html
-          position={[0, 0.65, 0]}
+          position={[0, 0.78, 0]}
           center
-          className="text-[9px] font-mono font-bold select-none pointer-events-none whitespace-nowrap px-1 py-0.5 rounded"
-          style={{ color: isMeasured ? (isThisMeasured ? '#22c55e' : '#64748b') : (isOracleApplied && isMarked ? '#f59e0b' : '#06b6d4') }}
+          className="select-none pointer-events-none whitespace-nowrap"
         >
-          {label}
+          <div
+            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border shadow-md transition-all ${
+              isThisMeasured
+                ? 'bg-emerald-950 text-emerald-300 border-emerald-400'
+                : isOracleApplied && isMarked
+                ? 'bg-amber-950 text-amber-200 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)]'
+                : 'bg-slate-900/90 text-sky-200 border-sky-500/40'
+            }`}
+          >
+            {label}
+          </div>
         </Html>
-        {/* Phase badge */}
+
+        {/* Phase tag badge */}
         {isOracleApplied && isMarked && (
           <Html
-            position={[0, -0.75, 0]}
+            position={[0, -0.85, 0]}
             center
-            className="text-[8px] font-mono font-bold text-amber-600 bg-amber-50 border border-amber-300 px-1.5 py-0.5 rounded shadow select-none pointer-events-none whitespace-nowrap"
+            className="select-none pointer-events-none whitespace-nowrap"
           >
-            phase: −1
+            <div className="text-[9px] font-mono font-bold text-amber-300 bg-amber-950/90 border border-amber-400 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)] animate-pulse">
+              phase: −1 (180° flip)
+            </div>
           </Html>
         )}
+
         {isThisMeasured && (
           <Html
-            position={[0, -0.75, 0]}
+            position={[0, -0.85, 0]}
             center
-            className="text-[8px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-1.5 py-0.5 rounded shadow select-none pointer-events-none whitespace-nowrap"
+            className="select-none pointer-events-none whitespace-nowrap"
           >
-            CLICKED!
+            <div className="text-[9px] font-mono font-bold text-emerald-300 bg-emerald-950/90 border border-emerald-400 px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.6)] animate-bounce">
+              MEASURED! (12.5%)
+            </div>
           </Html>
         )}
       </group>
@@ -95,17 +154,99 @@ function Chest({ index, label, isMarked, isOracleApplied, isMeasured, measuredIn
   );
 }
 
-function RingConnector() {
-  const points: THREE.Vector3[] = [];
-  for (let i = 0; i <= 64; i++) {
-    const angle = (i / 64) * Math.PI * 2 - Math.PI / 2;
-    points.push(new THREE.Vector3(Math.cos(angle) * RING_RADIUS, 0, Math.sin(angle) * RING_RADIUS));
+// Glowing Ring Platform with concentric quantum coordinate rings
+function QuantumStageRings() {
+  const innerPoints: THREE.Vector3[] = [];
+  const outerPoints: THREE.Vector3[] = [];
+  const segments = 80;
+
+  for (let i = 0; i <= segments; i++) {
+    const angle = (i / segments) * Math.PI * 2;
+    innerPoints.push(new THREE.Vector3(Math.cos(angle) * RING_RADIUS, -0.4, Math.sin(angle) * RING_RADIUS));
+    outerPoints.push(new THREE.Vector3(Math.cos(angle) * (RING_RADIUS + 0.6), -0.42, Math.sin(angle) * (RING_RADIUS + 0.6)));
   }
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  const innerGeo = new THREE.BufferGeometry().setFromPoints(innerPoints);
+  const outerGeo = new THREE.BufferGeometry().setFromPoints(outerPoints);
+
   return (
-    <line geometry={geometry}>
-      <lineBasicMaterial color="#334155" transparent opacity={0.3} />
-    </line>
+    <group>
+      {/* Primary Glowing Orbit Rail */}
+      <line geometry={innerGeo}>
+        <lineBasicMaterial color="#38bdf8" transparent opacity={0.6} />
+      </line>
+
+      {/* Outer Ground Ring */}
+      <line geometry={outerGeo}>
+        <lineBasicMaterial color="#6366f1" transparent opacity={0.25} />
+      </line>
+
+      {/* Stage Floor Disc with soft radial glow */}
+      <mesh position={[0, -0.45, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[RING_RADIUS + 1.2, 48]} />
+        <meshStandardMaterial
+          color="#030712"
+          emissive="#0284c7"
+          emissiveIntensity={0.08}
+          roughness={0.8}
+          metalness={0.2}
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// Center Singularity (Pulsing Superposition Energy Node)
+function CenterSingularity({ isOracleApplied }: { isOracleApplied: boolean }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const auraRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current && auraRef.current) {
+      const scale = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.08;
+      auraRef.current.scale.set(scale * 1.35, scale * 1.35, scale * 1.35);
+      meshRef.current.rotation.y += 0.015;
+      meshRef.current.rotation.x += 0.008;
+    }
+  });
+
+  const coreColor = isOracleApplied ? '#f59e0b' : '#38bdf8';
+
+  return (
+    <group position={[0, 0, 0]}>
+      {/* Core point light illuminating all 8 chests from the center */}
+      <pointLight
+        color={coreColor}
+        intensity={isOracleApplied ? 3.8 : 2.6}
+        distance={9}
+        decay={2}
+      />
+
+      {/* Outer aura pulse */}
+      <mesh ref={auraRef}>
+        <sphereGeometry args={[0.32, 16, 16]} />
+        <meshBasicMaterial
+          color={coreColor}
+          wireframe
+          transparent
+          opacity={0.35}
+        />
+      </mesh>
+
+      {/* Center octahedron core */}
+      <mesh ref={meshRef}>
+        <octahedronGeometry args={[0.22, 0]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive={coreColor}
+          emissiveIntensity={1.2}
+          roughness={0.1}
+          metalness={0.9}
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -128,7 +269,6 @@ export function QuantumChestRing3D({ markedState = '101' }: QuantumChestRing3DPr
   };
 
   const measure = () => {
-    // Uniform random — phase flip is invisible!
     const outcome = Math.floor(Math.random() * 8);
     setMeasuredIndex(outcome);
     setIsMeasured(true);
@@ -143,35 +283,65 @@ export function QuantumChestRing3D({ markedState = '101' }: QuantumChestRing3DPr
   };
 
   const statusMsg = () => {
-    if (!isOracleApplied) return 'All 8 states are equal. Each chest has exactly 12.5% chance of being found.';
-    if (!isMeasured) return `Oracle tagged |${markedState}⟩ with phase −1. Chest flipped upside-down. But can you spot it by measuring?`;
-    return `You got |${STATES[measuredIndex!].slice(1, -1)}⟩ — still random! The phase flip is invisible until Diffusion amplifies it.`;
+    if (!isOracleApplied) return 'All 8 chests glow in equal superposition. Each has exactly 12.5% chance of being found.';
+    if (!isMeasured) return `Oracle applied phase flip −1 to |${markedState}⟩ (turned upside down with golden aura). But notice: can you detect it by measuring?`;
+    return `Measured |${STATES[measuredIndex!].slice(1, -1)}⟩! Probability is still uniform (12.5%). The phase mark is invisible until Diffusion!`;
   };
 
   return (
     <div className="w-full rounded-xl border border-border-subtle overflow-hidden bg-surface shadow-xs">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-border-subtle bg-surface-raised/40 flex items-center justify-between">
-        <div>
-          <p className="text-xs font-mono font-semibold text-text-primary tracking-wider">8 MYSTERY CHESTS · 3D QUANTUM RING</p>
-          <p className="text-[11px] font-mono text-text-muted mt-0.5">Marked state: <span className="text-accent font-bold">|{markedState}⟩</span> · Drag to rotate</p>
+      <div className="px-4 py-3 border-b border-border-subtle bg-surface-raised/40 flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-accent" />
+          <div>
+            <p className="text-xs font-mono font-semibold text-text-primary tracking-wider">8 MYSTERY CHESTS · 3D QUANTUM CHAMBER</p>
+            <p className="text-[11px] font-mono text-text-muted mt-0.5">Marked state: <span className="text-accent font-bold">|{markedState}⟩</span> · Drag to orbit · Scroll to zoom</p>
+          </div>
         </div>
         {measureCount > 0 && (
-          <span className="text-[10px] font-mono bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">
-            {measureCount} measure{measureCount > 1 ? 's' : ''} · still random!
+          <span className="text-[10px] font-mono bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded font-semibold shadow-2xs">
+            {measureCount} measurement{measureCount > 1 ? 's' : ''} · 12.5% flat distribution
           </span>
         )}
       </div>
 
-      {/* 3D Canvas */}
-      <div className="w-full h-[320px] bg-slate-950 relative cursor-move touch-none">
-        <Canvas camera={{ position: [0, 5, 9], fov: 48 }}>
-          <ambientLight intensity={0.4} />
-          <pointLight position={[5, 5, 5]} intensity={1.2} />
-          <pointLight position={[-5, 3, -5]} intensity={0.5} color="#06b6d4" />
+      {/* 3D Canvas with enhanced lighting & atmosphere */}
+      <div className="w-full h-[360px] bg-gradient-to-b from-slate-950 via-[#070d19] to-slate-950 relative cursor-move touch-none overflow-hidden">
+        <Canvas camera={{ position: [0, 4.2, 7.2], fov: 46 }}>
+          {/* 1. Ambient Fill Light: soft cool tint */}
+          <ambientLight intensity={0.7} color="#cbd5e1" />
 
-          <RingConnector />
+          {/* 2. Key Studio Directional Light from top-front */}
+          <directionalLight
+            position={[6, 9, 7]}
+            intensity={2.4}
+            color="#ffffff"
+          />
 
+          {/* 3. Deep Rim Light from behind for specular edge definition */}
+          <directionalLight
+            position={[-6, 5, -6]}
+            intensity={1.8}
+            color="#a855f7"
+          />
+
+          {/* 4. Soft Top Spotlight focused on the quantum stage */}
+          <spotLight
+            position={[0, 8, 0]}
+            angle={0.65}
+            penumbra={0.8}
+            intensity={2.0}
+            color="#38bdf8"
+          />
+
+          {/* Stage floor & rail lines */}
+          <QuantumStageRings />
+
+          {/* Center singularity radiating core light */}
+          <CenterSingularity isOracleApplied={isOracleApplied} />
+
+          {/* 8 Quantum Chests */}
           {STATES.map((label, i) => (
             <Chest
               key={label}
@@ -186,14 +356,24 @@ export function QuantumChestRing3D({ markedState = '101' }: QuantumChestRing3DPr
 
           <OrbitControls
             enablePan={false}
-            enableZoom={false}
+            enableZoom={true}
+            minDistance={4.5}
+            maxDistance={12}
             minPolarAngle={Math.PI / 6}
-            maxPolarAngle={Math.PI / 2.2}
+            maxPolarAngle={Math.PI / 2.15}
           />
         </Canvas>
-        <div className="absolute top-2 left-2 text-[9px] font-mono text-slate-400 bg-slate-900/70 px-2 py-0.5 rounded border border-slate-700">
-          Drag to orbit
+
+        {/* HUD Navigation Hints */}
+        <div className="absolute top-3 left-3 text-[10px] font-mono text-slate-300 bg-slate-900/80 px-2.5 py-1 rounded border border-slate-700/80 shadow-md backdrop-blur-xs select-none pointer-events-none">
+          Drag to orbit · Scroll to zoom
         </div>
+
+        {isOracleApplied && (
+          <div className="absolute top-3 right-3 text-[10px] font-mono text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded border border-amber-500/60 shadow-md backdrop-blur-xs select-none pointer-events-none">
+            Oracle Active: Phase Flip (−1) Applied
+          </div>
+        )}
       </div>
 
       {/* Controls */}
