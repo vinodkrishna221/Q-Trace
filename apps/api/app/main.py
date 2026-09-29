@@ -23,8 +23,9 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.models.errors import ErrorDetail, ErrorEnvelope
-from app.repositories import get_repository, seed_core_truth
+from app.repositories import get_repository, seed_core_truth, seed_mutation_challenges
 from app.routers import circuits, simulation_runs
+from app.routers.grading import router as grading_router
 from app.routers.flight_recorder import router as flight_recorder_router
 from app.routers.instructor import router as instructor_router
 from app.routers.learning import router as learning_router
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
     """Lifespan event handler to ensure core truth is seeded and adapters pre-warmed."""
     repo = get_repository()
     await seed_core_truth(repo)
+    await seed_mutation_challenges(repo)
     loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, prewarm_adapters)
     yield
@@ -164,6 +166,7 @@ app.include_router(instructor_router, prefix="/v1")
 app.include_router(tutor_router, prefix="/v1")
 app.include_router(auth_router)
 app.include_router(waitlist_router)
+app.include_router(grading_router)
 
 # ---------------------------------------------------------------------------
 # Core endpoints

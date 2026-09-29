@@ -13,10 +13,12 @@ from app.repositories.seeds import (
     CORE_MODULES,
     CORE_PREDICTION_CHECKPOINTS,
     CORE_PROGRESS_RECORDS,
+    MUTATION_CHALLENGES,
     get_core_seed_dataset,
     get_demo_cohort_dataset,
     seed_core_truth,
     seed_demo_cohort,
+    seed_mutation_challenges,
     seed_synthetic_cohort,
 )
 
@@ -83,6 +85,8 @@ __all__ = [
     "CORE_CIRCUIT_MODELS",
     "CORE_CHALLENGES",
     "CORE_PROGRESS_RECORDS",
+    "MUTATION_CHALLENGES",
+    "seed_mutation_challenges",
 ]
 
 

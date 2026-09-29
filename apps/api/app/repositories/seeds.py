@@ -304,6 +304,85 @@ CORE_CHALLENGES: list[Challenge] = [
 
 
 # ==============================================================================
+# Socratic Mutation Challenges (FEA-6 / Deliverable 5)
+# ==============================================================================
+
+MUTATION_CHALLENGES: list[Challenge] = [
+    Challenge(
+        id="CH_BELL_ENTANGLE",
+        moduleId="mod_bell",
+        type="CIRCUIT_REPAIR",
+        title="Bell State Entanglement Verification",
+        prompt="Construct a circuit that produces the maximally entangled Bell state |Φ+⟩ with entanglement entropy S(ρ_A) = 1.0.",
+        starterCircuitModelId="cm_bell_broken",
+        acceptanceRule={
+            "version": 1,
+            "kind": "INVARIANT_CHECK",
+            "invariant": "G-1",
+            "targetState": "BELL_PHI_PLUS",
+            "expectedEntropy": 1.0,
+        },
+        targetsMisconceptionCodes=["SUPERPOSITION_VS_ENTANGLEMENT", "GATE_ORDER"],
+        points=100,
+        schemaVersion=1,
+    ),
+    Challenge(
+        id="CH_PHASE_SUPER",
+        moduleId="mod_superposition",
+        type="CIRCUIT_REPAIR",
+        title="Phase Observability & Coherence",
+        prompt="Prepare the state |+⟩ on qubit 0 with correct relative phase such that measurement in the Hadamard basis yields |0⟩ with 100% certainty.",
+        starterCircuitModelId=None,
+        acceptanceRule={
+            "version": 1,
+            "kind": "INVARIANT_CHECK",
+            "invariant": "G-2",
+            "targetState": "PLUS_STATE",
+            "expectedHadamardBasis": "0",
+        },
+        targetsMisconceptionCodes=["MEASUREMENT_DETERMINISM", "GATE_ORDER"],
+        points=100,
+        schemaVersion=1,
+    ),
+    Challenge(
+        id="CH_GROVER_2Q",
+        moduleId="mod_bell",
+        type="CIRCUIT_REPAIR",
+        title="2-Qubit Grover Search (|11⟩)",
+        prompt="Construct a 2-qubit Grover search circuit that marks and amplifies the target state |11⟩ to probability >= 0.99 in one iteration.",
+        starterCircuitModelId=None,
+        acceptanceRule={
+            "version": 1,
+            "kind": "INVARIANT_CHECK",
+            "invariants": ["G-1", "G-3"],
+            "targetState": "11",
+            "expectedProbability": 1.0,
+        },
+        targetsMisconceptionCodes=["GATE_ORDER", "SUPERPOSITION_VS_ENTANGLEMENT"],
+        points=150,
+        schemaVersion=1,
+    ),
+    Challenge(
+        id="CH_UNITARY_REV",
+        moduleId="mod_measurement",
+        type="CIRCUIT_REPAIR",
+        title="Unitary Reversibility Check",
+        prompt="Construct a unitary sequence U that when reversed with U† restores the initial computational basis state |00⟩ with fidelity >= 0.99.",
+        starterCircuitModelId=None,
+        acceptanceRule={
+            "version": 1,
+            "kind": "INVARIANT_CHECK",
+            "invariant": "G-3",
+            "expectedFidelity": 1.0,
+        },
+        targetsMisconceptionCodes=["MEASUREMENT_DETERMINISM"],
+        points=100,
+        schemaVersion=1,
+    ),
+]
+
+
+# ==============================================================================
 # Modules (Three Modules)
 # ==============================================================================
 
@@ -653,6 +732,17 @@ async def seed_demo_cohort(repo: DataRepositoryProtocol) -> dict[str, int]:
     """Seed both core truth and synthetic cohort datasets into the repository."""
     core = await seed_core_truth(repo)
     synth = await seed_synthetic_cohort(repo)
-    merged = {**core, **synth}
+    mut = await seed_mutation_challenges(repo)
+    merged = {**core, **synth, "mutation_challenges": mut}
     return merged
+
+
+async def seed_mutation_challenges(repo: DataRepositoryProtocol) -> int:
+    """Seed the 4 mutation challenges into repository (FEA-6)."""
+    count = 0
+    for ch in MUTATION_CHALLENGES:
+        await repo.create_or_update_challenge(ch.model_copy(deep=True))
+        count += 1
+    return count
+
 

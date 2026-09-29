@@ -211,7 +211,7 @@ DELIVERABLE: Create apps/api/app/services/grading/socratic_engine.py (implement 
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/grading/test_socratic_engine.py -v`
 DEPENDS: FEA-1          UNBLOCKS: FEA-7, FEA-14
 DEMO: Submitting an X+CNOT circuit against the Bell challenge returns an invariant violation G-1 with input |+⟩ proving subsystem purity produces deterministic |1⟩ instead of random 50/50.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] green
 BRANCH: `feat/features-phase/fea-6-socratic-grading-engine`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
