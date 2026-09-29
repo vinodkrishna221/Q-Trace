@@ -6,7 +6,7 @@ import { GATE_DEFINITIONS, GATE_FAMILIES } from './circuit-types';
 import { useCircuitStore } from '@/lib/circuit-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { MousePointerClick, Layers } from 'lucide-react';
+import { MousePointerClick, Layers, RotateCcw, Trash2 } from 'lucide-react';
 import { GateTile } from './gate-glyph';
 
 interface GatePaletteProps {
@@ -17,6 +17,8 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
   const {
     selectedGateToPlace,
     selectGateToPlace,
+    resetToBellSeed,
+    clearCircuit,
   } = useCircuitStore();
 
   // Global Escape key listener to disarm palette gate
@@ -39,6 +41,30 @@ export function GatePalette({ onDragStart }: GatePaletteProps) {
             <CardTitle className="text-xs font-mono tracking-wider text-text-primary font-semibold">
               GATE PALETTE
             </CardTitle>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={resetToBellSeed}
+              data-testid="reset-bell-circuit-btn"
+              className="h-6 px-2 text-[10px] font-mono border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent/40"
+              title="Reset to seeded Bell State circuit (H + CNOT)"
+            >
+              <RotateCcw className="w-2.5 h-2.5 mr-1 text-accent" />
+              Reset Bell Seed
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={clearCircuit}
+              data-testid="clear-circuit-btn"
+              className="h-6 px-2 text-[10px] font-mono border-border-subtle text-text-secondary hover:text-danger hover:border-danger/40"
+              title="Clear all gates from circuit wires"
+            >
+              <Trash2 className="w-2.5 h-2.5 mr-1" />
+              Clear Grid
+            </Button>
           </div>
         </div>
         <CardDescription className="text-[11px] text-text-secondary mt-0.5">

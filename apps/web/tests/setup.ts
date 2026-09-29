@@ -14,3 +14,15 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
     }),
   });
 }
+
+// Polyfill ResizeObserver for Three.js / React Three Fiber / react-use-measure
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  window.ResizeObserver = ResizeObserver;
+  (global as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = ResizeObserver;
+}
+

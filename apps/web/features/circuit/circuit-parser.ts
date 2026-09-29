@@ -187,8 +187,14 @@ export function parseQiskitCode(code: string, currentModel?: CircuitModel): Pars
   }
 
   // Security AST / keyword check: Reject unsafe patterns
+  // Strip comment-only lines before scanning so generated comments (e.g. "# …classical-bit…")
+  // don't false-positive on keywords like "class".
+  const codeWithoutComments = code
+    .split('\n')
+    .filter((l) => !l.trim().startsWith('#'))
+    .join('\n');
   for (const keyword of DISALLOWED_KEYWORDS) {
-    if (code.includes(keyword)) {
+    if (codeWithoutComments.includes(keyword)) {
       return {
         success: false,
         errorCode: 'UNSAFE_CODE',
@@ -255,8 +261,10 @@ export function parseQiskitCode(code: string, currentModel?: CircuitModel): Pars
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
     const rawLine = lines[lineIndex];
 
-    // Skip import and initialization lines
+    // Skip blank lines, comments, and import/initialization lines
     if (
+      rawLine.trim() === '' ||
+      rawLine.trim().startsWith('#') ||
       rawLine.startsWith('from qiskit') ||
       rawLine.startsWith('import qiskit') ||
       rawLine.includes('QuantumCircuit(')

@@ -843,6 +843,35 @@ export default function LabPage() {
           </div>
         )}
 
+        {/* Ready to Simulate prompt card — shown before first run */}
+        {!hasExecuted && !isExecutingPipeline && (
+          <Card
+            className="p-6 flex flex-col items-center gap-4 border-border-subtle bg-surface-secondary text-center"
+            data-testid="lab-ready-to-simulate-card"
+          >
+            <Zap className="w-8 h-8 text-accent" />
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-text-primary">Ready to Simulate</h3>
+              <p className="text-xs text-text-secondary">
+                Run the circuit to reveal Visual Evidence, Bloch Spheres, and the Flight Recorder.
+              </p>
+            </div>
+            <div className="flex gap-6 text-xs text-text-secondary font-mono">
+              <span>Visual Evidence</span>
+              <span>Bloch Spheres</span>
+              <span>Flight Recorder</span>
+            </div>
+            <Button
+              onClick={() => handleRunSimulation()}
+              data-testid="lab-start-simulation-btn"
+              className="gap-2"
+            >
+              <Play className="w-4 h-4" />
+              Run Simulation
+            </Button>
+          </Card>
+        )}
+
       </div>
 
       {/* STAGE 2: VISUAL EVIDENCE (Probabilities + Bloch Sphere + Q-Sphere) */}
@@ -1003,7 +1032,7 @@ export default function LabPage() {
               activeLearnerProfile?.role ||
               (activeRole.id === 'role_meera' ? 'PHYSICS_TO_CODE' : 'BEGINNER_CSE')
             }
-            hideHypothesisBanner={true}
+            hideHypothesisBanner={false}
           />
         </div>
       )}

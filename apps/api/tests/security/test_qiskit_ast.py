@@ -1,4 +1,4 @@
-﻿"""QA-4: Malicious AST corpus for the safe Qiskit parser.
+"""QA-4: Malicious AST corpus for the safe Qiskit parser.
 
 Tests that the parser rejects every dangerous construct and accepts only the
 safe subset defined in circuit-simulation.md v1 and quantum-runtime.md.
@@ -269,12 +269,12 @@ def test_rejects_unsupported_gate_rz():
     assert err.code == "UNSUPPORTED_GATE"
 
 
-def test_rejects_unsupported_gate_t():
-    """T gate must be rejected."""
+def test_rejects_unsupported_gate_swap():
+    """SWAP gate must be rejected."""
     err = _assert_rejected(
         "from qiskit import QuantumCircuit\n"
         "qc = QuantumCircuit(2, 2)\n"
-        "qc.t(0)\n",
+        "qc.swap(0, 1)\n",
     )
     assert err.code == "UNSUPPORTED_GATE"
 
