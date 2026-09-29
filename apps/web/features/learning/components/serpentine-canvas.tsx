@@ -36,6 +36,8 @@ export interface SerpentineCanvasProps {
   activeUnitTab?: number | 'all';
   onAdvanceUnit?: (unitNumber: number) => void;
   className?: string;
+  testId?: string;
+  hideGuidedPrompt?: boolean;
 }
 
 export function SerpentineCanvas({
@@ -50,6 +52,8 @@ export function SerpentineCanvas({
   activeUnitTab = 'all',
   onAdvanceUnit,
   className = '',
+  testId,
+  hideGuidedPrompt = false,
 }: SerpentineCanvasProps) {
   // Stepper state for legacy / acceptance test compatibility
   const stepTitles = ['Single-Qubit Foundations', 'Entanglement & Bell Lab', 'Teleportation Protocols'];
@@ -147,15 +151,16 @@ export function SerpentineCanvas({
   return (
     <main
       className={`space-y-8 w-full ${className}`}
-      data-testid="serpentine-canvas"
+      data-testid={testId || 'serpentine-canvas'}
       aria-label="Quantum Coherence Learning Path"
     >
       {/* 1. Guided Pedagogical Directive Prompt & Stepper (Hidden from visual UI per user request; sr-only for tests) */}
-      <section
-        className="sr-only"
-        data-testid="learning-guided-prompt"
-        aria-label="Pedagogical Directive and Sequence"
-      >
+      {!hideGuidedPrompt && (
+        <section
+          className="sr-only"
+          data-testid="learning-guided-prompt"
+          aria-label="Pedagogical Directive and Sequence"
+        >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
           <div>
             <div className="flex items-center gap-2">
@@ -225,6 +230,7 @@ export function SerpentineCanvas({
           </div>
         </div>
       </section>
+      )}
 
       {/* 2. Structured Multi-Unit Serpentine Tracks */}
       <div className="space-y-12">

@@ -25,12 +25,14 @@ export interface RightStageInspectorProps {
   selectedStage: CurriculumStage | null;
   onEnterChamber?: (stage: CurriculumStage) => void;
   className?: string;
+  testId?: string;
 }
 
 export function RightStageInspector({
   selectedStage,
   onEnterChamber,
   className = '',
+  testId,
 }: RightStageInspectorProps) {
   const [selectedOptionId, setSelectedOptionId] = React.useState<string | null>(null);
   const [completedConceptIds, setCompletedConceptIds] = React.useState<Set<string>>(new Set());
@@ -44,7 +46,7 @@ export function RightStageInspector({
     return (
       <aside
         className={`w-full p-5 rounded-2xl border border-border-subtle bg-surface text-text-muted text-center space-y-2 ${className}`}
-        data-testid="stage-inspector-panel"
+        data-testid={testId || 'stage-inspector-panel'}
       >
         <p className="text-xs font-mono">Select a Chamber Node to view telemetry</p>
       </aside>
@@ -124,7 +126,7 @@ export function RightStageInspector({
   return (
     <aside
       className={`space-y-4 w-full select-none ${className}`}
-      data-testid="stage-inspector-panel"
+      data-testid={testId || 'stage-inspector-panel'}
       aria-label="Selected Stage Telemetry Inspector"
     >
       <Card

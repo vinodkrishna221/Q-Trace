@@ -15,6 +15,7 @@ export interface UnitSectionBannerProps {
   accentRailColor?: string;
   onOpenGuidebook?: () => void;
   className?: string;
+  testId?: string;
 }
 
 export function UnitSectionBanner({
@@ -26,6 +27,7 @@ export function UnitSectionBanner({
   accentRailColor,
   onOpenGuidebook,
   className,
+  testId,
 }: UnitSectionBannerProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -54,7 +56,7 @@ export function UnitSectionBanner({
           'relative w-full overflow-hidden rounded-2xl border border-border-subtle bg-surface text-text-primary shadow-xs transition-all duration-200 hover:border-border-medium',
           className
         )}
-        data-testid="unit-section-banner"
+        data-testid={testId || 'unit-section-banner'}
       >
         {/* Precision Laser Accent Rail */}
         <div
