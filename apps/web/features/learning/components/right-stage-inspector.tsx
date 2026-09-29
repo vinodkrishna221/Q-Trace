@@ -116,7 +116,7 @@ export function RightStageInspector({
   const targetRoute =
     route ||
     (isGrover
-      ? (isLabStage ? '/lab?preset=grover' : undefined)
+      ? '/learn/grover'
       : selectedStage.id === 'bell-state'
       ? '/learn/bell-state'
       : selectedStage.lessonId && selectedStage.lessonId !== selectedStage.id
@@ -469,7 +469,7 @@ export function RightStageInspector({
 
               {/* Action Button: Conditional Lab vs In-Situ Concept */}
               <div className="pt-2">
-                {isLabStage && targetRoute ? (
+                {targetRoute ? (
                   <Link href={targetRoute} className="w-full block">
                     <Button
                       type="button"
@@ -479,7 +479,9 @@ export function RightStageInspector({
                     >
                       <Zap className="w-4 h-4 fill-current" />
                       <span>ENTER CHAMBER</span>
-                      <span className="text-[10px] opacity-85 font-normal">· LAUNCH LAB ➔</span>
+                      <span className="text-[10px] opacity-85 font-normal">
+                        {isLabStage ? '· LAUNCH LAB ➔' : '· ENTER LESSON ➔'}
+                      </span>
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>

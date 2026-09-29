@@ -201,6 +201,52 @@ export const DEMO_MODULES: Record<string, ModuleDetail> = {
     challengeIds: [],
     schemaVersion: 1,
   },
+  grover: {
+    id: 'mod_grover',
+    slug: 'grover',
+    title: "Grover's Search Algorithm: 3-Qubit Search",
+    skillIds: ['skill_grover_oracle', 'skill_amplitude_amplification', 'skill_ccx_toffoli'],
+    level: 'INTERMEDIATE',
+    estimatedMinutes: 20,
+    contentBlocks: [
+      {
+        type: 'TEXT',
+        body: 'Grover\'s algorithm achieves a quadratic speedup O(√N) for unstructured database search. By chaining oracle phase marking with diffusion reflection about the mean, target state |101⟩ is amplified to >90% probability.',
+      },
+      {
+        type: 'CALLOUT',
+        tone: 'INFO',
+        body: 'Optimal count: For N = 8 states (3 qubits), exactly 2 iterations amplify the target |101⟩ to ~94.5% probability without inspecting non-matching states.',
+      },
+      {
+        type: 'FORMULA',
+        latex: '|\\psi_k\\rangle = (U_s U_\\omega)^k H^{\\otimes 3} |000\\rangle',
+      },
+    ],
+    predictionCheckpoint: {
+      id: 'pc_grover_outcomes',
+      moduleId: 'mod_grover',
+      prompt: 'After applying 2 Grover iterations targeting state |101⟩ on 3 qubits, which outcome should dominate the measurement?',
+      answerSchema: {
+        type: 'SINGLE_CHOICE',
+        options: [
+          'TARGET_101_AMPLIFIED',
+          'EQUAL_RANDOM_12_5',
+          'OVER_ROTATED_COLLAPSE',
+          'ALWAYS_000',
+        ],
+      },
+      misconceptionMap: {
+        EQUAL_RANDOM_12_5: 'ORACLE_WITHOUT_DIFFUSION',
+        OVER_ROTATED_COLLAPSE: 'SOUFFLE_FALLACY',
+        ALWAYS_000: 'INITIAL_STATE_BIAS',
+      },
+      schemaVersion: 1,
+    },
+    starterCircuitModelId: 'cm_grover_seed',
+    challengeIds: ['ch_grover_repair'],
+    schemaVersion: 1,
+  },
 };
 
 export const DEMO_STARTER_CIRCUIT: CircuitModel = {
@@ -527,4 +573,269 @@ export const DEMO_CHALLENGE_ATTEMPT_RESPONSE: CreateChallengeAttemptResponse = {
     updatedAt: '2026-08-23T05:28:00Z',
   },
 };
+
+export const DEMO_GROVER_STARTER_CIRCUIT: CircuitModel = {
+  id: 'cm_grover_seed',
+  name: 'Grover 3-Qubit Search (|101⟩ Target)',
+  qubitCount: 3,
+  classicalBitCount: 3,
+  operations: [
+    { opId: 'op_gh_0', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_gh_1', gate: 'H', targets: [1], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_gh_2', gate: 'H', targets: [2], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_gx_1', gate: 'X', targets: [1], controls: [], classicalTargets: [], column: 1 },
+    { opId: 'op_gccx_1', gate: 'CCX', targets: [2], controls: [0, 1], classicalTargets: [], column: 2 },
+    { opId: 'op_gx_2', gate: 'X', targets: [1], controls: [], classicalTargets: [], column: 3 },
+    { opId: 'op_gdh_1', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_gdh_2', gate: 'H', targets: [1], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_gdh_3', gate: 'H', targets: [2], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_gdx_1', gate: 'X', targets: [0], controls: [], classicalTargets: [], column: 5 },
+    { opId: 'op_gdx_2', gate: 'X', targets: [1], controls: [], classicalTargets: [], column: 5 },
+    { opId: 'op_gdx_3', gate: 'X', targets: [2], controls: [], classicalTargets: [], column: 5 },
+    { opId: 'op_gdccx_1', gate: 'CCX', targets: [2], controls: [0, 1], classicalTargets: [], column: 6 },
+    { opId: 'op_gdx_4', gate: 'X', targets: [0], controls: [], classicalTargets: [], column: 7 },
+    { opId: 'op_gdx_5', gate: 'X', targets: [1], controls: [], classicalTargets: [], column: 7 },
+    { opId: 'op_gdx_6', gate: 'X', targets: [2], controls: [], classicalTargets: [], column: 7 },
+    { opId: 'op_gdh_4', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 8 },
+    { opId: 'op_gdh_5', gate: 'H', targets: [1], controls: [], classicalTargets: [], column: 8 },
+    { opId: 'op_gdh_6', gate: 'H', targets: [2], controls: [], classicalTargets: [], column: 8 },
+    { opId: 'op_gm_0', gate: 'MEASURE', targets: [0], controls: [], classicalTargets: [0], column: 9 },
+    { opId: 'op_gm_1', gate: 'MEASURE', targets: [1], controls: [], classicalTargets: [1], column: 9 },
+    { opId: 'op_gm_2', gate: 'MEASURE', targets: [2], controls: [], classicalTargets: [2], column: 9 },
+  ],
+  source: 'SEED',
+  openQasm3:
+    'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[3] q;\nbit[3] c;\nh q[0];\nh q[1];\nh q[2];\nx q[1];\nccx q[0], q[1], q[2];\nx q[1];\nh q[0];\nh q[1];\nh q[2];\nx q[0];\nx q[1];\nx q[2];\nccx q[0], q[1], q[2];\nx q[0];\nx q[1];\nx q[2];\nh q[0];\nh q[1];\nh q[2];\nc[0] = measure q[0];\nc[1] = measure q[1];\nc[2] = measure q[2];\n',
+  modelVersion: 1,
+  ownerLearnerProfileId: null,
+  createdAt: '2026-08-23T05:27:00Z',
+  updatedAt: '2026-08-23T05:27:00Z',
+};
+
+export const DEMO_GROVER_BROKEN_CIRCUIT: CircuitModel = {
+  id: 'cm_grover_broken',
+  name: 'Broken Grover Circuit (Missing Phase Oracle)',
+  qubitCount: 3,
+  classicalBitCount: 3,
+  operations: [
+    { opId: 'op_b_h0', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_b_h1', gate: 'H', targets: [1], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_b_h2', gate: 'H', targets: [2], controls: [], classicalTargets: [], column: 0 },
+    { opId: 'op_b_dh0', gate: 'H', targets: [0], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_b_dh1', gate: 'H', targets: [1], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_b_dh2', gate: 'H', targets: [2], controls: [], classicalTargets: [], column: 4 },
+    { opId: 'op_b_m0', gate: 'MEASURE', targets: [0], controls: [], classicalTargets: [0], column: 9 },
+    { opId: 'op_b_m1', gate: 'MEASURE', targets: [1], controls: [], classicalTargets: [1], column: 9 },
+    { opId: 'op_b_m2', gate: 'MEASURE', targets: [2], controls: [], classicalTargets: [2], column: 9 },
+  ],
+  source: 'SEED',
+  openQasm3:
+    'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[3] q;\nbit[3] c;\nh q[0];\nh q[1];\nh q[2];\nh q[0];\nh q[1];\nh q[2];\nc[0] = measure q[0];\nc[1] = measure q[1];\nc[2] = measure q[2];\n',
+  modelVersion: 1,
+  ownerLearnerProfileId: null,
+  createdAt: '2026-08-23T05:27:00Z',
+  updatedAt: '2026-08-23T05:27:00Z',
+};
+
+export const DEMO_GROVER_CHALLENGE: Challenge = {
+  id: 'ch_grover_repair',
+  moduleId: 'mod_grover',
+  type: 'CIRCUIT_REPAIR',
+  title: 'Restore Grover Phase Oracle for |101⟩',
+  prompt: 'Insert the missing phase oracle (X on q1, then CCX on target q2 with controls q0 and q1, then X on q1) to mark state |101⟩ before the diffusion layer.',
+  starterCircuitModelId: 'cm_grover_broken',
+  acceptanceRule: {
+    version: 1,
+    kind: 'PROBABILITY_SUPPORT_EQUALS',
+    states: ['101'],
+    epsilon: 0.15,
+  },
+  targetsMisconceptionCodes: ['ORACLE_WITHOUT_DIFFUSION', 'GATE_ORDER'],
+  points: 150,
+  schemaVersion: 1,
+};
+
+export const DEMO_GROVER_SIMULATION_RUN: SimulationRun = {
+  id: 'sr_grover_demo_001',
+  learnerProfileId: 'lp_aarav',
+  moduleId: 'mod_grover',
+  circuitModelId: 'cm_grover_seed',
+  adapter: 'QISKIT_AER',
+  shots: 1024,
+  status: 'SUCCEEDED',
+  probabilities: {
+    '000': 0.008,
+    '001': 0.008,
+    '010': 0.008,
+    '011': 0.008,
+    '100': 0.008,
+    '101': 0.945,
+    '110': 0.008,
+    '111': 0.008,
+  },
+  counts: {
+    '000': 8,
+    '001': 8,
+    '010': 8,
+    '011': 8,
+    '100': 8,
+    '101': 968,
+    '110': 8,
+    '111': 8,
+  },
+  stateTrace: [
+    {
+      stepIndex: 0,
+      operationId: 'op_gh_0',
+      label: 'Equal Superposition (H^⊗3)',
+      basisProbabilities: {
+        '000': 0.125, '001': 0.125, '010': 0.125, '011': 0.125,
+        '100': 0.125, '101': 0.125, '110': 0.125, '111': 0.125,
+      },
+      amplitudes: {
+        '000': { re: 0.3536, im: 0.0 }, '001': { re: 0.3536, im: 0.0 },
+        '010': { re: 0.3536, im: 0.0 }, '011': { re: 0.3536, im: 0.0 },
+        '100': { re: 0.3536, im: 0.0 }, '101': { re: 0.3536, im: 0.0 },
+        '110': { re: 0.3536, im: 0.0 }, '111': { re: 0.3536, im: 0.0 },
+      },
+      reducedQubits: [
+        { qubit: 0, bloch: { x: 1.0, y: 0.0, z: 0.0 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+        { qubit: 1, bloch: { x: 1.0, y: 0.0, z: 0.0 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+        { qubit: 2, bloch: { x: 1.0, y: 0.0, z: 0.0 }, purity: 1.0, label: 'PURE_SUBSYSTEM' },
+      ],
+    },
+    {
+      stepIndex: 1,
+      operationId: 'op_gccx_1',
+      label: 'Oracle Phase Marking (|101⟩ Inverted)',
+      basisProbabilities: {
+        '000': 0.125, '001': 0.125, '010': 0.125, '011': 0.125,
+        '100': 0.125, '101': 0.125, '110': 0.125, '111': 0.125,
+      },
+      amplitudes: {
+        '000': { re: 0.3536, im: 0.0 }, '001': { re: 0.3536, im: 0.0 },
+        '010': { re: 0.3536, im: 0.0 }, '011': { re: 0.3536, im: 0.0 },
+        '100': { re: 0.3536, im: 0.0 }, '101': { re: -0.3536, im: 0.0 },
+        '110': { re: 0.3536, im: 0.0 }, '111': { re: 0.3536, im: 0.0 },
+      },
+      reducedQubits: [],
+    },
+    {
+      stepIndex: 2,
+      operationId: 'op_gdccx_1',
+      label: 'Diffusion Iteration 1 (Reflection)',
+      basisProbabilities: {
+        '000': 0.031, '001': 0.031, '010': 0.031, '011': 0.031,
+        '100': 0.031, '101': 0.531, '110': 0.031, '111': 0.031,
+      },
+      amplitudes: {
+        '000': { re: 0.1768, im: 0.0 }, '001': { re: 0.1768, im: 0.0 },
+        '010': { re: 0.1768, im: 0.0 }, '011': { re: 0.1768, im: 0.0 },
+        '100': { re: 0.1768, im: 0.0 }, '101': { re: 0.7289, im: 0.0 },
+        '110': { re: 0.1768, im: 0.0 }, '111': { re: 0.1768, im: 0.0 },
+      },
+      reducedQubits: [],
+    },
+    {
+      stepIndex: 3,
+      operationId: 'op_gdh_6',
+      label: 'Diffusion Iteration 2 (Peak Amplification)',
+      basisProbabilities: {
+        '000': 0.008, '001': 0.008, '010': 0.008, '011': 0.008,
+        '100': 0.008, '101': 0.945, '110': 0.008, '111': 0.008,
+      },
+      amplitudes: {
+        '000': { re: 0.0884, im: 0.0 }, '001': { re: 0.0884, im: 0.0 },
+        '010': { re: 0.0884, im: 0.0 }, '011': { re: 0.0884, im: 0.0 },
+        '100': { re: 0.0884, im: 0.0 }, '101': { re: 0.9723, im: 0.0 },
+        '110': { re: 0.0884, im: 0.0 }, '111': { re: 0.0884, im: 0.0 },
+      },
+      reducedQubits: [],
+    },
+  ],
+  conformance: {
+    adapter: 'PENNYLANE',
+    maxProbabilityDelta: 0.0,
+    epsilon: 0.000001,
+    passed: true,
+    skippedReason: null,
+  },
+  durationMs: 92,
+  createdAt: '2026-08-23T05:27:00Z',
+};
+
+export const DEMO_GROVER_DIAGNOSIS: DiagnoseResponse = {
+  misconceptionSignal: {
+    id: 'ms_grover_demo_001',
+    learnerProfileId: 'lp_aarav',
+    simulationRunId: 'sr_grover_demo_001',
+    code: 'NO_SIGNAL',
+    firstDivergenceStep: null,
+    isCorrectPrediction: true,
+    evidence: {
+      prediction: 'TARGET_101_AMPLIFIED',
+      verifiedBehavior: 'TARGET_101_AMPLIFIED',
+      predictionDescription: 'Correctly predicted that 2 Grover iterations amplify |101⟩ to ~94.5%',
+      verifiedBehaviorDescription: 'Constructive interference verified: |101⟩ measures with 94.5% probability',
+      stateTraceStepIndexes: [0, 1, 2, 3],
+    },
+    confidence: 1.0,
+    repairChallengeId: 'ch_grover_repair',
+    createdAt: '2026-08-23T05:27:01Z',
+  },
+  replay: [
+    {
+      stepIndex: 0,
+      headline: 'Equal superposition initialized',
+      evidenceKeys: ['stateTrace.0.basisProbabilities'],
+    },
+    {
+      stepIndex: 1,
+      headline: 'Phase oracle marks target |101⟩ with negative phase',
+      evidenceKeys: ['stateTrace.1.basisProbabilities'],
+    },
+    {
+      stepIndex: 2,
+      headline: 'First diffusion reflection boosts |101⟩ to 53.1%',
+      evidenceKeys: ['stateTrace.2.basisProbabilities'],
+    },
+    {
+      stepIndex: 3,
+      headline: 'Second diffusion reflection reaches peak 94.5% fidelity',
+      evidenceKeys: ['stateTrace.3.basisProbabilities'],
+    },
+  ],
+};
+
+export const DEMO_GROVER_TUTOR_RESPONSE: TutorExplanation = {
+  responseId: 'tr_grover_demo_001',
+  intent: 'EXPLAIN_DIVERGENCE',
+  summary:
+    'Grover\'s algorithm amplified state |101⟩ by inverting its phase with the CCX oracle, then reflecting all amplitudes across the mean ᾱ with the diffusion operator.',
+  steps: [
+    {
+      title: 'Equal Superposition',
+      body: 'All 8 states initialized with amplitude 1/√8 ≈ 0.354 (12.5% each).',
+      evidenceKeys: ['stateTrace.0.basisProbabilities'],
+    },
+    {
+      title: 'Oracle Phase Tag',
+      body: 'The oracle flipped |101⟩ to -0.354, pulling the average line ᾱ down to 0.265.',
+      evidenceKeys: ['stateTrace.1.basisProbabilities'],
+    },
+    {
+      title: 'Diffusion Reflection',
+      body: 'Inversion about the mean (2ᾱ - α) amplified |101⟩ to 0.972 (94.5% probability) while suppressing unmarked states.',
+      evidenceKeys: ['stateTrace.3.basisProbabilities'],
+    },
+  ],
+  numericalClaims: [
+    { claim: 'P(101)=0.945', evidenceKey: 'stateTrace.3.basisProbabilities.101' },
+  ],
+  repairChallengeId: 'ch_grover_repair',
+  fallbackUsed: true,
+  model: 'DEMO_FALLBACK',
+  safetyNote: 'Explanation is grounded in this Qiskit Aer Simulation Run; it is not a hardware claim.',
+};
+
 

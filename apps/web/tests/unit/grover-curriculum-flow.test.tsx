@@ -56,7 +56,7 @@ describe('Grover Curriculum Navigation & In-Situ Concept Flow Suite', () => {
     expect(within(inspector).getByTestId('inspector-stage-title').textContent).toContain('The Oracle');
   });
 
-  it('keeps Grover concept stages in-situ on /learn without navigating to /lab', () => {
+  it('navigates to /learn/oracle for Oracle concept stage', () => {
     const oracleStage = module2Unit21Stages.find((s) => s.id === 'mod2_grover_oracle_concept')!;
     expect(oracleStage).toBeDefined();
 
@@ -75,15 +75,39 @@ describe('Grover Curriculum Navigation & In-Situ Concept Flow Suite', () => {
     expect(within(inspector).getByTestId('inspector-concept-summary')).toBeDefined();
     expect(within(inspector).getAllByText(/phase flip/i).length).toBeGreaterThan(0);
 
-    // Action button exists with text "ENTER CHAMBER"
+    // Action button exists with text "ENTER CHAMBER" linking to /learn/oracle
     const enterBtn = within(inspector).getByTestId('enter-chamber-button');
     expect(enterBtn).toBeDefined();
     expect(within(enterBtn).getByText('ENTER CHAMBER')).toBeDefined();
+
+    const link = enterBtn.closest('a');
+    expect(link).toBeDefined();
+    expect(link?.getAttribute('href')).toBe('/learn/oracle');
+  });
+
+  it('supports in-situ completion for stages without a dedicated route', () => {
+    const unroutedStage = {
+      ...module2Unit21Stages[0],
+      id: 'custom_concept_stage',
+      lessonId: 'custom_concept_stage',
+      unitId: 'unit_custom',
+      route: undefined,
+    };
+
+    const handleEnter = vi.fn();
+    render(
+      <RightStageInspector
+        selectedStage={unroutedStage}
+        onEnterChamber={handleEnter}
+      />
+    );
+
+    const inspector = screen.getByTestId('stage-inspector-panel');
+    const enterBtn = within(inspector).getByTestId('enter-chamber-button');
     expect(within(enterBtn).getByText(/COMPLETE CONCEPT/i)).toBeDefined();
 
-    // Clicking completes the concept in-situ without link navigation to /lab
     fireEvent.click(enterBtn);
-    expect(handleEnter).toHaveBeenCalledWith(oracleStage);
+    expect(handleEnter).toHaveBeenCalledWith(unroutedStage);
     expect(within(enterBtn).getByText(/CONCEPT GROUNDED/i)).toBeDefined();
   });
 
@@ -132,7 +156,7 @@ describe('Grover Curriculum Navigation & In-Situ Concept Flow Suite', () => {
     expect(within(checkpoint).getByText(/94.5%/i)).toBeDefined();
   });
 
-  it('routes to /lab?preset=grover for Grover lab stages like CCX Lab and Full Grover Lab', () => {
+  it('routes to dedicated learning chambers for Grover stages', () => {
     const ccxLab = module2Unit21Stages.find((s) => s.id === 'mod2_ccx_lab')!;
     expect(ccxLab).toBeDefined();
 
@@ -142,12 +166,16 @@ describe('Grover Curriculum Navigation & In-Situ Concept Flow Suite', () => {
     const enterBtn = within(inspector).getByTestId('enter-chamber-button');
     expect(enterBtn).toBeDefined();
     expect(within(enterBtn).getByText('ENTER CHAMBER')).toBeDefined();
-    expect(within(enterBtn).getByText(/LAUNCH LAB/i)).toBeDefined();
 
-    // Link target is /lab?preset=grover
+    // Link target is /learn/oracle
     const link = enterBtn.closest('a');
     expect(link).toBeDefined();
-    expect(link?.getAttribute('href')).toBe('/lab?preset=grover');
+    expect(link?.getAttribute('href')).toBe('/learn/oracle');
+
+    // Full Grover lab routes to /learn/grover
+    const fullGroverLab = module2Unit21Stages.find((s) => s.id === 'mod2_full_grover_lab')!;
+    expect(fullGroverLab).toBeDefined();
+    expect(fullGroverLab.route).toBe('/learn/grover');
   });
 
   it('maps stage IDs to correct units via getUnitForStage helper', () => {

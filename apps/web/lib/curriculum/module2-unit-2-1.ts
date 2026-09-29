@@ -36,6 +36,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 5,
     coherenceReward: 60,
     shieldReward: 15,
+    route: "/learn/oracle",
     analogyHook:
       "A metal detector doesn't tell you what's buried — it just beeps louder over the right spot. Grover's oracle does the same: it marks the answer qubit with a phase flip without revealing which item it is.",
     conceptSummary:
@@ -63,6 +64,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 6,
     coherenceReward: 70,
     shieldReward: 15,
+    route: "/learn/diffusion",
     analogyHook:
       "Imagine all arrow heights on a target represent probability amplitudes. Grover flips the marked arrow negative, then reflects every arrow about their average height. The positive arrows shrink; the once-negative marked arrow shoots up above the average.",
     conceptSummary:
@@ -98,6 +100,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 5,
     coherenceReward: 65,
     shieldReward: 15,
+    route: "/learn/oracle",
     analogyHook:
       "A traffic light changes to green ONLY IF both the pedestrian button is pressed AND the timer has elapsed. CCX (Toffoli) flips its target qubit ONLY IF both control qubits are |1⟩ — it is a quantum AND gate.",
     conceptSummary:
@@ -143,6 +146,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 4,
     coherenceReward: 55,
     shieldReward: 15,
+    route: "/learn/diffusion",
     analogyHook:
       "Finding a name in an unsorted phone book requires reading, on average, half the pages — N/2 lookups. Grover finds the name by opening the book roughly √N times, using quantum wave interference to cancel out every wrong page.",
     conceptSummary:
@@ -175,6 +179,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 6,
     coherenceReward: 80,
     shieldReward: 20,
+    route: "/learn/oracle",
     analogyHook:
       "Just like testing a logic gate with a multimeter, assemble two control inputs and see the CCX target flip only when both switches are ON.",
     conceptSummary:
@@ -220,6 +225,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 7,
     coherenceReward: 85,
     shieldReward: 20,
+    route: "/learn/oracle",
     analogyHook:
       "Tagging a luggage bag with a hidden RFID tag: the bag looks identical from the outside, but when passed through the scanner, the phase tag lights up.",
     conceptSummary:
@@ -266,6 +272,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 3,
     coherenceReward: 50,
     shieldReward: 10,
+    route: "/learn/diffusion",
     analogyHook:
       "Baking a soufflé: take it out too early and it hasn't risen; leave it in too long and it collapses. Quantum amplitude amplification has an exact sweet spot.",
     conceptSummary:
@@ -328,6 +335,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     estimatedMinutes: 10,
     coherenceReward: 100,
     shieldReward: 25,
+    route: "/learn/grover",
     analogyHook:
       "Putting the entire engine together: initialization, oracle phase marking, and diffusion reflection working in tandem to pull the needle out of the haystack.",
     conceptSummary:
@@ -408,6 +416,7 @@ export const module2Unit21Stages: CurriculumStage[] = [
     coherenceReward: 150,
     shieldReward: 50,
     bossChallenge: true,
+    route: "/learn/grover",
     analogyHook:
       "The ultimate test of quantum advantage: a black-box oracle conceals a secret 3-bit password. You cannot inspect the oracle wires — only run the search and let quantum interference reveal the answer.",
     conceptSummary:
