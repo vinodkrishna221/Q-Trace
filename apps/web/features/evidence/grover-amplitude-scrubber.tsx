@@ -551,40 +551,41 @@ export function GroverAmplitudeScrubber({
               </Button>
             </div>
 
-            {/* Step badges clickable strip */}
-            <div
-              className="flex items-center gap-1 overflow-x-auto py-0.5"
-              role="tablist"
-              aria-label="Execution steps"
-            >
-              {activeSteps.map((step, idx) => {
-                const isSelected = idx === currentStepIndex;
-                const isOracle = step.label?.toLowerCase().includes('oracle') || idx === 1 || idx === 3;
-                return (
-                  <button
-                    key={`step-pill-${step.stepIndex ?? idx}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={isSelected}
-                    aria-label={`Step ${idx + 1}: ${step.label || 'Grover step'}`}
-                    data-testid={`step-pill-${idx}`}
-                    onClick={() => handleStepChange(idx)}
-                    className={`h-7 px-2.5 rounded-full text-xs font-mono transition-all flex items-center gap-1 cursor-pointer outline-none ${
-                      isSelected
-                        ? 'bg-accent text-white font-medium shadow-xs ring-2 ring-accent/30'
-                        : isOracle
-                        ? 'bg-[#00D4FF]/10 text-[#006f85] border border-[#00D4FF]/30 hover:bg-[#00D4FF]/20'
-                        : 'bg-surface border border-border-subtle text-text-secondary hover:text-text-primary hover:bg-surface-active'
-                    }`}
-                  >
-                    <span>{idx + 1}</span>
-                    <span className="hidden md:inline text-[10px] opacity-85">
-                      {isOracle ? 'Oracle' : idx === 0 ? 'Init' : 'Diff'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          </div>
+
+          {/* Step badges: packed into wrapped rows without horizontal scroll */}
+          <div
+            className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border-subtle/60"
+            role="tablist"
+            aria-label="Execution steps"
+          >
+            {activeSteps.map((step, idx) => {
+              const isSelected = idx === currentStepIndex;
+              const isOracle = step.label?.toLowerCase().includes('oracle') || idx === 1 || idx === 3;
+              return (
+                <button
+                  key={`step-pill-${step.stepIndex ?? idx}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  aria-label={`Step ${idx + 1}: ${step.label || 'Grover step'}`}
+                  data-testid={`step-pill-${idx}`}
+                  onClick={() => handleStepChange(idx)}
+                  className={`h-7 px-2.5 rounded-full text-xs font-mono transition-all flex items-center gap-1 cursor-pointer outline-none ${
+                    isSelected
+                      ? 'bg-accent text-white font-medium shadow-xs ring-2 ring-accent/30'
+                      : isOracle
+                      ? 'bg-[#00D4FF]/10 text-[#006f85] border border-[#00D4FF]/30 hover:bg-[#00D4FF]/20'
+                      : 'bg-surface border border-border-subtle text-text-secondary hover:text-text-primary hover:bg-surface-active'
+                  }`}
+                >
+                  <span className="font-semibold">{idx + 1}</span>
+                  <span className="text-[10px] opacity-85">
+                    {isOracle ? 'Oracle' : idx === 0 ? 'Init' : 'Diff'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Interactive Range Input */}

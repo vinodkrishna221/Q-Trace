@@ -32,13 +32,28 @@ export function ProbabilityHistogramView({
     ? stateTrace[stateTrace.length - 1]
     : null;
 
-  const reducedQubits = latestTraceStep?.reducedQubits || [
-    { qubit: 0, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
-    { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 0.0 }, purity: 0.5, label: 'MIXED_SUBSYSTEM' as const },
-  ];
+  // Derive basis keys dynamically from probabilities and counts (supports 2-qubit, 3-qubit Grover, etc.)
+  const basisKeys = React.useMemo(() => {
+    const rawKeys = new Set([...Object.keys(probabilities), ...Object.keys(counts)]);
+    if (rawKeys.size === 0) {
+      return ['00', '01', '10', '11'];
+    }
+    // Sort in binary ascending order ('000', '001', ...)
+    return Array.from(rawKeys).sort((a, b) => parseInt(a, 2) - parseInt(b, 2));
+  }, [probabilities, counts]);
 
-  // All known 2-qubit basis states
-  const basisKeys = ['00', '01', '10', '11'];
+  // Determine qubit count from basis keys or simulation run
+  const detectedQubitCount = basisKeys[0] ? basisKeys[0].length : 2;
+
+  // Reduced qubits matching actual qubit count
+  const reducedQubits = (latestTraceStep?.reducedQubits && latestTraceStep.reducedQubits.length > 0)
+    ? latestTraceStep.reducedQubits
+    : Array.from({ length: detectedQubitCount }, (_, q) => ({
+        qubit: q,
+        bloch: { x: 0.0, y: 0.0, z: 0.0 },
+        purity: 0.5,
+        label: 'MIXED_SUBSYSTEM' as const,
+      }));
 
   return (
     <div className="space-y-6" data-testid="visual-evidence-suite">

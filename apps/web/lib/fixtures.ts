@@ -750,7 +750,11 @@ export const DEMO_GROVER_SIMULATION_RUN: SimulationRun = {
         '100': { re: 0.0884, im: 0.0 }, '101': { re: 0.9723, im: 0.0 },
         '110': { re: 0.0884, im: 0.0 }, '111': { re: 0.0884, im: 0.0 },
       },
-      reducedQubits: [],
+      reducedQubits: [
+        { qubit: 0, bloch: { x: 0.0, y: 0.0, z: -0.89 }, purity: 0.95, label: 'PURE_SUBSYSTEM' },
+        { qubit: 1, bloch: { x: 0.0, y: 0.0, z: 0.89 }, purity: 0.95, label: 'PURE_SUBSYSTEM' },
+        { qubit: 2, bloch: { x: 0.0, y: 0.0, z: -0.89 }, purity: 0.95, label: 'PURE_SUBSYSTEM' },
+      ],
     },
   ],
   conformance: {

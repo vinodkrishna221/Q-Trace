@@ -258,10 +258,8 @@ export function FlightRecorderView({
             </span>
           </div>
 
-          <div className="relative flex items-center gap-3 overflow-x-auto pb-4 pt-6 px-4 snap-x">
-            {/* The Scrubber Timeline Wire */}
-            <div className="absolute top-[38px] left-8 right-8 h-[2px] bg-line z-0 pointer-events-none" />
-            
+          {/* 4-per-row packed grid for trace steps — eliminates horizontal scroll */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
             {stateTrace.map((step) => {
               const isSelected = activeStepIndex === step.stepIndex;
               const isDivergence = !isCorrect && step.stepIndex === misconceptionSignal.firstDivergenceStep;
@@ -275,14 +273,16 @@ export function FlightRecorderView({
                   aria-current={isSelected ? 'step' : undefined}
                   aria-label={`Step ${step.stepIndex}: ${step.label}${isDivergence ? ' (First Conceptual Divergence)' : ''}`}
                   onClick={() => handleStepClick(step.stepIndex)}
-                  className={`relative z-10 min-w-[220px] p-4 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none snap-start focus-visible:ring-2 focus-visible:ring-accent hover:-translate-y-0.5 ${
+                  className={`relative w-full p-3.5 rounded-lg border text-left font-mono transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent hover:-translate-y-0.5 ${
                     isSelected
                       ? 'border-accent bg-surface-raised shadow-[0_0_15px_rgba(124,58,237,0.15)] ring-1 ring-accent'
                       : 'border-border-subtle bg-surface text-ink-dim hover:border-accent/40 hover:bg-surface-raised'
                   }`}
                 >
-                  {/* Timeline Glowing Node */}
-                  <div className={`absolute -top-[19px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 transition-colors duration-300 ${isSelected ? 'bg-accent border-surface shadow-[0_0_10px_rgba(124,58,237,0.8)]' : 'bg-surface border-line'}`} />
+                  {/* Selected indicator pip */}
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent animate-pulse" />
+                  )}
 
                   {/* Divergent pip */}
                   {isDivergence && (

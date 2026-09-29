@@ -95,7 +95,7 @@ export function BlochSphereView({
                   }`}
                 >
                   <Link2 className="w-3 h-3" />
-                  <span>Dual 3D Bloch</span>
+                  <span>{reducedQubits.length === 2 ? 'Dual 3D Bloch' : `${reducedQubits.length}-Qubit 3D Bloch`}</span>
                 </button>
                 <button
                   type="button"
@@ -397,96 +397,57 @@ export function BlochSphereView({
             {/* MODE A: DUAL 3D BLOCH SPHERES (Both Qubits Side-by-Side + Entanglement Bridge) */}
             {viewMode === 'DUAL_3D' && hasTwoQubits && (
               <div className="space-y-6" data-testid="dual-3d-bloch-view">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Sphere 0: Qubit 0 */}
-                  <div
-                    onClick={() => setSelectedQubitIndex(0)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer bg-abyss flex flex-col items-center ${
-                      selectedQubitIndex === 0
-                        ? 'border-accent shadow-glow'
-                        : 'border-line hover:border-line-bright'
-                    }`}
-                  >
-                    <div className="w-full flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-accent">q[0] Wire</span>
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] font-mono ${
-                            reducedQubits[0].label === 'MIXED_SUBSYSTEM'
-                              ? 'text-violet border-violet/40'
-                              : 'text-evidence border-evidence/40'
-                          }`}
-                        >
-                          {reducedQubits[0].label === 'MIXED_SUBSYSTEM' ? 'MIXED (r=0)' : 'PURE (r=1)'}
-                        </Badge>
+                <div className={`grid grid-cols-1 ${reducedQubits.length === 2 ? 'lg:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
+                  {reducedQubits.map((rq, idx) => {
+                    const isSelected = selectedQubitIndex === idx;
+                    const wireColorClass = idx === 0 ? 'text-accent' : idx === 1 ? 'text-violet' : 'text-emerald-400';
+                    return (
+                      <div
+                        key={rq.qubit}
+                        onClick={() => setSelectedQubitIndex(idx)}
+                        className={`p-4 rounded-xl border transition-all cursor-pointer bg-abyss flex flex-col items-center ${
+                          isSelected
+                            ? 'border-accent shadow-glow'
+                            : 'border-line hover:border-line-bright'
+                        }`}
+                      >
+                        <div className="w-full flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-mono text-xs font-bold ${wireColorClass}`}>q[{rq.qubit}] Wire</span>
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] font-mono ${
+                                rq.label === 'MIXED_SUBSYSTEM'
+                                  ? 'text-violet border-violet/40'
+                                  : 'text-evidence border-evidence/40'
+                              }`}
+                            >
+                              {rq.label === 'MIXED_SUBSYSTEM' ? 'MIXED (r=0)' : 'PURE (r=1)'}
+                            </Badge>
+                          </div>
+                          <span className="text-[10px] font-mono text-ink-faint">
+                            γ = {rq.purity.toFixed(3)}
+                          </span>
+                        </div>
+
+                        <Bloch3DSphere
+                          bloch={rq.bloch}
+                          purity={rq.purity}
+                          label={rq.label}
+                          qubitIndex={rq.qubit}
+                          rotation={syncCameras ? sharedRotation : undefined}
+                          onRotate={syncCameras ? setSharedRotation : undefined}
+                          size={reducedQubits.length >= 3 ? 220 : 270}
+                        />
+
+                        <div className="mt-2 text-[10px] font-mono text-ink-dim flex justify-between w-full px-2">
+                          <span>⟨X⟩: {rq.bloch.x.toFixed(2)}</span>
+                          <span>⟨Y⟩: {rq.bloch.y.toFixed(2)}</span>
+                          <span>⟨Z⟩: {rq.bloch.z.toFixed(2)}</span>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-mono text-ink-faint">
-                        γ = {reducedQubits[0].purity.toFixed(3)}
-                      </span>
-                    </div>
-
-                    <Bloch3DSphere
-                      bloch={reducedQubits[0].bloch}
-                      purity={reducedQubits[0].purity}
-                      label={reducedQubits[0].label}
-                      qubitIndex={0}
-                      rotation={syncCameras ? sharedRotation : undefined}
-                      onRotate={syncCameras ? setSharedRotation : undefined}
-                      size={270}
-                    />
-
-                    <div className="mt-2 text-[10px] font-mono text-ink-dim flex justify-between w-full px-2">
-                      <span>⟨X⟩: {reducedQubits[0].bloch.x.toFixed(2)}</span>
-                      <span>⟨Y⟩: {reducedQubits[0].bloch.y.toFixed(2)}</span>
-                      <span>⟨Z⟩: {reducedQubits[0].bloch.z.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Sphere 1: Qubit 1 */}
-                  <div
-                    onClick={() => setSelectedQubitIndex(1)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer bg-abyss flex flex-col items-center ${
-                      selectedQubitIndex === 1
-                        ? 'border-accent shadow-glow'
-                        : 'border-line hover:border-line-bright'
-                    }`}
-                  >
-                    <div className="w-full flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-bold text-violet">q[1] Wire</span>
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] font-mono ${
-                            reducedQubits[1].label === 'MIXED_SUBSYSTEM'
-                              ? 'text-violet border-violet/40'
-                              : 'text-evidence border-evidence/40'
-                          }`}
-                        >
-                          {reducedQubits[1].label === 'MIXED_SUBSYSTEM' ? 'MIXED (r=0)' : 'PURE (r=1)'}
-                        </Badge>
-                      </div>
-                      <span className="text-[10px] font-mono text-ink-faint">
-                        γ = {reducedQubits[1].purity.toFixed(3)}
-                      </span>
-                    </div>
-
-                    <Bloch3DSphere
-                      bloch={reducedQubits[1].bloch}
-                      purity={reducedQubits[1].purity}
-                      label={reducedQubits[1].label}
-                      qubitIndex={1}
-                      rotation={syncCameras ? sharedRotation : undefined}
-                      onRotate={syncCameras ? setSharedRotation : undefined}
-                      size={270}
-                    />
-
-                    <div className="mt-2 text-[10px] font-mono text-ink-dim flex justify-between w-full px-2">
-                      <span>⟨X⟩: {reducedQubits[1].bloch.x.toFixed(2)}</span>
-                      <span>⟨Y⟩: {reducedQubits[1].bloch.y.toFixed(2)}</span>
-                      <span>⟨Z⟩: {reducedQubits[1].bloch.z.toFixed(2)}</span>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
 
                 {/* Synchronized Camera Toggle */}
@@ -500,12 +461,14 @@ export function BlochSphereView({
                   </button>
                 </div>
 
-                {/* Entanglement Bridge & Pauli Correlation Tensor */}
-                <TwoQubitCorrelationBridge
-                  reducedQubits={reducedQubits}
-                  amplitudes={amplitudes}
-                  basisProbabilities={basisProbabilities}
-                />
+                {/* Entanglement Bridge & Pauli Correlation Tensor (2-qubit systems) */}
+                {reducedQubits.length === 2 && (
+                  <TwoQubitCorrelationBridge
+                    reducedQubits={reducedQubits}
+                    amplitudes={amplitudes}
+                    basisProbabilities={basisProbabilities}
+                  />
+                )}
               </div>
             )}
 
