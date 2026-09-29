@@ -1,6 +1,7 @@
 import { CurriculumStage } from './types';
 import { units6to7Stages } from './units-6-to-7';
 import { units8to10Stages } from './units-8-to-10';
+import { module2Unit21Stages } from './module2-unit-2-1';
 
 export const unit1FoundationsStages: CurriculumStage[] = [
   {
@@ -118,7 +119,10 @@ export const allCurriculumStages: CurriculumStage[] = [
   ...unit1FoundationsStages,
   ...units6to7Stages,
   ...units8to10Stages,
+  ...module2Unit21Stages,
 ];
+
+export { module2Unit21Stages };
 
 export function getStageById(id: string): CurriculumStage | undefined {
   return allCurriculumStages.find((s) => s.id === id || s.lessonId === id);

@@ -171,6 +171,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 29 Sep 11:30 Uday: FEA-2 green (feat/features-phase/fea-2-linter-backend) — Quantum Invariant Linter backend implemented in apps/api/app/services/quantum/linter.py (QI-1 post-collapse unitary [WARNING], QI-2 no-cloning violation [INFO], QI-3 controlled wire collision [ERROR]); extended ParseQiskitResponse and added POST /v1/circuits/lint endpoint in apps/api/app/routers/circuits.py; 18/18 unit tests passed in test_linter.py (64/64 regression passed); PR ready for Warden review. Unblocks FEA-5, FEA-14.
 
+- 29 Sep 11:35 Rajeswari: FEA-3 green (feat/features-phase/fea-3-grover-curriculum) — Module 2 Unit 2.1 (Grover Search Algorithm) curriculum engine implemented in apps/web/lib/curriculum/module2-unit-2-1.ts and all-stages.ts with 9 typed stages (oracle phase flip, amplitude reflection, Toffoli CCX truth table, O(sqrt(N)) speedup table, CCX gate lab, phase oracle lab, pc_grover_iterations prediction checkpoint, full 3-qubit Grover circuit with CCX, and Grover Boss capstone); 13/13 FEA-3 tests green, 49/49 curriculum tests passed, Next.js production build clean (17/17 routes); PR ready for Warden review. Unblocks FEA-4.
+
 - 29 Sep 12:28 Vinod: FEA-12 green (feat/features-phase/fea-12-gate-palette-glyph) — implemented gate palette family groupings (Single Qubit, Phase, Multi-Qubit, Measure) and SVG glyphs for CCX, CZ, S, T; added multi-wire vertical connection spans and control/target rendering on qubit wires with dynamic qubit count controls; 13/13 FEA-12 unit tests passed, full web suite and Next.js 17/17 routes clean; PR ready for Warden review.
-
-
