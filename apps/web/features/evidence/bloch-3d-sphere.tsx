@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useTheme } from 'next-themes';
 import { RotateCcw, Play, Pause, ZoomIn, ZoomOut, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface Bloch3DSphereProps {
   bloch: { x: number; y: number; z: number };
@@ -480,6 +481,27 @@ export function Bloch3DSphere({
             <span>Drag to rotate 3D</span>
           </span>
         </div>
+      </div>
+
+      {/* Purity Readout Badge below sphere canvas */}
+      <div
+        className="mt-2.5 flex items-center gap-1.5 px-3 py-1 rounded-full border border-border-subtle bg-surface-raised/70 text-xs font-mono shadow-2xs"
+        data-testid={`bloch-purity-readout-${qubitIndex}`}
+      >
+        <span className="text-text-secondary">Purity:</span>
+        <span className="font-semibold text-text-primary">
+          Tr(ρ²) = {purity.toFixed(3)}
+        </span>
+        <span
+          className={cn(
+            'text-[10px] px-1.5 py-0.5 rounded-full font-semibold',
+            isMixed
+              ? 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30'
+              : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+          )}
+        >
+          [{isMixed ? 'mixed state' : 'pure state'}]
+        </span>
       </div>
     </div>
   );

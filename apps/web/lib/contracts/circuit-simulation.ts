@@ -89,6 +89,7 @@ export interface SimulationRun {
   stateTrace: StateTraceStep[];
   conformance?: ConformanceResult;
   durationMs: number;
+  noisePreset?: "superconducting" | string | null;
   error?: ContractError | null;
   schemaVersion?: number;
   createdAt: string;
@@ -126,6 +127,7 @@ export interface SimulationRunRequest {
   primaryAdapter?: AdapterName;
   runConformance?: boolean;
   shots?: number;
+  noisePreset?: "superconducting" | null;
 }
 
 export interface SimulationRunResponse {

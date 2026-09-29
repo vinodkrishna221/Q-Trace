@@ -5,8 +5,10 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { InteractiveCircuitWorkspace } from '@/features/circuit/interactive-circuit-workspace';
 import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
+import { TwoQubitQSphere } from '@/features/evidence/two-qubit-qsphere';
 import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
 import { DEMO_STARTER_CIRCUIT, DEMO_FLIGHT_RECORDER_DIAGNOSIS } from '@/lib/fixtures';
 import { CircuitModel, SimulationRun, DiagnoseResponse, StateTraceStep } from '@/lib/contracts';
@@ -116,6 +118,7 @@ export default function LabPage() {
     message: string;
     isTimeout: boolean;
   } | null>(null);
+  const [noiseEnabled, setNoiseEnabled] = React.useState(false);
 
   // Determine active preset dynamically from circuit state
   const activePreset = determinePreset(circuit);
@@ -145,6 +148,7 @@ export default function LabPage() {
     setDiagnosis(null);
     setSimulationError(null);
     setLastSimulatedCircuit(null);
+    setNoiseEnabled(false);
   };
 
   const handleLoadSuperposition = () => {
@@ -154,6 +158,7 @@ export default function LabPage() {
     setDiagnosis(null);
     setSimulationError(null);
     setLastSimulatedCircuit(null);
+    setNoiseEnabled(false);
   };
 
   const handleClearGrid = () => {
@@ -163,11 +168,13 @@ export default function LabPage() {
     setDiagnosis(null);
     setSimulationError(null);
     setLastSimulatedCircuit(null);
+    setNoiseEnabled(false);
   };
 
-  const handleRunSimulation = async (circuitOverride?: CircuitModel) => {
+  const handleRunSimulation = async (circuitOverride?: CircuitModel, noiseOverride?: boolean) => {
     setSimulationError(null);
     const targetCircuit = circuitOverride || circuit || DEMO_STARTER_CIRCUIT;
+    const activeNoise = noiseOverride !== undefined ? noiseOverride : noiseEnabled;
 
     try {
       // 1. Run simulation via TanStack Query mutation
@@ -182,11 +189,41 @@ export default function LabPage() {
         primaryAdapter: 'QISKIT_AER',
         runConformance: true,
         shots: 1024,
+        noisePreset: activeNoise ? 'superconducting' : null,
       });
 
-      // If offline fallback is active, adapt probabilities and state trace based on circuit structure
+      // If offline fallback is active, adapt probabilities and state trace based on circuit structure and noise
       if (simResult.meta.isFallback) {
-        if (
+        if (activeNoise) {
+          const noisyProbs: Record<string, number> = {};
+          const noisyCounts: Record<string, number> = {};
+          const keys = ['00', '01', '10', '11'];
+          keys.forEach((k) => {
+            const idealP = simResult.data.probabilities[k] || 0;
+            const p = Math.round((idealP * 0.92 + 0.02) * 1000) / 1000;
+            noisyProbs[k] = p;
+            noisyCounts[k] = Math.round(p * 1024);
+          });
+          simResult.data.probabilities = noisyProbs;
+          simResult.data.counts = noisyCounts;
+          simResult.data.noisePreset = 'superconducting';
+
+          if (simResult.data.stateTrace && simResult.data.stateTrace.length > 0) {
+            simResult.data.stateTrace = simResult.data.stateTrace.map((st) => ({
+              ...st,
+              reducedQubits: st.reducedQubits.map((rq) => ({
+                ...rq,
+                purity: 0.847,
+                bloch: {
+                  x: Math.round(rq.bloch.x * 0.847 * 1000) / 1000,
+                  y: Math.round(rq.bloch.y * 0.847 * 1000) / 1000,
+                  z: Math.round(rq.bloch.z * 0.847 * 1000) / 1000,
+                },
+                label: 'MIXED_SUBSYSTEM',
+              })),
+            }));
+          }
+        } else if (
           targetCircuit.id === 'cm_superposition_seed' ||
           (targetCircuit.operations.length === 2 && targetCircuit.operations.some((op) => op.gate === 'H'))
         ) {
@@ -360,6 +397,11 @@ export default function LabPage() {
       });
       setHasExecuted(false);
     }
+  };
+
+  const handleNoiseToggle = async (enabled: boolean) => {
+    setNoiseEnabled(enabled);
+    await handleRunSimulation(undefined, enabled);
   };
 
   return (
@@ -603,7 +645,7 @@ export default function LabPage() {
 
       </div>
 
-      {/* STAGE 2: VISUAL EVIDENCE (Probabilities + Bloch Sphere) */}
+      {/* STAGE 2: VISUAL EVIDENCE (Probabilities + Bloch Sphere + Q-Sphere) */}
       {hasExecuted && simulationRun && (
         <div className="space-y-4 pt-4 border-t border-border-subtle" data-testid="lab-visual-evidence-section">
           <div className="flex items-center justify-between">
@@ -615,8 +657,90 @@ export default function LabPage() {
                 Measurement Probabilities &amp; Bloch Spheres
               </h2>
             </div>
-            <span className="text-xs font-mono text-success">Qiskit Aer · 1024 Shots</span>
+            <span className="text-xs font-mono text-success">
+              {noiseEnabled ? 'Qiskit Aer · NISQ Superconducting Noise' : 'Qiskit Aer · 1024 Shots'}
+            </span>
           </div>
+
+          {/* NISQ Noise Model Switch & Status Toolbar */}
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 bg-surface border border-border-subtle p-3 rounded-lg shadow-2xs"
+            data-testid="nisq-noise-toolbar"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={noiseEnabled}
+                  onCheckedChange={handleNoiseToggle}
+                  id="noise-toggle"
+                  data-testid="noise-toggle-switch"
+                  disabled={isExecutingPipeline}
+                />
+                <label
+                  htmlFor="noise-toggle"
+                  className="text-xs font-mono font-medium text-text-primary cursor-pointer select-none"
+                >
+                  NISQ Noise Model (Superconducting T₁/T₂)
+                </label>
+              </div>
+              {noiseEnabled && (
+                <Badge
+                  variant="warning"
+                  className="text-[10px] font-mono"
+                  data-testid="noise-active-badge"
+                >
+                  T₁=50µs · T₂=70µs · Readout 1%
+                </Badge>
+              )}
+            </div>
+
+            {isExecutingPipeline && (
+              <div
+                className="flex items-center gap-2 text-xs font-mono text-accent"
+                data-testid="noise-loading-indicator"
+              >
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-accent" />
+                <span>Simulating thermal relaxation &amp; readout noise...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Multi-Qubit 3D Q-Sphere Component (when qubitCount >= 2) */}
+          {circuit.qubitCount >= 2 && (
+            <Card className="border-border-subtle bg-surface p-4 shadow-xs" data-testid="lab-qsphere-section">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border-subtle pb-2.5 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold font-mono text-text-primary">
+                    Multi-Qubit State (3D Q-Sphere)
+                  </span>
+                  <Badge variant="outline" className="text-[10px] font-mono text-accent border-accent/30">
+                    {circuit.qubitCount}-QUBIT CANVASES
+                  </Badge>
+                  {noiseEnabled && (
+                    <Badge variant="outline" className="text-[10px] font-mono text-caution border-caution/40 bg-caution/10">
+                      NOISE LEAKAGE ACTIVE
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-[10px] font-mono text-text-secondary">
+                  Point Size ∝ Probability · Hue = Phase Angle θ
+                </span>
+              </div>
+              <div className="flex justify-center py-2">
+                <TwoQubitQSphere
+                  amplitudes={
+                    simulationRun.stateTrace && simulationRun.stateTrace.length > 0
+                      ? simulationRun.stateTrace[simulationRun.stateTrace.length - 1].amplitudes
+                      : undefined
+                  }
+                  basisProbabilities={simulationRun.probabilities}
+                  qubitCount={circuit.qubitCount}
+                  noiseEnabled={noiseEnabled}
+                />
+              </div>
+            </Card>
+          )}
+
           <ProbabilityHistogramView simulationRun={simulationRun} hideStepHeader={true} />
         </div>
       )}

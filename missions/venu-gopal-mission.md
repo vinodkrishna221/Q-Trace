@@ -259,7 +259,7 @@ DELIVERABLE: Modify apps/web/app/(app)/lab/page.tsx (import and mount TwoQubitQS
 TEST: `pnpm test:web tests/unit/noise-toggle-qsphere.test.tsx`
 DEPENDS: FEA-10          UNBLOCKS: —
 DEMO: Judge flips the "NISQ Noise" switch; the Bloch vector contracts inside the sphere with purity 0.847, the histogram shows noise leakage, and the 3D Q-Sphere displays the multi-qubit state.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-11-noise-toggle-qsphere-ui`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 

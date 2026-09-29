@@ -5,15 +5,21 @@ import { useTheme } from 'next-themes';
 import { ComplexValue } from '@/lib/contracts';
 import { RotateCcw, Sparkles } from 'lucide-react';
 
-interface TwoQubitQSphereProps {
+export interface TwoQubitQSphereProps {
   amplitudes?: Record<string, ComplexValue>;
   basisProbabilities?: Record<string, number>;
+  statevector?: ComplexValue[] | Record<string, ComplexValue> | number[] | Array<{ re: number; im: number }>;
+  qubitCount?: number;
+  noiseEnabled?: boolean;
   size?: number;
 }
 
 export function TwoQubitQSphere({
   amplitudes,
   basisProbabilities,
+  statevector,
+  qubitCount,
+  noiseEnabled,
   size = 280,
 }: TwoQubitQSphereProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
@@ -23,8 +29,26 @@ export function TwoQubitQSphere({
   const [isDragging, setIsDragging] = React.useState(false);
   const dragStartRef = React.useRef({ x: 0, y: 0, rotX: 0, rotY: 0 });
 
+  // Resolve amplitudes from direct prop or statevector
+  let resolvedAmps = amplitudes;
+  if (!resolvedAmps && statevector) {
+    if (Array.isArray(statevector)) {
+      const keys = ['00', '01', '10', '11'];
+      resolvedAmps = {};
+      statevector.slice(0, 4).forEach((val, idx) => {
+        if (typeof val === 'number') {
+          resolvedAmps![keys[idx]] = { re: val, im: 0 };
+        } else if (val && typeof val === 'object' && 're' in val) {
+          resolvedAmps![keys[idx]] = { re: (val as { re: number }).re, im: (val as { im?: number }).im || 0 };
+        }
+      });
+    } else if (typeof statevector === 'object') {
+      resolvedAmps = statevector as Record<string, ComplexValue>;
+    }
+  }
+
   // Default to Bell state amplitudes if not provided
-  const amps = amplitudes || {
+  const amps = resolvedAmps || {
     '00': { re: 0.70710678, im: 0 },
     '01': { re: 0, im: 0 },
     '10': { re: 0, im: 0 },
@@ -276,6 +300,12 @@ export function TwoQubitQSphere({
           </span>
         </div>
       </div>
+      {noiseEnabled && (
+        <div className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20" data-testid="qsphere-noise-badge">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+          <span>NISQ Noise Emulation Active</span>
+        </div>
+      )}
     </div>
   );
 }
