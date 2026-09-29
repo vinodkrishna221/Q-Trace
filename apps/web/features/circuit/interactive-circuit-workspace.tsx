@@ -12,7 +12,7 @@ import { LintWarning, lintCircuitLocally } from './circuit-linter';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2, Plus, Minus, AlertTriangle, ChevronDown, ChevronUp, Code2, Copy, Check } from 'lucide-react';
+import { Cpu, Play, CheckCircle2, RefreshCw, Zap, Share2, Plus, Minus, AlertTriangle, ChevronDown, ChevronUp, Code2, Copy, Check, RotateCcw } from 'lucide-react';
 
 interface InteractiveCircuitWorkspaceProps {
   initialCircuit?: CircuitModel;
@@ -313,22 +313,22 @@ export function InteractiveCircuitWorkspace({
             onClick={handleRun}
             disabled={isLocked}
             data-testid="run-simulation-btn"
-            variant={hasExecuted ? 'outline' : 'default'}
-            className="font-medium text-xs gap-1.5"
+            variant="default"
+            className="font-semibold text-xs h-8.5 px-4 rounded-full gap-2 transition-all cursor-pointer whitespace-nowrap shadow-xs bg-accent hover:bg-accent-hover text-white"
           >
             {isSimulating ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 mr-1 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 <span>Simulating on Aer...</span>
               </>
             ) : hasExecuted ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-success" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span>Re-run Simulation</span>
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 mr-1 fill-white text-white" />
+                <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Run Simulation (Qiskit Aer)</span>
               </>
             )}

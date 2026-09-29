@@ -208,22 +208,22 @@ export function CircuitWorkspaceReadonly({
           onClick={onRunSimulation}
           disabled={isSimulating}
           data-testid="run-simulation-btn"
-          variant={hasExecuted ? 'outline' : 'default'}
-          className="font-semibold"
+          variant="default"
+          className="font-semibold text-xs h-8.5 px-4 rounded-full gap-2 transition-all cursor-pointer whitespace-nowrap shadow-xs bg-accent hover:bg-accent-hover text-white"
         >
           {isSimulating ? (
             <>
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5 animate-spin" />
               <span>Simulating on Aer...</span>
             </>
           ) : hasExecuted ? (
             <>
-              <CheckCircle2 className="w-4 h-4 mr-2 text-evidence" />
-              <span>Re-run Simulation (Qiskit Aer)</span>
+              <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+              <span>Re-run Simulation</span>
             </>
           ) : (
             <>
-              <Play className="w-4 h-4 mr-2 text-current fill-current" />
+              <Play className="w-3.5 h-3.5 mr-1.5 fill-current" />
               <span>Run Simulation (Qiskit Aer)</span>
             </>
           )}
