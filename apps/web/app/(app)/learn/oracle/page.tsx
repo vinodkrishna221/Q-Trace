@@ -8,21 +8,19 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { QuantumStateRing3D } from '@/features/learning/components/quantum-state-ring-3d';
-import { OracleFormulaMicroscope } from '@/features/learning/components/oracle-formula-microscope';
-import { PhaseInversionMirror } from '@/features/learning/components/phase-inversion-mirror';
 import { CcxGateSimulation } from '@/features/learning/components/ccx-gate-simulation';
+import { PhaseInversionMirror } from '@/features/learning/components/phase-inversion-mirror';
+import { QuantumChestRing3D } from '@/features/learning/components/quantum-chest-ring-3d';
+import { InteractiveFormulaDecoder } from '@/features/learning/components/interactive-formula-decoder';
 import {
   Clock,
   Cpu,
   ArrowRight,
   ArrowLeft,
-  Sparkles,
   ShieldCheck,
   HelpCircle,
-  CheckCircle2,
+  PackageOpen,
   Lightbulb,
-  Layers,
 } from 'lucide-react';
 
 export default function GroverOracleLearnPage() {
@@ -37,13 +35,13 @@ export default function GroverOracleLearnPage() {
             <Badge variant="default">INTERMEDIATE MODULE</Badge>
             <span className="flex items-center gap-1 font-mono text-xs text-text-secondary">
               <Clock className="w-3.5 h-3.5" />
-              6 mins
+              8 mins
             </span>
             <span className="font-mono text-xs text-text-muted">ID: grover-oracle</span>
           </>
         }
         title="The Phase Oracle & Toffoli Gate (CCX)"
-        purpose="Learn how quantum oracles tag target basis states with phase inversion without collapsing the superposition."
+        purpose="Learn how quantum oracles tag target states with a phase flip — and why that flip stays completely invisible until amplification."
         actions={
           <div className="flex items-center gap-2">
             <Link href="/learn">
@@ -71,53 +69,76 @@ export default function GroverOracleLearnPage() {
         />
       </div>
 
-      {/* Beginner-Friendly Intuitive Metaphor Banner */}
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5 text-text-primary shadow-xs">
-        <div className="flex items-start gap-3.5">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-700 border border-amber-500/30">
-            <Lightbulb className="w-5 h-5" />
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-sans font-bold text-amber-950">
-                Intuitive Concept: The 8 Mystery Chests Metaphor
-              </h2>
-              <Badge variant="outline" className="text-[10px] font-mono border-amber-600/30 text-amber-700 bg-amber-50/50">
-                START HERE
-              </Badge>
-            </div>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              Imagine 8 identical closed treasure chests floating in space (<span className="font-mono text-text-primary">|000⟩</span> through <span className="font-mono text-text-primary">|111⟩</span>). One chest contains gold (<span className="font-mono text-text-primary">|101⟩</span>). In classical computing, you have to open chests one by one (taking up to 8 checks). In quantum computing, all 8 chests exist at the same time in superposition.
+      {/* ── HOOK: THE STORY ── */}
+      <Card className="border-border-subtle bg-surface shadow-xs">
+        <CardHeader className="py-3 px-4 bg-surface-raised/40 border-b border-border-subtle">
+          <CardTitle className="text-xs font-mono tracking-wider text-text-primary font-semibold flex items-center gap-2">
+            <PackageOpen className="w-4 h-4 text-accent" />
+            <span>THE PUZZLE: 8 MYSTERY CHESTS</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 space-y-4">
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Imagine 8 locked chests. One of them holds a diamond — but you can only check them one at a time.
+            Classically, you'd open up to 8 chests before finding it. That's{' '}
+            <span className="font-mono font-semibold text-text-primary">O(N)</span> time.
+          </p>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Grover's algorithm does something wild: it can <em>physically tilt</em> the probability of finding the correct chest
+            by running a quantum search. The key ingredient? A <strong className="text-text-primary">Phase Oracle</strong> — a
+            special quantum operation that secretly marks the treasure chest without opening it.
+          </p>
+          <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex gap-3">
+            <Lightbulb className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-text-secondary leading-relaxed">
+              <strong className="text-text-primary">The twist:</strong> The oracle flips the <em>phase</em> (sign) of the
+              marked state's amplitude. Measurement probabilities depend on |amplitude|² so the sign cancels out — the mark
+              is <em>completely invisible</em> to measurement. It only becomes useful once the Diffusion operator runs next.
             </p>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              <strong>The catch:</strong> If you open any chest right now, the superposition collapses and the other 7 chests disappear forever! Instead, the <strong>Quantum Oracle</strong> leaves all chests closed and simply flips the winning chest <em>upside down</em> (multiplies its quantum amplitude by <span className="font-mono text-text-primary">-1</span>).
-            </p>
-            <div className="mt-2 flex items-center gap-2 pt-1 font-mono text-[11px] text-amber-800">
-              <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
-              <span>Key Secret: To an outside observer, an upside-down chest has the exact same size (12.5% chance). The tag is hidden in the phase until Diffusion!</span>
-            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Main Learning Grid */}
+      {/* ── 3D INTERACTIVE: CHEST RING ── */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+          Step 1 · See the Oracle in Action
+        </h2>
+        <QuantumChestRing3D markedState="101" />
+        <p className="text-[11px] text-text-muted font-mono px-1">
+          ↑ Click <strong>Apply Oracle</strong>, then <strong>Measure Now</strong> repeatedly. Notice: the marked chest flips but
+          measurement is still perfectly random. This is phase kickback — invisible until diffusion!
+        </p>
+      </section>
+
+      {/* ── FORMULA DECODER ── */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+          Step 2 · Decode the Oracle Formula
+        </h2>
+        <InteractiveFormulaDecoder />
+      </section>
+
+      {/* ── MAIN GRID: Mirror + CCX + Sidebar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Visualizers, Formula Microscope & Simulators */}
+        {/* Left Column: Interactive simulators */}
         <div className="lg:col-span-8 space-y-6">
-          {/* 1. Interactive 3D Quantum State Ring */}
-          <QuantumStateRing3D />
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              Step 3 · Phase Inversion Mirror
+            </h2>
+            <PhaseInversionMirror />
+          </section>
 
-          {/* 2. Interactive Formula Microscope */}
-          <OracleFormulaMicroscope />
-
-          {/* 3. 2D Signed Amplitude Mirror */}
-          <PhaseInversionMirror />
-
-          {/* 4. Interactive Toffoli (CCX) Gate Simulator */}
-          <CcxGateSimulation />
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              Step 4 · CCX Gate Simulator (Toffoli)
+            </h2>
+            <CcxGateSimulation />
+          </section>
         </div>
 
-        {/* Right Column: Qiskit Code, Checkpoint & Summary Card */}
+        {/* Right Column: Code + Checkpoint */}
         <div className="lg:col-span-4 space-y-6">
           {/* Oracle Circuit Card */}
           <Card className="border-border-subtle bg-surface shadow-xs">
@@ -138,7 +159,6 @@ export default function GroverOracleLearnPage() {
 qc = QuantumCircuit(3)
 
 # 1. Flip q1 for |101> pattern
-# (converts 1-0-1 into 1-1-1)
 qc.x(1)
 
 # 2. Phase-flip via CCZ or CCX
@@ -219,30 +239,6 @@ qc.x(1)`}
                     </button>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Three Golden Rules Card */}
-          <Card className="border-border-subtle bg-surface shadow-xs">
-            <CardHeader className="py-3 px-4 bg-surface-raised/40 border-b border-border-subtle">
-              <CardTitle className="text-xs font-mono tracking-wider text-text-primary font-semibold flex items-center gap-2">
-                <Layers className="w-4 h-4 text-accent" />
-                <span>3 GOLDEN RULES OF ORACLES</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-3 text-xs text-text-secondary leading-relaxed">
-              <div className="flex items-start gap-2">
-                <span className="font-mono text-accent font-bold text-[11px]">1.</span>
-                <span><strong>Phase is stealthy:</strong> Multiplying amplitude by -1 changes the sign, but the Born probability $|-α|^2 = |α|^2$ stays identical.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="font-mono text-accent font-bold text-[11px]">2.</span>
-                <span><strong>No early measurement:</strong> Peeking into the quantum register causes immediate wave function collapse, destroying quantum speedup.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="font-mono text-accent font-bold text-[11px]">3.</span>
-                <span><strong>Diffusion is the partner:</strong> The Oracle places the phase tag; Amplitude Diffusion converts that phase tag into a massive probability spike.</span>
               </div>
             </CardContent>
           </Card>
