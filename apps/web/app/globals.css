@@ -705,21 +705,55 @@ body.custom-cursor-active [data-interactive] {
 
 .atomic-cursor-svg {
   overflow: visible;
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 2.5px rgba(2, 132, 199, 0.45));
 }
 
 /* 1. Orbital Ellipse Paths */
 .orbital-ellipse {
   fill: none;
-  stroke: rgba(11, 10, 67, 0.45);
-  stroke-width: 1.15;
+  stroke: #0284c7;
+  stroke-width: 1.25;
   stroke-dasharray: 2.5 1.5;
   transition: stroke 0.2s, stroke-width 0.2s, opacity 0.2s;
 }
 
 .dark .orbital-ellipse {
-  stroke: rgba(144, 164, 253, 0.6);
-  filter: drop-shadow(0 0 1px rgba(144, 164, 253, 0.4));
+  stroke: rgba(144, 164, 253, 0.85);
+  filter: drop-shadow(0 0 2px rgba(144, 164, 253, 0.6));
+}
+
+/* Luminous Mode when cursor hovers over dark elements, code panels, and terminals */
+body.cursor-over-dark .atomic-cursor-svg {
+  filter: drop-shadow(0 0 4px #00f0ff) drop-shadow(0 0 1px #ffffff) !important;
+}
+
+body.cursor-over-dark .orbital-ellipse {
+  stroke: #38bdf8 !important;
+  stroke-width: 1.6 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 3px #0284c7) !important;
+}
+
+body.cursor-over-dark .electron {
+  fill: #38bdf8 !important;
+  stroke: #ffffff !important;
+  stroke-width: 1 !important;
+  filter: drop-shadow(0 0 6px #38bdf8) !important;
+}
+
+body.cursor-over-dark .nucleus-core {
+  fill: #ffffff !important;
+  stroke: #0284c7 !important;
+  stroke-width: 1.5 !important;
+  filter: drop-shadow(0 0 6px #38bdf8) !important;
+}
+
+body.cursor-over-dark .nucleus-pip {
+  fill: #00f0ff !important;
+}
+
+body.cursor-over-dark .nucleus-aura {
+  stroke: rgba(56, 189, 248, 0.75) !important;
 }
 
 /* 2. Revolving Quantum Electrons (Electric Cyan / Azure - Different from purple nucleus!) */

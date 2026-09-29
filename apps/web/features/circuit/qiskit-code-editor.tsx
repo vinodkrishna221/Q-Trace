@@ -21,6 +21,7 @@ interface QiskitCodeEditorProps {
   isReadOnly?: boolean;
   lintWarnings?: LintWarning[];
   code?: string;
+  hideHeader?: boolean;
 }
 
 function renderHighlightedQiskitCode(
@@ -39,60 +40,66 @@ function renderHighlightedQiskitCode(
 
     const tokens: React.ReactNode[] = [];
     const tokenRegex =
-      /(\b(?:from|import|def|return|as|with)\b)|(\bQuantumCircuit\b)|(\.(?:h|x|y|z|cx|measure)\b)|(\b\d+\b)|("[^"]*"|'[^']*')|([a-zA-Z_]\w*)|([^\s\w]+|\s+)/g;
+      /(\b(?:from|import|def|return|as|with)\b)|(\bQuantumCircuit\b)|(\.(?:h|x|y|z|cx|ccx|measure)\b)|(\b\d+\b)|("[^"]*"|'[^']*')|([a-zA-Z_]\w*)|([^\s\w]+|\s+)/g;
     let match: RegExpExecArray | null;
 
     while ((match = tokenRegex.exec(codePart)) !== null) {
       const [full, kw, cls, method, num, str, ident] = match;
       if (kw) {
         tokens.push(
-          <span key={`kw-${lineIdx}-${tokens.length}`} className="text-violet-600 dark:text-violet-400 font-semibold">
+          <span key={`kw-${lineIdx}-${tokens.length}`} className="text-violet-300 font-bold">
             {kw}
           </span>
         );
       } else if (cls) {
         tokens.push(
-          <span key={`cls-${lineIdx}-${tokens.length}`} className="text-sky-600 dark:text-sky-400 font-semibold">
+          <span key={`cls-${lineIdx}-${tokens.length}`} className="text-sky-300 font-bold">
             {cls}
           </span>
         );
       } else if (method) {
         tokens.push(
-          <span key={`meth-${lineIdx}-${tokens.length}`} className="text-emerald-600 dark:text-emerald-400 font-semibold">
+          <span key={`meth-${lineIdx}-${tokens.length}`} className="text-amber-300 font-bold">
             {method}
           </span>
         );
       } else if (num) {
         tokens.push(
-          <span key={`num-${lineIdx}-${tokens.length}`} className="text-amber-700 dark:text-amber-400 font-medium">
+          <span key={`num-${lineIdx}-${tokens.length}`} className="text-orange-300 font-semibold">
             {num}
           </span>
         );
       } else if (str) {
         tokens.push(
-          <span key={`str-${lineIdx}-${tokens.length}`} className="text-teal-600 dark:text-teal-400">
+          <span key={`str-${lineIdx}-${tokens.length}`} className="text-emerald-300 font-medium">
             {str}
           </span>
         );
       } else if (ident) {
         tokens.push(
-          <span key={`id-${lineIdx}-${tokens.length}`} className="text-ink">
+          <span key={`id-${lineIdx}-${tokens.length}`} className="text-slate-100 font-semibold">
             {ident}
           </span>
         );
       } else {
-        tokens.push(full);
+        tokens.push(
+          <span key={`punc-${lineIdx}-${tokens.length}`} className="text-slate-300 font-medium">
+            {full}
+          </span>
+        );
       }
     }
+
+    const isSectionComment = commentPart ? /^#\s*(Column|Initialize|Measure|Oracle|Diffusion|Grover)/i.test(commentPart) : false;
 
     return (
       <div
         key={`line-${lineIdx}`}
         data-testid={hasWarning ? 'offending-code-line' : `code-line-${lineNum}`}
         data-line-number={lineNum}
-        className={`leading-relaxed ${
+        className={`leading-relaxed text-slate-100 ${
           hasWarning
-            ? 'underline decoration-wavy decoration-amber-500 underline-offset-4 text-amber-200'
+            ? 'underline decoration-wavy decoration-amber-400 underline-offset-4 text-amber-200'
             : ''
         }`}
         style={hasWarning ? { textDecoration: 'underline wavy #F59E0B' } : undefined}
@@ -100,7 +107,7 @@ function renderHighlightedQiskitCode(
       >
         {tokens}
         {commentPart && (
-          <span className="text-slate-400 dark:text-slate-500 italic">
+          <span className={isSectionComment ? "text-sky-300 font-semibold italic ml-1" : "text-slate-300/80 italic ml-1"}>
             {commentPart}
           </span>
         )}
@@ -113,6 +120,7 @@ export function QiskitCodeEditor({
   isReadOnly = false,
   lintWarnings = [],
   code: codeProp,
+  hideHeader = false,
 }: QiskitCodeEditorProps) {
   const {
     code: storeCode,
@@ -169,7 +177,8 @@ export function QiskitCodeEditor({
       className="border-line bg-panel shadow-xl overflow-hidden"
       data-testid="qiskit-code-panel"
     >
-      <CardHeader className="py-2.5 px-4 bg-raised/50 border-b border-line flex flex-row items-center justify-between space-y-0">
+      {!hideHeader && (
+      <CardHeader className="py-2.5 px-4 bg-slate-900 border-b border-slate-800 flex flex-row items-center justify-between space-y-0 text-slate-100">
         <div className="flex items-center gap-2">
           <Code2 className="w-4 h-4 text-accent" />
           <CardTitle className="text-xs font-mono text-ink font-semibold">
@@ -221,6 +230,7 @@ export function QiskitCodeEditor({
           </Button>
         </div>
       </CardHeader>
+      )}
 
       <CardContent className="p-0">
         {/* Error Notification Banner */}
@@ -277,7 +287,7 @@ export function QiskitCodeEditor({
         {/* Editor text area / display */}
         <div className="relative bg-slate-950 border-b border-line">
           {isReadOnly ? (
-            <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300">
+            <div className="p-4 font-mono text-xs overflow-x-auto leading-relaxed text-slate-100" style={{ maxHeight: "360px", overflowY: "auto" }}>
               <pre data-testid="qiskit-code-content" className="font-mono">
                 <code>{renderHighlightedQiskitCode(localInput, offendingLines)}</code>
               </pre>
@@ -322,18 +332,19 @@ export function QiskitCodeEditor({
                   value={localInput}
                   onChange={handleChange}
                   spellCheck={false}
-                  rows={Math.max(8, localInput.split('\n').length + 1)}
-                  className="w-full p-4 bg-transparent text-sky-200 font-mono text-xs leading-relaxed focus:outline-none resize-y selection:bg-accent/40"
+                  rows={Math.min(16, Math.max(8, localInput.split('\n').length + 1))}
+                  style={{ caretColor: '#38bdf8' }}
+                  className="w-full p-4 bg-transparent text-slate-100 font-mono text-xs leading-relaxed focus:outline-none resize-y selection:bg-sky-500/30"
                   placeholder="Write Qiskit Python code..."
                   aria-label="Qiskit Python Code Editor"
                 />
 
                 {/* DOM representation with wavy underlines for inspection & visual AST tracking */}
-                <div className="border-t border-slate-800/80 bg-slate-950/60 p-3">
-                  <div className="text-[10px] text-slate-400 font-semibold mb-1.5 flex items-center justify-between">
+                <div className="border-t border-slate-800 bg-slate-900/90 p-3.5">
+                  <div className="text-[11px] text-slate-200 font-semibold mb-2 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
-                      <Code2 className="w-3 h-3 text-accent" />
-                      <span>AST Live View &amp; Invariants</span>
+                      <Code2 className="w-3.5 h-3.5 text-sky-400" />
+                      <span className="text-slate-200">AST Live View &amp; Invariants</span>
                     </span>
                     {lintWarnings.length > 0 && (
                       <span className="text-amber-400 text-[10px] font-mono flex items-center gap-1">
@@ -342,7 +353,7 @@ export function QiskitCodeEditor({
                       </span>
                     )}
                   </div>
-                  <pre data-testid="qiskit-code-content" className="font-mono text-xs leading-relaxed overflow-x-auto">
+                  <pre data-testid="qiskit-code-content" className="font-mono text-xs leading-relaxed overflow-x-auto text-slate-100" style={{ maxHeight: "360px", overflowY: "auto" }}>
                     <code>{renderHighlightedQiskitCode(localInput, offendingLines)}</code>
                   </pre>
                 </div>

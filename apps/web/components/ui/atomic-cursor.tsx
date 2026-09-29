@@ -126,17 +126,29 @@ export function AtomicCursor() {
         'button, a, [role="button"], [role="tab"], [role="radio"], [role="checkbox"], [role="slider"], input[type="range"], .gate-chip, .gate-tile, .cursor-pointer, [data-interactive], select, summary, [tabindex]:not([tabindex="-1"])'
       );
 
+      // Check if hovering over dark container, code editor, or terminal surface
+      const isDark = Boolean(
+        target.closest(
+          '[data-dark="true"], .bg-slate-950, .bg-slate-900, .bg-slate-850, .bg-abyss, pre, code, textarea, [data-testid="qiskit-code-panel"], [data-testid="code-drawer"], .dark'
+        )
+      );
+      if (isDark) {
+        document.body.classList.add('cursor-over-dark');
+      } else {
+        document.body.classList.remove('cursor-over-dark');
+      }
+
       if (input) {
-        document.body.classList.add('cursor-collimated');
+        document.body.classList.add('cursor-collimated', 'cursor-over-dark');
         document.body.classList.remove('cursor-excited');
         targetSpeedMultiplier = 0.7;
       } else if (interactive) {
         document.body.classList.add('cursor-excited');
-        document.body.classList.remove('cursor-collimated');
+        document.body.classList.remove('cursor-collimated', 'cursor-over-dark');
         targetSpeedMultiplier = 2.4;
       } else {
         document.body.classList.remove('cursor-excited');
-        document.body.classList.remove('cursor-collimated');
+        document.body.classList.remove('cursor-collimated', 'cursor-over-dark');
         targetSpeedMultiplier = 1.0;
       }
     };
@@ -148,7 +160,7 @@ export function AtomicCursor() {
           'custom-cursor-active',
           'cursor-excited',
           'cursor-down',
-          'cursor-collimated'
+          'cursor-collimated', 'cursor-over-dark'
         );
         setEnabled(false);
       } else {
@@ -202,7 +214,7 @@ export function AtomicCursor() {
         'custom-cursor-active',
         'cursor-excited',
         'cursor-down',
-        'cursor-collimated'
+        'cursor-collimated', 'cursor-over-dark'
       );
       window.removeEventListener('qtrace:cursor-toggle', handleToggleEvent);
       window.removeEventListener('mousemove', handleMouseMove);
