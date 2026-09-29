@@ -32,6 +32,8 @@ class SimulationRunRequest(BaseModel):
     runConformance: bool = False
     shots: int = Field(default=1024, ge=1, le=8192)
     backends: list[str] = Field(default_factory=lambda: ["qiskit"])
+    noisePreset: Literal["superconducting"] | None = None
+
 
 
 # ---------------------------------------------------------------------------
@@ -96,6 +98,7 @@ class SimulationRunOut(BaseModel):
     conformanceResults: dict[str, Any] | None = None
     conformanceDelta: float | None = None
     conformanceBadge: Literal["VERIFIED", "DIVERGED"] | None = None
+    noisePreset: str | None = None
 
 
 

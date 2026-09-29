@@ -64,7 +64,11 @@ def build_simulation_run(
     """
     # Run Qiskit Aer adapter (CPU-bound — safe because we are already in executor)
     try:
-        aer_result = run_qiskit_aer(request.circuitModel, shots=request.shots)
+        aer_result = run_qiskit_aer(
+            request.circuitModel,
+            shots=request.shots,
+            noise_preset=request.noisePreset,
+        )
     except Exception as exc:
         logger.error(
             "sim_service.aer_error requestId=%s circuitId=%s error=%s",
@@ -262,6 +266,7 @@ def build_simulation_run(
         conformanceResults=conformance_results if conformance_results else None,
         conformanceDelta=max_delta,
         conformanceBadge=conformance_badge,
+        noisePreset=request.noisePreset,
     )
 
 

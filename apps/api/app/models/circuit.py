@@ -332,3 +332,11 @@ class LintCircuitResponse(BaseModel):
     """
     lintWarnings: list[LintWarning] = Field(default_factory=list)
 
+
+# ---------------------------------------------------------------------------
+# FEA-10: NISQ Noise Presets
+# ---------------------------------------------------------------------------
+
+NoisePreset = Literal["superconducting"]
+
+

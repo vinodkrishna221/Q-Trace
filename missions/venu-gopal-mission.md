@@ -246,7 +246,7 @@ DELIVERABLE: Modify apps/api/app/services/quantum/adapter.py (add noise_preset p
 TEST: `uv run --project apps/api pytest apps/api/tests/unit/quantum/test_noise_model.py -v`
 DEPENDS: FEA-1          UNBLOCKS: FEA-11
 DEMO: Backend executes circuits under realistic superconducting noise parameters, returning mixed state density matrices with purity < 1.0 and contracted Bloch vector coordinates.
-PERSONA: Forge           STATUS: [ ] ready
+PERSONA: Forge           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-10-nisq-noise-backend`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
