@@ -92,6 +92,9 @@ export interface SimulationRun {
   error?: ContractError | null;
   schemaVersion?: number;
   createdAt: string;
+  conformanceResults?: Record<string, { statevector?: unknown; durationMs?: number }>;
+  conformanceDelta?: number;
+  conformanceBadge?: "VERIFIED" | "DIVERGED";
 }
 
 export interface ParseQiskitRequest {
@@ -126,6 +129,7 @@ export interface SimulationRunRequest {
   primaryAdapter?: AdapterName;
   runConformance?: boolean;
   shots?: number;
+  backends?: string[];
 }
 
 export interface SimulationRunResponse {
