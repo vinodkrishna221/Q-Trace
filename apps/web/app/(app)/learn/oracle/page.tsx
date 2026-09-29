@@ -2,15 +2,31 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRoleStore } from '@/lib/role-store';
+import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { OracleCoinFlip3D } from '@/features/learning/components/oracle-coin-flip-3d';
+import { QuantumStateRing3D } from '@/features/learning/components/quantum-state-ring-3d';
+import { OracleFormulaMicroscope } from '@/features/learning/components/oracle-formula-microscope';
+import { PhaseInversionMirror } from '@/features/learning/components/phase-inversion-mirror';
 import { CcxGateSimulation } from '@/features/learning/components/ccx-gate-simulation';
-import { Clock, Cpu, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, HelpCircle, CheckCircle2, KeyRound, Box } from 'lucide-react';
+import {
+  Clock,
+  Cpu,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  ShieldCheck,
+  HelpCircle,
+  CheckCircle2,
+  Lightbulb,
+  Layers,
+} from 'lucide-react';
 
 export default function GroverOracleLearnPage() {
+  const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
   const [selectedAnswer, setSelectedAnswer] = React.useState<string | null>(null);
 
   return (
@@ -27,7 +43,7 @@ export default function GroverOracleLearnPage() {
           </>
         }
         title="The Phase Oracle & Toffoli Gate (CCX)"
-        purpose="Discover how a quantum computer secretly tags a target item by flipping it upside down—without looking inside or collapsing the wave."
+        purpose="Learn how quantum oracles tag target basis states with phase inversion without collapsing the superposition."
         actions={
           <div className="flex items-center gap-2">
             <Link href="/learn">
@@ -46,90 +62,62 @@ export default function GroverOracleLearnPage() {
         }
       />
 
-      {/* Intuitive Story Intro Card */}
-      <Card className="border border-line bg-card shadow-xs">
-        <CardContent className="p-5 sm:p-6 space-y-4">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0 mt-0.5">
-              <Box className="w-5 h-5 text-accent" />
-            </div>
-            <div className="space-y-1.5">
-              <h2 className="text-base sm:text-lg font-semibold text-text-primary">
-                The Mystery of the 8 Secret Coins
+      {/* Hidden accessible Prior Knowledge Badge */}
+      <div className="sr-only" aria-hidden="true">
+        <PriorKnowledgeBadge
+          activeRole={activeRole}
+          learnerProfile={activeLearnerProfile}
+          learningPath={activeLearningPath}
+        />
+      </div>
+
+      {/* Beginner-Friendly Intuitive Metaphor Banner */}
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5 text-text-primary shadow-xs">
+        <div className="flex items-start gap-3.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-amber-700 border border-amber-500/30">
+            <Lightbulb className="w-5 h-5" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-sans font-bold text-amber-950">
+                Intuitive Concept: The 8 Mystery Chests Metaphor
               </h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                Imagine 8 identical coins placed in front of you. Exactly one coin holds the secret prize (for example, coin <span className="font-mono text-accent font-semibold">|101⟩</span>).
-              </p>
+              <Badge variant="outline" className="text-[10px] font-mono border-amber-600/30 text-amber-700 bg-amber-50/50">
+                START HERE
+              </Badge>
+            </div>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              Imagine 8 identical closed treasure chests floating in space (<span className="font-mono text-text-primary">|000⟩</span> through <span className="font-mono text-text-primary">|111⟩</span>). One chest contains gold (<span className="font-mono text-text-primary">|101⟩</span>). In classical computing, you have to open chests one by one (taking up to 8 checks). In quantum computing, all 8 chests exist at the same time in superposition.
+            </p>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              <strong>The catch:</strong> If you open any chest right now, the superposition collapses and the other 7 chests disappear forever! Instead, the <strong>Quantum Oracle</strong> leaves all chests closed and simply flips the winning chest <em>upside down</em> (multiplies its quantum amplitude by <span className="font-mono text-text-primary">-1</span>).
+            </p>
+            <div className="mt-2 flex items-center gap-2 pt-1 font-mono text-[11px] text-amber-800">
+              <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+              <span>Key Secret: To an outside observer, an upside-down chest has the exact same size (12.5% chance). The tag is hidden in the phase until Diffusion!</span>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            <div className="p-4 rounded-lg bg-surface border border-line space-y-2">
-              <div className="text-xs font-mono font-semibold text-text-muted uppercase tracking-wider flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-400" />
-                <span>Classical Computer</span>
-              </div>
-              <p className="text-xs text-text-secondary leading-relaxed">
-                Has no choice but to inspect coin #1, then coin #2, then #3... one by one. In the worst case, it has to check all 8 boxes.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-lg bg-accent/5 border border-accent/20 space-y-2">
-              <div className="text-xs font-mono font-semibold text-accent uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-3 h-3 text-accent" />
-                <span>Quantum Computer & The Oracle</span>
-              </div>
-              <p className="text-xs text-text-secondary leading-relaxed">
-                Puts all 8 coins into a <strong>superposition</strong> at once. Then, it uses the <strong>Oracle</strong>: a magic scanner that recognizes the winner and secretly <strong className="text-text-primary">flips it upside-down</strong> (Phase Inversion: +1 → -1).
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Main Learning Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: 3D Interactive Simulators & Logic */}
+        {/* Left Column: Visualizers, Formula Microscope & Simulators */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Primary 3D Visual: The 3D Quantum Coin Flip */}
-          <OracleCoinFlip3D />
+          {/* 1. Interactive 3D Quantum State Ring */}
+          <QuantumStateRing3D />
 
-          {/* Intuitive Hardware Circuit Bridge: The 3-Key Vault */}
-          <Card className="border border-line bg-card shadow-xs">
-            <CardHeader className="p-5 pb-3 border-b border-line bg-surface/30">
-              <div className="flex items-center gap-2 text-xs font-mono text-accent">
-                <KeyRound className="w-4 h-4" />
-                <span>HOW THE CIRCUIT DOES IT</span>
-              </div>
-              <CardTitle className="text-base text-text-primary">
-                The 3-Key Quantum Vault (Toffoli / CCX Gate)
-              </CardTitle>
-              <CardDescription className="text-xs text-text-secondary">
-                How does a quantum circuit flip <em>only</em> coin |101⟩ without guessing? Think of it like a vault with 3 locks.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-5 space-y-4">
-              <div className="text-xs text-text-secondary leading-relaxed space-y-2">
-                <p>
-                  To trigger an action only when the state is <strong className="text-text-primary font-mono">|101⟩</strong> (q0=1, q1=0, q2=1):
-                </p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Key 0 (<code className="font-mono text-text-primary">q0</code>) is already <strong className="font-mono text-emerald-400">1</strong>.</li>
-                  <li>Key 1 (<code className="font-mono text-text-primary">q1</code>) is a <strong className="font-mono">0</strong>, so an <strong>X gate</strong> (NOT) flips it to <strong className="font-mono text-emerald-400">1</strong>.</li>
-                  <li>Key 2 (<code className="font-mono text-text-primary">q2</code>) is already <strong className="font-mono text-emerald-400">1</strong>.</li>
-                </ul>
-                <p>
-                  When all three keys are simultaneously <strong className="text-emerald-400 font-mono">1</strong>, the <strong>Toffoli (CCX) gate</strong> trips its wire and inverts the phase! Test the switches below:
-                </p>
-              </div>
+          {/* 2. Interactive Formula Microscope */}
+          <OracleFormulaMicroscope />
 
-              {/* Interactive Toffoli Gate Component */}
-              <CcxGateSimulation />
-            </CardContent>
-          </Card>
+          {/* 3. 2D Signed Amplitude Mirror */}
+          <PhaseInversionMirror />
+
+          {/* 4. Interactive Toffoli (CCX) Gate Simulator */}
+          <CcxGateSimulation />
         </div>
 
-        {/* Right Column: Qiskit Code & Checkpoint Card */}
+        {/* Right Column: Qiskit Code, Checkpoint & Summary Card */}
         <div className="lg:col-span-4 space-y-6">
           {/* Oracle Circuit Card */}
           <Card className="border-border-subtle bg-surface shadow-xs">
@@ -150,6 +138,7 @@ export default function GroverOracleLearnPage() {
 qc = QuantumCircuit(3)
 
 # 1. Flip q1 for |101> pattern
+# (converts 1-0-1 into 1-1-1)
 qc.x(1)
 
 # 2. Phase-flip via CCZ or CCX
@@ -189,19 +178,19 @@ qc.x(1)`}
                     id: 'opt_1',
                     text: 'State |101⟩ with 100% certainty',
                     correct: false,
-                    hint: 'Incorrect. The oracle only flipped the sign upside down (-1). Its size (probability) is still only 12.5%.',
+                    hint: 'Incorrect. The oracle only changes phase (sign), not measurement probability.',
                   },
                   {
                     id: 'opt_2',
                     text: 'A completely random 1/8 (12.5%) distribution across all 8 states',
                     correct: true,
-                    hint: 'Correct! |(-0.35)|² = 12.5%. Flipping a coin upside-down does not make it more likely to be picked until the Diffusion step amplifies it!',
+                    hint: 'Correct! |(-1)/√8|² = 1/8. The phase change is invisible until the diffusion operator!',
                   },
                   {
                     id: 'opt_3',
                     text: 'All states collapse to |000⟩',
                     correct: false,
-                    hint: 'Incorrect. Measurement samples uniformly according to probability.',
+                    hint: 'Incorrect. Measurement samples according to Born probabilities.',
                   },
                 ].map((opt) => {
                   const isSelected = selectedAnswer === opt.id;
@@ -230,6 +219,30 @@ qc.x(1)`}
                     </button>
                   );
                 })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Three Golden Rules Card */}
+          <Card className="border-border-subtle bg-surface shadow-xs">
+            <CardHeader className="py-3 px-4 bg-surface-raised/40 border-b border-border-subtle">
+              <CardTitle className="text-xs font-mono tracking-wider text-text-primary font-semibold flex items-center gap-2">
+                <Layers className="w-4 h-4 text-accent" />
+                <span>3 GOLDEN RULES OF ORACLES</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3 text-xs text-text-secondary leading-relaxed">
+              <div className="flex items-start gap-2">
+                <span className="font-mono text-accent font-bold text-[11px]">1.</span>
+                <span><strong>Phase is stealthy:</strong> Multiplying amplitude by -1 changes the sign, but the Born probability $|-α|^2 = |α|^2$ stays identical.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-mono text-accent font-bold text-[11px]">2.</span>
+                <span><strong>No early measurement:</strong> Peeking into the quantum register causes immediate wave function collapse, destroying quantum speedup.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-mono text-accent font-bold text-[11px]">3.</span>
+                <span><strong>Diffusion is the partner:</strong> The Oracle places the phase tag; Amplitude Diffusion converts that phase tag into a massive probability spike.</span>
               </div>
             </CardContent>
           </Card>
