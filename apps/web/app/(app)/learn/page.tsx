@@ -75,6 +75,11 @@ function UnitSectionRow({
   const updateInspectorPositionAndArrow = React.useCallback(() => {
     if (typeof window === 'undefined') return;
 
+    if (!isActiveUnit) {
+      setArrowCoords((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+      return;
+    }
+
     const container = containerRef.current;
     const inspector = inspectorWrapperRef.current;
     if (!container || !inspector || !selectedStage) return;
@@ -129,9 +134,14 @@ function UnitSectionRow({
     } else {
       setArrowCoords((prev) => (prev.visible ? { ...prev, visible: false } : prev));
     }
-  }, [selectedStage]);
+  }, [selectedStage, isActiveUnit]);
 
   React.useEffect(() => {
+    if (!isActiveUnit) {
+      setArrowCoords((prev) => (prev.visible ? { ...prev, visible: false } : prev));
+      return;
+    }
+
     updateInspectorPositionAndArrow();
     const t1 = setTimeout(updateInspectorPositionAndArrow, 50);
     const t2 = setTimeout(updateInspectorPositionAndArrow, 150);
@@ -147,7 +157,7 @@ function UnitSectionRow({
       window.removeEventListener('resize', updateInspectorPositionAndArrow);
       window.removeEventListener('scroll', updateInspectorPositionAndArrow);
     };
-  }, [updateInspectorPositionAndArrow, selectedStage]);
+  }, [updateInspectorPositionAndArrow, selectedStage, isActiveUnit]);
 
   return (
     <section
@@ -239,7 +249,7 @@ function UnitSectionRow({
         <div className="lg:col-span-5 w-full space-y-6">
           <SerpentineCanvas
             stages={stages}
-            selectedStageId={selectedStage?.id || 'bell-state'}
+            selectedStageId={isActiveUnit ? selectedStage?.id || '' : ''}
             onSelectStage={onSelectStage}
             activeStepIndex={activeStepIndex}
             setActiveStepIndex={setActiveStepIndex}
@@ -252,18 +262,22 @@ function UnitSectionRow({
         </div>
 
         {/* Right Stage Inspector (7 cols on desktop for wide horizontal card) */}
-        <div
-          ref={inspectorWrapperRef}
-          className="lg:col-span-7 w-full transition-transform duration-500 ease-out will-change-transform"
-          style={{
-            transform: `translateY(${inspectorTranslateY}px)`,
-          }}
-        >
-          <RightStageInspector
-            selectedStage={selectedStage}
-            testId={isActiveUnit ? 'stage-inspector-panel' : `stage-inspector-panel-unit-${unitDef.unitNumber}`}
-          />
-        </div>
+        {isActiveUnit ? (
+          <div
+            ref={inspectorWrapperRef}
+            className="lg:col-span-7 w-full transition-transform duration-500 ease-out will-change-transform"
+            style={{
+              transform: `translateY(${inspectorTranslateY}px)`,
+            }}
+          >
+            <RightStageInspector
+              selectedStage={selectedStage}
+              testId="stage-inspector-panel"
+            />
+          </div>
+        ) : (
+          <div className="hidden lg:block lg:col-span-7" aria-hidden="true" />
+        )}
       </div>
     </section>
   );
@@ -342,6 +356,15 @@ export default function LearnIndexPage() {
 
   const handleAdvanceUnit = (targetUnitNumber: number) => {
     setActiveUnitNumber(targetUnitNumber);
+    const def = UNIT_DEFINITIONS.find((u) => u.unitNumber === targetUnitNumber);
+    if (def) {
+      const stage = allCurriculumStages.find((s) => s.id === def.firstStageId);
+      if (stage) {
+        if (targetUnitNumber === 1) setUnit1Stage(stage);
+        else if (targetUnitNumber === 2) setUnit2Stage(stage);
+        else if (targetUnitNumber === 3) setUnit3Stage(stage);
+      }
+    }
     if (typeof window !== 'undefined') {
       const el = document.getElementById(`unit-section-${targetUnitNumber}`);
       if (el && typeof el.scrollIntoView === 'function') {
