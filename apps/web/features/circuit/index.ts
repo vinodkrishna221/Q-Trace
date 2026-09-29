@@ -10,3 +10,5 @@ export * from './interactive-circuit-workspace';
 export * from './circuit-workspace-readonly';
 export * from './qiskit-code-panel';
 export * from './gate-glyph';
+export * from './conformance-badge';
+export * from './endianness-rosetta-stone';

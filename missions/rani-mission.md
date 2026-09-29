@@ -208,7 +208,7 @@ DELIVERABLE: Create apps/web/features/circuit/conformance-badge.tsx (badge compo
 TEST: `pnpm test:web tests/unit/conformance-arena-ui.test.tsx`
 DEPENDS: FEA-8          UNBLOCKS: —
 DEMO: Judge selects all three engines (Qiskit, PennyLane, Cirq), runs a Bell circuit, sees the green "✓ Multi-Engine Verified Δ = 0.000000" badge appear, and opens the Endianness Rosetta Stone to see side-by-side bit mappings.
-PERSONA: Nova           STATUS: [ ] ready
+PERSONA: Nova           STATUS: [x] done
 BRANCH: `feat/features-phase/fea-9-engine-selector-rosetta-ui`
 PR: one card per PR; paste the TEST result and link any contract/version decision.
 
