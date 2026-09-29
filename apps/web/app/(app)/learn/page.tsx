@@ -226,15 +226,6 @@ export default function LearnIndexPage() {
           </div>
         </div>
 
-        {/* Full-Width Unit 1 Progress & Guidebook Banner (Takes full horizontal width across the workspace) */}
-        <UnitSectionBanner
-          unitNumber={1}
-          unitTitle="THE QUANTUM COMPASS"
-          subtitle="Single-Qubit Rotations & Superposition"
-          completedCount={3}
-          totalCount={6}
-        />
-
         {/* 3-ZONE DESKTOP PRIMARY ARCHITECTURE */}
         {/* Left Rail (Col 3) + Center Serpentine Canvas (Col 6) + Right Stage Inspector (Col 3) */}
         <div
@@ -313,8 +304,6 @@ export default function LearnIndexPage() {
               }}
               activeStepIndex={activeStepIndex}
               setActiveStepIndex={setActiveStepIndex}
-              hideUnit1Banner={true}
-              hideUnit2Banner={true}
             />
 
             {/* Structured Module Catalogue Cards (Hidden from visual UI per user request; sr-only for tests) */}
@@ -460,16 +449,6 @@ export default function LearnIndexPage() {
             />
           </div>
         </div>
-
-        {/* Full-Width Unit 2 Progress & Guidebook Banner (Enlarged across full workspace like Unit 1) */}
-        <UnitSectionBanner
-          unitNumber={2}
-          unitTitle="ENTANGLEMENT & BELL STATES"
-          subtitle="Non-Local Correlation & Flight Recorder Verification"
-          completedCount={1}
-          totalCount={4}
-          accentRailColor="linear-gradient(to right, #4a02b1, #2a2882)"
-        />
       </div>
 
       {/* Global SVG dash animation */}

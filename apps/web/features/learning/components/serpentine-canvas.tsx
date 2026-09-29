@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { UnitSectionBanner } from './unit-section-banner';
 import { CurriculumStage } from '@/lib/curriculum/types';
+import { module2Unit21Stages } from '@/lib/curriculum/all-stages';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -55,9 +56,86 @@ export function SerpentineCanvas({
     setActiveStepIndex((prev) => Math.max(0, prev - 1));
   };
 
+  // Derive unit-specific stage lists
+  const unit1Stages = stages.filter(
+    (s) => s.unitNumber === 1 || s.id.startsWith('stage_1_')
+  );
+  const finalUnit1Stages = unit1Stages.length > 0 ? unit1Stages : stages.slice(0, 6);
+
+  const unit2CandidateStages = stages.filter(
+    (s) =>
+      s.unitId === 'unit_1_6' ||
+      s.unitId === 'unit_1_7' ||
+      (s.unitNumber && [6, 7].includes(s.unitNumber as number)) ||
+      s.id === 'bell-state'
+  );
+  const keyUnit2Ids = [
+    'mod1_multi_qubit_register',
+    'mod1_gate_cnot',
+    'bell-state',
+    'mod1_flight_recorder_repair',
+  ];
+  const finalUnit2Stages =
+    unit2CandidateStages.length >= 4
+      ? (keyUnit2Ids
+          .map((id) => unit2CandidateStages.find((s) => s.id === id || s.lessonId === id))
+          .filter(Boolean) as CurriculumStage[])
+      : unit2CandidateStages.length > 0
+      ? unit2CandidateStages.slice(0, 4)
+      : stages.slice(6, 10);
+
+  const unit21Stages = stages.filter(
+    (s) =>
+      s.unitId === 'unit_2_1' ||
+      s.id.startsWith('mod2_') ||
+      s.id.startsWith('pc_grover')
+  );
+  const finalUnit21Stages = unit21Stages.length > 0 ? unit21Stages : module2Unit21Stages;
+
+  const unitSections = [
+    {
+      key: 'unit_1',
+      unitNumber: 1,
+      unitTitle: 'THE QUANTUM COMPASS',
+      subtitle: 'Single-Qubit Rotations & Superposition',
+      completedCount: 3,
+      totalCount: 6,
+      accentRailColor: undefined,
+      stages: finalUnit1Stages,
+      hideBanner: hideUnit1Banner,
+    },
+    {
+      key: 'unit_2',
+      unitNumber: 2,
+      unitTitle: 'ENTANGLEMENT & BELL STATES',
+      subtitle: 'Non-Local Correlation & Flight Recorder Verification',
+      completedCount: 1,
+      totalCount: 4,
+      accentRailColor: 'linear-gradient(to right, #4a02b1, #2a2882)',
+      stages: finalUnit2Stages,
+      hideBanner: hideUnit2Banner,
+    },
+    {
+      key: 'unit_2_1',
+      unitNumber: '2.1',
+      unitTitle: "GROVER'S SEARCH ALGORITHM",
+      subtitle: 'Amplitude Amplification & Quantum Database Search (Module 2 Launch)',
+      completedCount: 0,
+      totalCount: 9,
+      accentRailColor: 'linear-gradient(to right, #00D4FF, #1E40AF)',
+      stages: finalUnit21Stages,
+      hideBanner: false,
+    },
+  ];
+
+  // Sinusoidal horizontal offset sequence
+  const desktopOffsets = [0, 56, -44, 68, -32, 52, -56, 0];
+  const mobileOffsets = [0, 36, -36, 44, -28, 32, -44, 0];
+  let globalNodeIndex = 0;
+
   return (
     <main
-      className={`space-y-6 w-full ${className}`}
+      className={`space-y-8 w-full ${className}`}
       data-testid="serpentine-canvas"
       aria-label="Quantum Coherence Learning Path"
     >
@@ -137,172 +215,206 @@ export function SerpentineCanvas({
         </div>
       </section>
 
-      {/* 3. Unit 1 Banner: The Quantum Compass */}
-      {!hideUnit1Banner && (
-        <UnitSectionBanner
-          unitNumber={1}
-          unitTitle="THE QUANTUM COMPASS"
-          subtitle="Single-Qubit Rotations & Superposition"
-          completedCount={3}
-          totalCount={6}
-        />
-      )}
+      {/* 2. Structured Multi-Unit Serpentine Tracks */}
+      <div className="space-y-12">
+        {unitSections.map((section) => (
+          <div key={section.key} className="space-y-6">
+            {/* Unit Section Banner */}
+            {!section.hideBanner && (
+              <UnitSectionBanner
+                unitNumber={section.unitNumber}
+                unitTitle={section.unitTitle}
+                subtitle={section.subtitle}
+                completedCount={section.completedCount}
+                totalCount={section.totalCount}
+                accentRailColor={section.accentRailColor}
+              />
+            )}
 
-      {/* 4. Serpentine Winding Path with ChamberNodes */}
-      <div
-        className="relative py-8 flex flex-col items-center select-none"
-        data-testid="serpentine-path-container"
-      >
-        {/* SVG Dual-Rail Voltage Bus Spline */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <defs>
-            <linearGradient id="voltageGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#2a2882" stopOpacity="0.8" />
-              <stop offset="50%" stopColor="#4a02b1" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#2a2882" stopOpacity="0.8" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        {/* List of Chamber Nodes positioned along sinusoidal serpentine path */}
-        <div className="w-full max-w-lg lg:ml-2 xl:ml-6 space-y-10 sm:space-y-12 relative z-10">
-          {stages.slice(0, 8).map((stage, index) => {
-            const isSelected = stage.id === selectedStageId || stage.lessonId === selectedStageId;
-            const isCompleted = index < 2;
-            const isActive = index === 2 || stage.id === 'bell-state';
-            const isDiverged = stage.archetype === 'NODE_DEBUG';
-            const isLocked = index > 3 && !isActive && !isDiverged;
-
-            // Sinusoidal horizontal offset:
-            // Mobile (<640px): 36-44px arc
-            // Desktop (>=640px): 56-68px arc
-            const desktopOffsets = [0, 56, -44, 68, -32, 52, -56, 0];
-            const mobileOffsets = [0, 36, -36, 44, -28, 32, -44, 0];
-            const desktopX = desktopOffsets[index % desktopOffsets.length];
-            const mobileX = mobileOffsets[index % mobileOffsets.length];
-
-            return (
-              <div
-                key={stage.id}
-                className="flex flex-col items-center transition-transform duration-300 translate-x-[var(--x-mobile)] sm:translate-x-[var(--x-desktop)]"
-                style={{
-                  '--x-mobile': `${mobileX}px`,
-                  '--x-desktop': `${desktopX}px`,
-                  transform: `translateX(${desktopX}px)`,
-                } as React.CSSProperties}
-                data-testid={`serpentine-node-slot-${stage.id}`}
-                data-mobile-offset={mobileX}
-                data-desktop-offset={desktopX}
+            {/* Serpentine Winding Path with ChamberNodes */}
+            <div
+              className="relative py-6 flex flex-col items-center select-none"
+              data-testid="serpentine-path-container"
+            >
+              {/* SVG Dual-Rail Voltage Bus Spline */}
+              <svg
+                className="absolute inset-0 w-full h-full pointer-events-none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
-                {/* Active Popover Preview (if selected on mobile) */}
-                {isSelected && (
-                  <div
-                    className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 p-2.5 rounded-xl border border-accent/40 bg-surface shadow-md text-center max-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto lg:hidden"
-                    data-testid="anchored-node-popover"
-                  >
-                    <p className="text-[11px] font-bold text-text-primary leading-tight truncate">
-                      {stage.title}
-                    </p>
-                    <div className="flex items-center justify-center gap-1 my-1">
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                      <Star className="w-3 h-3 text-border-medium" />
-                      <span className="text-[10px] font-mono text-text-muted ml-1">+{stage.coherenceReward || 35} XP</span>
-                    </div>
-                    <Link href={stage.route || (stage.id === 'bell-state' ? '/learn/bell-state' : `/learn/${stage.lessonId}`)}>
-                      <Button
+                <defs>
+                  <linearGradient id={`voltageGradient-${section.key}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#2a2882" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#4a02b1" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#2a2882" stopOpacity="0.8" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {/* Chamber Nodes positioned along sinusoidal serpentine path */}
+              <div className="w-full max-w-lg lg:ml-2 xl:ml-6 space-y-10 sm:space-y-12 relative z-10">
+                {section.stages.map((stage, localIndex) => {
+                  const nodeGlobalIdx = globalNodeIndex++;
+                  const isSelected = stage.id === selectedStageId || stage.lessonId === selectedStageId;
+
+                  const isCompleted =
+                    section.unitNumber === 1
+                      ? localIndex < 2
+                      : section.unitNumber === 2
+                      ? stage.id === 'mod1_multi_qubit_register'
+                      : false;
+
+                  const isActive =
+                    section.unitNumber === 1
+                      ? localIndex === 2
+                      : section.unitNumber === 2
+                      ? stage.id === 'bell-state'
+                      : section.unitNumber === '2.1'
+                      ? stage.id === 'mod2_grover_oracle_concept'
+                      : false;
+
+                  const isDiverged = stage.archetype === 'NODE_DEBUG';
+                  const isLocked =
+                    !isCompleted &&
+                    !isActive &&
+                    !isDiverged &&
+                    (section.unitNumber === 1 ? localIndex > 3 : false);
+
+                  const desktopX = desktopOffsets[nodeGlobalIdx % desktopOffsets.length];
+                  const mobileX = mobileOffsets[nodeGlobalIdx % mobileOffsets.length];
+
+                  const isGrover =
+                    stage.unitId === 'unit_2_1' ||
+                    stage.id.startsWith('mod2_') ||
+                    stage.id.startsWith('pc_grover');
+
+                  const stageRoute =
+                    stage.route ||
+                    (isGrover
+                      ? '/lab?preset=grover'
+                      : stage.id === 'bell-state'
+                      ? '/learn/bell-state'
+                      : `/learn/${stage.lessonId}`);
+
+                  return (
+                    <div
+                      key={stage.id}
+                      className="flex flex-col items-center transition-transform duration-300 translate-x-[var(--x-mobile)] sm:translate-x-[var(--x-desktop)]"
+                      style={{
+                        '--x-mobile': `${mobileX}px`,
+                        '--x-desktop': `${desktopX}px`,
+                        transform: `translateX(${desktopX}px)`,
+                      } as React.CSSProperties}
+                      data-testid={`serpentine-node-slot-${stage.id}`}
+                      data-mobile-offset={mobileX}
+                      data-desktop-offset={desktopX}
+                    >
+                      {/* Active Popover Preview (if selected on mobile) */}
+                      {isSelected && (
+                        <div
+                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-30 p-2.5 rounded-xl border border-accent/40 bg-surface shadow-md text-center max-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto lg:hidden"
+                          data-testid="anchored-node-popover"
+                        >
+                          <p className="text-[11px] font-bold text-text-primary leading-tight truncate">
+                            {stage.title}
+                          </p>
+                          <div className="flex items-center justify-center gap-1 my-1">
+                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                            <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                            <Star className="w-3 h-3 text-border-medium" />
+                            <span className="text-[10px] font-mono text-text-muted ml-1">
+                              +{stage.coherenceReward || 35} XP
+                            </span>
+                          </div>
+                          <Link href={stageRoute}>
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="w-full h-6 text-[10px] font-mono bg-accent hover:bg-accent-hover text-white py-0 px-2"
+                            >
+                              ✦ START
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+
+                      {/* Tactile ChamberNode Button */}
+                      <button
                         type="button"
-                        size="sm"
-                        className="w-full h-6 text-[10px] font-mono bg-accent hover:bg-accent-hover text-white py-0 px-2"
+                        id={`chamber-node-${stage.id}`}
+                        onClick={() => onSelectStage(stage)}
+                        data-testid={`chamber-node-${stage.id}`}
+                        data-stage-id={stage.id}
+                        data-node-state={
+                          isCompleted
+                            ? 'COMPLETED'
+                            : isActive
+                            ? 'ACTIVE'
+                            : isDiverged
+                            ? 'DIVERGED'
+                            : 'LOCKED'
+                        }
+                        aria-label={`${stage.title} (${stage.archetype})`}
+                        className={`relative group w-[52px] h-[52px] sm:w-[68px] sm:h-[68px] lg:w-[76px] lg:h-[76px] rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
+                          isSelected
+                            ? 'ring-4 ring-accent/30 scale-105'
+                            : 'hover:scale-105 active:scale-95'
+                        } ${
+                          isCompleted
+                            ? 'bg-surface border-2 border-emerald-600 text-emerald-700'
+                            : isActive
+                            ? 'bg-surface border-2 border-accent text-accent shadow-[0_0_15px_rgba(42,40,130,0.2)]'
+                            : isDiverged
+                            ? 'bg-amber-500/10 border-2 border-amber-600 text-amber-700'
+                            : 'bg-surface-sunken border-2 border-border-medium text-text-muted opacity-80'
+                        }`}
                       >
-                        ✦ START
-                      </Button>
-                    </Link>
-                  </div>
-                )}
+                        {/* Radar Sonar Beacon Ring for active frontier node */}
+                        {isActive && (
+                          <span
+                            className="absolute inset-0 rounded-full border-2 border-accent animate-ping opacity-40 pointer-events-none"
+                            aria-hidden="true"
+                          />
+                        )}
 
-                {/* Tactile ChamberNode Button (52px on mobile per UI Spec Section 4, 76px on desktop) */}
-                <button
-                  type="button"
-                  id={`chamber-node-${stage.id}`}
-                  onClick={() => onSelectStage(stage)}
-                  data-testid={`chamber-node-${stage.id}`}
-                  data-stage-id={stage.id}
-                  data-node-state={isCompleted ? 'COMPLETED' : isActive ? 'ACTIVE' : isDiverged ? 'DIVERGED' : 'LOCKED'}
-                  aria-label={`${stage.title} (${stage.archetype})`}
-                  className={`relative group w-[52px] h-[52px] sm:w-[68px] sm:h-[68px] lg:w-[76px] lg:h-[76px] rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${
-                    isSelected
-                      ? 'ring-4 ring-accent/30 scale-105'
-                      : 'hover:scale-105 active:scale-95'
-                  } ${
-                    isCompleted
-                      ? 'bg-surface border-2 border-emerald-600 text-emerald-700'
-                      : isActive
-                      ? 'bg-surface border-2 border-accent text-accent shadow-[0_0_15px_rgba(42,40,130,0.2)]'
-                      : isDiverged
-                      ? 'bg-amber-500/10 border-2 border-amber-600 text-amber-700'
-                      : 'bg-surface-sunken border-2 border-border-medium text-text-muted opacity-80'
-                  }`}
-                >
-                  {/* Radar Sonar Beacon Ring for active frontier node */}
-                  {isActive && (
-                    <span
-                      className="absolute inset-0 rounded-full border-2 border-accent animate-ping opacity-40 pointer-events-none"
-                      aria-hidden="true"
-                    />
-                  )}
+                        {/* Node Glyph Icon based on Archetype / State */}
+                        {isCompleted ? (
+                          <Check className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 stroke-[2.5]" />
+                        ) : isLocked ? (
+                          <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-text-muted" />
+                        ) : isDiverged ? (
+                          <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
+                        ) : stage.archetype === 'NODE_MILESTONE' ? (
+                          <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
+                        ) : stage.archetype === 'NODE_GATE_LAB' ? (
+                          <Atom className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
+                        ) : stage.archetype === 'NODE_PREDICTION' ? (
+                          <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
+                        ) : (
+                          <Compass className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
+                        )}
 
-                  {/* Node Glyph Icon based on Archetype / State */}
-                  {isCompleted ? (
-                    <Check className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 stroke-[2.5]" />
-                  ) : isLocked ? (
-                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-text-muted" />
-                  ) : isDiverged ? (
-                    <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-amber-600" />
-                  ) : stage.archetype === 'NODE_MILESTONE' ? (
-                    <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
-                  ) : stage.archetype === 'NODE_GATE_LAB' ? (
-                    <Atom className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
-                  ) : stage.archetype === 'NODE_PREDICTION' ? (
-                    <HelpCircle className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
-                  ) : (
-                    <Compass className="w-6 h-6 sm:w-8 sm:h-8 text-accent" />
-                  )}
+                        {/* Selected Node Dotted Connector Anchor (Desktop) */}
+                        {isSelected && (
+                          <span
+                            className="hidden lg:block absolute -right-1 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-accent ring-2 ring-surface shadow-xs pointer-events-none"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </button>
 
-                  {/* Selected Node Dotted Connector Anchor (Desktop) */}
-                  {isSelected && (
-                    <span
-                      className="hidden lg:block absolute -right-1 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-accent ring-2 ring-surface shadow-xs pointer-events-none"
-                      aria-hidden="true"
-                    />
-                  )}
-                </button>
-
-                {/* Node Label Below */}
-                <span className="text-[11px] sm:text-xs font-mono text-text-secondary mt-2 font-semibold max-w-[150px] text-center truncate">
-                  {stage.title.split(':')[0]}
-                </span>
+                      {/* Node Label Below */}
+                      <span className="text-[11px] sm:text-xs font-mono text-text-secondary mt-2 font-semibold max-w-[150px] text-center truncate">
+                        {stage.title.split(':')[0]}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          </div>
+        ))}
       </div>
-
-      {/* 5. Unit 2 Banner: Entanglement */}
-      {!hideUnit2Banner && (
-        <UnitSectionBanner
-          unitNumber={2}
-          unitTitle="ENTANGLEMENT & BELL STATES"
-          subtitle="Non-Local Correlation & Flight Recorder Verification"
-          completedCount={1}
-          totalCount={4}
-          accentRailColor="linear-gradient(to right, #4a02b1, #2a2882)"
-        />
-      )}
     </main>
   );
 }

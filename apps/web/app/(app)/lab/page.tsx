@@ -176,6 +176,21 @@ export default function LabPage() {
     });
   }, []);
 
+  // Handle preset query param from /learn route transitions (e.g. ?preset=grover)
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const presetParam = params.get('preset');
+      if (presetParam === 'grover') {
+        setCircuit(GROVER_CIRCUIT);
+      } else if (presetParam === 'superposition') {
+        setCircuit(SUPERPOSITION_CIRCUIT);
+      } else if (presetParam === 'bell') {
+        resetToBellSeed();
+      }
+    }
+  }, [setCircuit, resetToBellSeed]);
+
   const isExecutingPipeline = simulationMutation.isPending || diagnoseMutation.isPending;
 
   const handleLoadBellState = () => {

@@ -67,9 +67,16 @@ export function RightStageInspector({
     .replace('NODE_', '')
     .replace('_', ' ');
 
+  const isGrover =
+    selectedStage.unitId === 'unit_2_1' ||
+    selectedStage.id.startsWith('mod2_') ||
+    selectedStage.id.startsWith('pc_grover');
+
   // Generate dynamic Qiskit preview based on stage
   const qiskitCode =
-    selectedStage.id === 'bell-state'
+    isGrover
+      ? `# Grover 3-Qubit Search (|101> Marked State)\nfrom qiskit import QuantumCircuit\n\nqc = QuantumCircuit(3, 3)\nqc.h([0, 1, 2])        # Equal superposition\nqc.cz(0, 2)            # Phase oracle (mark |101>)\nqc.h([0, 1, 2])        # Diffusion start\nqc.x([0, 1, 2])\nqc.ccx(0, 1, 2)        # Multi-controlled Toffoli\nqc.x([0, 1, 2])\nqc.h([0, 1, 2])        # Inversion complete\nqc.measure_all()`
+      : selectedStage.id === 'bell-state'
       ? `from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)          # Superposition on q0\nqc.cx(0, 1)      # Entangle q0 -> q1\nqc.measure_all() # |Phi+> state`
       : selectedStage.id.includes('cnot')
       ? `from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2)\nqc.cx(0, 1)      # Controlled-X gate`
@@ -79,7 +86,13 @@ export function RightStageInspector({
       ? `from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(3, 2)\nqc.h(1)\nqc.cx(1, 2)      # Bell pair (q1, q2)\nqc.cx(0, 1)\nqc.h(0)\nqc.measure([0, 1], [0, 1])`
       : `from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(1)\nqc.x(0)          # Pauli-X bit flip`;
 
-  const targetRoute = route || (selectedStage.id === 'bell-state' ? '/learn/bell-state' : `/learn/${selectedStage.lessonId}`);
+  const targetRoute =
+    route ||
+    (isGrover
+      ? '/lab?preset=grover'
+      : selectedStage.id === 'bell-state'
+      ? '/learn/bell-state'
+      : `/learn/${selectedStage.lessonId}`);
 
   return (
     <aside
@@ -171,15 +184,34 @@ export function RightStageInspector({
                   Key Concepts Grounded
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-accent/10 border border-accent/25 text-accent font-medium">
-                    Superposition
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-violet-500/10 border border-violet-500/25 text-violet-700 font-medium">
-                    Unitary Inversion
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-surface-sunken border border-border-subtle text-text-secondary font-medium">
-                    Born Rule
-                  </span>
+                  {isGrover ? (
+                    <>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-accent/10 border border-accent/25 text-accent font-medium">
+                        Phase Oracle
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-violet-500/10 border border-violet-500/25 text-violet-700 font-medium">
+                        Inversion About Mean
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-surface-sunken border border-border-subtle text-text-secondary font-medium">
+                        Toffoli CCX
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 font-medium">
+                        O(√N) Speedup
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-accent/10 border border-accent/25 text-accent font-medium">
+                        Superposition
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-violet-500/10 border border-violet-500/25 text-violet-700 font-medium">
+                        Unitary Inversion
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-surface-sunken border border-border-subtle text-text-secondary font-medium">
+                        Born Rule
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -189,20 +221,41 @@ export function RightStageInspector({
                   Prerequisite Status
                 </span>
                 <div className="space-y-1 text-[11px] font-mono">
-                  <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Concept 01: Compass [Mastered]</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Gate 02: Pauli-X [Mastered]</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-accent">
-                    <span className="h-3.5 w-3.5 rounded-full border-2 border-accent flex items-center justify-center text-[9px]">
-                      •
-                    </span>
-                    <span>Checkpoint 03: Ready</span>
-                  </div>
+                  {isGrover ? (
+                    <>
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Unit 01: Superposition & Inversion [Mastered]</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Unit 02: Multi-Qubit & CNOT [Mastered]</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-accent">
+                        <span className="h-3.5 w-3.5 rounded-full border-2 border-accent flex items-center justify-center text-[9px]">
+                          •
+                        </span>
+                        <span>Unit 2.1: Amplitude Amplification [Active]</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Concept 01: Compass [Mastered]</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Gate 02: Pauli-X [Mastered]</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-accent">
+                        <span className="h-3.5 w-3.5 rounded-full border-2 border-accent flex items-center justify-center text-[9px]">
+                          •
+                        </span>
+                        <span>Checkpoint 03: Ready</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 

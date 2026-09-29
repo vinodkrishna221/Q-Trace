@@ -122,7 +122,7 @@ export const allCurriculumStages: CurriculumStage[] = [
   ...module2Unit21Stages,
 ];
 
-export { module2Unit21Stages };
+export { units6to7Stages, units8to10Stages, module2Unit21Stages };
 
 export function getStageById(id: string): CurriculumStage | undefined {
   return allCurriculumStages.find((s) => s.id === id || s.lessonId === id);

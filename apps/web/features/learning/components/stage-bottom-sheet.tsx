@@ -121,16 +121,25 @@ export function StageBottomSheet({
       ? 'Medium'
       : 'Foundational';
 
+  const isGrover =
+    stage.unitId === 'unit_2_1' ||
+    stage.id.startsWith('mod2_') ||
+    stage.id.startsWith('pc_grover');
+
   const targetRoute =
     stage.route ||
-    (stage.id === 'bell-state' || stage.lessonId === 'bell-state'
+    (isGrover
+      ? '/lab?preset=grover'
+      : stage.id === 'bell-state' || stage.lessonId === 'bell-state'
       ? '/learn/bell-state'
       : `/learn/${stage.lessonId}`);
 
   // Fallback Qiskit Aer Snippet
   const qiskitCode =
     handsOnLab?.codeSnippet ||
-    `# Q-Trace Telemetry Simulation
+    (isGrover
+      ? `# Grover 3-Qubit Search (|101> Marked State)\nfrom qiskit import QuantumCircuit\n\nqc = QuantumCircuit(3, 3)\nqc.h([0, 1, 2])        # Equal superposition\nqc.cz(0, 2)            # Phase oracle\nqc.h([0, 1, 2])        # Diffusion start\nqc.x([0, 1, 2])\nqc.ccx(0, 1, 2)        # Multi-controlled Toffoli\nqc.x([0, 1, 2])\nqc.h([0, 1, 2])        # Inversion complete\nqc.measure_all()`
+      : `# Q-Trace Telemetry Simulation
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 
@@ -143,7 +152,7 @@ simulator = AerSimulator()
 compiled_circuit = transpile(qc, simulator)
 job = simulator.run(compiled_circuit, shots=1024)
 result = job.result()
-counts = result.get_counts()`;
+counts = result.get_counts()`);
 
   const handleOptionSelect = (optionId: string) => {
     setInternalSelectedOption(optionId);
