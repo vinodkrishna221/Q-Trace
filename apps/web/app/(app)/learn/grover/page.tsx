@@ -28,6 +28,8 @@ import { useCircuitStore } from '@/lib/circuit-store';
 import { ProbabilityHistogramView } from '@/features/evidence/probability-histogram-view';
 import { FlightRecorderView } from '@/features/flight-recorder/flight-recorder-view';
 import { GroverAmplitudeScrubber } from '@/features/evidence/grover-amplitude-scrubber';
+import { GroverIterationVisualizer } from '@/features/learning/components/grover-iteration-visualizer';
+import { GroverFormulaDecoder } from '@/features/learning/components/grover-formula-decoder';
 import { TutorCard } from '@/features/tutor/tutor-card';
 import { RepairChallengeCard } from '@/features/challenges/repair-challenge-card';
 import { ProgressSuccessCard } from '@/features/progress/progress-success-card';
@@ -379,27 +381,56 @@ export default function GroverLearnPage() {
 
         {/* STEP 1: Prediction Checkpoint */}
         <div className={viewMode === 'step-by-step' && activeStep !== 1 ? 'hidden' : 'space-y-6'}>
-          <div className="rounded-xl border border-border-subtle bg-surface p-5 space-y-3">
+          {/* Story Hook */}
+          <div className="rounded-xl border border-border-subtle bg-surface p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent/20 border border-accent text-accent">
                   <Lightbulb className="w-3.5 h-3.5" />
                 </div>
                 <span className="text-xs font-sans uppercase tracking-wider text-accent font-semibold">
-                  Step 01 · Initial Prediction Directive & Mental Model Checkpoint
+                  Step 01 · What Grover&apos;s Algorithm Actually Does
                 </span>
               </div>
               <Badge variant="outline" className="text-[10px] font-mono border-accent/40 text-accent">
                 ACTIVE DIRECTIVE
               </Badge>
             </div>
-            <p className="text-xs text-text-secondary leading-relaxed">
-              Before compiling the 3-qubit circuit, test your mental model: An oracle marks |101⟩ with a phase flip,
-              and the diffusion operator reflects all amplitudes about the mean. After 2 iterations, which measurement
-              distribution will emerge?
+            <p className="text-sm text-text-secondary leading-relaxed">
+              You already know the Oracle (secretly marks one chest) and the Diffusion operator (seesaw reflection that
+              catapults the marked amplitude up). <strong className="text-text-primary">Grover&apos;s algorithm</strong>{' '}
+              is simply running those two steps back-to-back, repeated exactly <strong className="text-text-primary">2 times</strong>{' '}
+              for N=8. Each cycle pumps probability from all non-target states into |101⟩ — like a quantum probability
+              pump.
             </p>
+            <div className="rounded-lg border border-accent/20 bg-accent/5 p-3 text-sm text-text-secondary leading-relaxed">
+              <strong className="text-text-primary">Your mental model to verify:</strong> An oracle marks |101⟩ with a
+              phase flip, and the diffusion operator reflects all amplitudes about the mean. After 2 iterations, which
+              measurement distribution will emerge?
+            </div>
           </div>
 
+          {/* Grover Iteration Visualizer */}
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              See It Happen · Probability Growth Per Iteration
+            </h2>
+            <GroverIterationVisualizer />
+            <p className="text-[11px] text-text-muted font-mono px-1">
+              ↑ Step through each iteration. Watch |101⟩ grow from 12.5% → 78% → 94.5% — then see what happens if you
+              add a 3rd iteration (the soufflé collapses!).
+            </p>
+          </section>
+
+          {/* Grover Formula Decoder */}
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              Decode the Formula · The Complete Algorithm
+            </h2>
+            <GroverFormulaDecoder />
+          </section>
+
+          {/* Original ConceptBlocks (kept for completeness) */}
           <div className="w-full">
             <ConceptBlocks contentBlocks={moduleData.contentBlocks} />
           </div>

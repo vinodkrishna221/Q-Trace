@@ -4,44 +4,30 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRoleStore } from '@/lib/role-store';
 import { PriorKnowledgeBadge } from '@/features/learning/prior-knowledge-badge';
-import { ConceptBlocks } from '@/features/learning/concept-blocks';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DiffusionMeanScrubber } from '@/features/learning/components/diffusion-mean-scrubber';
 import { GroverRotation2D } from '@/features/learning/components/grover-rotation-2d';
-import { Clock, Layers, ArrowRight, ArrowLeft, ShieldCheck, Zap, BarChart3, HelpCircle } from 'lucide-react';
-import { ContentBlock } from '@/lib/contracts';
+import { DiffusionAmplitudeVisualizer } from '@/features/learning/components/diffusion-amplitude-visualizer';
+import { DiffusionFormulaDecoder } from '@/features/learning/components/diffusion-formula-decoder';
+import { SouffleOverRotationMeter } from '@/features/learning/components/souffle-over-rotation-meter';
+import {
+  Clock,
+  Layers,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  BarChart3,
+  HelpCircle,
+  TrendingUp,
+  Lightbulb,
+} from 'lucide-react';
 
 export default function GroverDiffusionLearnPage() {
   const { activeRole, activeLearnerProfile, activeLearningPath } = useRoleStore();
   const [selectedAnswer, setSelectedAnswer] = React.useState<string | null>(null);
-
-  const contentBlocks: ContentBlock[] = [
-    {
-      type: 'TEXT',
-      body: 'Once the oracle has marked the answer state with a negative sign (-1), the amplitudes are out of balance. The Grover Diffusion operator (U_s) exploits this imbalance by reflecting every amplitude across their average height ᾱ.',
-    },
-    {
-      type: 'FORMULA',
-      latex: 'U_s = 2|s\\rangle\\langle s| - I, \\quad \\alpha_i \\to 2\\bar{\\alpha} - \\alpha_i \\quad \\text{where } \\bar{\\alpha} = \\frac{1}{N}\\sum_{j=1}^{N} \\alpha_j',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'INFO',
-      body: 'Geometric Reflection Insight: Because the marked state is negative (-0.354), its distance to the mean is large and positive. When reflected across the mean, it catapults above the average line to +0.729, while the other 7 positive states shrink from +0.354 to +0.177!',
-    },
-    {
-      type: 'TEXT',
-      body: 'Grover\'s algorithm is a geometric rotation in a 2D plane spanned by the target state |ω⟩ and the uniform superposition of all other states |ω_⟂⟩. Each Grover iteration (Oracle + Diffusion) rotates the statevector by angle 2θ, where sin(θ) = 1/√N.',
-    },
-    {
-      type: 'CALLOUT',
-      tone: 'CAUTION',
-      body: 'The Soufflé Pitfall (Over-Rotation): Classical search benefits from "trying more times." Quantum search does NOT! For 3 qubits (N=8), exactly 2 iterations reach 94.5% fidelity. A 3rd iteration rotates the vector past the target axis, causing probability to collapse back to 33%!',
-    },
-  ];
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-16" data-testid="learn-grover-diffusion-view">
@@ -51,13 +37,13 @@ export default function GroverDiffusionLearnPage() {
             <Badge variant="default">INTERMEDIATE MODULE</Badge>
             <span className="flex items-center gap-1 font-mono text-xs text-text-secondary">
               <Clock className="w-3.5 h-3.5" />
-              6 mins
+              8 mins
             </span>
             <span className="font-mono text-xs text-text-muted">ID: grover-diffusion</span>
           </>
         }
         title="Amplitude Amplification & Inversion About the Mean"
-        purpose="Reflect quantum amplitudes about their average to boost the marked state's probability to 94.5%."
+        purpose="Reflect quantum amplitudes about their average to catapult the marked state from 12.5% to 94.5% probability."
         actions={
           <div className="flex items-center gap-2">
             <Link href="/learn/oracle">
@@ -85,21 +71,85 @@ export default function GroverDiffusionLearnPage() {
         />
       </div>
 
-      {/* Main Learning Grid */}
+      {/* ── HOOK: THE STORY ── */}
+      <Card className="border-border-subtle bg-surface shadow-xs">
+        <CardHeader className="py-3 px-4 bg-surface-raised/40 border-b border-border-subtle">
+          <CardTitle className="text-xs font-mono tracking-wider text-text-primary font-semibold flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-accent" />
+            <span>THE PUZZLE: THE BROKEN SEESAW</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 space-y-4">
+          <p className="text-sm text-text-secondary leading-relaxed">
+            After the oracle runs, you have 8 identical-looking bars — except one of them secretly went negative.
+            Probabilities are based on <strong className="text-text-primary">|amplitude|²</strong>, so the negative bar looks{' '}
+            <em>exactly the same</em> as all the positive ones. The oracle marked the treasure chest, but you still can't
+            tell which one it is.
+          </p>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            The <strong className="text-text-primary">Diffusion Operator</strong> exploits this asymmetry. By reflecting
+            every amplitude across their average, it transforms the tiny asymmetry (one bar slightly more negative) into a
+            massive probability spike. One iteration takes |101⟩ from 12.5% → 78%, two iterations reaches 94.5%.
+          </p>
+          <div className="rounded-lg border border-accent/20 bg-accent/5 p-4 flex gap-3">
+            <Lightbulb className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-text-secondary leading-relaxed">
+              <strong className="text-text-primary">Key intuition:</strong> Reflection about the mean is like a see-saw.
+              A bar that's far <em>below</em> the average bounces far <em>above</em> when flipped. The oracle created
+              the imbalance; diffusion exploits it.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── STEP 1: AMPLITUDE BAR CHART ── */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+          Step 1 · Watch the Amplitudes Move
+        </h2>
+        <DiffusionAmplitudeVisualizer />
+        <p className="text-[11px] text-text-muted font-mono px-1">
+          ↑ Click through the 3 phases. Watch the dashed <strong>mean line</strong> (ᾱ) drop after the oracle, then see
+          how reflection catapults |101⟩ from −0.354 to +0.884.
+        </p>
+      </section>
+
+      {/* ── STEP 2: FORMULA DECODER ── */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+          Step 2 · Decode the Diffusion Formula
+        </h2>
+        <DiffusionFormulaDecoder />
+      </section>
+
+      {/* ── STEP 3: SOUFFLÉ DANGER METER ── */}
+      <section className="space-y-2">
+        <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+          Step 3 · The Soufflé Pitfall — Over-Rotation Danger
+        </h2>
+        <SouffleOverRotationMeter />
+      </section>
+
+      {/* ── MAIN GRID: Scrubber + Rotation + Sidebar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Theory & Interactive Simulators */}
+        {/* Left Column: Interactive simulators */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Core Theory Concept Blocks */}
-          <ConceptBlocks contentBlocks={contentBlocks} />
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              Step 4 · 3-Step Geometric Reflection Scrubber
+            </h2>
+            <DiffusionMeanScrubber />
+          </section>
 
-          {/* Interactive Diffusion Mean Scrubber */}
-          <DiffusionMeanScrubber />
-
-          {/* Interactive 2D State Plane Rotation */}
-          <GroverRotation2D />
+          <section className="space-y-2">
+            <h2 className="text-xs font-mono font-semibold text-text-muted tracking-widest uppercase px-1">
+              Step 5 · 2D Subspace Rotation Visualizer
+            </h2>
+            <GroverRotation2D />
+          </section>
         </div>
 
-        {/* Right Column: Diffusion Construction & Speedup Table */}
+        {/* Right Column: Code + Speedup Table + Checkpoint */}
         <div className="lg:col-span-4 space-y-6">
           {/* Diffusion Circuit Specs */}
           <Card className="border-border-subtle bg-surface shadow-xs">
@@ -218,7 +268,7 @@ qc.h([0, 1, 2])`}
                     id: 'opt_1',
                     text: '1 iteration',
                     correct: false,
-                    hint: 'Under-rotated! Reaches ~53.1% probability, well short of peak.',
+                    hint: 'Under-rotated! Reaches ~78.1% probability, well short of peak.',
                   },
                   {
                     id: 'opt_2',
@@ -230,7 +280,7 @@ qc.h([0, 1, 2])`}
                     id: 'opt_3',
                     text: '8 iterations (one for each state)',
                     correct: false,
-                    hint: 'Classical fallacy! Grover does not check states one by one. 8 iterations causes complete chaotic over-rotation.',
+                    hint: 'Classical fallacy! 8 iterations causes complete chaotic over-rotation.',
                   },
                 ].map((opt) => {
                   const isSelected = selectedAnswer === opt.id;
