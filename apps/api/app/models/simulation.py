@@ -31,6 +31,7 @@ class SimulationRunRequest(BaseModel):
     primaryAdapter: Literal["QISKIT_AER"] = "QISKIT_AER"
     runConformance: bool = False
     shots: int = Field(default=1024, ge=1, le=8192)
+    noisePreset: Literal["superconducting"] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -92,6 +93,7 @@ class SimulationRunOut(BaseModel):
     conformance: ConformanceResult
     durationMs: int
     createdAt: str
+    noisePreset: str | None = None
 
 
 # ---------------------------------------------------------------------------

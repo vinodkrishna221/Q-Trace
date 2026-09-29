@@ -243,3 +243,11 @@ class ExportOpenQasm3Response(BaseModel):
     openQasm3: str
     lossy: bool
     warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# FEA-10: NISQ Noise Presets
+# ---------------------------------------------------------------------------
+
+NoisePreset = Literal["superconducting"]
+

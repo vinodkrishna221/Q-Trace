@@ -133,6 +133,7 @@ class SimulationRun(BaseModel):
     error: Optional[dict[str, Any]] = None
     schemaVersion: int = 1
     createdAt: str = Field(default_factory=utc_now_iso)
+    noisePreset: Optional[str] = None
 
 
 # --- Misconception Signal ---

@@ -53,6 +53,68 @@ import os as _os
 _adapter_logger = _logging.getLogger("qtrace.adapter")
 _sv_simulator = None   # AerSimulator(method="statevector") — reused across calls
 _meas_simulator = None  # AerSimulator() — reused across calls
+_noise_models: dict[str, object] = {}
+_noisy_dm_simulators: dict[str, object] = {}
+_noisy_meas_simulators: dict[str, object] = {}
+
+
+def get_noise_model(preset: str = "superconducting"):
+    """Build or retrieve cached NoiseModel for a known preset.
+
+    FEA-10 NISQ Noise Presets:
+      'superconducting': Realistic superconducting qubit parameters (IBM Eagle QPU typical).
+        - T1 = 50 µs thermal relaxation
+        - T2 = 70 µs dephasing
+        - gate_time = 50 ns (single and 2-qubit gates)
+        - readout error: [[0.99, 0.01], [0.01, 0.99]]
+    """
+    if preset != "superconducting":
+        raise ValueError(f"Unsupported noise preset: {preset}")
+
+    if preset not in _noise_models:
+        from qiskit_aer.noise import NoiseModel, thermal_relaxation_error  # noqa: PLC0415
+
+        nm = NoiseModel()
+        t1 = 50e-6
+        t2 = 70e-6
+        gate_time = 50e-9
+
+        error_1q = thermal_relaxation_error(t1, t2, gate_time)
+        error_2q = error_1q.tensor(error_1q)
+        error_3q = error_1q.tensor(error_2q)
+
+        # Single-qubit gates (including S, T for forward compatibility with FEA-1)
+        nm.add_all_qubit_quantum_error(error_1q, ["h", "x", "y", "z", "s", "t"])
+        # Two-qubit gates (including CZ for forward compatibility with FEA-1)
+        nm.add_all_qubit_quantum_error(error_2q, ["cx", "cz"])
+        # Three-qubit gates (CCX / Toffoli for forward compatibility with FEA-1)
+        nm.add_all_qubit_quantum_error(error_3q, ["ccx"])
+        # Readout error (~1%)
+        nm.add_all_qubit_readout_error([[0.99, 0.01], [0.01, 0.99]])
+
+        _noise_models[preset] = nm
+
+    return _noise_models[preset]
+
+
+def get_noisy_dm_simulator(preset: str = "superconducting"):
+    """Retrieve or construct cached density matrix simulator with noise model."""
+    if preset not in _noisy_dm_simulators:
+        from qiskit_aer import AerSimulator  # noqa: PLC0415
+
+        nm = get_noise_model(preset)
+        _noisy_dm_simulators[preset] = AerSimulator(noise_model=nm, method="density_matrix")
+    return _noisy_dm_simulators[preset]
+
+
+def get_noisy_meas_simulator(preset: str = "superconducting"):
+    """Retrieve or construct cached measurement simulator with noise model."""
+    if preset not in _noisy_meas_simulators:
+        from qiskit_aer import AerSimulator  # noqa: PLC0415
+
+        nm = get_noise_model(preset)
+        _noisy_meas_simulators[preset] = AerSimulator(noise_model=nm)
+    return _noisy_meas_simulators[preset]
 
 
 def prewarm_adapters() -> None:
@@ -207,6 +269,42 @@ def _reduced_qubits(statevector: list[complex], n_qubits: int) -> list[ReducedQu
     return result
 
 
+def _partial_density_matrix_from_dm(dm, n_qubits: int, qubit: int):
+    """Compute the 2×2 reduced density matrix for a single qubit from a full density matrix.
+
+    Returns a 2×2 list-of-lists of complex numbers.
+    """
+    dim = 2 ** n_qubits
+    rho = [[complex(0), complex(0)], [complex(0), complex(0)]]
+
+    for i in range(dim):
+        for j in range(dim):
+            mask = ~(1 << qubit)
+            if (i & mask) != (j & mask):
+                continue
+            ri = (i >> qubit) & 1
+            rj = (j >> qubit) & 1
+            val = dm[i, j] if hasattr(dm, "shape") else dm[i][j]
+            rho[ri][rj] += complex(val)
+
+    return rho
+
+
+def _reduced_qubits_from_dm(dm, n_qubits: int) -> list[ReducedQubit]:
+    """Compute ReducedQubit list (Bloch + purity) for all qubits from full density matrix."""
+    result = []
+    for q in range(n_qubits):
+        rho = _partial_density_matrix_from_dm(dm, n_qubits, q)
+        bloch, purity = _bloch_and_purity(rho)
+        _assert_finite(bloch.x, f"Bloch x qubit {q}")
+        _assert_finite(bloch.y, f"Bloch y qubit {q}")
+        _assert_finite(bloch.z, f"Bloch z qubit {q}")
+        _assert_finite(purity, f"purity qubit {q}")
+        label = "PURE_SUBSYSTEM" if purity >= _PURITY_MIXED_THRESHOLD else "MIXED_SUBSYSTEM"
+        result.append(ReducedQubit(qubit=q, bloch=bloch, purity=purity, label=label))
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Gate mapping: CircuitModel GateName → Qiskit method name
 # ---------------------------------------------------------------------------
@@ -224,22 +322,33 @@ _SINGLE_QUBIT_GATES = {
 # ---------------------------------------------------------------------------
 
 
-def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
+def run_qiskit_aer(
+    circuit: CircuitModel,
+    shots: int = 1024,
+    noise_preset: str | None = None,
+) -> AerResult:
     """Execute a validated CircuitModel with Qiskit Aer.
 
     Imports Qiskit inside the function — validation already passed at this point.
 
+    When noise_preset is None (default):
+      Executes ideal statevector simulation (method="statevector").
+    When noise_preset == "superconducting":
+      Executes realistic NISQ simulation with thermal relaxation and readout errors
+      using density matrix snapshots (method="density_matrix").
+
     Steps:
     1. Build Qiskit QuantumCircuit from CircuitModel operations (no MEASURE yet)
-    2. After each non-MEASURE gate, snapshot the statevector → one StateTraceStep
-    3. Add MEASURE gates and run statevector_simulator with shots for counts
-    4. Compute ideal probabilities from final pre-measurement statevector
+    2. After each non-MEASURE gate, snapshot the state (statevector or density matrix) → one StateTraceStep
+    3. Add MEASURE gates and run simulator with shots for counts (including readout errors if noisy)
+    4. Compute probabilities from final pre-measurement state
     5. Normalize all basis labels to contract big-endian order
     6. Validate no NaN/Infinity
 
     Args:
         circuit: Validated CircuitModel (SIM-2 guarantees validity)
         shots: Number of measurement shots for counts
+        noise_preset: Optional noise preset name (e.g. "superconducting")
 
     Returns:
         AerResult with stateTrace, probabilities, counts, durationMs
@@ -258,17 +367,22 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
     measure_ops = [op for op in circuit.operations if op.gate == GateName.MEASURE]
 
     # ------------------------------------------------------------------
-    # Build incremental statevector snapshots (one per non-MEASURE gate)
+    # Build incremental state snapshots (one per non-MEASURE gate)
     # ------------------------------------------------------------------
     trace_steps: list[StateTraceStep] = []
     step_index = 0
 
-    # We build the circuit incrementally to capture statevector after each gate
+    # We build the circuit incrementally to capture state after each gate
     qr = QuantumRegister(n_qubits, "q")
     qc_trace = QuantumCircuit(qr)
 
-    # SIM-9: reuse cached simulator instance; create one only if cache is cold
-    sv_simulator = _sv_simulator if _sv_simulator is not None else AerSimulator(method="statevector")
+    if noise_preset is not None:
+        if noise_preset != "superconducting":
+            raise ValueError(f"Unsupported noise preset: {noise_preset}")
+        dm_simulator = get_noisy_dm_simulator(noise_preset)
+    else:
+        # SIM-9: reuse cached simulator instance; create one only if cache is cold
+        sv_simulator = _sv_simulator if _sv_simulator is not None else AerSimulator(method="statevector")
 
     for op in non_measure_ops:
         gate = op.gate
@@ -282,36 +396,64 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
             # Should never happen — CircuitModel validation already enforced the enum
             raise ValueError(f"Unexpected gate {gate} in adapter")  # pragma: no cover
 
-        # Save statevector snapshot after this gate
-        qc_snap = qc_trace.copy()
-        qc_snap.save_statevector()
-        job = sv_simulator.run(qc_snap, shots=1)
-        result_snap = job.result()
-        sv = result_snap.get_statevector(qc_snap).data  # numpy array of complex
+        if noise_preset is not None:
+            # Snapshot density matrix under NISQ noise model
+            qc_snap = qc_trace.copy()
+            qc_snap.save_density_matrix()
+            job = dm_simulator.run(qc_snap, shots=1)
+            result_snap = job.result()
+            dm_obj = result_snap.data(qc_snap)["density_matrix"]
+            dm_data = dm_obj.data
 
-        # Convert numpy complex to Python complex
-        sv_list: list[complex] = [complex(a) for a in sv]
+            dim = 2 ** n_qubits
+            basis_probs: dict[str, float] = {}
+            amplitudes: dict[str, dict[str, float]] = {}
 
-        # Validate no NaN/Infinity in statevector
-        for idx, amp in enumerate(sv_list):
-            _assert_finite(amp.real, f"statevector[{idx}].real after {op.opId}")
-            _assert_finite(amp.imag, f"statevector[{idx}].imag after {op.opId}")
+            for i in range(dim):
+                prob = float(dm_data[i, i].real)
+                _assert_finite(prob, f"density_matrix[{i},{i}].real after {op.opId}")
+                prob = max(0.0, min(1.0, prob))
+                if prob > _PROB_TOL:
+                    label = qiskit_index_to_contract_label(i, n_qubits)
+                    basis_probs[label] = prob
+                    amplitudes[label] = {"re": float(math.sqrt(prob)), "im": 0.0}
 
-        amplitudes = build_normalized_amplitude_map(sv_list, n_qubits)
-        basis_probs = build_normalized_probability_map(sv_list, n_qubits)
+            for label, p in basis_probs.items():
+                _assert_finite(p, f"probability for {label} after {op.opId}")
 
-        # Validate probabilities
-        total_prob = sum(basis_probs.values())
-        if not (abs(total_prob - 1.0) < 1e-6 or len(basis_probs) == 0):
-            raise ValueError(
-                f"Probabilities do not sum to 1 after {op.opId}: sum={total_prob}"
-            )
-        for label, p in basis_probs.items():
-            _assert_finite(p, f"probability for {label} after {op.opId}")
-            if not (0.0 <= p <= 1.0 + 1e-10):
-                raise ValueError(f"Probability {p} for {label} out of [0,1]")
+            reduced = _reduced_qubits_from_dm(dm_data, n_qubits)
 
-        reduced = _reduced_qubits(sv_list, n_qubits)
+        else:
+            # Save statevector snapshot after this gate
+            qc_snap = qc_trace.copy()
+            qc_snap.save_statevector()
+            job = sv_simulator.run(qc_snap, shots=1)
+            result_snap = job.result()
+            sv = result_snap.get_statevector(qc_snap).data  # numpy array of complex
+
+            # Convert numpy complex to Python complex
+            sv_list: list[complex] = [complex(a) for a in sv]
+
+            # Validate no NaN/Infinity in statevector
+            for idx, amp in enumerate(sv_list):
+                _assert_finite(amp.real, f"statevector[{idx}].real after {op.opId}")
+                _assert_finite(amp.imag, f"statevector[{idx}].imag after {op.opId}")
+
+            amplitudes = build_normalized_amplitude_map(sv_list, n_qubits)
+            basis_probs = build_normalized_probability_map(sv_list, n_qubits)
+
+            # Validate probabilities
+            total_prob = sum(basis_probs.values())
+            if not (abs(total_prob - 1.0) < 1e-6 or len(basis_probs) == 0):
+                raise ValueError(
+                    f"Probabilities do not sum to 1 after {op.opId}: sum={total_prob}"
+                )
+            for label, p in basis_probs.items():
+                _assert_finite(p, f"probability for {label} after {op.opId}")
+                if not (0.0 <= p <= 1.0 + 1e-10):
+                    raise ValueError(f"Probability {p} for {label} out of [0,1]")
+
+            reduced = _reduced_qubits(sv_list, n_qubits)
 
         trace_steps.append(
             StateTraceStep(
@@ -363,8 +505,12 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
             for t, c in zip(op.targets, op.classicalTargets):
                 qc_measure.measure(t, c)
 
-        # SIM-9: reuse cached meas simulator; create one only if cache is cold
-        meas_simulator = _meas_simulator if _meas_simulator is not None else AerSimulator()
+        if noise_preset is not None:
+            meas_simulator = get_noisy_meas_simulator(noise_preset)
+        else:
+            # SIM-9: reuse cached meas simulator; create one only if cache is cold
+            meas_simulator = _meas_simulator if _meas_simulator is not None else AerSimulator()
+
         job_meas = meas_simulator.run(qc_measure, shots=shots)
         raw_counts = job_meas.result().get_counts(qc_measure)
         counts = normalize_counts(dict(raw_counts), n_classical)
@@ -385,3 +531,7 @@ def qiskit_index_to_contract_label(qiskit_index: int, n_qubits: int) -> str:
     """Re-export from normalizer for convenience."""
     from app.services.quantum.normalizer import qiskit_index_to_contract_label as _f  # noqa: PLC0415
     return _f(qiskit_index, n_qubits)
+
+
+# Alias run_circuit to run_qiskit_aer per FEATURES-SPEC.md § 4.3
+run_circuit = run_qiskit_aer

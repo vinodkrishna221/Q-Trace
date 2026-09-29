@@ -43,6 +43,8 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 ## Log
 
+- 29 Sep 12:25 Venu: FEA-10 green (feat/features-phase/fea-10-nisq-noise-backend) — NISQ Noise Model Backend implemented in apps/api/app/services/quantum/adapter.py with "superconducting" preset (T1=50µs, T2=70µs, gate_time=50ns for 1q/2q/3q gates, and readout error [[0.99, 0.01], [0.01, 0.99]]), density matrix snapshots computing subsystem purity Tr(ρ²) < 1.0 and contracted Bloch vectors (|r| < 1.0); noisePreset added to SimulationRunRequest and SimulationRunOut; 11/11 unit tests passed in test_noise_model.py; PR ready for Warden review. Unblocks FEA-11.
+
 - 28 Sep 19:55 Antigravity: Feature Differentiation & SIH Deliverables Audit — Completed deep codebase reality audit and /ideate gauntlet for SIH Problem Statement 4 (SIH26140.pdf); generated docs/FEATURE-DIFFERENTIATION.md defining 6 high-impact differentiating features directly mapped to the 6 official deliverables.
 
 - 27 Sep 16:00 Vinod: DUO-6 green (feat/duolingo-path/duo-6-telemetry-hud-profile) -- created sticky LearningHUD with reactive gamification-store telemetry (streak pill, Joules XP counter with award flash, Coherence Shield gauge with amber/crimson condition tokens, freeze tooltip), account profile dropdown with calibration summary and settings/sign-out, and responsive mobile layout; 14/14 unit tests passed, PR ready for Warden review. Unblocks DUO-11.
