@@ -138,7 +138,7 @@ FEA-14 (Cross-Feature Contract & Golden Fixtures — grading-assessment.md + gol
 
 ### Discord Acceptance Lines — FEA Phase
 
-- `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-1 — feat/features-phase/fea-1-gate-model-expansion` — STATUS: [ ] ready
+- `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-1 — feat/features-phase/fea-1-gate-model-expansion` — STATUS: [x] done
 - `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-12 — feat/features-phase/fea-12-gate-palette-glyph` — STATUS: [ ] ready
 - `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-14 — feat/features-phase/fea-14-contracts-golden-fixtures` — STATUS: [ ] ready
 - `Rajeswari: ACCEPTED — Features Phase — starting FEA-3 — feat/features-phase/fea-3-grover-curriculum` — STATUS: [ ] ready

@@ -165,3 +165,5 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 29 Sep 11:05 Orion: Features Phase Cards (FEA-1 through FEA-14) distributed across all 6 team members in missions/ and MISSION-MAP.md — 13 atomic cards (38h total load) covering F1 Grover Curriculum/Scrubber, F2 Invariant Linter, F3 Tri-Engine Conformance, F4 NISQ Noise/Q-Sphere, and F5 Socratic Grading Engine; FEA-1 identified as critical path gate.
 
+- 29 Sep 11:25 Vinod: FEA-1 green (feat/features-phase/fea-1-gate-model-expansion) — expanded GateName enum and models with CCX (Toffoli), CZ, S, and T; added CCX/CZ validators and increased operations limit to 30; wired Qiskit Aer simulation and AST parser allowlist; added OpenQASM 3 mappings and frontend GateName union; 29/29 FEA-1 unit tests passed, 173/173 simulation regression passed; PR ready for Warden review. Unblocks FEA-2, FEA-3, FEA-6, FEA-8, FEA-10, FEA-12, FEA-14.
+

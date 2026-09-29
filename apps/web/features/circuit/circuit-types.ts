@@ -1,4 +1,6 @@
-import { GateName, Operation, CircuitModel } from '@/lib/contracts';
+import { Operation, CircuitModel } from '@/lib/contracts';
+
+export type GateName = 'H' | 'X' | 'Y' | 'Z' | 'CNOT' | 'MEASURE' | 'CCX' | 'CZ' | 'S' | 'T';
 
 export interface GateDefinition {
   gate: GateName;
@@ -57,6 +59,44 @@ export const GATE_DEFINITIONS: Record<GateName, GateDefinition> = {
     shortcutKey: 'c',
     colorClass: 'border-gate-cnot text-gate-cnot bg-gate-cnot/20',
     badgeClass: 'border-gate-cnot/60 bg-gate-cnot/10 text-gate-cnot',
+  },
+  CZ: {
+    gate: 'CZ',
+    name: 'Controlled-Z',
+    symbol: 'CZ',
+    description: 'Applies Pauli-Z to target qubit when control is |1⟩',
+    isMultiQubit: true,
+    shortcutKey: 'z',
+    colorClass: 'border-gate-pauli-z text-gate-pauli-z bg-gate-pauli-z/20',
+    badgeClass: 'border-gate-pauli-z/60 bg-gate-pauli-z/10 text-gate-pauli-z',
+  },
+  CCX: {
+    gate: 'CCX',
+    name: 'Toffoli (CCX)',
+    symbol: 'CCX',
+    description: 'Controlled-Controlled-NOT; flips target when both controls are |1⟩',
+    isMultiQubit: true,
+    shortcutKey: 't',
+    colorClass: 'border-gate-cnot text-gate-cnot bg-gate-cnot/20',
+    badgeClass: 'border-gate-cnot/60 bg-gate-cnot/10 text-gate-cnot',
+  },
+  S: {
+    gate: 'S',
+    name: 'Phase (S)',
+    symbol: 'S',
+    description: 'π/2 phase rotation around Z axis (|1⟩ → i|1⟩)',
+    shortcutKey: 's',
+    colorClass: 'border-gate-pauli-z text-gate-pauli-z bg-gate-pauli-z/15',
+    badgeClass: 'border-gate-pauli-z/60 bg-gate-pauli-z/10 text-gate-pauli-z',
+  },
+  T: {
+    gate: 'T',
+    name: 'π/8 (T)',
+    symbol: 'T',
+    description: 'π/4 phase rotation around Z axis (|1⟩ → e^(iπ/4)|1⟩)',
+    shortcutKey: 't',
+    colorClass: 'border-accent text-accent bg-accent/15',
+    badgeClass: 'border-accent/60 bg-accent/10 text-accent',
   },
   MEASURE: {
     gate: 'MEASURE',

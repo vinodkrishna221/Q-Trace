@@ -3,7 +3,7 @@
  * Mirror of board/contracts/circuit-simulation.md
  */
 
-export type GateName = "H" | "X" | "Y" | "Z" | "CNOT" | "MEASURE";
+export type GateName = "H" | "X" | "Y" | "Z" | "CNOT" | "MEASURE" | "CCX" | "CZ" | "S" | "T";
 export type CircuitSource = "BUILDER" | "SUPPORTED_QISKIT" | "SEED";
 export type AdapterName = "QISKIT_AER" | "PENNYLANE";
 export type SimulationStatus = "SUCCEEDED" | "FAILED";
