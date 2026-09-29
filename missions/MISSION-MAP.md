@@ -143,7 +143,7 @@ FEA-14 (Cross-Feature Contract & Golden Fixtures — grading-assessment.md + gol
 - `Vinod Krishna: ACCEPTED — Features Phase — starting FEA-14 — feat/features-phase/fea-14-contracts-golden-fixtures` — STATUS: [ ] ready
 - `Rajeswari: ACCEPTED — Features Phase — starting FEA-3 — feat/features-phase/fea-3-grover-curriculum` — STATUS: [ ] ready
 - `Rajeswari: ACCEPTED — Features Phase — starting FEA-4 — feat/features-phase/fea-4-grover-amplitude-scrubber` — STATUS: [ ] ready
-- `Uday Rohit: ACCEPTED — Features Phase — starting FEA-2 — feat/features-phase/fea-2-linter-backend` — STATUS: [ ] ready
+- `Uday Rohit: ACCEPTED — Features Phase — starting FEA-2 — feat/features-phase/fea-2-linter-backend` — STATUS: [x] done
 - `Uday Rohit: ACCEPTED — Features Phase — starting FEA-5 — feat/features-phase/fea-5-linter-frontend` — STATUS: [ ] ready
 - `Rani: ACCEPTED — Features Phase — starting FEA-8 — feat/features-phase/fea-8-cirq-adapter-backend` — STATUS: [ ] ready
 - `Rani: ACCEPTED — Features Phase — starting FEA-9 — feat/features-phase/fea-9-engine-selector-rosetta-ui` — STATUS: [ ] ready

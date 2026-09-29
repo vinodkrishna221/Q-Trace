@@ -165,3 +165,6 @@ Skeleton **25 Aug 09:00** · Risky-feature **27 Aug 18:00** · Feature + video s
 
 - 29 Sep 11:05 Orion: Features Phase Cards (FEA-1 through FEA-14) distributed across all 6 team members in missions/ and MISSION-MAP.md — 13 atomic cards (38h total load) covering F1 Grover Curriculum/Scrubber, F2 Invariant Linter, F3 Tri-Engine Conformance, F4 NISQ Noise/Q-Sphere, and F5 Socratic Grading Engine; FEA-1 identified as critical path gate.
 
+- 29 Sep 11:30 Uday: FEA-2 green (feat/features-phase/fea-2-linter-backend) — Quantum Invariant Linter backend implemented in apps/api/app/services/quantum/linter.py (QI-1 post-collapse unitary [WARNING], QI-2 no-cloning violation [INFO], QI-3 controlled wire collision [ERROR]); extended ParseQiskitResponse and added POST /v1/circuits/lint endpoint in apps/api/app/routers/circuits.py; 18/18 unit tests passed in test_linter.py (64/64 regression passed); PR ready for Warden review. Unblocks FEA-5, FEA-14.
+
+

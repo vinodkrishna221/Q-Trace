@@ -16,9 +16,28 @@ No quantum SDK import anywhere in this module.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+
+
+# ---------------------------------------------------------------------------
+# Linting types (FEA-2 / F2 Quantum Invariant Linter)
+# ---------------------------------------------------------------------------
+
+class LintSeverity(str, Enum):
+    ERROR = "ERROR"
+    WARNING = "WARNING"
+    INFO = "INFO"
+
+
+class LintWarning(BaseModel):
+    rule: str
+    severity: LintSeverity
+    qubit: int | None = None
+    column: int
+    opId: str
+    message: str
 
 
 # ---------------------------------------------------------------------------
@@ -216,10 +235,11 @@ class ParseQiskitRequest(BaseModel):
 class ParseQiskitResponse(BaseModel):
     """POST /v1/circuits/parse-qiskit 200 response.
 
-    Contract: { circuitModel: CircuitModel, warnings: list[str] }
+    Contract: { circuitModel: CircuitModel, warnings: list[str], lintWarnings: list[LintWarning] }
     """
     circuitModel: CircuitModel
     warnings: list[str] = Field(default_factory=list)
+    lintWarnings: list[LintWarning] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -243,3 +263,24 @@ class ExportOpenQasm3Response(BaseModel):
     openQasm3: str
     lossy: bool
     warnings: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# FEA-2: Lint-Circuit request / response (F2 Quantum Invariant Linter)
+# ---------------------------------------------------------------------------
+
+class LintCircuitRequest(BaseModel):
+    """POST /v1/circuits/lint request body.
+
+    Contract: { circuitModel: CircuitModel | dict[str, Any] }
+    """
+    circuitModel: CircuitModel | dict[str, Any]
+
+
+class LintCircuitResponse(BaseModel):
+    """POST /v1/circuits/lint 200 response.
+
+    Contract: { lintWarnings: list[LintWarning] }
+    """
+    lintWarnings: list[LintWarning] = Field(default_factory=list)
+
