@@ -127,6 +127,7 @@ class AerResult:
     probabilities: dict[str, float] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)
     durationMs: int = 0
+    finalStatevector: list[complex] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -280,6 +281,7 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
     # ------------------------------------------------------------------
     trace_steps: list[StateTraceStep] = []
     step_index = 0
+    last_sv: list[complex] = []
 
     # We build the circuit incrementally to capture statevector after each gate
     qr = QuantumRegister(n_qubits, "q")
@@ -300,6 +302,7 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
 
         # Convert numpy complex to Python complex
         sv_list: list[complex] = [complex(a) for a in sv]
+        last_sv = sv_list
 
         # Validate no NaN/Infinity in statevector
         for idx, amp in enumerate(sv_list):
@@ -377,11 +380,16 @@ def run_qiskit_aer(circuit: CircuitModel, shots: int = 1024) -> AerResult:
     t_end = time.monotonic()
     duration_ms = int((t_end - t_start) * 1000)
 
+    if not last_sv:
+        dim = 2 ** n_qubits
+        last_sv = [complex(1.0, 0.0)] + [complex(0.0, 0.0)] * (dim - 1)
+
     return AerResult(
         stateTrace=trace_steps,
         probabilities=ideal_probs,
         counts=counts,
         durationMs=duration_ms,
+        finalStatevector=last_sv,
     )
 
 

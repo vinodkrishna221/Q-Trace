@@ -145,7 +145,7 @@ FEA-14 (Cross-Feature Contract & Golden Fixtures — grading-assessment.md + gol
 - `Rajeswari: ACCEPTED — Features Phase — starting FEA-4 — feat/features-phase/fea-4-grover-amplitude-scrubber` — STATUS: [x] done
 - `Uday Rohit: ACCEPTED — Features Phase — starting FEA-2 — feat/features-phase/fea-2-linter-backend` — STATUS: [x] done
 - `Uday Rohit: ACCEPTED — Features Phase — starting FEA-5 — feat/features-phase/fea-5-linter-frontend` — STATUS: [ ] ready
-- `Rani: ACCEPTED — Features Phase — starting FEA-8 — feat/features-phase/fea-8-cirq-adapter-backend` — STATUS: [ ] ready
+- `Rani: ACCEPTED — Features Phase — starting FEA-8 — feat/features-phase/fea-8-cirq-adapter-backend` — STATUS: [x] done
 - `Rani: ACCEPTED — Features Phase — starting FEA-9 — feat/features-phase/fea-9-engine-selector-rosetta-ui` — STATUS: [ ] ready
 - `Venu Gopal: ACCEPTED — Features Phase — starting FEA-10 — feat/features-phase/fea-10-nisq-noise-backend` — STATUS: [ ] ready
 - `Venu Gopal: ACCEPTED — Features Phase — starting FEA-11 — feat/features-phase/fea-11-noise-toggle-qsphere-ui` — STATUS: [ ] ready

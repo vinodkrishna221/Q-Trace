@@ -25,6 +25,8 @@ import os
 import uuid
 from datetime import datetime, timezone
 
+import numpy as np
+
 from app.models.simulation import (
     BlochVectorOut,
     ComplexValue,
@@ -156,6 +158,93 @@ def build_simulation_run(
             skippedReason="PENNYLANE_NOT_REQUESTED",
         )
 
+    # --- Multi-Engine Execution & Conformance (FEA-8) -------------------------
+    conformance_results: dict[str, Any] = {}
+    engine_svs: dict[str, np.ndarray] = {}
+
+    # Normalize requested backend identifiers
+    raw_backends = getattr(request, "backends", None) or ["qiskit"]
+    req_backends = [b.lower().strip() for b in raw_backends]
+    req_backends = ["qiskit" if b in ("qiskit_aer", "aer") else b for b in req_backends]
+
+    # Always ensure qiskit statevector is recorded
+    if aer_result.finalStatevector:
+        qk_sv = np.asarray(aer_result.finalStatevector, dtype=complex)
+    else:
+        dim = 2 ** request.circuitModel.qubitCount
+        qk_sv = np.zeros(dim, dtype=complex)
+        qk_sv[0] = 1.0
+
+    if "qiskit" in req_backends:
+        engine_svs["qiskit"] = qk_sv
+        conformance_results["qiskit"] = {
+            "statevector": [{"re": float(c.real), "im": float(c.imag)} for c in qk_sv],
+            "durationMs": aer_result.durationMs,
+        }
+
+    # Parallel execution for Cirq and PennyLane via ThreadPoolExecutor
+    other_backends = [b for b in req_backends if b in ("cirq", "pennylane")]
+    if other_backends:
+        from concurrent.futures import ThreadPoolExecutor
+
+        futures = {}
+        with ThreadPoolExecutor(max_workers=max(1, len(other_backends))) as executor:
+            if "cirq" in other_backends:
+                from app.services.quantum.cirq_adapter import run_cirq  # noqa: PLC0415
+
+                futures["cirq"] = executor.submit(run_cirq, request.circuitModel)
+            if "pennylane" in other_backends:
+                from app.services.quantum.pennylane_adapter import (  # noqa: PLC0415
+                    run_pennylane_statevector,
+                )
+
+                futures["pennylane"] = executor.submit(
+                    run_pennylane_statevector, request.circuitModel
+                )
+
+        for backend_name, fut in futures.items():
+            try:
+                res = fut.result()
+                sv_list = res.get("statevector", [])
+                sv_arr = np.asarray(sv_list, dtype=complex)
+                engine_svs[backend_name] = sv_arr
+                conformance_results[backend_name] = {
+                    "statevector": [
+                        {"re": float(c.real), "im": float(c.imag)} for c in sv_arr
+                    ],
+                    "durationMs": res.get("durationMs", 1),
+                }
+            except Exception as exc:
+                logger.warning(
+                    "sim_service.multi_engine_error backend=%s error=%s",
+                    backend_name,
+                    exc,
+                )
+                conformance_results[backend_name] = {
+                    "statevector": [],
+                    "durationMs": 0,
+                    "error": str(exc),
+                }
+
+    # Compute maximum pairwise L2 delta across all successful engine statevectors
+    max_delta = 0.0
+    valid_sv_backends = list(engine_svs.keys())
+    if len(valid_sv_backends) >= 2:
+        for i in range(len(valid_sv_backends)):
+            for j in range(i + 1, len(valid_sv_backends)):
+                sv_a = engine_svs[valid_sv_backends[i]]
+                sv_b = engine_svs[valid_sv_backends[j]]
+                if len(sv_a) == len(sv_b):
+                    delta = float(np.linalg.norm(sv_a - sv_b))
+                    if delta > max_delta:
+                        max_delta = delta
+
+    failed_backends = [b for b in other_backends if b not in engine_svs]
+    if failed_backends:
+        conformance_badge = "DIVERGED"
+    else:
+        conformance_badge = "VERIFIED" if max_delta <= 1e-6 else "DIVERGED"
+
     return SimulationRunOut(
         id=f"sr_{uuid.uuid4().hex[:12]}",
         learnerProfileId=request.learnerProfileId,
@@ -170,5 +259,9 @@ def build_simulation_run(
         conformance=conformance,
         durationMs=aer_result.durationMs,
         createdAt=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        conformanceResults=conformance_results if conformance_results else None,
+        conformanceDelta=max_delta,
+        conformanceBadge=conformance_badge,
     )
+
 
