@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Trace Architecture & User Flow Diagrams</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #07090E;
+    --bg-secondary: #0F172A;
+    --border-color: rgba(56, 189, 248, 0.25);
+    --text-primary: #F1F5F9;
+    --text-muted: #94A3B8;
+    --accent-cyan: #38BDF8;
+    --accent-purple: #C084FC;
+    --accent-emerald: #34D399;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 30px;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #38BDF8, #818CF8, #C084FC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  p.subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .badges {
+    display: flex;
+    gap: 8px;
+  }
+  .badge {
+    background: rgba(14, 165, 233, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: var(--accent-cyan);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 35px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  .card-header {
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .card-subtitle {
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .mermaid-wrapper {
+    background: #0B0F19;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .mermaid {
+    width: 100%;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>⚛️ Q-Trace: Technical Architecture & User Flows</h1>
+      <p class="subtitle">Official System Architecture & Pedagogical User Journey | SIH26140 Specification</p>
+    </div>
+    <div class="badges">
+      <span class="badge">Mermaid v10</span>
+      <span class="badge" style="color: var(--accent-purple); border-color: rgba(192, 132, 252, 0.4);">National Quantum Mission</span>
+    </div>
+  </header>
+
+  <!-- DIAGRAM 1: FULL ARCHITECTURE -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">1. End-to-End System Architecture</div>
+        <div class="card-subtitle">Client Tier, FastAPI Gateway, Multi-Engine Quantum Runtime, Evidence-Bound AI, and National DPI Tier</div>
+      </div>
+    </div>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+flowchart TD
+  subgraph CLIENT["Client Tier (Next.js 15 + React 19 App Router)"]
+    SHELL["Learner Shell & Nav"]
+    PATH["Gamified Learning Path (ChamberNodes)"]
+    WORKSPACE["Circuit Workspace (dnd-kit + CodeMirror 6)"]
+    LINTER["Live Quantum Invariant Linter (QI-1, QI-2, QI-3)"]
+    PRED_UI["Prediction Checkpoint Modal"]
+    VIS_EVID["Visual Evidence (State Trace, Bloch, Q-Sphere)"]
+    RECORDER_UI["Quantum Flight Recorder UI"]
+    TUTOR_UI["Socratic Tutor UI & Counterexample Panel"]
+    INSTRUCTOR_UI["Instructor Failure Topology Dashboard"]
+  end
+
+  subgraph API_GATEWAY["API Gateway & Security Boundary (FastAPI Monolith)"]
+    REQ_MID["RequestID & Observability Middleware"]
+    AST_SEC["AST Code Security Sandbox (Closed Grammar Allowlist)"]
+    CIRCUIT_ROUTER["Circuit Router (OpenQASM 3.0 Exporter)"]
+    SIM_ROUTER["Simulation Router (POST /v1/simulation-runs)"]
+    FLIGHT_ROUTER["Flight Recorder Router (/v1/flight-recorder)"]
+    TUTOR_ROUTER["Tutor Router (/v1/tutor/chat)"]
+    PROG_ROUTER["Progress & Assessment Router (/v1/challenge-attempts)"]
+    INSIGHT_ROUTER["Instructor Analytics Router (/v1/instructor-insights)"]
+  end
+
+  subgraph QUANTUM_RUNTIME["Quantum Simulation Runtime Engine"]
+    MODEL_VAL["Circuit Model Pydantic Validator"]
+    ROSETTA["Endianness Rosetta Stone & Normalizer"]
+    QISKIT_AER["Qiskit Aer Simulator (Statevector + Density Matrix)"]
+    PENNYLANE["PennyLane Conformance Adapter (default.qubit)"]
+    CIRQ["Google Cirq Multi-Backend Conformance Adapter"]
+    NOISE["NISQ Noise Emulator (T1/T2 Relaxation + Readout Error)"]
+    STATE_TRACE["Step-by-Step State Trace Engine"]
+  end
+
+  subgraph AI_PEDAGOGY["Evidence-Bound AI Pedagogy & Grading"]
+    MISCON_MATRIX["40+ Misconception Decision Matrix"]
+    CLAIM_VAL["Deterministic Claim Validator (Zero-Hallucination Guard)"]
+    SOCRATIC_GEN["Socratic Counterexample Generator"]
+    LLM_ADAPTER["LLM Provider Gateway (Gemini / Claude / GPT-4o)"]
+    FALLBACK_RES["Curated Pedagogical Reserve (Offline Fallback)"]
+  end
+
+  subgraph PERSISTENCE["Data & Persistence Layer"]
+    REPO_IF["Typed Repository Interface"]
+    MONGO_DB[("MongoDB Atlas M30 (26 Collection Indexes)")]
+    IN_MEM_STORE[("Deterministic In-Memory Seed Store (DEMO_LOCAL=1)")]
+  end
+
+  subgraph DPI_INTEGRATION["National DPI & Sovereign Cloud Tier"]
+    NKN["National Knowledge Network (NKN Edge Caching)"]
+    MEGHRAJ["NIC MeghRaj GovCloud"]
+    SWAYAM["SWAYAM & DIKSHA Syndication"]
+    NAD["National Academic Depository (NAD / DigiLocker)"]
+    INDIGENOUS_QPU["Indigenous QPU Hardware Adapters (NQM Labs)"]
+  end
+
+  WORKSPACE --> AST_SEC
+  PRED_UI --> SIM_ROUTER
+  WORKSPACE --> CIRCUIT_ROUTER
+  WORKSPACE --> SIM_ROUTER
+  RECORDER_UI --> FLIGHT_ROUTER
+  TUTOR_UI --> TUTOR_ROUTER
+  PATH --> PROG_ROUTER
+  INSTRUCTOR_UI --> INSIGHT_ROUTER
+
+  AST_SEC --> MODEL_VAL
+  CIRCUIT_ROUTER --> MODEL_VAL
+  SIM_ROUTER --> MODEL_VAL
+  MODEL_VAL --> ROSETTA
+  ROSETTA --> QISKIT_AER
+  ROSETTA --> PENNYLANE
+  ROSETTA --> CIRQ
+  QISKIT_AER --> NOISE
+  NOISE --> STATE_TRACE
+  STATE_TRACE --> SIM_ROUTER
+  SIM_ROUTER --> VIS_EVID
+
+  FLIGHT_ROUTER --> MISCON_MATRIX
+  STATE_TRACE -. Numeric Evidence .-> MISCON_MATRIX
+  MISCON_MATRIX --> SOCRATIC_GEN
+  TUTOR_ROUTER --> CLAIM_VAL
+  CLAIM_VAL --> LLM_ADAPTER
+  LLM_ADAPTER -. Intercept Hallucination .-> CLAIM_VAL
+  CLAIM_VAL -. If Offline / Error .-> FALLBACK_RES
+  CLAIM_VAL --> TUTOR_UI
+
+  PROG_ROUTER --> REPO_IF
+  INSIGHT_ROUTER --> REPO_IF
+  SIM_ROUTER --> REPO_IF
+  REPO_IF --> MONGO_DB
+  REPO_IF -. Local Mode .-> IN_MEM_STORE
+
+  API_GATEWAY -. Hosted On .-> MEGHRAJ
+  CLIENT -. Low Latency Peering .-> NKN
+  CLIENT -. Course Embeds .-> SWAYAM
+  PROG_ROUTER -. Issue Micro-Credentials .-> NAD
+  ROSETTA -. Hardware Horizon .-> INDIGENOUS_QPU
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGRAM 2: CORE LEARNER USERFLOW -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">2. Core Learner User Flow: "Predict → Simulate → Inspect → Repair"</div>
+        <div class="card-subtitle">Autonomous pedagogical loop with causal misconception detection and Socratic repair</div>
+      </div>
+    </div>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+flowchart TD
+  START([Learner Enters Q-Trace Platform]) --> SELECT_PATH[Select Unit on Gamified Learning Path]
+  SELECT_PATH --> VIEW_CHALLENGE[Read Quantum Challenge Objective e.g. Bell State Creation]
+
+  VIEW_CHALLENGE --> PREDICT_MODAL{Prediction Checkpoint}
+  PREDICT_MODAL -->|Learner Declares Hypothesis| RECORD_PRED[Record Intuition: e.g. Independent 50/50 Outcomes]
+
+  RECORD_PRED --> BUILD_CIRCUIT[Construct Quantum Circuit in Workspace]
+  BUILD_CIRCUIT -->|Drag and Drop Gates or Type Code| LIVE_LINT{Live Invariant Linter}
+
+  LIVE_LINT -->|QI-1 Post-Collapse Violation| LINT_ERR[Show Warning: Gate placed after measurement wire]
+  LINT_ERR --> BUILD_CIRCUIT
+  LIVE_LINT -->|Valid Quantum Invariants| RUN_SIM[Click 'Simulate & Flight Record']
+
+  RUN_SIM --> AST_CHECK{AST Security Sandbox}
+  AST_CHECK -->|Disallowed Syntax| REJECT_CODE[Display Security Rejection Notice]
+  REJECT_CODE --> BUILD_CIRCUIT
+
+  AST_CHECK -->|Allowlisted Python/Circuit| EXEC_SIM[FastAPI executes Qiskit Aer / PennyLane]
+  EXEC_SIM --> INSPECT_EVID[Inspect Visual Evidence: Histogram, Phase Discs, Q-Sphere]
+
+  INSPECT_EVID --> SCRUB_TRACE[Scrub State Trace Step-by-Step with Flight Recorder]
+  SCRUB_TRACE --> COMPARE_PRED{Causal Flight Recorder Evaluation}
+
+  COMPARE_PRED -->|Simulation Matches Prediction| SUCCESS_BRANCH[Learner Demonstrated Accurate Intuition]
+  SUCCESS_BRANCH --> AWARD_BADGE[Award Algorithmic Mastery Badge & Increment Streak]
+  AWARD_BADGE --> NEXT_NODE([Unlock Next ChamberNode in Learning Path])
+
+  COMPARE_PRED -->|Conceptual Divergence Detected| DIAGNOSE_MISCON[Identify Misconception Signal e.g. SUPERPOSITION_VS_ENTANGLEMENT]
+  DIAGNOSE_MISCON --> SOCRATIC_TUTOR[Evidence-Bound Socratic AI Tutor Opens]
+  SOCRATIC_TUTOR --> COUNTER_EXAMPLE[Generate Minimal Socratic Counterexample Circuit]
+  COUNTER_EXAMPLE --> REPAIR_CHALLENGE[Learner Accepts Targeted Repair Challenge]
+  REPAIR_CHALLENGE --> FIX_CIRCUIT[Apply Correction: Add CNOT Gate to entangle Q0 and Q1]
+  FIX_CIRCUIT --> RE_EVALUATE{Automated Linear Algebra Grader}
+
+  RE_EVALUATE -->|Still Incomplete| HINT_LOOP[Provide Guided Socratic Hint based on Trace State]
+  HINT_LOOP --> REPAIR_CHALLENGE
+
+  RE_EVALUATE -->|Challenge Solved| UPDATE_PROGRESS[Update Progress Record & Resolve Misconception]
+  UPDATE_PROGRESS --> NOTIFY_INSTRUCTOR[Sync to Cohort Topology: Misconception Resolved]
+  NOTIFY_INSTRUCTOR --> NEXT_NODE
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGRAM 3: INSTRUCTOR FEEDBACK LOOP -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">3. Instructor Cohort Analytics & 1-Click Remediation Flow</div>
+        <div class="card-subtitle">Sequence of telemetry capture, heatmap visualization, and targeted lab dispatch</div>
+      </div>
+    </div>
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+sequenceDiagram
+  autonumber
+  actor Learner as Student (Aarav)
+  participant UI as Q-Trace Learner Shell
+  participant API as FastAPI Backend & Engine
+  participant DB as MongoDB Atlas / Telemetry
+  actor Faculty as Instructor (Dr. Rao)
+  participant Dash as Instructor Failure Topology Dashboard
+
+  Note over Learner, UI: Learner attempts Bell State Module
+  Learner->>UI: Enters incorrect Prediction (Independent Random)
+  Learner->>UI: Simulates circuit without CNOT entangling gate
+  UI->>API: POST /v1/flight-recorder/diagnose
+  API->>API: Detects SUPERPOSITION_VS_ENTANGLEMENT
+  API->>DB: Log Misconception Signal + Student Attempt
+
+  Note over Faculty, Dash: Instructor reviews live class telemetry
+  Faculty->>Dash: Opens Cohort Analytics for "Quantum Foundations A"
+  Dash->>API: GET /v1/instructor-insights/demo-cohort
+  API->>DB: Query aggregated misconception heatmaps
+  DB-->>API: Return cohort clusters: 64% confused on Entanglement
+  API-->>Dash: Render Failure Topology Heatmap
+
+  Note over Faculty, Dash: 1-Click Remedial Intervention
+  Faculty->>Dash: Reviews identified misconception cluster
+  Faculty->>Dash: Clicks "Dispatch 1-Click Remedial Repair Lab"
+  Dash->>API: POST /v1/instructor/dispatch-remedy
+  API->>DB: Push Targeted Entanglement Repair Challenge to cohort
+
+  Note over Learner, UI: Student receives real-time guided lab
+  API-->>UI: Real-time notification: "New Remedial Lab Dispatched by Dr. Rao"
+  Learner->>UI: Completes Socratic Repair Lab
+  UI->>API: POST /v1/challenge-attempts
+  API->>DB: Update Learner Progress & Clear Misconception Flag
+  DB-->>Dash: Cohort Entanglement Mastery increases from 36% to 92%
+  Faculty->>Dash: Observes validated learning outcome improvement
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#0B0F19',
+      primaryColor: '#1E293B',
+      primaryTextColor: '#F1F5F9',
+      primaryBorderColor: '#38BDF8',
+      lineColor: '#38BDF8',
+      secondaryColor: '#334155',
+      tertiaryColor: '#0F172A',
+      fontSize: '13px'
+    }
+  });
+</script>
+</body>
+</html>
